@@ -1,0 +1,452 @@
+:root {
+  --primary-color: #d90429;
+  --primary-hover-color: #b30322;
+  --dark-bg: #212529;
+  --light-bg: #f8f9fa;
+  --surface-color: #ffffff;
+  --text-primary: #212529;
+  --text-secondary: #6c757d;
+  --border-color: #dee2e6;
+  --white: #fff;
+  --success-color: #28a745;
+  --error-color: #dc3545;
+  --font-family: 'Roboto', sans-serif;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --border-radius: 8px;
+}
+
+body {
+  font-family: var(--font-family);
+  margin: 0;
+  background-color: var(--light-bg);
+  color: var(--text-primary);
+}
+
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+#sidebar {
+  width: 250px;
+  background-color: var(--dark-bg);
+  color: var(--white);
+  padding: 20px;
+  box-shadow: var(--shadow-md);
+  flex-shrink: 0;
+}
+
+.sidebar-header h2 {
+  margin: 0 0 20px 0;
+  text-align: center;
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+.sidebar-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-nav li {
+  padding: 15px 10px;
+  cursor: pointer;
+  border-radius: var(--border-radius);
+  transition: background-color 0.2s ease, color 0.2s ease;
+  font-weight: 500;
+}
+
+.sidebar-nav li:hover {
+  background-color: rgba(217, 4, 41, 0.5);
+}
+
+.sidebar-nav li.active {
+  background-color: var(--primary-color);
+  color: var(--white);
+  font-weight: 700;
+}
+
+#main-content {
+  flex-grow: 1;
+  padding: 40px;
+  overflow-y: auto;
+}
+
+.content-card {
+  background-color: var(--surface-color);
+  padding: 30px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  margin-bottom: 25px;
+}
+
+.content-card h1 {
+  margin-top: 0;
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 10px;
+}
+
+.content-card h3 {
+    color: var(--primary-color);
+}
+
+.content-card h4 {
+    font-weight: 700;
+    margin-top: 20px;
+}
+
+.content-card ul {
+  line-height: 1.8;
+  padding-left: 20px;
+}
+
+.content-card ul li, .content-card ol li {
+  margin-bottom: 10px;
+}
+
+.script {
+    background-color: #f8f9fa;
+    border-left: 4px solid var(--primary-color);
+    padding: 15px;
+    margin: 20px 0;
+    font-style: italic;
+    color: #495057;
+    position: relative;
+}
+
+/* Shingle Comparison Styles */
+.shingle-comparison {
+    display: flex;
+    gap: 30px;
+    align-items: stretch; /* Make cards equal height */
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 25px;
+}
+
+.shingle-type {
+    flex: 1;
+    min-width: 300px;
+    max-width: 420px;
+    background-color: var(--light-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+    text-align: left; /* Key fix for readability */
+    display: flex;
+    flex-direction: column;
+}
+
+.shingle-type h4 {
+    text-align: center;
+    margin-top: 0;
+    font-size: 1.2rem;
+}
+
+.shingle-comparison img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--border-radius);
+    margin-bottom: 15px;
+}
+
+
+/* Speak Button */
+.speak-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin: 0;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.speak-btn:hover {
+    color: var(--primary-hover-color);
+}
+
+
+/* --- Game Styles --- */
+.game-container {
+    background-color: var(--light-bg);
+    padding: 20px;
+    border-radius: var(--border-radius);
+    margin-top: 20px;
+}
+
+.game-instructions {
+    font-weight: 500;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.game-board {
+    display: flex;
+    justify-content: space-around;
+    gap: 20px;
+}
+
+.game-column {
+    flex: 1;
+    min-width: 200px;
+}
+.game-column h4 {
+    text-align: center;
+    margin-bottom: 15px;
+}
+.draggable-item {
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    border-radius: var(--border-radius);
+    cursor: grab;
+    transition: box-shadow 0.2s ease, opacity 0.2s ease;
+    user-select: none;
+}
+.draggable-item:active {
+    cursor: grabbing;
+    box-shadow: var(--shadow-md);
+}
+.draggable-item.dragging {
+    opacity: 0.5;
+}
+
+.drop-zone, .drop-zone-sort {
+    background-color: #e9ecef;
+    border: 2px dashed var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 15px;
+    min-height: 100px;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.drop-zone .response-text {
+    color: var(--text-secondary);
+    font-style: italic;
+    text-align: center;
+}
+.drop-zone .draggable-item {
+    cursor: default;
+    background-color: #d4edda;
+    border-color: var(--success-color);
+}
+.drop-zone.correctly-matched {
+     border-color: var(--success-color);
+     border-style: solid;
+}
+
+.drop-zone-sort .draggable-item {
+    cursor: default;
+}
+
+
+.drop-zone.drag-over, .drop-zone-sort.drag-over {
+    background-color: #cfe2ff;
+    border-color: #9ec5fe;
+}
+
+.feedback-message {
+    text-align: center;
+    font-weight: bold;
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: var(--border-radius);
+}
+.feedback-message.correct {
+    background-color: var(--success-color);
+    color: white;
+}
+.feedback-message.incorrect {
+    background-color: var(--error-color);
+    color: white;
+}
+
+
+/* --- Role Play Simulator --- */
+#chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 60vh;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+#chat-messages {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+}
+
+.chat-message {
+    max-width: 80%;
+    padding: 10px 15px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+.ai-message {
+    background-color: #e9ecef;
+    color: var(--text-primary);
+    align-self: flex-start;
+    border-bottom-left-radius: 3px;
+}
+
+.user-message {
+    background-color: var(--primary-color);
+    color: white;
+    align-self: flex-end;
+    margin-left: auto;
+    border-bottom-right-radius: 3px;
+}
+
+#chat-input-area {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid var(--border-color);
+    background-color: var(--surface-color);
+}
+
+#chat-input {
+    flex-grow: 1;
+    padding: 10px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    margin-right: 10px;
+    font-size: 1rem;
+}
+
+#send-button {
+    margin: 0;
+    padding: 10px 20px;
+}
+
+
+/* Quiz Styles */
+#quiz-container {
+    max-width: 700px;
+    margin: auto;
+}
+.quiz-item {
+    margin-bottom: 2rem;
+}
+.quiz-question {
+  font-size: 1.2em;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+.quiz-options {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.quiz-options li {
+  background-color: var(--light-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 15px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.quiz-options li:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+}
+.quiz-options li.selected {
+  background-color: #cfe2ff;
+  border-color: #9ec5fe;
+  font-weight: bold;
+}
+.quiz-feedback {
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  text-align: center;
+}
+.quiz-feedback.correct {
+  background-color: #d4edda;
+  color: #155724;
+}
+.quiz-feedback.incorrect {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+#loader {
+  text-align: center;
+  font-size: 1.2em;
+  padding: 40px;
+}
+button {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 14px 24px;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  transition: background-color 0.3s ease, box-shadow 0.2s ease;
+  display: block;
+  margin: 20px auto 0;
+}
+button:hover {
+  background-color: var(--primary-hover-color);
+}
+button:disabled {
+  background-color: #ced4da;
+  cursor: not-allowed;
+}
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+  }
+  #sidebar {
+    width: 100%;
+    height: auto;
+    box-shadow: none;
+  }
+  #main-content {
+    padding: 20px;
+  }
+}
+
+/* Minimal styles for new UI elements */
+.profile-cards { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
+.profile-card { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); background: var(--light-bg); width: 220px; }
+.profile-card .avatar { width: 64px; height: 64px; border-radius: 50%; background: #cfe2ff; display: flex; align-items: center; justify-content: center; font-weight: 700; overflow: hidden; }
+.profile-card .avatar img { width: 100%; height: 100%; object-fit: cover; }
+.commitment-gate label { display: block; margin: 8px 0; }
+.exam-section { margin: 16px 0; }
+.exam-item { padding: 8px 0; }
+
+/* Role-play controls */
+.rp-controls { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.rp-controls label { display: flex; align-items: center; gap: 6px; }
+.rp-actions { display: flex; gap: 8px; justify-content: flex-start; margin: 10px 0; }
+
+/* Modal styles */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+.modal-overlay.show { display: flex; }
+.modal { background: #fff; color: #222; border-radius: 12px; max-width: 720px; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,.2); overflow: hidden; }
+.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--light-bg); border-bottom: 1px solid var(--border-color); }
+.modal-header h3 { margin: 0; font-size: 18px; }
+.modal-close { background: transparent; color: #333; border: none; font-size: 22px; line-height: 1; cursor: pointer; padding: 4px 8px; }
+.modal-body { display: grid; grid-template-columns: 160px 1fr; gap: 16px; padding: 16px; }
+.modal-body img { width: 160px; height: 160px; object-fit: cover; border-radius: 8px; }
+@media (max-width: 560px) { .modal-body { grid-template-columns: 1fr; } .modal-body img { width: 100%; height: auto; } }
