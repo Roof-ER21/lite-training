@@ -1,0 +1,159 @@
+╔══════════════════════════════════════════════════════════════════════╗
+║                PHASE 4: QUICK INTEGRATION GUIDE                      ║
+║              Real-Time Feedback Panel - 5 Minute Setup               ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+STEP 1: Open index.tsx
+─────────────────────────────────────────────────────────────────────
+Location: /Users/a21/Downloads/Lite Training/index.tsx
+
+
+STEP 2: Find displayScenario() function (around line 2097)
+─────────────────────────────────────────────────────────────────────
+Look for:
+  function displayScenario(scenario: any) {
+    ...
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit Response';
+    }
+  }  ← ADD CODE HERE (just before this closing brace)
+
+
+STEP 3: Add these lines at the END of displayScenario()
+─────────────────────────────────────────────────────────────────────
+COPY AND PASTE:
+
+    // Initialize live feedback panel with scenario key points
+    initializeLiveFeedback(scenario);
+
+    // Set up real-time feedback listener
+    if (responseTextarea) {
+      responseTextarea.removeEventListener('input', handleLiveFeedbackUpdate);
+      responseTextarea.addEventListener('input', handleLiveFeedbackUpdate);
+    }
+
+
+STEP 4: Copy ALL functions from live-feedback-functions.js
+─────────────────────────────────────────────────────────────────────
+Location: /Users/a21/Downloads/Lite Training/live-feedback-functions.js
+
+PASTE them right AFTER the displayScenario() function (around line 2117)
+
+Functions to copy:
+  ✓ initializeLiveFeedback(scenario)
+  ✓ handleLiveFeedbackUpdate(event)
+  ✓ updateLiveScore(score)
+  ✓ updateKeyPointsLive(matchedPoints, allPoints)
+  ✓ analyzeTone(text)
+  ✓ updateToneIndicator(tone)
+  ✓ analyzeConfidence(text)
+  ✓ updateConfidenceLevel(confidence)
+  ✓ updateWordCount(count)
+  ✓ setupFeedbackPanelToggle()
+
+
+STEP 5: Find roleplay initialization (around line 2405)
+─────────────────────────────────────────────────────────────────────
+Look for:
+  setupRoleSelection();
+  setupPersonalitySelection();
+
+  ← ADD CODE HERE (after these lines)
+
+
+STEP 6: Add this line after setupPersonalitySelection()
+─────────────────────────────────────────────────────────────────────
+COPY AND PASTE:
+
+  // Initialize feedback panel toggle
+  setupFeedbackPanelToggle();
+
+
+STEP 7: Save and test
+─────────────────────────────────────────────────────────────────────
+✓ Save index.tsx
+✓ Refresh browser
+✓ Navigate to Role-Play module
+✓ Select any role and personality
+✓ Start typing - watch live feedback appear!
+
+
+═══════════════════════════════════════════════════════════════════════
+                         WHAT TO EXPECT
+═══════════════════════════════════════════════════════════════════════
+
+When you start typing your response:
+  ✓ Score circle updates from 0 as you type
+  ✓ Checkmarks appear next to key points you mention
+  ✓ Tone bar changes color (Green/Gray/Red)
+  ✓ Confidence meter fills based on your language
+  ✓ Word count updates in real-time
+
+Panel is on the RIGHT side (desktop) or TOP (mobile)
+
+Click the [-] button to collapse the panel
+Click the [+] button to expand it again
+
+
+═══════════════════════════════════════════════════════════════════════
+                           TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════════════
+
+Panel not appearing?
+  → Check browser console for errors
+  → Verify HTML structure in index.tsx (lines 1157-1227)
+  → Make sure scenario-display div is visible
+
+Score not updating?
+  → Verify all functions were copied correctly
+  → Check if event listener is attached to textarea
+  → Ensure scenario has expectedKeyPoints array
+
+Styling looks broken?
+  → Clear browser cache (Ctrl+Shift+Delete)
+  → Hard refresh (Ctrl+F5 or Cmd+Shift+R)
+  → Check index.css has lines 520-846
+
+
+═══════════════════════════════════════════════════════════════════════
+                      VERIFY CSS & HTML ARE IN PLACE
+═══════════════════════════════════════════════════════════════════════
+
+CSS: /Users/a21/Downloads/Lite Training/index.css
+  ✓ Check lines 520-846 exist
+  ✓ Look for /* Live Feedback Panel */ comment
+  ✓ Should have ~327 lines of CSS
+
+HTML: /Users/a21/Downloads/Lite Training/index.tsx
+  ✓ Check lines 1157-1227
+  ✓ Look for <div class="roleplay-container-with-feedback">
+  ✓ Look for <div id="live-feedback-panel">
+
+
+═══════════════════════════════════════════════════════════════════════
+                           NEED MORE HELP?
+═══════════════════════════════════════════════════════════════════════
+
+Read full documentation:
+  → PHASE_4_INSTALLATION_GUIDE.md  (Detailed instructions)
+  → PHASE_4_VISUAL_GUIDE.md        (Visual diagrams)
+  → PHASE_4_SUMMARY.md             (Complete overview)
+
+All files in: /Users/a21/Downloads/Lite Training/
+
+
+═══════════════════════════════════════════════════════════════════════
+                           INTEGRATION TIME
+═══════════════════════════════════════════════════════════════════════
+
+  ⏱️  Step 1-2: Finding locations           1 minute
+  ⏱️  Step 3:   Adding initialization       1 minute
+  ⏱️  Step 4:   Copying functions           2 minutes
+  ⏱️  Step 5-6: Adding toggle setup         1 minute
+  ⏱️  Step 7:   Testing                    2-3 minutes
+  ────────────────────────────────────────────────────
+  ⏱️  TOTAL TIME:                         7-8 minutes
+
+
+Good luck! The live feedback panel will make training much more effective! 🎉
