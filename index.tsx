@@ -257,16 +257,99 @@ const trainingContent = {
   `,
   'role-play': `
     <div class="content-card">
-        <h1>AI Role-Play Simulator</h1>
-        <p>Practice your initial pitch with our AI Homeowner, "Alex". Type your opening line and press send. Alex will respond based on common homeowner personalities. Your goal is to get Alex to agree to a free inspection.</p>
-        <div id="chat-container">
-            <div id="chat-messages">
-                <div class="chat-message ai-message">Hi there. Can I help you?</div>
+        <h1>Agnes 21 Role-Play Training System</h1>
+        <div id="roleplay-live-region" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+        <!-- Screen 1: Role Selection -->
+        <div id="roleplay-setup" style="display: block;">
+            <h2>Select Your Training Role</h2>
+            <p>Choose a role to practice. Each role has multiple scenarios with AI-powered feedback.</p>
+            <div class="role-selection-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 30px 0;">
+                <button class="role-btn" data-role="homeowner" style="padding: 30px; border: 2px solid #8b4fbe; border-radius: 10px; background: linear-gradient(135deg, #8b4fbe 0%, #a370d1 100%); color: white; font-size: 18px; cursor: pointer; transition: all 0.3s;">
+                    <div style="font-size: 48px; margin-bottom: 10px;">🏠</div>
+                    <div style="font-weight: bold; margin-bottom: 10px;">Homeowner</div>
+                    <div style="font-size: 14px; opacity: 0.9;">Practice handling common objections and concerns</div>
+                </button>
+                <button class="role-btn" data-role="rep" style="padding: 30px; border: 2px solid #8b4fbe; border-radius: 10px; background: linear-gradient(135deg, #8b4fbe 0%, #a370d1 100%); color: white; font-size: 18px; cursor: pointer; transition: all 0.3s;">
+                    <div style="font-size: 48px; margin-bottom: 10px;">💼</div>
+                    <div style="font-weight: bold; margin-bottom: 10px;">Sales Rep</div>
+                    <div style="font-size: 14px; opacity: 0.9;">Refine your pitch and closing techniques</div>
+                </button>
+                <button class="role-btn" data-role="adjuster" style="padding: 30px; border: 2px solid #8b4fbe; border-radius: 10px; background: linear-gradient(135deg, #8b4fbe 0%, #a370d1 100%); color: white; font-size: 18px; cursor: pointer; transition: all 0.3s;">
+                    <div style="font-size: 48px; margin-bottom: 10px;">📋</div>
+                    <div style="font-weight: bold; margin-bottom: 10px;">Adjuster</div>
+                    <div style="font-size: 14px; opacity: 0.9;">Master technical documentation and negotiation</div>
+                </button>
             </div>
-            <div id="chat-input-area">
-                <input type="text" id="chat-input" placeholder="Type your pitch here...">
-                <button id="send-button">Send</button>
+        </div>
+
+        <!-- Screen 2: Scenario Display -->
+        <div id="scenario-display" style="display: none;">
+            <div id="scenario-progress" style="text-align: center; margin-bottom: 20px; font-weight: 500; color: #8b4fbe;"></div>
+            <div style="background: #f8f4fc; border-left: 4px solid #8b4fbe; padding: 20px; margin-bottom: 20px; border-radius: 5px;">
+                <h3 id="scenario-title" style="margin: 0 0 10px 0; color: #8b4fbe;">Scenario</h3>
+                <p id="scenario-context" style="margin: 0 0 15px 0; color: #555;"></p>
+                <div style="background: white; padding: 15px; border-radius: 5px; border: 1px solid #e0d4f0;">
+                    <strong style="color: #8b4fbe;">Agnes says:</strong>
+                    <p id="agnes-prompt" style="margin: 10px 0 0 0; font-style: italic;"></p>
+                </div>
             </div>
+
+            <div style="margin-bottom: 20px;">
+                <label for="user-response" style="display: block; font-weight: 500; margin-bottom: 10px;">Your Response:</label>
+                <textarea id="user-response" rows="6" style="width: 100%; padding: 15px; border: 2px solid #e0d4f0; border-radius: 5px; font-size: 16px; font-family: inherit;" placeholder="Type your response here..."></textarea>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button id="submit-response" style="flex: 1; padding: 15px 30px; background: #8b4fbe; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: 500; cursor: pointer;">Submit Response</button>
+                <button id="voice-input-btn" style="padding: 15px 30px; background: #f8f4fc; color: #8b4fbe; border: 2px solid #8b4fbe; border-radius: 5px; font-size: 16px; cursor: pointer;">🎤 Voice Input</button>
+                <button id="hint-btn" style="padding: 15px 30px; background: #f8f4fc; color: #8b4fbe; border: 2px solid #8b4fbe; border-radius: 5px; font-size: 16px; cursor: pointer;">💡 Hint</button>
+            </div>
+
+            <div id="hint-display" style="display: none; background: #fff9e6; border-left: 4px solid #ffc107; padding: 15px; margin-bottom: 20px; border-radius: 5px;"></div>
+        </div>
+
+        <!-- Screen 3: Feedback Display -->
+        <div id="feedback-area" style="display: none;">
+            <h2 style="text-align: center; color: #8b4fbe; margin-bottom: 30px;">Performance Feedback</h2>
+
+            <div style="text-align: center; margin-bottom: 30px;">
+                <div id="score-circle" style="display: inline-block; width: 120px; height: 120px; border-radius: 50%; border: 8px solid #8b4fbe; display: flex; align-items: center; justify-content: center; font-size: 48px; font-weight: bold; color: #8b4fbe; margin-bottom: 10px;"></div>
+                <p id="score-text" style="font-size: 18px; font-weight: 500;"></p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                <div style="background: #e8f5e9; padding: 20px; border-radius: 8px; border-left: 4px solid #4caf50;">
+                    <h3 style="margin: 0 0 15px 0; color: #2e7d32;">Matched Key Points</h3>
+                    <ul id="matched-points-list" style="list-style: none; padding: 0; margin: 0;"></ul>
+                </div>
+                <div style="background: #fff3e0; padding: 20px; border-radius: 8px; border-left: 4px solid #ff9800;">
+                    <h3 style="margin: 0 0 15px 0; color: #e65100;">Areas to Improve</h3>
+                    <ul id="missed-points-list" style="list-style: none; padding: 0; margin: 0;"></ul>
+                </div>
+            </div>
+
+            <div style="background: #f8f4fc; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+                <h3 style="margin: 0 0 15px 0; color: #8b4fbe;">AI Coach Feedback</h3>
+                <div style="margin-bottom: 20px;">
+                    <h4 style="margin: 0 0 10px 0; color: #4caf50;">Strengths:</h4>
+                    <ul id="strengths-list" style="margin: 0;"></ul>
+                </div>
+                <div>
+                    <h4 style="margin: 0 0 10px 0; color: #ff9800;">Growth Opportunities:</h4>
+                    <ul id="improvements-list" style="margin: 0;"></ul>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button id="next-scenario-btn" style="flex: 1; padding: 15px 30px; background: #8b4fbe; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: 500; cursor: pointer;">Next Scenario →</button>
+                <button id="retry-scenario-btn" style="padding: 15px 30px; background: #f8f4fc; color: #8b4fbe; border: 2px solid #8b4fbe; border-radius: 5px; font-size: 16px; cursor: pointer;">🔄 Retry</button>
+            </div>
+        </div>
+
+        <!-- Screen 4: Session Summary -->
+        <div id="session-summary" style="display: none;">
+            <!-- Content will be dynamically generated -->
         </div>
     </div>
   `,
@@ -636,134 +719,376 @@ function initObjectionMatcher() {
 }
 
 
-// --- Role-Play Simulator ---
-async function initRolePlay() {
-    const chatMessages = document.getElementById('chat-messages');
-    const chatInput = document.getElementById('chat-input') as HTMLInputElement;
-    const sendButton = document.getElementById('send-button');
-    const personaSel = document.getElementById('rp-persona') as HTMLSelectElement | null;
-    const scenarioSel = document.getElementById('rp-scenario') as HTMLSelectElement | null;
-    const roleSel = document.getElementById('rp-role') as HTMLSelectElement | null;
-    const nameInput = document.getElementById('rp-name') as HTMLInputElement | null;
-    const resetBtn = document.getElementById('rp-reset') as HTMLButtonElement | null;
-    const hintBtn = document.getElementById('rp-hint') as HTMLButtonElement | null;
-    const exportBtn = document.getElementById('rp-export') as HTMLButtonElement | null;
+// --- Agnes 21 Role-Play System ---
+function initRolePlay() {
+  console.log('🎭 Initializing Agnes Role-Play System...');
 
-    if (!chatMessages || !chatInput || !sendButton) return;
+  // Verify that agnes-scenarios.js loaded successfully
+  if (typeof getAllAgnesScenarios !== 'function') {
+    console.error('❌ Agnes scenarios not loaded. Check that agnes-scenarios.js is included before index.tsx');
+    alert('Error: Agnes scenario data not loaded. Please check browser console.');
+    return;
+  }
 
-    if (!ai) {
-        chatMessages.innerHTML += `<div class="chat-message ai-message">Role-play is unavailable: missing API key. Set GEMINI_API_KEY in .env.local and reload.</div>`;
+  if (typeof scoreResponse !== 'function') {
+    console.error('❌ scoreResponse function not found. Check agnes-scenarios.js');
+    alert('Error: Scoring function not available. Please check browser console.');
+    return;
+  }
+
+  // Session state management
+  const sessionState: {
+    selectedRole: string | null;
+    difficulty: string;
+    scenarios: any[];
+    currentScenarioIndex: number;
+    currentScenario: any;
+    responses: any[];
+    scores: any[];
+    hintsUsed: number;
+    startTime: number;
+    recognition: any;
+    scenarioStartTime: number | null;
+  } = {
+    selectedRole: null,
+    difficulty: 'beginner',
+    scenarios: [],
+    currentScenarioIndex: 0,
+    currentScenario: null,
+    responses: [],
+    scores: [],
+    hintsUsed: 0,
+    startTime: Date.now(),
+    recognition: null,
+    scenarioStartTime: null
+  };
+
+  // Screen management functions
+  function showScreen(screenId: string) {
+    const screens = ['roleplay-setup', 'scenario-display', 'feedback-area', 'session-summary'];
+    screens.forEach(id => {
+      const screen = document.getElementById(id);
+      if (screen) {
+        screen.style.display = (id === screenId) ? 'block' : 'none';
+      }
+    });
+  }
+
+  function showRoleSelection() {
+    console.log('📋 Showing role selection');
+    showScreen('roleplay-setup');
+    sessionState.selectedRole = null;
+    sessionState.scenarios = [];
+    sessionState.currentScenarioIndex = 0;
+    sessionState.responses = [];
+    sessionState.scores = [];
+    sessionState.hintsUsed = 0;
+    sessionState.startTime = Date.now();
+  }
+
+  function loadScenario(index: number) {
+    if (index < 0 || index >= sessionState.scenarios.length) return;
+    sessionState.currentScenarioIndex = index;
+    sessionState.currentScenario = sessionState.scenarios[index];
+    sessionState.scenarioStartTime = Date.now();
+    displayScenario(sessionState.currentScenario);
+  }
+
+  function displayScenario(scenario: any) {
+    const titleEl = document.getElementById('scenario-title');
+    const contextEl = document.getElementById('scenario-context');
+    const promptEl = document.getElementById('agnes-prompt');
+    const progressEl = document.getElementById('scenario-progress');
+    const responseTextarea = document.getElementById('user-response') as HTMLTextAreaElement;
+    const submitBtn = document.getElementById('submit-response') as HTMLButtonElement;
+
+    if (titleEl) titleEl.textContent = scenario.id || `Scenario ${sessionState.currentScenarioIndex + 1}`;
+    if (contextEl) contextEl.textContent = `Role: ${scenario.role} | Difficulty: beginner`;
+    if (promptEl) promptEl.textContent = scenario.prompt || '';
+    if (progressEl) progressEl.textContent = `Scenario ${sessionState.currentScenarioIndex + 1} of ${sessionState.scenarios.length}`;
+    if (responseTextarea) {
+      responseTextarea.value = '';
+      responseTextarea.disabled = false;
+    }
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit Response';
+    }
+  }
+
+  // Response submission and scoring
+  async function handleResponseSubmit() {
+    try {
+      const responseTextarea = document.getElementById('user-response') as HTMLTextAreaElement;
+      const submitButton = document.getElementById('submit-response') as HTMLButtonElement;
+
+      if (!responseTextarea || !submitButton) return;
+
+      const userResponse = responseTextarea.value.trim();
+      if (!userResponse) {
+        alert('Please enter a response before submitting.');
         return;
-    }
+      }
 
-    const scenarioLibrary: Record<string, {desc: string; success: string[]; hints: string[]}> = {
-      noDamage: { desc: "Homeowner doubts there is any storm damage.", success: ["free inspection","document damage","photos","walk the property"], hints: ["Offer a free inspection.","Explain documentation with photos."] },
-      badTiming: { desc: "Bad time at the door; homeowner is busy.", success: ["schedule","2-3 minute","later today","tomorrow"], hints: ["Respect their time; propose a quick follow-up."] },
-      insuranceDIY: { desc: "Homeowner wants to call insurance themselves.", success: ["advocate","on your behalf","handle communication","keep you updated"], hints: ["Clarify how you advocate and simplify the process."] },
-      hoaRules: { desc: "HOA rules complicate exterior work.", success: ["HOA","policy","guidelines","process"], hints: ["Acknowledge HOA rules; share your process within guidelines."] },
-      budget: { desc: "Concerned about cost/deductible.", success: ["deductible","only out of pocket","no surprises"], hints: ["Clarify deductible and approvals."] },
-      schedule: { desc: "Scheduling/availability conflict.", success: ["schedule","flexible","today","tomorrow"], hints: ["Offer windows and flexible times."] },
-      claimClosed: { desc: "Claim previously denied or closed.", success: ["reinspect","supplement","documentation"], hints: ["Explain reinspect and supplement approach."] },
-      materials: { desc: "Discontinued materials concern.", success: ["discontinued","match","manufacturer","resources"], hints: ["Share how you handle discontinued products."] },
-      safety: { desc: "Ladder/safety hesitation.", success: ["safety","ladder","insured","OSHA","harness"], hints: ["Reassure safety protocols and insurance."] }
-    };
-    const transcript: {sender: 'you'|'ai'; text: string}[] = [];
+      responseTextarea.disabled = true;
+      submitButton.disabled = true;
+      submitButton.textContent = 'Processing...';
 
-    const setupChat = async () => {
+      const scenario = sessionState.currentScenario;
+      const scoreResult = (window as any).scoreResponse(
+        userResponse,
+        scenario.expectedKeyPoints || [],
+        scenario.rubric?.keywords || [],
+        scenario.rubric?.passThreshold || 70
+      );
+
+      // Generate AI feedback if available
+      let aiFeedback = null;
+      if (ai) {
         try {
-            const persona = personaSel?.value || 'neutral';
-            const scenario = scenarioSel?.value || 'noDamage';
-            const role = roleSel?.value || 'homeowner';
-            const aiName = (nameInput?.value || 'Agnes').trim() || 'Agnes';
-            const personaText = persona === 'skeptical' ? 'You are skeptical but reasonable.'
-                              : persona === 'busy' ? 'You are rushed and time-pressured.'
-                              : persona === 'cost' ? 'You are cost-sensitive and worry about expense.'
-                              : 'You are neutral and open to discussion.';
-            const scenarioText = scenario === 'noDamage' ? 'You doubt there is any damage at all.'
-                                : scenario === 'badTiming' ? 'This is a bad time to talk at the door.'
-                                : scenario === 'insuranceDIY' ? 'You prefer to call insurance yourself.'
-                                : scenario === 'hoaRules' ? 'Your HOA rules complicate exterior work.'
-                                : scenario === 'schedule' ? 'Scheduling is challenging for you.'
-                                : scenario === 'claimClosed' ? 'You had a prior claim denial/closure.'
-                                : scenario === 'materials' ? 'You are worried about discontinued materials matching.'
-                                : scenario === 'safety' ? 'You have safety concerns about ladder/roof access.'
-                                : 'You are concerned about budget and deductible.';
-            const roleInstruction = role === 'homeowner'
-              ? `You are a homeowner named ${aiName}. ${personaText} Scenario: ${scenarioText} React realistically to the salesperson. Keep responses to 1-2 sentences. If concerns are addressed and an inspection is requested, agree.`
-              : `You are a seasoned Roof-ER sales rep named ${aiName}. ${personaText} Scenario context: ${scenarioText} Lead the conversation professionally. Keep responses to 1-2 sentences. Ask for the inspection at the appropriate moment.`;
-            chat = ai!.chats.create({
-                model: 'gemini-2.5-flash',
-                config: {
-                    systemInstruction: roleInstruction,
-                },
-            });
-            if (chatMessages) {
-                chatMessages.innerHTML = '';
-                chatMessages.innerHTML += `<div class="chat-message ai-message">New scenario loaded: ${persona} / ${scenario} as ${role}.</div>`;
-            }
-            transcript.length = 0;
+          aiFeedback = await generateAIFeedback(userResponse, scenario, scoreResult);
         } catch (e) {
-            console.error(e);
-            chatMessages?.insertAdjacentHTML('beforeend', `<div class="chat-message ai-message">Failed to start role‑play.</div>`);
+          console.warn('AI feedback unavailable:', e);
         }
-    };
+      }
 
-    await setupChat();
-    personaSel?.addEventListener('change', setupChat);
-    scenarioSel?.addEventListener('change', setupChat);
-    roleSel?.addEventListener('change', setupChat);
-    nameInput?.addEventListener('change', setupChat);
+      sessionState.responses.push({
+        scenarioIndex: sessionState.currentScenarioIndex,
+        userResponse,
+        timestamp: new Date().toISOString()
+      });
 
+      sessionState.scores.push({
+        ...scoreResult,
+        scenarioIndex: sessionState.currentScenarioIndex,
+        aiFeedback
+      });
 
-    async function sendMessage() {
-        const message = chatInput.value.trim();
-        if (!message || !chat) return;
+      displayFeedback(scoreResult, aiFeedback);
 
-        chatInput.value = '';
-        chatMessages.innerHTML += `<div class="chat-message user-message">${message}</div>`;
-        transcript.push({ sender: 'you', text: message });
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-        sendButton.setAttribute('disabled', 'true');
+      responseTextarea.disabled = false;
+      submitButton.textContent = 'Submit Response';
+    } catch (error) {
+      console.error('Error submitting response:', error);
+      alert('Error processing response. Please try again.');
+    }
+  }
 
-        const aiMessageDiv = document.createElement('div');
-        aiMessageDiv.className = 'chat-message ai-message';
-        chatMessages.appendChild(aiMessageDiv);
+  async function generateAIFeedback(userResponse: string, scenario: any, scoreResult: any) {
+    if (!ai) return null;
 
-        try {
-            const response = await chat.sendMessageStream({ message });
-            let streamedText = '';
-            for await (const chunk of response) {
-                streamedText += chunk.text;
-                aiMessageDiv.textContent = streamedText;
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-            transcript.push({ sender: 'ai', text: aiMessageDiv.textContent || '' });
-        } catch (error) {
-            aiMessageDiv.textContent = "Sorry, I encountered an error. Please try again.";
-            console.error("Roleplay send message error:", error);
-        } finally {
-            sendButton.removeAttribute('disabled');
-        }
+    const prompt = `You are Agnes, an expert insurance training coach. Analyze this role-play response and provide constructive feedback.
+
+Scenario: ${scenario.id}
+User Response: "${userResponse}"
+
+Performance:
+- Score: ${scoreResult.score}/100
+- Matched: ${scoreResult.matchedPoints.join(', ') || 'None'}
+- Missed: ${scoreResult.missedPoints.join(', ') || 'None'}
+
+Provide feedback in JSON format:
+{
+  "strengths": ["Strength 1", "Strength 2"],
+  "improvements": ["Improvement 1", "Improvement 2"]
+}
+
+Be specific, actionable, and encouraging.`;
+
+    try {
+      const chat = await ai.chats.create({
+        model: 'gemini-2.0-flash-exp',
+        config: { temperature: 0.7, maxOutputTokens: 500 }
+      });
+
+      const response = await chat.sendMessage(prompt);
+      let jsonText = response.text.trim();
+      if (jsonText.includes('```json')) {
+        jsonText = jsonText.match(/```json\n([\s\S]*?)\n```/)?.[1] || jsonText;
+      }
+      return JSON.parse(jsonText);
+    } catch (e) {
+      return {
+        strengths: [`You scored ${scoreResult.score}/100`, `Matched ${scoreResult.matchedPoints.length} key points`],
+        improvements: [`Try to include: ${scoreResult.missedPoints.slice(0, 2).join(', ')}`, 'Practice using clear, professional language']
+      };
+    }
+  }
+
+  function displayFeedback(scoreResult: any, aiFeedback: any) {
+    const scoreCircle = document.getElementById('score-circle');
+    const scoreText = document.getElementById('score-text');
+    const matchedList = document.getElementById('matched-points-list');
+    const missedList = document.getElementById('missed-points-list');
+    const strengthsList = document.getElementById('strengths-list');
+    const improvementsList = document.getElementById('improvements-list');
+
+    if (scoreCircle) {
+      scoreCircle.textContent = String(scoreResult.score);
+      scoreCircle.style.borderColor = scoreResult.score >= 85 ? '#4caf50' : scoreResult.score >= 70 ? '#ff9800' : '#f44336';
+      scoreCircle.style.color = scoreResult.score >= 85 ? '#4caf50' : scoreResult.score >= 70 ? '#ff9800' : '#f44336';
     }
 
-    sendButton.addEventListener('click', sendMessage);
-    chatInput.addEventListener('keyup', (event) => {
-        if (event.key === 'Enter') sendMessage();
+    if (scoreText) {
+      scoreText.textContent = scoreResult.score >= 70 ? `Great! You passed with ${scoreResult.score}/100` : `Score: ${scoreResult.score}/100 (Need 70 to pass)`;
+    }
+
+    if (matchedList) {
+      matchedList.innerHTML = scoreResult.matchedPoints.length > 0
+        ? scoreResult.matchedPoints.map((p: string) => `<li style="margin-bottom: 8px;"><span style="color: #4caf50; margin-right: 8px;">✓</span>${p}</li>`).join('')
+        : '<li>No key points matched</li>';
+    }
+
+    if (missedList) {
+      missedList.innerHTML = scoreResult.missedPoints.length > 0
+        ? scoreResult.missedPoints.map((p: string) => `<li style="margin-bottom: 8px;"><span style="color: #ff9800; margin-right: 8px;">✗</span>${p}</li>`).join('')
+        : '<li>All key points covered!</li>';
+    }
+
+    if (aiFeedback && strengthsList && improvementsList) {
+      strengthsList.innerHTML = aiFeedback.strengths.map((s: string) => `<li style="margin-bottom: 8px;">${s}</li>`).join('');
+      improvementsList.innerHTML = aiFeedback.improvements.map((i: string) => `<li style="margin-bottom: 8px;">${i}</li>`).join('');
+    }
+
+    showScreen('feedback-area');
+  }
+
+  function nextScenario() {
+    const nextIndex = sessionState.currentScenarioIndex + 1;
+    if (nextIndex >= sessionState.scenarios.length) {
+      showSessionSummary();
+    } else {
+      loadScenario(nextIndex);
+      showScreen('scenario-display');
+    }
+  }
+
+  function retryScenario() {
+    if (sessionState.responses.length > 0) sessionState.responses.pop();
+    if (sessionState.scores.length > 0) sessionState.scores.pop();
+    displayScenario(sessionState.currentScenario);
+    showScreen('scenario-display');
+  }
+
+  function showSessionSummary() {
+    showScreen('session-summary');
+    const summaryContainer = document.getElementById('session-summary');
+    if (!summaryContainer) return;
+
+    const scores = sessionState.scores.map(s => s.score);
+    const avgScore = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+    const highScore = scores.length > 0 ? Math.max(...scores) : 0;
+    const passedCount = scores.filter(s => s >= 70).length;
+
+    summaryContainer.innerHTML = `
+      <h2 style="text-align: center; color: #8b4fbe; margin-bottom: 30px;">🎉 Session Complete!</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
+        <div style="background: #f8f4fc; padding: 20px; border-radius: 8px; text-align: center;">
+          <div style="font-size: 36px; font-weight: bold; color: #8b4fbe;">${sessionState.scores.length}</div>
+          <div style="color: #666;">Scenarios Completed</div>
+        </div>
+        <div style="background: #f8f4fc; padding: 20px; border-radius: 8px; text-align: center;">
+          <div style="font-size: 36px; font-weight: bold; color: #8b4fbe;">${avgScore}</div>
+          <div style="color: #666;">Average Score</div>
+        </div>
+        <div style="background: #f8f4fc; padding: 20px; border-radius: 8px; text-align: center;">
+          <div style="font-size: 36px; font-weight: bold; color: #8b4fbe;">${highScore}</div>
+          <div style="color: #666;">Highest Score</div>
+        </div>
+        <div style="background: #f8f4fc; padding: 20px; border-radius: 8px; text-align: center;">
+          <div style="font-size: 36px; font-weight: bold; color: #8b4fbe;">${passedCount}/${sessionState.scores.length}</div>
+          <div style="color: #666;">Passed</div>
+        </div>
+      </div>
+      <div style="text-align: center;">
+        <button id="start-new-session-btn" style="padding: 15px 40px; background: #8b4fbe; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: 500; cursor: pointer;">Start New Session</button>
+      </div>
+    `;
+
+    const newSessionBtn = document.getElementById('start-new-session-btn');
+    if (newSessionBtn) {
+      newSessionBtn.addEventListener('click', showRoleSelection);
+    }
+  }
+
+  function showHint() {
+    const scenario = sessionState.currentScenario;
+    if (!scenario?.followUps || scenario.followUps.length === 0) {
+      alert('No hints available for this scenario.');
+      return;
+    }
+    const hint = scenario.followUps[Math.floor(Math.random() * scenario.followUps.length)];
+    const hintDisplay = document.getElementById('hint-display');
+    if (hintDisplay) {
+      hintDisplay.innerHTML = `<strong>💡 Hint:</strong> ${hint}`;
+      hintDisplay.style.display = 'block';
+      sessionState.hintsUsed++;
+      setTimeout(() => { hintDisplay.style.display = 'none'; }, 10000);
+    }
+  }
+
+  // Setup event listeners
+  function setupRoleSelection() {
+    const roleButtons = document.querySelectorAll('.role-btn');
+    roleButtons.forEach(button => {
+      button.addEventListener('click', async (e) => {
+        const target = e.target as HTMLElement;
+        const role = target.closest('[data-role]')?.getAttribute('data-role');
+        if (!role) return;
+
+        sessionState.selectedRole = role;
+        sessionState.startTime = Date.now();
+
+        try {
+          const scenarios = (window as any).getAgnesScenariosByRole(role);
+          if (!scenarios || scenarios.length === 0) {
+            throw new Error(`No scenarios found for role: ${role}`);
+          }
+          sessionState.scenarios = scenarios;
+          sessionState.currentScenarioIndex = 0;
+
+          setTimeout(() => {
+            loadScenario(0);
+            showScreen('scenario-display');
+          }, 300);
+        } catch (error) {
+          console.error('Error loading scenarios:', error);
+          alert(`Error: ${(error as Error).message}`);
+        }
+      });
     });
-    resetBtn?.addEventListener('click', setupChat);
-    hintBtn?.addEventListener('click', () => {
-      const scenario = scenarioSel?.value || 'noDamage';
-      const hints = scenarioLibrary[scenario]?.hints || [];
-      const next = hints[Math.floor(Math.random()*hints.length)] || 'Try asking for an inspection politely.';
-      chatMessages?.insertAdjacentHTML('beforeend', `<div class=\"chat-message ai-message\">Hint: ${next}</div>`);
-    });
-    exportBtn?.addEventListener('click', () => {
-      const data = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(transcript, null, 2));
-      const a = document.createElement('a');
-      a.setAttribute('href', data);
-      a.setAttribute('download', 'roleplay-transcript.json');
-      a.click();
-    });
+  }
+
+  // Initialize
+  try {
+    setupRoleSelection();
+
+    const submitButton = document.getElementById('submit-response');
+    if (submitButton) {
+      submitButton.addEventListener('click', handleResponseSubmit);
+    }
+
+    const nextButton = document.getElementById('next-scenario-btn');
+    if (nextButton) {
+      nextButton.addEventListener('click', nextScenario);
+    }
+
+    const retryButton = document.getElementById('retry-scenario-btn');
+    if (retryButton) {
+      retryButton.addEventListener('click', retryScenario);
+    }
+
+    const hintButton = document.getElementById('hint-btn');
+    if (hintButton) {
+      hintButton.addEventListener('click', showHint);
+    }
+
+    showRoleSelection();
+    console.log('✅ Agnes Role-Play System initialized successfully');
+  } catch (error) {
+    console.error('❌ Error initializing Agnes system:', error);
+    throw error;
+  }
 }
 
 
