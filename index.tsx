@@ -768,16 +768,16 @@ const trainingContent = {
             <!-- Image Gallery -->
             <div class="damage-gallery">
               <div class="damage-image-item">
-                <img src="https://images.unsplash.com/photo-1560185127-1eba5c1099a6?w=500" alt="Hail damage circular bruising">
-                <p class="image-caption">Circular bruising and divots from hail impact</p>
+                <img src="/assets/damage/wind/Wind.jpg" alt="Example roof damage">
+                <p class="image-caption">Example roof damage - impact patterns</p>
               </div>
               <div class="damage-image-item">
-                <img src="https://images.unsplash.com/photo-1563804249-e51b63aaf831?w=500" alt="Granule loss from hail">
-                <p class="image-caption">Granule loss exposing asphalt mat</p>
+                <img src="/assets/damage/wind/wind1.jpg" alt="Example roof damage">
+                <p class="image-caption">Example roof damage - shingle surface</p>
               </div>
               <div class="damage-image-item">
-                <img src="https://images.unsplash.com/photo-1534237710431-e2fc698436d0?w=500" alt="Hail damage with penny reference">
-                <p class="image-caption">Damage with size reference (penny)</p>
+                <img src="/assets/damage/wind/wind2.jpg" alt="Example roof damage">
+                <p class="image-caption">Example roof damage - close-up detail</p>
               </div>
             </div>
 
@@ -840,16 +840,16 @@ const trainingContent = {
 
             <div class="damage-gallery">
               <div class="damage-image-item">
-                <img src="https://images.unsplash.com/photo-1588492069485-d05b56688ea0?w=500" alt="Dented gutter from hail">
-                <p class="image-caption">Dented gutters and downspouts</p>
+                <img src="/assets/damage/wind/Wind.jpg" alt="Example collateral damage">
+                <p class="image-caption">Example collateral damage on exterior surfaces</p>
               </div>
               <div class="damage-image-item">
-                <img src="https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?w=500" alt="Damaged AC unit">
-                <p class="image-caption">Hail damage on AC unit</p>
+                <img src="/assets/damage/wind/wind1.jpg" alt="Example collateral damage">
+                <p class="image-caption">Example impact damage on property</p>
               </div>
               <div class="damage-image-item">
-                <img src="https://images.unsplash.com/photo-1621905252472-178a03c5f0da?w=500" alt="Siding damage">
-                <p class="image-caption">Impact damage on siding</p>
+                <img src="/assets/damage/wind/wind2.jpg" alt="Example collateral damage">
+                <p class="image-caption">Example secondary storm damage</p>
               </div>
             </div>
 
@@ -871,16 +871,16 @@ const trainingContent = {
           <!-- Test Square Visual Examples -->
           <div class="damage-gallery" style="margin: 20px 0;">
             <div class="damage-image-item">
-              <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=500" alt="Test square with chalk marks">
-              <p class="image-caption">Circled hail damage in test square</p>
+              <img src="/assets/damage/wind/Wind.jpg" alt="Example test square documentation">
+              <p class="image-caption">Example damage documentation method</p>
             </div>
             <div class="damage-image-item">
-              <img src="https://images.unsplash.com/photo-1581094271901-8022df4466f9?w=500" alt="Measuring test square area">
-              <p class="image-caption">10x10 ft test square measurement</p>
+              <img src="/assets/damage/wind/wind1.jpg" alt="Example test square area">
+              <p class="image-caption">Example test square area measurement</p>
             </div>
             <div class="damage-image-item">
-              <img src="https://images.unsplash.com/photo-1517581177682-a085bb7ffb15?w=500" alt="Penny size reference">
-              <p class="image-caption">Size reference with penny/quarter</p>
+              <img src="/assets/damage/wind/wind2.jpg" alt="Example damage reference">
+              <p class="image-caption">Example damage reference documentation</p>
             </div>
           </div>
 
@@ -897,12 +897,18 @@ const trainingContent = {
         <div class="shingle-comparison">
             <div class="shingle-type">
                 <h4>3-Tab Shingles</h4>
-                <img src="https://i.imgur.com/gYx2V2y.jpeg" alt="3-Tab Shingles">
+                <div style="padding: 40px; background: #f5f5f5; border: 2px solid #ddd; border-radius: 8px; text-align: center;">
+                  <p><strong>3-Tab Shingle Reference</strong></p>
+                  <p style="margin-top: 10px; color: #666;">Flat, single-layer appearance with distinct rectangular cutouts</p>
+                </div>
                 <p>Flat, single-layer appearance with distinct rectangular cutouts.</p>
             </div>
             <div class="shingle-type">
                 <h4>Architectural Shingles</h4>
-                <img src="https://i.imgur.com/bA5wY4z.jpeg" alt="Architectural Shingles">
+                <div style="padding: 40px; background: #f5f5f5; border: 2px solid #ddd; border-radius: 8px; text-align: center;">
+                  <p><strong>Architectural Shingle Reference</strong></p>
+                  <p style="margin-top: 10px; color: #666;">Laminated, multi-layer design giving a dimensional, textured look</p>
+                </div>
                 <p>Laminated, multi-layer design giving a dimensional, textured look.</p>
             </div>
         </div>
@@ -916,8 +922,8 @@ const trainingContent = {
             <h3 style="color: #28a745;">✅ Storm Damage (Qualifying)</h3>
             <div class="damage-gallery">
               <div class="damage-image-item">
-                <img src="https://images.unsplash.com/photo-1517581177682-a085bb7ffb15?w=500" alt="Hail impact bruising">
-                <p class="image-caption">Hail: Circular bruises with soft feel</p>
+                <img src="/assets/damage/wind/Wind.jpg" alt="Example storm damage">
+                <p class="image-caption">Example storm damage - qualifying impacts</p>
               </div>
               <div class="damage-image-item">
                 <img src="/assets/damage/wind/wind1.jpg" alt="Wind lifted shingles">
@@ -935,16 +941,16 @@ const trainingContent = {
             <h3 style="color: #dc3545;">❌ Non-Storm Damage (Non-Qualifying)</h3>
             <div class="damage-gallery">
               <div class="damage-image-item">
-                <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500" alt="Shingle blistering">
-                <p class="image-caption">Blistering: Manufacturing defect</p>
+                <img src="/assets/damage/wind/wind2.jpg" alt="Example non-qualifying damage">
+                <p class="image-caption">Example non-qualifying damage reference</p>
               </div>
               <div class="damage-image-item">
-                <img src="https://images.unsplash.com/photo-1565008576549-57569a49371d?w=500" alt="Age-related cracking">
-                <p class="image-caption">Cracking: Age-related wear</p>
+                <img src="/assets/damage/wind/Wind.jpg" alt="Example age-related wear">
+                <p class="image-caption">Example wear pattern reference</p>
               </div>
               <div class="damage-image-item">
-                <img src="https://images.unsplash.com/photo-1590846083693-f23fdede3a7e?w=500" alt="General granule loss">
-                <p class="image-caption">Granule Loss: Normal aging</p>
+                <img src="/assets/damage/wind/wind1.jpg" alt="Example general deterioration">
+                <p class="image-caption">Example deterioration reference</p>
               </div>
             </div>
             <ul>
@@ -963,11 +969,11 @@ const trainingContent = {
         <div id="hotspot-quiz-container">
           <!-- Quiz Question 1: Hail Damage -->
           <div class="hotspot-quiz-question" data-question="1" data-damage-type="hail">
-            <h3>Challenge 1: Find the Hail Damage</h3>
-            <p class="quiz-instruction">Click on all areas showing circular hail impact damage (3 spots)</p>
+            <h3>Challenge 1: Find the Roof Damage</h3>
+            <p class="quiz-instruction">Click on all areas showing damage patterns (3 spots)</p>
 
             <div class="quiz-image-container">
-              <img src="https://images.unsplash.com/photo-1560185127-1eba5c1099a6?w=800" alt="Roof with hail damage"
+              <img src="/assets/damage/wind/Wind.jpg" alt="Roof with damage"
                    class="clickable-quiz-image"
                    data-hotspots="35,45,8;60,55,8;45,70,8"
                    data-total-spots="3">
@@ -1015,7 +1021,7 @@ const trainingContent = {
             <p class="quiz-instruction">Click ONLY on areas with qualifying storm damage, NOT age-related wear (2 spots)</p>
 
             <div class="quiz-image-container">
-              <img src="https://images.unsplash.com/photo-1517581177682-a085bb7ffb15?w=800" alt="Mixed damage types"
+              <img src="/assets/damage/wind/wind2.jpg" alt="Mixed damage types"
                    class="clickable-quiz-image"
                    data-hotspots="30,50,10;65,45,10"
                    data-total-spots="2">
