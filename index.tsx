@@ -127,32 +127,45 @@ const trainingContent = {
       </div>
 
       <h2>Your Commitment as a Roof-ER Representative</h2>
-      <div class="commitment-checklist">
-        <h3>As a Roof-ER Sales Representative, I commit to:</h3>
-        <ul>
-          <li>✓ Complete all 16 training modules with focus and dedication</li>
-          <li>✓ Pass the final certification exam with a score of 80% or higher</li>
-          <li>✓ Uphold Roof-ER's standards in every customer interaction</li>
-          <li>✓ Continuously improve my skills and product knowledge</li>
-          <li>✓ Represent the company with professionalism and integrity</li>
-          <li>✓ Support my teammates and contribute to our collective success</li>
-          <li>✓ Always prioritize what's right for the homeowner over quick sales</li>
-        </ul>
-      </div>
 
       <p>As a member of the Roof-ER team, your commitment to our values and processes is paramount to our collective success. Here is what we expect:</p>
-      <ul>
-        <li>I will conduct myself in alignment with the Mission and Core Values.</li>
-        <li>I will dedicate myself to Roof-ER's successful sales process.</li>
-        <li>I will always show an exceptional level of integrity.</li>
-        <li>I will listen to and grow from receiving constructive feedback.</li>
-        <li>I will not be involved in gossip or "office drama."</li>
-        <li>I will show an intense level of discipline in the work that I conduct.</li>
-        <li>I will have pride in my work.</li>
-        <li><strong>I will do what it takes to commit to this. I will achieve tremendous levels of success.</strong></li>
-      </ul>
 
-      <p><strong>Required:</strong> You must digitally sign these commitments below before accessing other modules.</p>
+      <div class="commitment-initials-section">
+        <div class="commitment-item">
+          <input type="text" class="initial-box" maxlength="3" placeholder="Init." aria-label="Initial for first commitment" />
+          <span>I will conduct myself in alignment with the Mission and Core Values.</span>
+        </div>
+        <div class="commitment-item">
+          <input type="text" class="initial-box" maxlength="3" placeholder="Init." aria-label="Initial for second commitment" />
+          <span>I will dedicate myself to Roof-ER's successful sales process.</span>
+        </div>
+        <div class="commitment-item">
+          <input type="text" class="initial-box" maxlength="3" placeholder="Init." aria-label="Initial for third commitment" />
+          <span>I will always show an exceptional level of integrity.</span>
+        </div>
+        <div class="commitment-item">
+          <input type="text" class="initial-box" maxlength="3" placeholder="Init." aria-label="Initial for fourth commitment" />
+          <span>I will listen to and grow from receiving constructive feedback.</span>
+        </div>
+        <div class="commitment-item">
+          <input type="text" class="initial-box" maxlength="3" placeholder="Init." aria-label="Initial for fifth commitment" />
+          <span>I will not be involved in gossip or "office drama."</span>
+        </div>
+        <div class="commitment-item">
+          <input type="text" class="initial-box" maxlength="3" placeholder="Init." aria-label="Initial for sixth commitment" />
+          <span>I will show an intense level of discipline in the work that I conduct.</span>
+        </div>
+        <div class="commitment-item">
+          <input type="text" class="initial-box" maxlength="3" placeholder="Init." aria-label="Initial for seventh commitment" />
+          <span>I will have pride in my work.</span>
+        </div>
+        <div class="commitment-item">
+          <input type="text" class="initial-box" maxlength="3" placeholder="Init." aria-label="Initial for eighth commitment" />
+          <span><strong>I will do what it takes to commit to this. I will achieve tremendous levels of success.</strong></span>
+        </div>
+      </div>
+
+      <p><strong>Required:</strong> You must initial each commitment above and digitally sign below before accessing other modules.</p>
       <p>Reference: <a href="/resources/Mission,%20Values,%20&%20Commitment.docx" target="_blank">Mission, Values, & Commitment (DOCX)</a></p>
     </div>
   `,
