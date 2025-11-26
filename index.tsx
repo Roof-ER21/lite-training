@@ -991,6 +991,7 @@ const trainingContent = {
                    data-hotspots="35,45,8;60,55,8;45,70,8"
                    data-total-spots="3">
               <div class="hotspot-markers"></div>
+              <div class="hotspot-guides"></div>
             </div>
 
             <div class="quiz-feedback">
@@ -998,6 +999,7 @@ const trainingContent = {
               <p class="quiz-hint" style="display: none;">💡 Hint: Look for circular divots with missing granules</p>
               <div class="quiz-actions">
                 <button class="btn-hint">Show Hint</button>
+                <button class="btn-toggle-guides" data-question="1">Show Hotspot Zones</button>
                 <button class="btn-reset">Try Again</button>
                 <button class="btn-next" style="display: none;">Next Challenge →</button>
               </div>
@@ -1015,6 +1017,7 @@ const trainingContent = {
                    data-hotspots="25,40,10;70,35,10;50,60,10;40,75,10"
                    data-total-spots="4">
               <div class="hotspot-markers"></div>
+              <div class="hotspot-guides"></div>
             </div>
 
             <div class="quiz-feedback">
@@ -1022,6 +1025,7 @@ const trainingContent = {
               <p class="quiz-hint" style="display: none;">💡 Hint: Look for lifted tabs and missing shingle sections</p>
               <div class="quiz-actions">
                 <button class="btn-hint">Show Hint</button>
+                <button class="btn-toggle-guides" data-question="2">Show Hotspot Zones</button>
                 <button class="btn-reset">Try Again</button>
                 <button class="btn-next" style="display: none;">Next Challenge →</button>
               </div>
@@ -1039,6 +1043,7 @@ const trainingContent = {
                    data-hotspots="30,50,10;65,45,10"
                    data-total-spots="2">
               <div class="hotspot-markers"></div>
+              <div class="hotspot-guides"></div>
             </div>
 
             <div class="quiz-feedback">
@@ -1046,6 +1051,7 @@ const trainingContent = {
               <p class="quiz-hint" style="display: none;">💡 Hint: Storm damage = circular impacts, not cracks or general wear</p>
               <div class="quiz-actions">
                 <button class="btn-hint">Show Hint</button>
+                <button class="btn-toggle-guides" data-question="3">Show Hotspot Zones</button>
                 <button class="btn-reset">Try Again</button>
                 <button class="btn-complete" style="display: none;">Complete Quiz 🎉</button>
               </div>
@@ -2599,7 +2605,17 @@ function initDamageHotspotQuiz() {
     totalQuestions: 3,
     foundHotspots: new Set(),
     totalScore: 0,
-    totalPossible: 9
+    totalPossible: 9,
+    showGuides: {
+      q1: false,
+      q2: false,
+      q3: false
+    },
+    questionStats: {
+      q1: { correct: 0, incorrect: 0 },
+      q2: { correct: 0, incorrect: 0 },
+      q3: { correct: 0, incorrect: 0 }
+    }
   };
 
   // Initialize all quiz images
@@ -2607,6 +2623,34 @@ function initDamageHotspotQuiz() {
   quizImages.forEach(img => {
     img.addEventListener('click', (e) => handleHotspotClick(e, img));
     img.style.cursor = 'crosshair';
+
+    // Touch-specific handling
+    img.addEventListener('touchstart', (e) => {
+      e.preventDefault(); // Prevent zoom/scroll
+
+      // Show flash feedback on touch
+      const flash = document.createElement('div');
+      flash.className = 'touch-flash';
+      const rect = img.getBoundingClientRect();
+      flash.style.left = `${((e.touches[0].clientX - rect.left) / rect.width) * 100}%`;
+      flash.style.top = `${((e.touches[0].clientY - rect.top) / rect.height) * 100}%`;
+      img.closest('.quiz-image-container').querySelector('.hotspot-markers').appendChild(flash);
+
+      setTimeout(() => flash.remove(), 300);
+    });
+
+    img.addEventListener('touchend', (e) => {
+      // Convert touch to click event
+      if (e.changedTouches.length > 0) {
+        const touch = e.changedTouches[0];
+        const clickEvent = new MouseEvent('click', {
+          clientX: touch.clientX,
+          clientY: touch.clientY,
+          bubbles: true
+        });
+        handleHotspotClick(clickEvent, img);
+      }
+    });
   });
 
   // Initialize hint buttons
@@ -2617,6 +2661,32 @@ function initDamageHotspotQuiz() {
       const hint = question.querySelector('.quiz-hint');
       if (hint) {
         hint.style.display = hint.style.display === 'none' ? 'block' : 'none';
+      }
+    });
+  });
+
+  // Initialize toggle guides buttons
+  const toggleGuideButtons = document.querySelectorAll('.btn-toggle-guides');
+  toggleGuideButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const questionNum = this.getAttribute('data-question');
+      const question = this.closest('.hotspot-quiz-question');
+      const guidesContainer = question.querySelector('.hotspot-guides');
+      const qKey = `q${questionNum}`;
+
+      // Toggle state
+      quizState.showGuides[qKey] = !quizState.showGuides[qKey];
+
+      // Update button text
+      this.textContent = quizState.showGuides[qKey]
+        ? 'Hide Hotspot Zones'
+        : 'Show Hotspot Zones';
+
+      // Render or clear guides
+      if (quizState.showGuides[qKey]) {
+        renderHotspotGuides(question, guidesContainer);
+      } else {
+        guidesContainer.innerHTML = '';
       }
     });
   });
@@ -2666,6 +2736,7 @@ function handleHotspotClick(event, imageElement) {
   const totalSpots = parseInt(imageElement.getAttribute('data-total-spots'));
   const question = imageElement.closest('.hotspot-quiz-question');
   const questionNum = question.getAttribute('data-question');
+  const qKey = `q${questionNum}`;
   const markersContainer = question.querySelector('.hotspot-markers');
 
   if (!hotspotsData) return;
@@ -2676,92 +2747,153 @@ function handleHotspotClick(event, imageElement) {
     return { x, y, radius };
   });
 
-  // Check if click is within any hotspot
-  let hitHotspot = null;
-  let hotspotIndex = -1;
+  let hitDetected = false;
+  let isDuplicate = false;
 
+  // Detect if touch device and add tolerance bonus
+  const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  const touchBonus = isTouchDevice ? 3 : 0; // 3% extra radius on touch devices
+
+  // Check each hotspot for collision
   for (let i = 0; i < hotspots.length; i++) {
-    const hotspot = hotspots[i];
-    const distance = calculateDistance(clickX, clickY, hotspot.x, hotspot.y);
+    const spot = hotspots[i];
+    const distance = Math.sqrt(
+      Math.pow(clickX - spot.x, 2) + Math.pow(clickY - spot.y, 2)
+    );
 
-    if (distance <= hotspot.radius) {
-      hitHotspot = hotspot;
-      hotspotIndex = i;
+    if (distance <= (spot.radius + touchBonus)) {
+      hitDetected = true;
+      const spotId = `q${questionNum}-spot${i}`;
+
+      // Check if already found
+      const existingMarker = markersContainer.querySelector(`[data-hotspot-id="${spotId}"]`);
+      if (existingMarker) {
+        isDuplicate = true;
+        // Show duplicate marker (orange recycle symbol)
+        const duplicateMarker = document.createElement('div');
+        duplicateMarker.className = 'hotspot-marker duplicate';
+        duplicateMarker.innerHTML = '<span style="font-size: 24px; color: #ff9800;">⟳</span>';
+        duplicateMarker.style.left = `${clickX}%`;
+        duplicateMarker.style.top = `${clickY}%`;
+        duplicateMarker.style.transform = 'translate(-50%, -50%)';
+        markersContainer.appendChild(duplicateMarker);
+
+        setTimeout(() => duplicateMarker.remove(), 1000);
+      } else {
+        // NEW HIT - Track as correct
+        if (quizState.questionStats) {
+          quizState.questionStats[qKey].correct++;
+        }
+
+        // Show correct marker (green checkmark)
+        const correctMarker = document.createElement('div');
+        correctMarker.className = 'hotspot-marker correct';
+        correctMarker.setAttribute('data-hotspot-id', spotId);
+        correctMarker.innerHTML = '<span style="font-size: 28px; color: #4caf50;">✓</span>';
+        correctMarker.style.left = `${spot.x}%`;
+        correctMarker.style.top = `${spot.y}%`;
+        correctMarker.style.transform = 'translate(-50%, -50%)';
+        markersContainer.appendChild(correctMarker);
+
+        // Update found count
+        const foundCountEl = question.querySelector('.found-count');
+        const currentCount = parseInt(foundCountEl.textContent);
+        foundCountEl.textContent = currentCount + 1;
+
+        // Check if all spots found
+        if (currentCount + 1 === totalSpots) {
+          question.querySelector('.btn-next, .btn-complete').style.display = 'inline-block';
+          setTimeout(() => {
+            alert(`🎉 Excellent! You found all ${totalSpots} damage spots!`);
+          }, 300);
+        }
+      }
       break;
     }
   }
 
-  // Create hotspot identifier
-  const hotspotId = `q${questionNum}-spot${hotspotIndex}`;
-
-  // Check if this specific hotspot was already found
-  const foundCount = parseInt(question.querySelector('.found-count').textContent);
-
-  if (hitHotspot && !question.querySelector(`[data-hotspot-id="${hotspotId}"]`)) {
-    // Correct hit - add green checkmark
-    const marker = document.createElement('div');
-    marker.className = 'hotspot-marker correct';
-    marker.setAttribute('data-hotspot-id', hotspotId);
-    marker.style.position = 'absolute';
-    marker.style.left = `${clickX}%`;
-    marker.style.top = `${clickY}%`;
-    marker.style.transform = 'translate(-50%, -50%)';
-    marker.style.color = '#4caf50';
-    marker.style.fontSize = '24px';
-    marker.style.fontWeight = 'bold';
-    marker.style.textShadow = '0 0 3px white, 0 0 5px white';
-    marker.innerHTML = '✓';
-    markersContainer.appendChild(marker);
-
-    // Update score
-    const newFoundCount = foundCount + 1;
-    question.querySelector('.found-count').textContent = newFoundCount;
-
-    // Check if all spots found
-    if (newFoundCount >= totalSpots) {
-      question.querySelector('.btn-next, .btn-complete').style.display = 'inline-block';
-      setTimeout(() => {
-        alert(`🎉 Excellent! You found all ${totalSpots} damage spots!`);
-      }, 300);
+  // INCORRECT CLICK - Track and show miss marker
+  if (!hitDetected) {
+    if (quizState.questionStats) {
+      quizState.questionStats[qKey].incorrect++;
     }
-  } else if (hitHotspot && question.querySelector(`[data-hotspot-id="${hotspotId}"]`)) {
-    // Already found this spot
-    const marker = document.createElement('div');
-    marker.className = 'hotspot-marker duplicate';
-    marker.style.position = 'absolute';
-    marker.style.left = `${clickX}%`;
-    marker.style.top = `${clickY}%`;
-    marker.style.transform = 'translate(-50%, -50%)';
-    marker.style.color = '#ff9800';
-    marker.style.fontSize = '18px';
-    marker.style.opacity = '0.7';
-    marker.innerHTML = '⟳';
-    markersContainer.appendChild(marker);
 
-    // Fade out and remove after 1 second
-    setTimeout(() => marker.remove(), 1000);
-  } else {
-    // Incorrect - add red X
-    const marker = document.createElement('div');
-    marker.className = 'hotspot-marker incorrect';
-    marker.style.position = 'absolute';
-    marker.style.left = `${clickX}%`;
-    marker.style.top = `${clickY}%`;
-    marker.style.transform = 'translate(-50%, -50%)';
-    marker.style.color = '#f44336';
-    marker.style.fontSize = '20px';
-    marker.style.textShadow = '0 0 3px white, 0 0 5px white';
-    marker.innerHTML = '✗';
-    markersContainer.appendChild(marker);
+    // Show incorrect marker (red X)
+    const incorrectMarker = document.createElement('div');
+    incorrectMarker.className = 'hotspot-marker incorrect';
+    incorrectMarker.innerHTML = '<span style="font-size: 24px; color: #f44336;">✗</span>';
+    incorrectMarker.style.left = `${clickX}%`;
+    incorrectMarker.style.top = `${clickY}%`;
+    incorrectMarker.style.transform = 'translate(-50%, -50%)';
+    markersContainer.appendChild(incorrectMarker);
 
-    // Fade out and remove after 1.5 seconds
-    setTimeout(() => marker.remove(), 1500);
+    setTimeout(() => incorrectMarker.remove(), 1500);
+  }
+
+  // Update accuracy display
+  if (quizState.questionStats) {
+    updateAccuracyDisplay(question, qKey);
   }
 }
 
 // Calculate distance between two points
 function calculateDistance(x1, y1, x2, y2) {
   return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+}
+
+// Render semi-transparent guide circles
+function renderHotspotGuides(questionElement, guidesContainer) {
+  const imageElement = questionElement.querySelector('.clickable-quiz-image');
+  const hotspotsData = imageElement.getAttribute('data-hotspots');
+
+  if (!hotspotsData) return;
+
+  // Clear existing guides
+  guidesContainer.innerHTML = '';
+
+  // Parse and render each hotspot zone
+  const hotspots = hotspotsData.split(';').map(spot => {
+    const [x, y, radius] = spot.split(',').map(Number);
+    return { x, y, radius };
+  });
+
+  hotspots.forEach((spot, index) => {
+    const guideCircle = document.createElement('div');
+    guideCircle.className = 'guide-circle';
+    guideCircle.style.left = `${spot.x}%`;
+    guideCircle.style.top = `${spot.y}%`;
+    guideCircle.style.width = `${spot.radius * 2}%`;
+    guideCircle.style.height = `${spot.radius * 2}%`;
+    guideCircle.style.animationDelay = `${index * 0.2}s`;
+    guidesContainer.appendChild(guideCircle);
+  });
+}
+
+// Update accuracy display for current question
+function updateAccuracyDisplay(questionElement, qKey) {
+  const stats = quizState.questionStats[qKey];
+  const totalClicks = stats.correct + stats.incorrect;
+  const accuracy = totalClicks > 0
+    ? Math.round((stats.correct / totalClicks) * 100)
+    : 100;
+
+  // Find or create accuracy display element
+  let accuracyEl = questionElement.querySelector('.quiz-accuracy');
+  if (!accuracyEl) {
+    accuracyEl = document.createElement('p');
+    accuracyEl.className = 'quiz-accuracy';
+    const feedbackDiv = questionElement.querySelector('.quiz-feedback');
+    const scoreEl = feedbackDiv.querySelector('.quiz-score');
+    scoreEl.after(accuracyEl);
+  }
+
+  // Update display
+  if (totalClicks > 0) {
+    accuracyEl.innerHTML = `Accuracy: <strong>${accuracy}%</strong> (${stats.correct} correct, ${stats.incorrect} incorrect)`;
+    accuracyEl.style.color = accuracy >= 70 ? '#4caf50' : accuracy >= 50 ? '#ff9800' : '#f44336';
+  } else {
+    accuracyEl.textContent = '';
+  }
 }
 
 // Show next question
@@ -2780,16 +2912,40 @@ function showNextQuestion(currentQuestionNum, quizState) {
 
 // Reset question
 function resetQuestion(questionElement, quizState) {
+  const questionNum = questionElement.getAttribute('data-question');
+  const qKey = `q${questionNum}`;
   const markersContainer = questionElement.querySelector('.hotspot-markers');
+  const guidesContainer = questionElement.querySelector('.hotspot-guides');
   const foundCountElement = questionElement.querySelector('.found-count');
   const hintElement = questionElement.querySelector('.quiz-hint');
   const nextButton = questionElement.querySelector('.btn-next, .btn-complete');
+  const toggleBtn = questionElement.querySelector('.btn-toggle-guides');
+
+  // Reset stats
+  if (quizState.questionStats) {
+    quizState.questionStats[qKey] = { correct: 0, incorrect: 0 };
+  }
 
   // Clear all markers
   if (markersContainer) markersContainer.innerHTML = '';
 
+  // Clear guides
+  if (guidesContainer) guidesContainer.innerHTML = '';
+
+  // Reset guide state and toggle button
+  if (quizState.showGuides) {
+    quizState.showGuides[qKey] = false;
+  }
+  if (toggleBtn) {
+    toggleBtn.textContent = 'Show Hotspot Zones';
+  }
+
   // Reset found count
   if (foundCountElement) foundCountElement.textContent = '0';
+
+  // Clear accuracy display
+  const accuracyEl = questionElement.querySelector('.quiz-accuracy');
+  if (accuracyEl) accuracyEl.textContent = '';
 
   // Hide hint
   if (hintElement) hintElement.style.display = 'none';
@@ -2800,56 +2956,74 @@ function resetQuestion(questionElement, quizState) {
 
 // Complete quiz
 function completeQuiz(quizState) {
-  // Calculate final score
-  let totalFound = 0;
-  const questions = document.querySelectorAll('.hotspot-quiz-question');
-
-  questions.forEach(q => {
-    const foundCount = parseInt(q.querySelector('.found-count').textContent);
-    totalFound += foundCount;
+  // Hide all questions
+  document.querySelectorAll('.hotspot-quiz-question').forEach(q => {
+    q.style.display = 'none';
   });
 
-  quizState.totalScore = totalFound;
+  // Calculate total stats
+  let totalCorrect = 0;
+  let totalIncorrect = 0;
+  let totalFound = 0;
 
-  // Hide all questions
-  questions.forEach(q => q.style.display = 'none');
+  document.querySelectorAll('.found-count').forEach(el => {
+    totalFound += parseInt(el.textContent);
+  });
 
-  // Show completion message
-  const completeMessage = document.getElementById('quiz-complete-message');
-  const finalScoreElement = document.getElementById('final-score');
-  const totalPossibleElement = document.getElementById('total-possible');
-
-  if (finalScoreElement) finalScoreElement.textContent = totalFound;
-  if (totalPossibleElement) totalPossibleElement.textContent = quizState.totalPossible;
-
-  if (completeMessage) {
-    completeMessage.style.display = 'block';
-    completeMessage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if (quizState.questionStats) {
+    Object.values(quizState.questionStats).forEach(stats => {
+      totalCorrect += stats.correct;
+      totalIncorrect += stats.incorrect;
+    });
   }
 
-  // Add performance feedback
-  const percentage = (totalFound / quizState.totalPossible) * 100;
-  let feedback = '';
+  const totalClicks = totalCorrect + totalIncorrect;
+  const overallAccuracy = totalClicks > 0
+    ? Math.round((totalCorrect / totalClicks) * 100)
+    : 100;
+  const completionRate = Math.round((totalFound / quizState.totalPossible) * 100);
 
-  if (percentage === 100) {
-    feedback = '🏆 Perfect score! You have an excellent eye for damage identification!';
-  } else if (percentage >= 80) {
-    feedback = '🌟 Great job! You identified most of the damage accurately!';
-  } else if (percentage >= 60) {
-    feedback = '👍 Good effort! Review the images again to improve your damage recognition skills.';
+  // Update final score display
+  document.getElementById('final-score').textContent = totalFound;
+  document.getElementById('total-possible').textContent = quizState.totalPossible;
+
+  // Add accuracy information
+  const finalScoreEl = document.querySelector('.final-score');
+  let accuracyInfo = document.getElementById('accuracy-info');
+  if (!accuracyInfo) {
+    accuracyInfo = document.createElement('p');
+    accuracyInfo.id = 'accuracy-info';
+    accuracyInfo.className = 'accuracy-info';
+    finalScoreEl.after(accuracyInfo);
+  }
+
+  accuracyInfo.innerHTML = `
+    <strong>Overall Accuracy:</strong> ${overallAccuracy}%<br>
+    <small>(${totalCorrect} correct clicks, ${totalIncorrect} incorrect clicks)</small>
+  `;
+
+  // Show completion message with performance feedback
+  const banner = document.querySelector('.success-banner');
+  let feedbackMsg = banner.querySelector('.performance-feedback');
+  if (!feedbackMsg) {
+    feedbackMsg = document.createElement('p');
+    feedbackMsg.className = 'performance-feedback';
+    banner.appendChild(feedbackMsg);
+  }
+
+  // Performance feedback based on completion AND accuracy
+  if (completionRate === 100 && overallAccuracy >= 80) {
+    feedbackMsg.innerHTML = '🏆 <strong>Perfect performance!</strong> You have excellent damage identification skills with great accuracy.';
+  } else if (completionRate >= 80 && overallAccuracy >= 70) {
+    feedbackMsg.innerHTML = '🌟 <strong>Great job!</strong> You identified most damage with good accuracy. Review any missed spots.';
+  } else if (completionRate >= 60 && overallAccuracy >= 60) {
+    feedbackMsg.innerHTML = '👍 <strong>Good effort!</strong> Review the images again to improve precision and coverage.';
   } else {
-    feedback = '📚 Keep practicing! Review the damage type descriptions and try again.';
+    feedbackMsg.innerHTML = '📚 <strong>Keep practicing!</strong> Review the damage types and practice identifying key patterns.';
   }
 
-  const successBanner = completeMessage?.querySelector('.success-banner');
-  if (successBanner && !successBanner.querySelector('.performance-feedback')) {
-    const feedbackP = document.createElement('p');
-    feedbackP.className = 'performance-feedback';
-    feedbackP.style.marginTop = '15px';
-    feedbackP.style.fontSize = '16px';
-    feedbackP.textContent = feedback;
-    successBanner.appendChild(feedbackP);
-  }
+  document.getElementById('quiz-complete-message').style.display = 'block';
+  document.getElementById('quiz-complete-message').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // Restart quiz
@@ -2858,6 +3032,12 @@ function restartQuiz(quizState) {
   quizState.currentQuestion = 1;
   quizState.foundHotspots.clear();
   quizState.totalScore = 0;
+  quizState.showGuides = { q1: false, q2: false, q3: false };
+  quizState.questionStats = {
+    q1: { correct: 0, incorrect: 0 },
+    q2: { correct: 0, incorrect: 0 },
+    q3: { correct: 0, incorrect: 0 }
+  };
 
   // Hide completion message
   const completeMessage = document.getElementById('quiz-complete-message');
