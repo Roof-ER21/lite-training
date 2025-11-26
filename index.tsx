@@ -172,6 +172,8 @@ const trainingContent = {
   'initial-pitch': `
     <div class="content-card">
       <h1>The Initial Pitch</h1>
+      ${renderVideoPlayer('/assets/training/module5-initial-pitch.mp4', 'initial-pitch-video', '📹 Mastering the Roof-ER Pitch')}
+
       <h3>5 Non-Negotiables</h3>
       <ol>
         <li>Who you are</li>
