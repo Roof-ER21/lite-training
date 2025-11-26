@@ -1,5 +1,11 @@
 [phases.setup]
 nixPkgs = ["nodejs_20"]
 
+[phases.install]
+cacheDirectories = []
+
+[phases.build]
+cacheDirectories = []
+
 [start]
 cmd = "npx serve -s dist -l $PORT"
