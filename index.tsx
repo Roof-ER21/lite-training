@@ -2599,30 +2599,40 @@ function resetInlinePractice(container) {
 function initDamageHotspotQuiz() {
   console.log('🎯 Initializing Damage Hotspot Quiz...');
 
-  // Quiz state management
-  const quizState = {
-    currentQuestion: 1,
-    totalQuestions: 3,
-    foundHotspots: new Set(),
-    totalScore: 0,
-    totalPossible: 9,
-    showGuides: {
-      q1: false,
-      q2: false,
-      q3: false
-    },
-    questionStats: {
-      q1: { correct: 0, incorrect: 0 },
-      q2: { correct: 0, incorrect: 0 },
-      q3: { correct: 0, incorrect: 0 }
-    }
-  };
+  // Wait for images to be in DOM (module content may still be rendering)
+  setTimeout(() => {
+    // Quiz state management
+    const quizState = {
+      currentQuestion: 1,
+      totalQuestions: 3,
+      foundHotspots: new Set(),
+      totalScore: 0,
+      totalPossible: 9,
+      showGuides: {
+        q1: false,
+        q2: false,
+        q3: false
+      },
+      questionStats: {
+        q1: { correct: 0, incorrect: 0 },
+        q2: { correct: 0, incorrect: 0 },
+        q3: { correct: 0, incorrect: 0 }
+      }
+    };
 
-  // Initialize all quiz images
-  const quizImages = document.querySelectorAll('.clickable-quiz-image');
-  quizImages.forEach(img => {
-    img.addEventListener('click', (e) => handleHotspotClick(e, img));
-    img.style.cursor = 'crosshair';
+    // Initialize all quiz images
+    const quizImages = document.querySelectorAll('.clickable-quiz-image');
+    console.log(`🔍 Found ${quizImages.length} clickable quiz images`);
+
+    if (quizImages.length === 0) {
+      console.error('❌ No quiz images found! Module content may not be visible yet.');
+      return;
+    }
+
+    quizImages.forEach((img, index) => {
+      console.log(`✅ Image ${index + 1}: ${img.src}`);
+      img.addEventListener('click', (e) => handleHotspotClick(e, img));
+      img.style.cursor = 'crosshair';
 
     // Touch-specific handling
     img.addEventListener('touchstart', (e) => {
@@ -2649,81 +2659,82 @@ function initDamageHotspotQuiz() {
           bubbles: true
         });
         handleHotspotClick(clickEvent, img);
-      }
+        }
+      });
     });
-  });
 
-  // Initialize hint buttons
-  const hintButtons = document.querySelectorAll('.btn-hint');
-  hintButtons.forEach(btn => {
-    btn.addEventListener('click', function() {
-      const question = this.closest('.hotspot-quiz-question');
-      const hint = question.querySelector('.quiz-hint');
-      if (hint) {
-        hint.style.display = hint.style.display === 'none' ? 'block' : 'none';
-      }
+    // Initialize hint buttons
+    const hintButtons = document.querySelectorAll('.btn-hint');
+    hintButtons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const question = this.closest('.hotspot-quiz-question');
+        const hint = question.querySelector('.quiz-hint');
+        if (hint) {
+          hint.style.display = hint.style.display === 'none' ? 'block' : 'none';
+        }
+      });
     });
-  });
 
-  // Initialize toggle guides buttons
-  const toggleGuideButtons = document.querySelectorAll('.btn-toggle-guides');
-  toggleGuideButtons.forEach(btn => {
-    btn.addEventListener('click', function() {
-      const questionNum = this.getAttribute('data-question');
-      const question = this.closest('.hotspot-quiz-question');
-      const guidesContainer = question.querySelector('.hotspot-guides');
-      const qKey = `q${questionNum}`;
+    // Initialize toggle guides buttons
+    const toggleGuideButtons = document.querySelectorAll('.btn-toggle-guides');
+    toggleGuideButtons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const questionNum = this.getAttribute('data-question');
+        const question = this.closest('.hotspot-quiz-question');
+        const guidesContainer = question.querySelector('.hotspot-guides');
+        const qKey = `q${questionNum}`;
 
-      // Toggle state
-      quizState.showGuides[qKey] = !quizState.showGuides[qKey];
+        // Toggle state
+        quizState.showGuides[qKey] = !quizState.showGuides[qKey];
 
-      // Update button text
-      this.textContent = quizState.showGuides[qKey]
-        ? 'Hide Hotspot Zones'
-        : 'Show Hotspot Zones';
+        // Update button text
+        this.textContent = quizState.showGuides[qKey]
+          ? 'Hide Hotspot Zones'
+          : 'Show Hotspot Zones';
 
-      // Render or clear guides
-      if (quizState.showGuides[qKey]) {
-        renderHotspotGuides(question, guidesContainer);
-      } else {
-        guidesContainer.innerHTML = '';
-      }
+        // Render or clear guides
+        if (quizState.showGuides[qKey]) {
+          renderHotspotGuides(question, guidesContainer);
+        } else {
+          guidesContainer.innerHTML = '';
+        }
+      });
     });
-  });
 
-  // Initialize reset buttons
-  const resetButtons = document.querySelectorAll('.btn-reset');
-  resetButtons.forEach(btn => {
-    btn.addEventListener('click', function() {
-      const question = this.closest('.hotspot-quiz-question');
-      resetQuestion(question, quizState);
+    // Initialize reset buttons
+    const resetButtons = document.querySelectorAll('.btn-reset');
+    resetButtons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const question = this.closest('.hotspot-quiz-question');
+        resetQuestion(question, quizState);
+      });
     });
-  });
 
-  // Initialize next buttons
-  const nextButtons = document.querySelectorAll('.btn-next');
-  nextButtons.forEach(btn => {
-    btn.addEventListener('click', function() {
-      const currentQ = parseInt(quizState.currentQuestion);
-      if (currentQ < quizState.totalQuestions) {
-        showNextQuestion(currentQ, quizState);
-      }
+    // Initialize next buttons
+    const nextButtons = document.querySelectorAll('.btn-next');
+    nextButtons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const currentQ = parseInt(quizState.currentQuestion);
+        if (currentQ < quizState.totalQuestions) {
+          showNextQuestion(currentQ, quizState);
+        }
+      });
     });
-  });
 
-  // Initialize complete button
-  const completeButton = document.querySelector('.btn-complete');
-  if (completeButton) {
-    completeButton.addEventListener('click', () => completeQuiz(quizState));
-  }
+    // Initialize complete button
+    const completeButton = document.querySelector('.btn-complete');
+    if (completeButton) {
+      completeButton.addEventListener('click', () => completeQuiz(quizState));
+    }
 
-  // Initialize restart button
-  const restartButton = document.querySelector('.btn-restart-quiz');
-  if (restartButton) {
-    restartButton.addEventListener('click', () => restartQuiz(quizState));
-  }
+    // Initialize restart button
+    const restartButton = document.querySelector('.btn-restart-quiz');
+    if (restartButton) {
+      restartButton.addEventListener('click', () => restartQuiz(quizState));
+    }
 
-  console.log(`✅ Damage Hotspot Quiz initialized with ${quizImages.length} interactive images`);
+    console.log(`✅ Damage Hotspot Quiz initialized with ${quizImages.length} interactive images`);
+  }, 100); // 100ms delay to ensure DOM is ready
 }
 
 // Handle click on quiz image
