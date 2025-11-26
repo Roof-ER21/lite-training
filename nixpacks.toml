@@ -1,16 +1,5 @@
 [phases.setup]
 nixPkgs = ["nodejs_20"]
 
-[phases.install]
-cmds = [
-  "npm ci --cache=/tmp/npm-cache --prefer-offline=false"
-]
-
-[phases.build]
-cmds = [
-  "rm -rf .vite",
-  "npm run build"
-]
-
 [start]
 cmd = "npx serve -s dist -l $PORT"
