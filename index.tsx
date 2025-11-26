@@ -982,13 +982,13 @@ const trainingContent = {
         <div id="hotspot-quiz-container">
           <!-- Quiz Question 1: Hail Damage -->
           <div class="hotspot-quiz-question" data-question="1" data-damage-type="hail">
-            <h3>Challenge 1: Find the Roof Damage</h3>
-            <p class="quiz-instruction">Click on all areas showing damage patterns (3 spots)</p>
+            <h3>Challenge 1: Identify Clear Hail Impact Sites</h3>
+            <p class="quiz-instruction">Click on all areas showing obvious hail damage (3 spots)</p>
 
             <div class="quiz-image-container">
-              <img src="/assets/damage/wind/Wind.jpg" alt="Roof with damage"
+              <img src="/assets/damage/hail/hail-damage-1.jpg" alt="Roof with clear hail damage"
                    class="clickable-quiz-image"
-                   data-hotspots="35,45,8;60,55,8;45,70,8"
+                   data-hotspots="28.6,30.0,4;57.1,45.0,4;75.0,60.0,4"
                    data-total-spots="3">
               <div class="hotspot-markers"></div>
               <div class="hotspot-guides"></div>
@@ -996,7 +996,7 @@ const trainingContent = {
 
             <div class="quiz-feedback">
               <p class="quiz-score">Found: <span class="found-count">0</span> / <span class="total-count">3</span></p>
-              <p class="quiz-hint" style="display: none;">💡 Hint: Look for circular divots with missing granules</p>
+              <p class="quiz-hint" style="display: none;">💡 Hint: Look for circular impact craters with inspection markers</p>
               <div class="quiz-actions">
                 <button class="btn-hint">Show Hint</button>
                 <button class="btn-toggle-guides" data-question="1">Show Hotspot Zones</button>
@@ -1006,23 +1006,23 @@ const trainingContent = {
             </div>
           </div>
 
-          <!-- Quiz Question 2: Wind Damage -->
-          <div class="hotspot-quiz-question" data-question="2" data-damage-type="wind" style="display: none;">
-            <h3>Challenge 2: Spot the Wind Damage</h3>
-            <p class="quiz-instruction">Click on areas showing wind damage - lifted, torn, or missing shingles (4 spots)</p>
+          <!-- Quiz Question 2: Mixed Damage -->
+          <div class="hotspot-quiz-question" data-question="2" data-damage-type="mixed" style="display: none;">
+            <h3>Challenge 2: Distinguish Impact vs. Normal Wear</h3>
+            <p class="quiz-instruction">Click ONLY on actual hail impacts, not general weathering (3 spots)</p>
 
             <div class="quiz-image-container">
-              <img src="/assets/damage/wind/Wind.jpg" alt="Roof with wind damage"
+              <img src="/assets/damage/hail/hail-damage-2.jpg" alt="Roof with mixed damage and wear"
                    class="clickable-quiz-image"
-                   data-hotspots="25,40,10;70,35,10;50,60,10;40,75,10"
-                   data-total-spots="4">
+                   data-hotspots="25.0,40.0,4;50.0,35.0,4;67.9,55.0,4"
+                   data-total-spots="3">
               <div class="hotspot-markers"></div>
               <div class="hotspot-guides"></div>
             </div>
 
             <div class="quiz-feedback">
-              <p class="quiz-score">Found: <span class="found-count">0</span> / <span class="total-count">4</span></p>
-              <p class="quiz-hint" style="display: none;">💡 Hint: Look for lifted tabs and missing shingle sections</p>
+              <p class="quiz-score">Found: <span class="found-count">0</span> / <span class="total-count">3</span></p>
+              <p class="quiz-hint" style="display: none;">💡 Hint: Impact damage shows distinct circular patterns, not random wear marks</p>
               <div class="quiz-actions">
                 <button class="btn-hint">Show Hint</button>
                 <button class="btn-toggle-guides" data-question="2">Show Hotspot Zones</button>
@@ -1032,23 +1032,23 @@ const trainingContent = {
             </div>
           </div>
 
-          <!-- Quiz Question 3: Storm vs Non-Storm -->
-          <div class="hotspot-quiz-question" data-question="3" data-damage-type="mixed" style="display: none;">
-            <h3>Challenge 3: Identify ONLY Storm Damage</h3>
-            <p class="quiz-instruction">Click ONLY on areas with qualifying storm damage, NOT age-related wear (2 spots)</p>
+          <!-- Quiz Question 3: Qualifying vs Non-Qualifying -->
+          <div class="hotspot-quiz-question" data-question="3" data-damage-type="subtle" style="display: none;">
+            <h3>Challenge 3: Find Qualifying Damage Among Weathering</h3>
+            <p class="quiz-instruction">Advanced: Identify subtle hail impacts among heavy weathering (3 spots)</p>
 
             <div class="quiz-image-container">
-              <img src="/assets/damage/wind/wind2.jpg" alt="Mixed damage types"
+              <img src="/assets/damage/hail/hail-damage-3.jpg" alt="Weathered roof with subtle damage"
                    class="clickable-quiz-image"
-                   data-hotspots="30,50,10;65,45,10"
-                   data-total-spots="2">
+                   data-hotspots="39.3,45.0,4;60.7,55.0,4;32.1,65.0,4"
+                   data-total-spots="3">
               <div class="hotspot-markers"></div>
               <div class="hotspot-guides"></div>
             </div>
 
             <div class="quiz-feedback">
-              <p class="quiz-score">Found: <span class="found-count">0</span> / <span class="total-count">2</span></p>
-              <p class="quiz-hint" style="display: none;">💡 Hint: Storm damage = circular impacts, not cracks or general wear</p>
+              <p class="quiz-score">Found: <span class="found-count">0</span> / <span class="total-count">3</span></p>
+              <p class="quiz-hint" style="display: none;">💡 Hint: Look for the few inspection markers showing actual impacts vs. general aging</p>
               <div class="quiz-actions">
                 <button class="btn-hint">Show Hint</button>
                 <button class="btn-toggle-guides" data-question="3">Show Hotspot Zones</button>
