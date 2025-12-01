@@ -68,6 +68,110 @@ body {
   font-weight: 700;
 }
 
+/* Locked module styles */
+.sidebar-nav li.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+  position: relative;
+}
+
+.sidebar-nav li.locked::after {
+  content: '🔒';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+}
+
+.sidebar-nav li.locked:hover {
+  background-color: transparent;
+}
+
+.sidebar-nav li.unlocked::after {
+  content: '';
+}
+
+/* Manager Mode Styles */
+#manager-mode-indicator {
+  text-align: center;
+  padding: 10px 0;
+  margin-bottom: 15px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+#manager-mode-indicator.manager-active {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  border-radius: var(--border-radius);
+  padding: 12px;
+  margin-bottom: 20px;
+}
+
+.manager-badge {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+#manager-login-btn {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.3);
+  color: rgba(255,255,255,0.7);
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  transition: all 0.2s ease;
+}
+
+#manager-login-btn:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.5);
+  color: #fff;
+}
+
+#exit-manager-btn {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  transition: all 0.2s ease;
+}
+
+#exit-manager-btn:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+/* Unlock notification */
+.unlock-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: #fff;
+  padding: 15px 25px;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+  z-index: 9999;
+  animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
 #main-content {
   flex-grow: 1;
   padding: 40px;

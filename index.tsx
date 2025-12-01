@@ -13,8 +13,93 @@ if (rawApiKey && rawApiKey.trim()) {
 
 // Local storage keys and gating
 const STORAGE_KEYS = {
-  commitmentSigned: 'roof-er.commitmentSigned'
+  commitmentSigned: 'roof-er.commitmentSigned',
+  managerMode: 'roof-er.managerMode',
+  unlockedModules: 'roof-er.unlockedModules',
+  currentModule: 'roof-er.currentModule'
 };
+
+// Manager access code (managers enter this to unlock all)
+const MANAGER_CODE = 'roofer2024';
+
+// Module order for progressive unlocking
+const MODULE_ORDER = [
+  'welcome',
+  'commitment',
+  'general-knowledge',
+  'shingle-types-materials',
+  'initial-pitch',
+  'handling-initial-pitch-objections',
+  'inspection-process',
+  'post-inspection-pitch',
+  'post-inspection-objections',
+  'damage-identification',
+  'filing-claim-closing',
+  'closing-objections',
+  'discontinued-products',
+  'sales-cycle-job-flow',
+  'role-play',
+  'final-exam'
+];
+
+// Check if manager mode is active
+function isManagerMode(): boolean {
+  return localStorage.getItem(STORAGE_KEYS.managerMode) === 'true';
+}
+
+// Get unlocked modules for regular users
+function getUnlockedModules(): string[] {
+  if (isManagerMode()) return MODULE_ORDER; // All unlocked for managers
+  const stored = localStorage.getItem(STORAGE_KEYS.unlockedModules);
+  return stored ? JSON.parse(stored) : ['welcome', 'commitment'];
+}
+
+// Unlock the next module
+function unlockNextModule(currentModule: string) {
+  if (isManagerMode()) return; // Managers don't need this
+  const unlocked = getUnlockedModules();
+  const currentIndex = MODULE_ORDER.indexOf(currentModule);
+  if (currentIndex >= 0 && currentIndex < MODULE_ORDER.length - 1) {
+    const nextModule = MODULE_ORDER[currentIndex + 1];
+    if (!unlocked.includes(nextModule)) {
+      unlocked.push(nextModule);
+      localStorage.setItem(STORAGE_KEYS.unlockedModules, JSON.stringify(unlocked));
+      updateSidebarLocks();
+    }
+  }
+}
+
+// Update sidebar to show locked/unlocked states
+function updateSidebarLocks() {
+  const unlocked = getUnlockedModules();
+  const items = sidebar?.querySelectorAll('li[data-module]');
+  items?.forEach(item => {
+    const moduleName = (item as HTMLElement).dataset.module || '';
+    if (unlocked.includes(moduleName)) {
+      item.classList.remove('locked');
+      item.classList.add('unlocked');
+    } else {
+      item.classList.add('locked');
+      item.classList.remove('unlocked');
+    }
+  });
+}
+
+// Toggle manager mode
+function toggleManagerMode(code: string): boolean {
+  if (code === MANAGER_CODE) {
+    localStorage.setItem(STORAGE_KEYS.managerMode, 'true');
+    updateSidebarLocks();
+    return true;
+  }
+  return false;
+}
+
+// Exit manager mode
+function exitManagerMode() {
+  localStorage.removeItem(STORAGE_KEYS.managerMode);
+  updateSidebarLocks();
+}
 
 const sidebar = document.getElementById('sidebar');
 const mainContent = document.getElementById('main-content');
@@ -3815,21 +3900,68 @@ function handleNavigation(event: Event) {
   if (target.tagName === 'LI' && target.dataset.module) {
     const moduleName = target.dataset.module;
 
-    // Gate: require commitment signing to proceed beyond core modules
-    // DISABLED: Allow access to all modules without commitment signature
-    // const requiresCommitment = !['welcome','commitment'].includes(moduleName);
-    // const signed = localStorage.getItem(STORAGE_KEYS.commitmentSigned) === 'true';
-    // if (requiresCommitment && !signed) {
-    //     alert('Please review and digitally sign the commitments before proceeding.');
-    //     renderModule('commitment');
-    //     sidebar?.querySelectorAll('li').forEach(li => li.classList.remove('active'));
-    //     sidebar?.querySelector('li[data-module="commitment"]')?.classList.add('active');
-    //     return;
-    // }
+    // Check if module is locked (unless in manager mode)
+    const unlockedModules = getUnlockedModules();
+    if (!unlockedModules.includes(moduleName)) {
+      alert('Complete previous modules to unlock this section.');
+      return;
+    }
 
     sidebar?.querySelectorAll('li').forEach(li => li.classList.remove('active'));
     target.classList.add('active');
     renderModule(moduleName);
+    localStorage.setItem(STORAGE_KEYS.currentModule, moduleName);
+  }
+}
+
+// Initialize manager mode UI
+function initManagerModeUI() {
+  const sidebarHeader = document.querySelector('.sidebar-header');
+  if (!sidebarHeader) return;
+
+  // Add manager mode toggle button (subtle)
+  const modeIndicator = document.createElement('div');
+  modeIndicator.id = 'manager-mode-indicator';
+  modeIndicator.className = isManagerMode() ? 'manager-active' : '';
+  modeIndicator.innerHTML = isManagerMode()
+    ? '<span class="manager-badge">MANAGER MODE</span><button id="exit-manager-btn">Exit</button>'
+    : '<button id="manager-login-btn">Manager Login</button>';
+  sidebarHeader.appendChild(modeIndicator);
+
+  // Add click handlers
+  setTimeout(() => {
+    document.getElementById('manager-login-btn')?.addEventListener('click', showManagerLogin);
+    document.getElementById('exit-manager-btn')?.addEventListener('click', () => {
+      exitManagerMode();
+      initManagerModeUI();
+      location.reload();
+    });
+  }, 0);
+}
+
+// Show manager login prompt
+function showManagerLogin() {
+  const code = prompt('Enter manager access code:');
+  if (code && toggleManagerMode(code)) {
+    alert('Manager mode activated! All modules unlocked.');
+    location.reload();
+  } else if (code) {
+    alert('Invalid access code.');
+  }
+}
+
+// Mark module as complete and unlock next
+function completeModule(moduleName: string) {
+  unlockNextModule(moduleName);
+  const currentIndex = MODULE_ORDER.indexOf(moduleName);
+  if (currentIndex < MODULE_ORDER.length - 1) {
+    const nextModule = MODULE_ORDER[currentIndex + 1];
+    // Show unlock notification
+    const notification = document.createElement('div');
+    notification.className = 'unlock-notification';
+    notification.innerHTML = `<strong>Next module unlocked!</strong> You can now access: Module ${currentIndex + 2}`;
+    document.body.appendChild(notification);
+    setTimeout(() => notification.remove(), 3000);
   }
 }
 
@@ -3839,6 +3971,11 @@ document.addEventListener('DOMContentLoaded', () => {
     sidebar.addEventListener('click', handleNavigation);
   }
   mainContent?.addEventListener('click', handleSpeak);
+
+  // Initialize manager mode UI and sidebar locks
+  initManagerModeUI();
+  updateSidebarLocks();
+
   renderModule('welcome');
   document.querySelector('#sidebar li[data-module="welcome"]')?.classList.add('active');
 });
