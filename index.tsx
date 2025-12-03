@@ -363,8 +363,11 @@ const MODULE_ORDER = [
   'final-exam'
 ];
 
-// Check if manager mode is active
+// Check if manager mode is active (either via old toggle or new login system)
 function isManagerMode(): boolean {
+  // Check new login system first
+  if (localStorage.getItem(STORAGE_KEYS.userIsManager) === 'true') return true;
+  // Fallback to old toggle method
   return localStorage.getItem(STORAGE_KEYS.managerMode) === 'true';
 }
 
