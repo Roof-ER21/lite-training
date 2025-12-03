@@ -6333,11 +6333,19 @@ function handleNavigation(event: Event) {
   if (target.tagName === 'LI' && target.dataset.module) {
     const moduleName = target.dataset.module;
 
-    // Check if module is locked (unless in manager mode)
-    const unlockedModules = getUnlockedModules();
-    if (!unlockedModules.includes(moduleName)) {
-      alert('Complete previous modules to unlock this section.');
-      return;
+    // Admin dashboard is always accessible for managers
+    if (moduleName === 'admin-dashboard') {
+      if (!isManagerMode()) {
+        alert('Admin dashboard is only accessible to managers.');
+        return;
+      }
+    } else {
+      // Check if module is locked (unless in manager mode)
+      const unlockedModules = getUnlockedModules();
+      if (!unlockedModules.includes(moduleName)) {
+        alert('Complete previous modules to unlock this section.');
+        return;
+      }
     }
 
     sidebar?.querySelectorAll('li').forEach(li => li.classList.remove('active'));
