@@ -87,7 +87,8 @@ export async function initDatabase(): Promise<void> {
           is_manager BOOLEAN DEFAULT FALSE,
           registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           last_login TIMESTAMP,
-          commitment_signed BOOLEAN DEFAULT FALSE
+          commitment_signed BOOLEAN DEFAULT FALSE,
+          commitment_date TIMESTAMP
         );
 
         -- Sessions table
@@ -104,7 +105,18 @@ export async function initDatabase(): Promise<void> {
           id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
           user_id UUID REFERENCES users(id) ON DELETE CASCADE,
           login_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          ip_address VARCHAR(45)
+          ip_address VARCHAR(45),
+          user_agent TEXT
+        );
+
+        -- User gamification (XP, streaks, etc.)
+        CREATE TABLE IF NOT EXISTS user_gamification (
+          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+          user_id UUID REFERENCES users(id) ON DELETE CASCADE UNIQUE,
+          total_xp INTEGER DEFAULT 0,
+          current_streak INTEGER DEFAULT 0,
+          longest_streak INTEGER DEFAULT 0,
+          last_activity_date DATE
         );
 
         -- Module progress
@@ -177,8 +189,52 @@ export async function initDatabase(): Promise<void> {
       await pool.query(schema);
       console.log('Database schema initialized successfully');
     } else {
-      console.log('Database schema already exists');
+      console.log('Database schema already exists, running migrations...');
     }
+
+    // Always run migrations to add missing tables/columns
+    const migrations = `
+      -- Add missing columns to users table
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS commitment_date TIMESTAMP;
+
+      -- Add missing columns to login_history table
+      ALTER TABLE login_history ADD COLUMN IF NOT EXISTS user_agent TEXT;
+
+      -- Create user_gamification table if not exists
+      CREATE TABLE IF NOT EXISTS user_gamification (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID REFERENCES users(id) ON DELETE CASCADE UNIQUE,
+        total_xp INTEGER DEFAULT 0,
+        current_streak INTEGER DEFAULT 0,
+        longest_streak INTEGER DEFAULT 0,
+        last_activity_date DATE
+      );
+
+      -- Ensure all other tables exist
+      CREATE TABLE IF NOT EXISTS roleplay_sessions (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+        started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        completed_at TIMESTAMP,
+        personality VARCHAR(50),
+        difficulty VARCHAR(20),
+        input_mode VARCHAR(10),
+        final_score INTEGER,
+        xp_earned INTEGER,
+        door_slammed BOOLEAN DEFAULT FALSE
+      );
+
+      CREATE TABLE IF NOT EXISTS certifications (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+        certified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        score INTEGER
+      );
+    `;
+
+    await pool.query(migrations);
+    console.log('Database migrations completed');
+
     dbAvailable = true;
   } catch (error) {
     console.error('Error initializing database:', error);
