@@ -1,23 +1,44 @@
 import pg from 'pg';
 const { Pool } = pg;
 
-// Database connection pool
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
-});
+// Check if database is configured
+const databaseUrl = process.env.DATABASE_URL;
+let pool: pg.Pool | null = null;
+let dbAvailable = false;
 
-// Test connection on startup
-pool.on('connect', () => {
-  console.log('Connected to PostgreSQL database');
-});
+if (databaseUrl) {
+  console.log('DATABASE_URL is configured, connecting to PostgreSQL...');
+  pool = new Pool({
+    connectionString: databaseUrl,
+    ssl: { rejectUnauthorized: false } // Railway requires SSL
+  });
 
-pool.on('error', (err) => {
-  console.error('Unexpected database error:', err);
-});
+  // Test connection on startup
+  pool.on('connect', () => {
+    console.log('Connected to PostgreSQL database');
+    dbAvailable = true;
+  });
+
+  pool.on('error', (err) => {
+    console.error('Unexpected database error:', err);
+    dbAvailable = false;
+  });
+} else {
+  console.warn('DATABASE_URL not set - running without database (localStorage fallback mode)');
+}
+
+// Check if database is available
+export function isDatabaseAvailable(): boolean {
+  return dbAvailable && pool !== null;
+}
 
 // Query helper with error handling
 export async function query<T = any>(text: string, params?: any[]): Promise<T[]> {
+  if (!pool) {
+    console.warn('Database not configured, skipping query');
+    return [];
+  }
+
   const start = Date.now();
   try {
     const result = await pool.query(text, params);
@@ -40,6 +61,11 @@ export async function queryOne<T = any>(text: string, params?: any[]): Promise<T
 
 // Initialize database schema
 export async function initDatabase(): Promise<void> {
+  if (!pool) {
+    console.log('No database configured, skipping schema initialization');
+    return;
+  }
+
   try {
     // Check if users table exists
     const tableCheck = await query(`
@@ -52,24 +78,112 @@ export async function initDatabase(): Promise<void> {
 
     if (!tableCheck[0]?.exists) {
       console.log('Initializing database schema...');
-      // Read and execute schema file
-      const fs = await import('fs');
-      const path = await import('path');
-      const schemaPath = path.join(process.cwd(), 'server', 'db', 'schema.sql');
+      // Execute schema inline since file path is tricky in production
+      const schema = `
+        -- Users table
+        CREATE TABLE IF NOT EXISTS users (
+          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+          name VARCHAR(255) NOT NULL UNIQUE,
+          is_manager BOOLEAN DEFAULT FALSE,
+          registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          last_login TIMESTAMP,
+          commitment_signed BOOLEAN DEFAULT FALSE
+        );
 
-      if (fs.existsSync(schemaPath)) {
-        const schema = fs.readFileSync(schemaPath, 'utf8');
-        await pool.query(schema);
-        console.log('Database schema initialized successfully');
-      } else {
-        console.warn('Schema file not found, skipping initialization');
-      }
+        -- Sessions table
+        CREATE TABLE IF NOT EXISTS sessions (
+          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+          user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+          token VARCHAR(255) UNIQUE NOT NULL,
+          expires_at TIMESTAMP,
+          is_active BOOLEAN DEFAULT TRUE
+        );
+
+        -- Login history
+        CREATE TABLE IF NOT EXISTS login_history (
+          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+          user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+          login_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          ip_address VARCHAR(45)
+        );
+
+        -- Module progress
+        CREATE TABLE IF NOT EXISTS module_progress (
+          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+          user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+          module_name VARCHAR(50) NOT NULL,
+          status VARCHAR(20) DEFAULT 'locked',
+          started_at TIMESTAMP,
+          completed_at TIMESTAMP,
+          time_spent_seconds INTEGER DEFAULT 0,
+          UNIQUE(user_id, module_name)
+        );
+
+        -- Exam attempts
+        CREATE TABLE IF NOT EXISTS exam_attempts (
+          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+          user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+          attempt_number INTEGER,
+          completed_at TIMESTAMP,
+          mcq_score INTEGER,
+          fib_score INTEGER,
+          sa_score INTEGER,
+          total_score INTEGER,
+          passed BOOLEAN,
+          time_taken_seconds INTEGER
+        );
+
+        -- Exam answers
+        CREATE TABLE IF NOT EXISTS exam_answers (
+          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+          attempt_id UUID REFERENCES exam_attempts(id) ON DELETE CASCADE,
+          question_type VARCHAR(10),
+          question_id VARCHAR(20),
+          user_answer TEXT,
+          correct_answer TEXT,
+          is_correct BOOLEAN
+        );
+
+        -- Roleplay sessions
+        CREATE TABLE IF NOT EXISTS roleplay_sessions (
+          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+          user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+          started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          completed_at TIMESTAMP,
+          personality VARCHAR(50),
+          difficulty VARCHAR(20),
+          input_mode VARCHAR(10),
+          final_score INTEGER,
+          xp_earned INTEGER,
+          door_slammed BOOLEAN DEFAULT FALSE
+        );
+
+        -- Certifications
+        CREATE TABLE IF NOT EXISTS certifications (
+          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+          user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+          certified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          score INTEGER
+        );
+
+        -- Create indexes for common queries
+        CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token);
+        CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
+        CREATE INDEX IF NOT EXISTS idx_module_progress_user ON module_progress(user_id);
+        CREATE INDEX IF NOT EXISTS idx_exam_attempts_user ON exam_attempts(user_id);
+        CREATE INDEX IF NOT EXISTS idx_roleplay_sessions_user ON roleplay_sessions(user_id);
+      `;
+
+      await pool.query(schema);
+      console.log('Database schema initialized successfully');
     } else {
       console.log('Database schema already exists');
     }
+    dbAvailable = true;
   } catch (error) {
     console.error('Error initializing database:', error);
-    throw error;
+    // Don't throw - allow server to start without database
+    dbAvailable = false;
   }
 }
 

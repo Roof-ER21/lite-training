@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { initDatabase } from './db/connection.js';
+import { initDatabase, isDatabaseAvailable } from './db/connection.js';
 
 // Import routes
 import authRoutes from './routes/auth.js';
@@ -31,7 +31,11 @@ if (process.env.NODE_ENV !== 'production') {
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    database: isDatabaseAvailable() ? 'connected' : 'unavailable'
+  });
 });
 
 // API Routes
