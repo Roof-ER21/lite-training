@@ -1106,6 +1106,667 @@ const agnesScenarios = {
 };
 
 // ========================================
+// SCENARIO CATEGORIES FOR UNIFIED SELECTOR
+// ========================================
+
+const scenarioCategories = {
+  inspection: {
+    id: 'inspection',
+    title: 'Inspection Process',
+    icon: '🔍',
+    description: 'Practice handling homeowner questions during roof inspections',
+    color: '#2196f3',
+    sourceModule: 'Module 7'
+  },
+  initialPitch: {
+    id: 'initialPitch',
+    title: 'Door Knock & Pitch',
+    icon: '🚪',
+    description: 'Master the door knock and 5 non-negotiables',
+    color: '#4caf50',
+    sourceModule: 'Module 7'
+  },
+  postInspection: {
+    id: 'postInspection',
+    title: 'Post-Inspection Pitch',
+    icon: '📋',
+    description: 'Present findings and build the evidence story',
+    color: '#ff9800',
+    sourceModule: 'Module 8'
+  },
+  initialObjections: {
+    id: 'initialObjections',
+    title: 'Initial Objections',
+    icon: '🛑',
+    description: 'Handle objections at the door using L.E.A.R.N.',
+    color: '#f44336',
+    sourceModule: 'Module 9'
+  },
+  postInspectionObjections: {
+    id: 'postInspectionObjections',
+    title: 'Post-Inspection Objections',
+    icon: '💬',
+    description: '9 common objections after finding damage',
+    color: '#9c27b0',
+    sourceModule: 'Module 9'
+  },
+  closingObjections: {
+    id: 'closingObjections',
+    title: 'Closing Objections',
+    icon: '✍️',
+    description: '12 final objections before signing',
+    color: '#607d8b',
+    sourceModule: 'Module 12'
+  }
+};
+
+// ========================================
+// CATEGORIZED SCENARIOS
+// ========================================
+
+// INSPECTION SCENARIOS (Module 7 content)
+const inspectionScenarios = [
+  {
+    id: 'insp-what-looking-for',
+    role: 'homeowner',
+    category: 'inspection',
+    prompt: "What exactly are you looking for up there on my roof?",
+    expectedKeyPoints: [
+      'Hail/storm damage indicators',
+      'Granule loss and bruising on shingles',
+      'Flashing and vent condition',
+      'Collateral damage for evidence'
+    ],
+    rubric: {
+      keywords: ['hail', 'granules', 'flashing', 'vents', 'damage', 'storm', 'evidence'],
+      passThreshold: 70
+    },
+    followUps: [
+      'How long will this inspection take?',
+      'Will you need to go inside my house?'
+    ]
+  },
+  {
+    id: 'insp-is-that-damage',
+    role: 'homeowner',
+    category: 'inspection',
+    prompt: "Is that actually damage? It looks pretty normal to me.",
+    expectedKeyPoints: [
+      'Explain hail indicators (circular divots)',
+      'Show granule displacement',
+      'Compare to undamaged area',
+      'Use test square method'
+    ],
+    rubric: {
+      keywords: ['circular', 'divot', 'granule', 'bruise', 'test square', 'chalk', 'pattern'],
+      passThreshold: 70
+    },
+    followUps: [
+      'How do you know it was from the recent storm?',
+      'My neighbor said their roof was fine.'
+    ]
+  },
+  {
+    id: 'insp-photo-purpose',
+    role: 'homeowner',
+    category: 'inspection',
+    prompt: "Why are you taking so many photos? Isn't that overkill?",
+    expectedKeyPoints: [
+      'Insurance evidence requirements',
+      'Building a case for claim approval',
+      'Documentation for adjuster review',
+      'Your protection and transparency'
+    ],
+    rubric: {
+      keywords: ['insurance', 'evidence', 'adjuster', 'documentation', 'claim', 'approve'],
+      passThreshold: 70
+    },
+    followUps: [
+      'Can I see the photos you took?',
+      'Will you share these with me?'
+    ]
+  },
+  {
+    id: 'insp-safety-concern',
+    role: 'homeowner',
+    category: 'inspection',
+    prompt: "Is it safe to be up there? I don't want anyone getting hurt on my property.",
+    expectedKeyPoints: [
+      'Safety protocols and training',
+      '3-point contact on ladder',
+      'Insurance and liability coverage',
+      'Weather check before climbing'
+    ],
+    rubric: {
+      keywords: ['safe', 'ladder', 'training', 'insurance', 'liability', 'weather'],
+      passThreshold: 70
+    },
+    followUps: [
+      'What happens if you slip or fall?',
+      'Do you have liability insurance?'
+    ]
+  },
+  {
+    id: 'insp-how-long',
+    role: 'homeowner',
+    category: 'inspection',
+    prompt: "How long is this going to take? I have somewhere to be.",
+    expectedKeyPoints: [
+      '15-20 minutes typical',
+      'Thorough but efficient process',
+      'Will show you findings after',
+      'Respect their time'
+    ],
+    rubric: {
+      keywords: ['15', '20', 'minutes', 'quick', 'thorough', 'efficient', 'findings'],
+      passThreshold: 70
+    },
+    followUps: [
+      'Can you just give me a quick answer?',
+      'What if you find something? How long then?'
+    ]
+  }
+];
+
+// INITIAL PITCH SCENARIOS (Module 7 content)
+const initialPitchScenarios = [
+  {
+    id: 'pitch-30sec-opener',
+    role: 'rep',
+    category: 'initialPitch',
+    prompt: 'Deliver your 30-second door knock pitch for a post-storm neighborhood.',
+    expectedKeyPoints: [
+      'Who you are (name)',
+      'Who we are (Roof-ER, local company)',
+      'Make it relatable (storms, neighbors)',
+      'What you\'re there to do (free inspection)',
+      'Go for the close (agreement to inspect)'
+    ],
+    rubric: {
+      keywords: ['name', 'Roof-ER', 'local', 'neighbors', 'storm', 'free', 'inspection', 'no obligation'],
+      passThreshold: 70
+    },
+    followUps: [
+      'Now shorten it to 20 seconds.',
+      'How would you adjust for a skeptical homeowner?'
+    ]
+  },
+  {
+    id: 'pitch-specific-damage',
+    role: 'rep',
+    category: 'initialPitch',
+    prompt: 'You notice dented gutters from the street. Craft your opening that references this observation.',
+    expectedKeyPoints: [
+      'Reference specific visible damage',
+      'Connect to storm activity',
+      'Offer free inspection',
+      'Create urgency without pressure'
+    ],
+    rubric: {
+      keywords: ['noticed', 'gutter', 'dent', 'storm', 'damage', 'free', 'inspection', 'quick'],
+      passThreshold: 70
+    },
+    followUps: [
+      'What if they say the gutters are old?',
+      'How do you transition to the roof inspection?'
+    ]
+  },
+  {
+    id: 'pitch-neighbor-reference',
+    role: 'rep',
+    category: 'initialPitch',
+    prompt: "You just finished an inspection at the neighbor's house. How do you use this for your pitch?",
+    expectedKeyPoints: [
+      'Reference nearby work',
+      'Build credibility through proximity',
+      'Mention similar findings',
+      'Offer convenience'
+    ],
+    rubric: {
+      keywords: ['neighbor', 'just', 'down the street', 'similar', 'damage', 'already here'],
+      passThreshold: 70
+    },
+    followUps: [
+      "Can I call that neighbor to verify?",
+      "What did you find at their house?"
+    ]
+  },
+  {
+    id: 'pitch-permission-ladder',
+    role: 'rep',
+    category: 'initialPitch',
+    prompt: 'The homeowner agrees to a ground inspection. How do you ask permission to use your ladder?',
+    expectedKeyPoints: [
+      'Confirm ground findings first',
+      'Explain need for roof-level photos',
+      'Quick 15-minute timeframe',
+      'No obligation commitment'
+    ],
+    rubric: {
+      keywords: ['ladder', 'roof', 'photos', '15 minutes', 'no obligation', 'quick', 'evidence'],
+      passThreshold: 70
+    },
+    followUps: [
+      "I don't want anyone on my roof.",
+      "Can't you see enough from the ground?"
+    ]
+  }
+];
+
+// POST-INSPECTION PITCH SCENARIOS (Module 8 content)
+const postInspectionPitchScenarios = [
+  {
+    id: 'pitch-found-damage',
+    role: 'rep',
+    category: 'postInspection',
+    prompt: 'You found qualifying damage. Walk the homeowner through your photos and explain next steps.',
+    expectedKeyPoints: [
+      'Set expectations (I found damage)',
+      'Walk through photos visually',
+      'Explain consequences (UV, leaks)',
+      'Present solution (insurance coverage)',
+      'Close with next step'
+    ],
+    rubric: {
+      keywords: ['photos', 'damage', 'insurance', 'deductible', 'claim', 'adjuster', 'process'],
+      passThreshold: 70
+    },
+    followUps: [
+      'How much will this cost me?',
+      'What if my insurance denies the claim?'
+    ]
+  },
+  {
+    id: 'pitch-build-story',
+    role: 'rep',
+    category: 'postInspection',
+    prompt: 'Explain how you build the "evidence story" with your photos for the insurance adjuster.',
+    expectedKeyPoints: [
+      'Start with collateral damage',
+      'Progress to roof overview',
+      'Show test squares and close-ups',
+      'Connect the storm pattern'
+    ],
+    rubric: {
+      keywords: ['collateral', 'evidence', 'story', 'pattern', 'test square', 'adjuster', 'overview'],
+      passThreshold: 70
+    },
+    followUps: [
+      'Why does the order matter?',
+      'What if the adjuster disagrees?'
+    ]
+  },
+  {
+    id: 'pitch-no-damage-found',
+    role: 'rep',
+    category: 'postInspection',
+    prompt: "You completed the inspection but didn't find qualifying damage. How do you handle this professionally?",
+    expectedKeyPoints: [
+      'Be honest and transparent',
+      'Explain what you looked for',
+      'Provide peace of mind value',
+      'Leave door open for future'
+    ],
+    rubric: {
+      keywords: ['honest', 'good news', 'peace of mind', 'monitor', 'future', 'storm', 'contact'],
+      passThreshold: 70
+    },
+    followUps: [
+      'Are you sure you checked everything?',
+      'Should I get a second opinion?'
+    ]
+  }
+];
+
+// INITIAL OBJECTIONS SCENARIOS (Module 9 content)
+const initialObjectionsScenarios = [
+  {
+    id: 'obj-busy-right-now',
+    role: 'homeowner',
+    category: 'initialObjections',
+    prompt: "I'm really busy right now. Can you just leave a card?",
+    expectedKeyPoints: [
+      'Acknowledge time constraint',
+      'Offer 10-second value statement',
+      'Provide two specific time options',
+      'Offer to text confirmation'
+    ],
+    rubric: {
+      keywords: ['understand', 'busy', '10 seconds', 'two options', 'text', 'tomorrow', 'today'],
+      passThreshold: 70
+    },
+    followUps: [
+      'I really can\'t talk right now.',
+      'Fine, what time tomorrow?'
+    ]
+  },
+  {
+    id: 'obj-have-roofer',
+    role: 'homeowner',
+    category: 'initialObjections',
+    prompt: "We already have a roofer we use. We'll call him if we need anything.",
+    expectedKeyPoints: [
+      'Acknowledge and respect relationship',
+      'Clarify storm claim vs retail work',
+      'Offer second opinion value',
+      'No obligation inspection'
+    ],
+    rubric: {
+      keywords: ['understand', 'storm claim', 'insurance', 'second opinion', 'no obligation', 'free'],
+      passThreshold: 70
+    },
+    followUps: [
+      'He\'s my brother-in-law actually.',
+      'Why should I trust you over him?'
+    ]
+  },
+  {
+    id: 'obj-not-interested',
+    role: 'homeowner',
+    category: 'initialObjections',
+    prompt: "Not interested. Have a good day.",
+    expectedKeyPoints: [
+      'Acknowledge respectfully',
+      'Quick pivot to value',
+      'Social proof (neighbors)',
+      'Risk reversal (2 minutes)'
+    ],
+    rubric: {
+      keywords: ['understand', 'neighbors', 'quick', '2 minutes', 'peace of mind', 'free'],
+      passThreshold: 70
+    },
+    followUps: [
+      '*Starts closing door*',
+      'Fine, you have 30 seconds.'
+    ]
+  },
+  {
+    id: 'obj-no-damage-visible',
+    role: 'homeowner',
+    category: 'initialObjections',
+    prompt: "I looked at my roof from the ground and don't see any damage. Why would I need an inspection?",
+    expectedKeyPoints: [
+      'Acknowledge their observation',
+      'Explain roof-level vs ground view',
+      'Reference hidden damage types',
+      'Offer quick verification'
+    ],
+    rubric: {
+      keywords: ['understand', 'roof-level', 'granules', 'hidden', 'close-up', 'verify', 'peace of mind'],
+      passThreshold: 70
+    },
+    followUps: [
+      'If I can\'t see it, why would insurance cover it?',
+      '8 out of 10 neighbors had damage? Really?'
+    ]
+  },
+  {
+    id: 'obj-scam-concern',
+    role: 'homeowner',
+    category: 'initialObjections',
+    prompt: "We've had a lot of people knocking lately. How do I know this isn't a scam?",
+    expectedKeyPoints: [
+      'Empathize with concern',
+      'Local presence and references',
+      'Transparent photo process',
+      'No money upfront'
+    ],
+    rubric: {
+      keywords: ['understand', 'local', 'references', 'transparent', 'photos', 'no money', 'no obligation'],
+      passThreshold: 70
+    },
+    followUps: [
+      'Can I verify your company online?',
+      'Do you have ID or a business card?'
+    ]
+  }
+];
+
+// CLOSING OBJECTIONS SCENARIOS (Module 12 content)
+const closingObjectionsScenarios = [
+  {
+    id: 'close-more-bids',
+    role: 'homeowner',
+    category: 'closingObjections',
+    prompt: "I want to wait and get a few more bids before deciding.",
+    expectedKeyPoints: [
+      'Acknowledge due diligence',
+      'Explain insurance claim vs retail bidding',
+      'Timeline and statute concerns',
+      'Position as starting the process'
+    ],
+    rubric: {
+      keywords: ['understand', 'insurance', 'not retail', 'timeline', 'statute', 'process', 'adjuster'],
+      passThreshold: 70
+    },
+    followUps: [
+      'What makes your company different?',
+      'How do I know I\'m getting a fair deal?'
+    ]
+  },
+  {
+    id: 'close-think-about-it',
+    role: 'homeowner',
+    category: 'closingObjections',
+    prompt: "I need to think about it. Can you call me next week?",
+    expectedKeyPoints: [
+      'Acknowledge need for consideration',
+      'Ask what specific concern to address',
+      'Explain what changes in a week',
+      'Offer to answer questions now'
+    ],
+    rubric: {
+      keywords: ['understand', 'concern', 'questions', 'help', 'decide', 'timeline'],
+      passThreshold: 70
+    },
+    followUps: [
+      'I just need time to process.',
+      'What if I decide not to move forward?'
+    ]
+  },
+  {
+    id: 'close-deductible-concern',
+    role: 'homeowner',
+    category: 'closingObjections',
+    prompt: "I'm not sure about paying the deductible. That's a lot of money right now.",
+    expectedKeyPoints: [
+      'Empathize with financial concern',
+      'Explain deductible timing (at completion)',
+      'Math comparison ($1,500 vs $20,000 roof)',
+      'Payment options if available'
+    ],
+    rubric: {
+      keywords: ['understand', 'deductible', 'completion', 'value', 'new roof', 'worth it'],
+      passThreshold: 70
+    },
+    followUps: [
+      'When exactly would I have to pay?',
+      'What if I can\'t afford it when the time comes?'
+    ]
+  },
+  {
+    id: 'close-spouse-decision',
+    role: 'homeowner',
+    category: 'closingObjections',
+    prompt: "My spouse handles all the home improvement decisions. I can't sign anything without them.",
+    expectedKeyPoints: [
+      'Respect the decision-making process',
+      'Offer to schedule when both present',
+      'Provide summary materials',
+      'Three-way call option'
+    ],
+    rubric: {
+      keywords: ['understand', 'both', 'schedule', 'summary', 'together', 'call'],
+      passThreshold: 70
+    },
+    followUps: [
+      'They work late every night.',
+      'Can you just email them the information?'
+    ]
+  },
+  {
+    id: 'close-dont-trust-contractors',
+    role: 'homeowner',
+    category: 'closingObjections',
+    prompt: "I've been burned by contractors before. How do I know you won't disappear after I sign?",
+    expectedKeyPoints: [
+      'Acknowledge past experience',
+      'Explain contingency agreement',
+      'Local presence and track record',
+      'Process transparency'
+    ],
+    rubric: {
+      keywords: ['understand', 'contingency', 'local', 'track record', 'references', 'process'],
+      passThreshold: 70
+    },
+    followUps: [
+      'What happens if I\'m not satisfied with the work?',
+      'Can I talk to some of your past customers?'
+    ]
+  },
+  {
+    id: 'close-rates-increase',
+    role: 'homeowner',
+    category: 'closingObjections',
+    prompt: "Won't filing a claim make my insurance rates go up?",
+    expectedKeyPoints: [
+      'Address common misconception',
+      'Storm claims vs at-fault claims',
+      'Policy protections',
+      'Cost comparison math'
+    ],
+    rubric: {
+      keywords: ['storm', 'act of God', 'not at-fault', 'policy', 'rates', 'value'],
+      passThreshold: 70
+    },
+    followUps: [
+      'Are you 100% sure about that?',
+      'What if my insurance drops me?'
+    ]
+  },
+  {
+    id: 'close-wait-and-see',
+    role: 'homeowner',
+    category: 'closingObjections',
+    prompt: "I think I'll just wait and see if we get any leaks first.",
+    expectedKeyPoints: [
+      'Explain damage progression',
+      'Statute of limitations urgency',
+      'Interior damage costs',
+      'Proactive vs reactive approach'
+    ],
+    rubric: {
+      keywords: ['deteriorate', 'statute', 'leak', 'interior damage', 'mold', 'time', 'now'],
+      passThreshold: 70
+    },
+    followUps: [
+      'How long do I actually have?',
+      'What\'s the worst that could happen?'
+    ]
+  },
+  {
+    id: 'close-claim-denied',
+    role: 'homeowner',
+    category: 'closingObjections',
+    prompt: "What if my insurance claim gets denied? Then I've wasted everyone's time.",
+    expectedKeyPoints: [
+      'Explain contingency agreement',
+      'No cost if denied',
+      'High approval rate',
+      'Worth trying given the upside'
+    ],
+    rubric: {
+      keywords: ['contingency', 'no cost', 'denied', 'approval', 'risk', 'free'],
+      passThreshold: 70
+    },
+    followUps: [
+      'What\'s your approval rate?',
+      'Have you ever had a claim denied?'
+    ]
+  },
+  {
+    id: 'close-handle-myself',
+    role: 'homeowner',
+    category: 'closingObjections',
+    prompt: "I think I can handle the insurance claim process myself. I don't need a contractor involved.",
+    expectedKeyPoints: [
+      'Acknowledge their capability',
+      'Explain adjuster tactics',
+      'Scope reduction risks',
+      'Your advocacy value'
+    ],
+    rubric: {
+      keywords: ['understand', 'adjuster', 'scope', 'negotiate', 'advocate', 'experience'],
+      passThreshold: 70
+    },
+    followUps: [
+      'What specifically do you do that I can\'t?',
+      'How much more would I get with your help?'
+    ]
+  },
+  {
+    id: 'close-just-patch',
+    role: 'homeowner',
+    category: 'closingObjections',
+    prompt: "Can't we just patch the damaged areas instead of replacing the whole roof?",
+    expectedKeyPoints: [
+      'Explain matching law',
+      'Color and material matching issues',
+      'Insurance coverage for full replacement',
+      'Long-term value'
+    ],
+    rubric: {
+      keywords: ['matching', 'law', 'insurance', 'color', 'replace', 'value', 'warranty'],
+      passThreshold: 70
+    },
+    followUps: [
+      'Why can\'t they just match the shingles?',
+      'What is matching law exactly?'
+    ]
+  },
+  {
+    id: 'close-spring-better',
+    role: 'homeowner',
+    category: 'closingObjections',
+    prompt: "Let's wait until spring when the weather is better for roof work.",
+    expectedKeyPoints: [
+      'Empathize with timing concern',
+      'Statute of limitations',
+      'Document now, schedule later',
+      'Spring crew availability'
+    ],
+    rubric: {
+      keywords: ['understand', 'statute', 'document', 'schedule', 'spring', 'busy', 'claim'],
+      passThreshold: 70
+    },
+    followUps: [
+      'Can we really install in winter?',
+      'What\'s the deadline to file?'
+    ]
+  },
+  {
+    id: 'close-assumptive',
+    role: 'rep',
+    category: 'closingObjections',
+    prompt: 'Demonstrate an assumptive close after the homeowner seems ready but hasn\'t committed.',
+    expectedKeyPoints: [
+      'Transition naturally from presentation',
+      'Ask preference questions (color, style)',
+      'Set next step as given',
+      'Remove friction from decision'
+    ],
+    rubric: {
+      keywords: ['color', 'preference', 'schedule', 'text', 'contract', 'next step'],
+      passThreshold: 70
+    },
+    followUps: [
+      'Wait, I didn\'t say yes yet.',
+      'What if I change my mind?'
+    ]
+  }
+];
+
+// ========================================
 // UTILITY FUNCTIONS FOR FILTERING
 // ========================================
 
@@ -1133,6 +1794,66 @@ function getScenariosByRole(role) {
 // Get scenarios by module
 function getScenariosByModule(moduleKey) {
   return agnesScenarios[moduleKey] ? agnesScenarios[moduleKey].scenarios : [];
+}
+
+// Get scenarios by category
+function getScenariosByCategory(categoryId) {
+  switch (categoryId) {
+    case 'inspection':
+      return inspectionScenarios;
+    case 'initialPitch':
+      return initialPitchScenarios;
+    case 'postInspection':
+      return postInspectionPitchScenarios;
+    case 'initialObjections':
+      return initialObjectionsScenarios;
+    case 'postInspectionObjections':
+      // Return existing module9 homeowner scenarios
+      return agnesScenarios.module9.scenarios.filter(s => s.role === 'homeowner');
+    case 'closingObjections':
+      return closingObjectionsScenarios;
+    default:
+      return [];
+  }
+}
+
+// Get all categorized scenarios with counts
+function getAllCategorizedScenarios() {
+  return {
+    inspection: inspectionScenarios,
+    initialPitch: initialPitchScenarios,
+    postInspection: postInspectionPitchScenarios,
+    initialObjections: initialObjectionsScenarios,
+    postInspectionObjections: agnesScenarios.module9.scenarios.filter(s => s.role === 'homeowner'),
+    closingObjections: closingObjectionsScenarios
+  };
+}
+
+// Get category info - single category by ID or all categories
+function getCategoryInfo(categoryId) {
+  if (categoryId) {
+    // Return single category info
+    const category = scenarioCategories[categoryId];
+    if (category) {
+      const scenarios = getScenariosByCategory(categoryId);
+      return {
+        ...category,
+        count: scenarios.length
+      };
+    }
+    return null;
+  }
+
+  // Return all categories
+  const categories = Object.keys(scenarioCategories).map(key => {
+    const category = scenarioCategories[key];
+    const scenarios = getScenariosByCategory(key);
+    return {
+      ...category,
+      count: scenarios.length
+    };
+  });
+  return categories;
 }
 
 // Get all trainer tips from all modules
@@ -1287,6 +2008,16 @@ if (typeof window !== 'undefined') {
   window.scoreResponse = scoreResponse;
   window.getAllAgnesScenarios = getAllAgnesScenarios;
   window.getAgnesScenariosByRole = getAgnesScenariosByRole;
+  // New categorized scenario functions
+  window.scenarioCategories = scenarioCategories;
+  window.getScenariosByCategory = getScenariosByCategory;
+  window.getAllCategorizedScenarios = getAllCategorizedScenarios;
+  window.getCategoryInfo = getCategoryInfo;
+  window.inspectionScenarios = inspectionScenarios;
+  window.initialPitchScenarios = initialPitchScenarios;
+  window.postInspectionPitchScenarios = postInspectionPitchScenarios;
+  window.initialObjectionsScenarios = initialObjectionsScenarios;
+  window.closingObjectionsScenarios = closingObjectionsScenarios;
 }
 
 // ========================================

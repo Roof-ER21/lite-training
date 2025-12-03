@@ -16,8 +16,329 @@ const STORAGE_KEYS = {
   commitmentSigned: 'roof-er.commitmentSigned',
   managerMode: 'roof-er.managerMode',
   unlockedModules: 'roof-er.unlockedModules',
-  currentModule: 'roof-er.currentModule'
+  currentModule: 'roof-er.currentModule',
+  // Final Exam keys
+  finalExamHistory: 'roof-er.finalExamHistory',
+  certifiedStatus: 'roof-er.certifiedStatus',
+  certificationDate: 'roof-er.certificationDate',
+  examUserName: 'roof-er.examUserName',
+  lastExamWrongAnswers: 'roof-er.lastExamWrongAnswers',
+  // Session/Auth keys
+  sessionToken: 'roof-er.sessionToken',
+  userId: 'roof-er.userId',
+  userName: 'roof-er.userName',
+  userIsManager: 'roof-er.userIsManager'
 };
+
+// ============================================================================
+// API & SESSION MANAGEMENT
+// ============================================================================
+
+const API_BASE = '/api';
+
+interface User {
+  id: string;
+  name: string;
+  isManager: boolean;
+}
+
+let currentUser: User | null = null;
+
+// API call helper with auth token
+async function apiCall<T>(endpoint: string, options?: RequestInit): Promise<T | null> {
+  try {
+    const token = localStorage.getItem(STORAGE_KEYS.sessionToken);
+    const res = await fetch(`${API_BASE}${endpoint}`, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        ...options?.headers
+      }
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      console.error('API error:', errorData);
+      return null;
+    }
+
+    return res.json();
+  } catch (error) {
+    console.error('API call failed:', error);
+    return null;
+  }
+}
+
+// Check if user is logged in
+function isLoggedIn(): boolean {
+  return !!localStorage.getItem(STORAGE_KEYS.sessionToken);
+}
+
+// Get current user from storage
+function getCurrentUser(): User | null {
+  const userId = localStorage.getItem(STORAGE_KEYS.userId);
+  const userName = localStorage.getItem(STORAGE_KEYS.userName);
+  const isManager = localStorage.getItem(STORAGE_KEYS.userIsManager) === 'true';
+
+  if (!userId || !userName) return null;
+  return { id: userId, name: userName, isManager };
+}
+
+// Save user session to storage
+function saveSession(userId: string, name: string, isManager: boolean, token: string): void {
+  localStorage.setItem(STORAGE_KEYS.sessionToken, token);
+  localStorage.setItem(STORAGE_KEYS.userId, userId);
+  localStorage.setItem(STORAGE_KEYS.userName, name);
+  localStorage.setItem(STORAGE_KEYS.userIsManager, isManager.toString());
+  currentUser = { id: userId, name, isManager };
+
+  // If manager, also set the old manager mode for compatibility
+  if (isManager) {
+    localStorage.setItem(STORAGE_KEYS.managerMode, 'true');
+  }
+}
+
+// Clear session
+function clearSession(): void {
+  localStorage.removeItem(STORAGE_KEYS.sessionToken);
+  localStorage.removeItem(STORAGE_KEYS.userId);
+  localStorage.removeItem(STORAGE_KEYS.userName);
+  localStorage.removeItem(STORAGE_KEYS.userIsManager);
+  currentUser = null;
+}
+
+// Validate session with server
+async function validateSession(): Promise<boolean> {
+  const token = localStorage.getItem(STORAGE_KEYS.sessionToken);
+  if (!token) return false;
+
+  // If offline session, just check local storage
+  if (token.startsWith('offline-')) {
+    currentUser = getCurrentUser();
+    return !!currentUser;
+  }
+
+  const result = await apiCall<{ valid: boolean; userId?: string; name?: string; isManager?: boolean }>('/auth/validate', {
+    method: 'POST',
+    body: JSON.stringify({ token })
+  });
+
+  if (result?.valid) {
+    currentUser = { id: result.userId!, name: result.name!, isManager: result.isManager! };
+    return true;
+  }
+
+  // Server unavailable - trust local storage
+  if (result === null) {
+    currentUser = getCurrentUser();
+    return !!currentUser;
+  }
+
+  // Invalid session - clear it
+  clearSession();
+  return false;
+}
+
+// Login function
+async function login(name: string, managerCode?: string): Promise<{ success: boolean; error?: string }> {
+  const result = await apiCall<{ userId: string; name: string; isManager: boolean; token: string } | { error: string }>('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ name, managerCode: managerCode || undefined })
+  });
+
+  if (!result) {
+    // Offline mode fallback - create a local session
+    console.log('Server unavailable, using offline mode');
+    const isManager = managerCode === MANAGER_CODE;
+    const localId = `local-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    saveSession(localId, name, isManager, `offline-${localId}`);
+    return { success: true };
+  }
+
+  if ('error' in result) {
+    return { success: false, error: result.error };
+  }
+
+  saveSession(result.userId, result.name, result.isManager, result.token);
+  return { success: true };
+}
+
+// Logout function
+async function logout(): Promise<void> {
+  await apiCall('/auth/logout', { method: 'POST' });
+  clearSession();
+  showLoginScreen();
+}
+
+// ============================================================================
+// FINAL EXAM TYPE DEFINITIONS
+// ============================================================================
+
+interface MCQQuestion {
+  id: string;
+  module: number;
+  question: string;
+  options: string[];
+  correctAnswer: number; // Index of correct option (0-3)
+  explanation: string;
+}
+
+interface FIBQuestion {
+  id: string;
+  module: number;
+  question: string; // Use _____ for blank
+  acceptableAnswers: string[]; // Multiple valid answers
+  explanation: string;
+}
+
+interface SAQuestion {
+  id: string;
+  module: number;
+  prompt: string;
+  keywords: string[]; // Keywords for scoring
+  minKeywords: number; // Min keywords needed for full credit
+  sampleAnswer: string;
+}
+
+interface ExamAttempt {
+  attemptNumber: number;
+  date: string;
+  mcqScore: number;
+  fibScore: number;
+  saScore: number;
+  totalScore: number;
+  passed: boolean;
+}
+
+interface ExamState {
+  attempts: ExamAttempt[];
+  isCertified: boolean;
+  certificationDate: string | null;
+  userName: string;
+}
+
+interface WrongAnswer {
+  type: 'mcq' | 'fib' | 'sa';
+  questionNumber: number;
+  question: string;
+  userAnswer: string;
+  correctAnswer: string;
+  explanation: string;
+}
+
+interface ExamDetailedResults {
+  mcqCorrect: number;
+  fibCorrect: number;
+  saPoints: number;
+  totalScore: number;
+  passed: boolean;
+  wrongAnswers: WrongAnswer[];
+}
+
+// ============================================================================
+// FINAL EXAM QUESTION BANK (50 Questions)
+// ============================================================================
+
+const FINAL_EXAM_MCQ: MCQQuestion[] = [
+  // Module 1-4: Basics (6 MCQ)
+  { id: 'mcq-1', module: 1, question: 'Who is the CEO and founder of Roof E.R.?', options: ['Reese Samala', 'Ford Barsi', 'Oliver Brown', 'John Smith'], correctAnswer: 2, explanation: 'Oliver Brown founded Roof E.R. in 2019.' },
+  { id: 'mcq-2', module: 1, question: 'What year was Roof E.R. founded?', options: ['2015', '2017', '2019', '2021'], correctAnswer: 2, explanation: 'Roof E.R. was founded in 2019.' },
+  { id: 'mcq-3', module: 2, question: 'What is Roof E.R.\'s primary mission?', options: ['Maximize profits', 'Hold fiduciary responsibility to customers', 'Sell the most roofs', 'Beat competitors'], correctAnswer: 1, explanation: 'Our mission is to hold fiduciary responsibility to customers - their interests come first.' },
+  { id: 'mcq-4', module: 3, question: 'What does "COI" stand for in roofing claims?', options: ['Cost Of Installation', 'Certificate Of Insurance', 'Claim Of Interest', 'Contract Of Intent'], correctAnswer: 1, explanation: 'COI stands for Certificate Of Insurance - proof of contractor insurance coverage.' },
+  { id: 'mcq-5', module: 4, question: 'Which shingle type is most commonly used in residential roofing?', options: ['Metal shingles', '3-tab asphalt', 'Clay tiles', 'Slate'], correctAnswer: 1, explanation: '3-tab asphalt shingles are the most common residential roofing material.' },
+  { id: 'mcq-6', module: 4, question: 'What is the typical warranty period for architectural shingles?', options: ['10 years', '25-30 years', '50 years', 'Lifetime'], correctAnswer: 1, explanation: 'Most architectural shingles carry a 25-30 year warranty.' },
+
+  // Module 5: Initial Pitch (4 MCQ)
+  { id: 'mcq-7', module: 5, question: 'What are the 5 Non-Negotiables of the initial pitch?', options: ['Name, Company, Price, Timeline, Close', 'Who you are, Who we are, Make it relatable, Purpose, Go for the close', 'Greeting, Inspect, Photo, File, Sign', 'Introduction, Benefits, Price, Warranty, Close'], correctAnswer: 1, explanation: 'The 5 Non-Negotiables: Who you are, Who we are, Make it relatable, Purpose (inspection), Go for the close.' },
+  { id: 'mcq-8', module: 5, question: 'What should you mention to make your pitch relatable?', options: ['Your personal story', 'Recent storms or helping neighbors', 'Company awards', 'Competitor weaknesses'], correctAnswer: 1, explanation: 'Mention recent storms or that you\'ve been helping their neighbors to create local relevance.' },
+  { id: 'mcq-9', module: 5, question: 'What is the primary purpose mentioned in the pitch?', options: ['Selling a roof', 'Getting a signature', 'Offering a free inspection', 'Collecting payment'], correctAnswer: 2, explanation: 'The purpose is offering a FREE inspection - no commitment, no pressure.' },
+  { id: 'mcq-10', module: 5, question: 'How long should you say the initial inspection takes?', options: ['5 minutes', '15 minutes', '45 minutes', '2 hours'], correctAnswer: 1, explanation: 'Tell them the inspection takes about 15 minutes - quick and easy.' },
+
+  // Module 6: Handling Initial Objections (4 MCQ)
+  { id: 'mcq-11', module: 6, question: 'What is the L.E.A.R.N. framework for handling objections?', options: ['Look, Evaluate, Analyze, Report, Notify', 'Listen, Empathize, Ask, Respond, Navigate', 'Learn, Educate, Assist, Repair, Negotiate', 'List, Examine, Address, Resolve, Note'], correctAnswer: 1, explanation: 'L.E.A.R.N.: Listen, Empathize, Ask clarifying questions, Respond, Navigate to next step.' },
+  { id: 'mcq-12', module: 6, question: 'When a homeowner says "I\'m not interested," what should you do first?', options: ['Walk away immediately', 'Offer a discount', 'Ask what specifically concerns them', 'Call your manager'], correctAnswer: 2, explanation: 'First, ask what specifically concerns them to uncover the real objection.' },
+  { id: 'mcq-13', module: 6, question: 'What\'s the best response to "I don\'t have time right now"?', options: ['Leave your card', 'Insist on doing it now', 'Offer to schedule a specific time that works for them', 'Say you\'ll only be 5 minutes'], correctAnswer: 2, explanation: 'Offer to schedule a specific time - respect their time while keeping the opportunity alive.' },
+  { id: 'mcq-14', module: 6, question: 'How should you handle "We already have a roofer"?', options: ['Criticize their roofer', 'Ask if they\'ve gotten a second opinion from a storm specialist', 'Give up and leave', 'Offer a lower price'], correctAnswer: 1, explanation: 'Ask about getting a second opinion - position yourself as a storm damage specialist.' },
+
+  // Module 7: Inspection Process (4 MCQ)
+  { id: 'mcq-15', module: 7, question: 'What is the first thing you should do during a roof inspection?', options: ['Start taking photos', 'Check for safety hazards and proper equipment', 'Knock on the door', 'Call the insurance company'], correctAnswer: 1, explanation: 'Safety first - always check for hazards and ensure you have proper equipment.' },
+  { id: 'mcq-16', module: 7, question: 'What size is a standard test square for damage documentation?', options: ['5x5 feet', '10x10 feet', '15x15 feet', '20x20 feet'], correctAnswer: 1, explanation: 'A 10x10 foot test square is the industry standard for counting damage.' },
+  { id: 'mcq-17', module: 7, question: 'How many photos should you typically take during an inspection?', options: ['5-10', '10-15', '20-40', '50+'], correctAnswer: 2, explanation: 'Take 20-40 photos to thoroughly document all damage and roof conditions.' },
+  { id: 'mcq-18', module: 7, question: 'What are the key areas to inspect for storm damage?', options: ['Only the shingles', 'Shingles, flashing, gutters, vents, and valleys', 'Just the gutters', 'Only visible damage from ground'], correctAnswer: 1, explanation: 'Inspect all components: shingles, flashing, gutters, vents, valleys, and accessories.' },
+
+  // Module 8: Post-Inspection Pitch (4 MCQ)
+  { id: 'mcq-19', module: 8, question: 'After finding damage, what should you show the homeowner first?', options: ['Your contract', 'The photos of damage on their roof', 'Your pricing', 'Competitor reviews'], correctAnswer: 1, explanation: 'Show them the actual photos of damage on THEIR roof - visual evidence is powerful.' },
+  { id: 'mcq-20', module: 8, question: 'What is the main benefit to emphasize about filing an insurance claim?', options: ['You get paid more', 'They can get their roof replaced with little to no out-of-pocket cost', 'Insurance rates always go down', 'It\'s required by law'], correctAnswer: 1, explanation: 'Emphasize they can get a new roof with often just their deductible out-of-pocket.' },
+  { id: 'mcq-21', module: 8, question: 'When explaining the process, what should you emphasize about Roof E.R.\'s role?', options: ['We handle everything with the insurance company', 'They must do all paperwork themselves', 'We only do the installation', 'Insurance handles everything'], correctAnswer: 0, explanation: 'We handle everything - filing, adjusters, supplements, making it easy for homeowners.' },
+  { id: 'mcq-22', module: 8, question: 'What document do you need signed to file a claim on their behalf?', options: ['A check', 'Direction to Pay / Assignment of Benefits', 'Their insurance policy', 'A loan application'], correctAnswer: 1, explanation: 'The Direction to Pay / Assignment of Benefits allows us to work directly with their insurance.' },
+
+  // Module 9: Post-Inspection Objections (4 MCQ)
+  { id: 'mcq-23', module: 9, question: 'When a homeowner says "My rates will go up," what\'s the best response?', options: ['That\'s probably true', 'Rates increase due to regional claims, not individual claims, and not filing means $20K+ later', 'Don\'t file then', 'I don\'t know about insurance'], correctAnswer: 1, explanation: 'Explain rates increase regionally regardless, and not filing now means huge out-of-pocket costs later.' },
+  { id: 'mcq-24', module: 9, question: 'How do you handle "I need to talk to my spouse"?', options: ['Call them yourself', 'Leave and hope they call back', 'Ask when the spouse will be available and schedule a time to meet together', 'Tell them to convince their spouse'], correctAnswer: 2, explanation: 'Schedule a time to meet when both decision-makers are present.' },
+  { id: 'mcq-25', module: 9, question: 'What\'s the response to "I don\'t trust insurance claims"?', options: ['You shouldn\'t trust them', 'This is what you PAY insurance for - it\'s your right to file', 'Don\'t file then', 'Insurance is always trustworthy'], correctAnswer: 1, explanation: 'Remind them this is exactly what they pay premiums for - it\'s their right to use it.' },
+  { id: 'mcq-26', module: 9, question: 'When they say "I\'ll think about it," you should:', options: ['Accept it and leave', 'Ask what specifically they need to think about, then address that concern', 'Apply heavy pressure', 'Offer 50% off'], correctAnswer: 1, explanation: 'Ask what specific concern needs thinking - usually reveals the real objection to address.' },
+
+  // Module 10-11: Damage ID & Claims (4 MCQ)
+  { id: 'mcq-27', module: 10, question: 'What does hail damage look like on asphalt shingles?', options: ['Straight cracks', 'Round bruises with granule loss and soft spots', 'Only missing shingles', 'Color changes only'], correctAnswer: 1, explanation: 'Hail causes round bruises with granule loss and creates soft spots when pressed.' },
+  { id: 'mcq-28', module: 10, question: 'What is considered wind damage on a roof?', options: ['Round spots', 'Lifted, creased, or missing shingles', 'Granule loss only', 'Color fading'], correctAnswer: 1, explanation: 'Wind damage shows as lifted edges, creased shingles, or completely missing shingles.' },
+  { id: 'mcq-29', module: 11, question: 'What is a supplement in the insurance claim process?', options: ['A vitamin', 'Additional documentation for work not covered in initial estimate', 'The homeowner\'s payment', 'A second insurance policy'], correctAnswer: 1, explanation: 'A supplement requests additional funds for work discovered after the initial estimate.' },
+  { id: 'mcq-30', module: 11, question: 'Who typically meets with the insurance adjuster at the property?', options: ['Only the homeowner', 'The Roof E.R. representative', 'The neighbor', 'No one - it\'s done remotely'], correctAnswer: 1, explanation: 'A Roof E.R. representative meets the adjuster to ensure all damage is properly documented.' },
+
+  // Module 12: Closing Objections (4 MCQ)
+  { id: 'mcq-31', module: 12, question: 'What is the "Assumptive Close"?', options: ['Assuming they won\'t buy', 'Acting as if they\'ve already agreed and moving to next steps', 'Assuming the insurance will deny', 'Guessing their concerns'], correctAnswer: 1, explanation: 'Assumptive close: proceed as if they\'ve said yes - "I\'ll get that contract texted to you now."' },
+  { id: 'mcq-32', module: 12, question: 'When they hesitate to sign, what technique helps?', options: ['Threaten to leave', 'Use urgency and timeline - explain why acting now protects them', 'Offer to do it for free', 'Tell them competitors are worse'], correctAnswer: 1, explanation: 'Create legitimate urgency - time limits on claim filing, weather concerns, etc.' },
+  { id: 'mcq-33', module: 12, question: 'The homeowner says "I want to get other quotes." Best response?', options: ['Fine, get 10 quotes', 'Explain you\'re a claims specialist, not just a roofer, and what sets you apart', 'Lower your price immediately', 'Criticize other companies'], correctAnswer: 1, explanation: 'Differentiate by explaining you\'re a claims specialist who handles insurance, not just a roofer.' },
+  { id: 'mcq-34', module: 12, question: 'What should you do immediately after getting a signature?', options: ['Leave quickly', 'Set clear next-step expectations and timeline', 'Ask for referrals only', 'Nothing - job is done'], correctAnswer: 1, explanation: 'Set clear expectations: what happens next, when they\'ll hear from you, timeline for process.' },
+
+  // Module 13-14: Products & Sales Cycle (1 MCQ)
+  { id: 'mcq-35', module: 14, question: 'What are the main stages of the Roof E.R. sales cycle?', options: ['Call, Sell, Install', 'Knock, Inspect, File claim, Meet adjuster, Install, Collect', 'Email, Quote, Invoice', 'Advertise, Estimate, Build'], correctAnswer: 1, explanation: 'Full cycle: Door knock → Inspection → File claim → Adjuster meeting → Installation → Collection.' }
+];
+
+const FINAL_EXAM_FIB: FIBQuestion[] = [
+  // Module 1-4: Basics (2 FIB)
+  { id: 'fib-1', module: 1, question: 'Roof E.R. was founded by _____ _____ in 2019.', acceptableAnswers: ['Oliver Brown', 'oliver brown', 'OLIVER BROWN'], explanation: 'Oliver Brown founded Roof E.R. in 2019.' },
+  { id: 'fib-2', module: 2, question: 'Roof E.R.\'s mission is to hold _____ responsibility to our customers.', acceptableAnswers: ['fiduciary', 'Fiduciary', 'FIDUCIARY'], explanation: 'Fiduciary responsibility means putting customer interests first.' },
+
+  // Module 5: Initial Pitch (1 FIB)
+  { id: 'fib-3', module: 5, question: 'The initial pitch should always end with going for the _____.', acceptableAnswers: ['close', 'Close', 'CLOSE'], explanation: 'Always go for the close - getting them to agree to the inspection.' },
+
+  // Module 6: Handling Initial Objections (1 FIB)
+  { id: 'fib-4', module: 6, question: 'The L.E.A.R.N. framework stands for Listen, _____, Ask, Respond, Navigate.', acceptableAnswers: ['Empathize', 'empathize', 'EMPATHIZE'], explanation: 'Empathize - show you understand their concerns before responding.' },
+
+  // Module 7: Inspection Process (1 FIB)
+  { id: 'fib-5', module: 7, question: 'A test square for damage documentation is _____x_____ feet.', acceptableAnswers: ['10x10', '10 x 10', '10 by 10', '10X10'], explanation: 'A 10x10 foot test square is standard for counting hail hits.' },
+
+  // Module 9: Post-Inspection Objections (1 FIB)
+  { id: 'fib-6', module: 9, question: 'When a homeowner needs to talk to their spouse, you should schedule a time when both _____ _____ are present.', acceptableAnswers: ['decision makers', 'decision-makers', 'Decision Makers', 'decisionmakers'], explanation: 'Both decision makers need to be present to avoid delays.' },
+
+  // Module 10-11: Damage ID & Claims (1 FIB)
+  { id: 'fib-7', module: 10, question: 'Hail damage on shingles appears as round _____ with granule loss.', acceptableAnswers: ['bruises', 'Bruises', 'BRUISES', 'marks', 'spots'], explanation: 'Hail creates round bruises with exposed mat under the granules.' },
+
+  // Module 12: Closing Objections (1 FIB)
+  { id: 'fib-8', module: 12, question: 'The _____ close means acting as if they\'ve already agreed and moving forward.', acceptableAnswers: ['assumptive', 'Assumptive', 'ASSUMPTIVE'], explanation: 'The assumptive close proceeds as if they\'ve already said yes.' },
+
+  // Module 13-14: Products & Sales Cycle (2 FIB)
+  { id: 'fib-9', module: 13, question: 'When a shingle is discontinued, insurance must pay for _____ roof replacement.', acceptableAnswers: ['full', 'Full', 'FULL', 'complete', 'Complete'], explanation: 'Discontinued products require full replacement to maintain warranty.' },
+  { id: 'fib-10', module: 14, question: 'After installation, the final step is _____ from the insurance company.', acceptableAnswers: ['collection', 'Collection', 'COLLECTION', 'payment', 'Payment'], explanation: 'Collection of the final payment completes the sales cycle.' }
+];
+
+const FINAL_EXAM_SA: SAQuestion[] = [
+  // Module 5: Initial Pitch (1 SA)
+  { id: 'sa-1', module: 5, prompt: 'Write a complete initial door knock pitch introducing yourself as a Roof E.R. representative. Include all 5 non-negotiables.', keywords: ['name', 'Roof E.R.', 'storm', 'neighbors', 'free', 'inspection', '15 minutes', 'insurance', 'damage', 'schedule', 'today', 'tomorrow'], minKeywords: 6, sampleAnswer: 'Hi, my name is [Name] with Roof E.R. We\'re a local roofing company helping homeowners get their roofs replaced using their insurance. We\'ve had some big storms recently and we\'ve been helping a lot of your neighbors file claims. I\'d like to offer you a completely free inspection - takes about 15 minutes. If there\'s damage, I can help you file a claim. If not, at least you\'ll have peace of mind. Would today or tomorrow work better for you?' },
+
+  // Module 8: Post-Inspection Pitch (1 SA)
+  { id: 'sa-2', module: 8, prompt: 'After finding storm damage, explain to the homeowner why they should file an insurance claim and how Roof E.R. helps.', keywords: ['damage', 'insurance', 'claim', 'deductible', 'out-of-pocket', 'free', 'handle', 'adjuster', 'file', 'replacement', 'cost', 'leak'], minKeywords: 5, sampleAnswer: 'I found clear storm damage on your roof. The good news is your insurance should cover the replacement - you\'d typically only pay your deductible. If you don\'t file now, you could be looking at $15-20K out of pocket when it starts leaking in a year or two. We handle everything with the insurance company - we file the claim, meet with the adjuster, and fight for you to get the full coverage you deserve.' },
+
+  // Module 9: Post-Inspection Objections (1 SA)
+  { id: 'sa-3', module: 9, prompt: 'A homeowner says: "I don\'t want to file a claim because my rates will go up." How do you respond?', keywords: ['rates', 'regional', 'claims', 'area', 'increase', 'regardless', 'pay', 'insurance', 'purpose', 'deductible', 'out-of-pocket', 'leak', 'thousands'], minKeywords: 4, sampleAnswer: 'I understand that concern. Here\'s what most people don\'t realize: rates are based on regional claims, not just your individual claim. Your rates may increase whether you file or not because of all the claims in your area. The real question is: would you rather pay your $1,000 deductible now, or $20,000 out of pocket when the roof fails? You pay premiums specifically for situations like this - it\'s your right to use your coverage.' },
+
+  // Module 12: Closing Objections (1 SA)
+  { id: 'sa-4', module: 12, prompt: 'The homeowner says: "I need to think about it." How do you handle this objection?', keywords: ['think', 'specifically', 'concern', 'address', 'timeline', 'claim', 'deadline', 'help', 'question', 'worry', 'understand'], minKeywords: 4, sampleAnswer: 'I completely understand wanting to think it over. To make sure I can help address any concerns, can you tell me specifically what you need to think about? Is it the process, the timing, or something else? I ask because storm claims have time limits for filing, and I want to make sure you don\'t miss that window. What questions can I answer right now?' },
+
+  // Module 13-14: Products & Sales Cycle (1 SA)
+  { id: 'sa-5', module: 14, prompt: 'Describe the complete Roof E.R. sales cycle from initial contact to final payment.', keywords: ['knock', 'door', 'inspect', 'inspection', 'damage', 'claim', 'file', 'adjuster', 'supplement', 'install', 'installation', 'collect', 'payment'], minKeywords: 5, sampleAnswer: 'The Roof E.R. sales cycle: 1) Door knock - introduce yourself and offer free inspection. 2) Roof inspection - document all damage with photos and test square. 3) File claim - submit paperwork to insurance with all documentation. 4) Adjuster meeting - meet on-site to ensure all damage is noted. 5) Supplements - request additional funds for any missed items. 6) Installation - complete the roof replacement. 7) Collection - receive final payment from insurance.' }
+];
 
 // Manager access code (managers enter this to unlock all)
 const MANAGER_CODE = 'roofer2024';
@@ -104,6 +425,523 @@ function exitManagerMode() {
 const sidebar = document.getElementById('sidebar');
 const mainContent = document.getElementById('main-content');
 let chat: Chat | null = null; // To hold the chat instance
+
+// ============================================================================
+// AGNES-21 LIVE VOICE ROLEPLAY SYSTEM
+// ============================================================================
+
+// Agnes-21 Audio Utilities
+function base64ToUint8Array(base64: string): Uint8Array {
+  const binaryString = atob(base64);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes;
+}
+
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+async function decodeAudioDataPCM(
+  data: Uint8Array,
+  ctx: AudioContext,
+  sampleRate: number = 24000,
+  numChannels: number = 1
+): Promise<AudioBuffer> {
+  const dataInt16 = new Int16Array(data.buffer);
+  const frameCount = dataInt16.length / numChannels;
+  const buffer = ctx.createBuffer(numChannels, frameCount, sampleRate);
+  for (let channel = 0; channel < numChannels; channel++) {
+    const channelData = buffer.getChannelData(channel);
+    for (let i = 0; i < frameCount; i++) {
+      channelData[i] = dataInt16[i * numChannels + channel] / 32768.0;
+    }
+  }
+  return buffer;
+}
+
+function createPcmBlob(data: Float32Array): { data: string; mimeType: string } {
+  const l = data.length;
+  const int16 = new Int16Array(l);
+  for (let i = 0; i < l; i++) {
+    int16[i] = Math.max(-32768, Math.min(32767, data[i] * 32768));
+  }
+  return {
+    data: arrayBufferToBase64(int16.buffer),
+    mimeType: 'audio/pcm;rate=16000',
+  };
+}
+
+async function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = (reader.result as string).split(',')[1];
+      resolve(base64String);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+// Agnes-21 Live State Management
+interface AgnesLiveState {
+  isConnected: boolean;
+  isMuted: boolean;
+  isVideoEnabled: boolean;
+  isSpeaking: boolean;
+  aiSpeaking: boolean;
+  inputMode: 'voice' | 'text';
+  currentScore: number | null;
+  transcript: Array<{ role: 'user' | 'agnes'; text: string; timestamp: Date }>;
+  difficulty: string;
+  sessionXP: number;
+  currentStreak: number;
+  mistakeCount: number;
+  selectedRole: string | null;
+  sessionStartTime: number;
+  sessionActive: boolean;
+}
+
+const agnesLiveState: AgnesLiveState = {
+  isConnected: false,
+  isMuted: false,
+  isVideoEnabled: true,
+  isSpeaking: false,
+  aiSpeaking: false,
+  inputMode: 'voice',
+  currentScore: null,
+  transcript: [],
+  difficulty: 'BEGINNER',
+  sessionXP: 0,
+  currentStreak: 0,
+  mistakeCount: 0,
+  selectedRole: null,
+  sessionStartTime: Date.now(),
+  sessionActive: false
+};
+
+// Agnes-21 Live Module-level variables
+let agnesInputAudioContext: AudioContext | null = null;
+let agnesOutputAudioContext: AudioContext | null = null;
+let agnesMediaStream: MediaStream | null = null;
+let agnesSessionPromise: Promise<any> | null = null;
+let agnesAudioSources: Set<AudioBufferSourceNode> = new Set();
+let agnesNextStartTime = 0;
+let agnesMediaRecorder: MediaRecorder | null = null;
+let agnesRecordedChunks: Blob[] = [];
+let agnesFrameIntervalId: number | null = null;
+let agnesAnalyserNode: AnalyserNode | null = null;
+let agnesMicAnalyserNode: AnalyserNode | null = null;
+let agnesAiClient: any = null;
+
+// Agnes-21 Difficulty Configuration
+const AGNES_DIFFICULTY_LEVELS: Record<string, { multiplier: number; unlockLevel: number; mistakes: number; description: string }> = {
+  BEGINNER: { multiplier: 1.0, unlockLevel: 1, mistakes: Infinity, description: 'The Eager Learner - Never slams door' },
+  ROOKIE: { multiplier: 1.2, unlockLevel: 3, mistakes: 5, description: 'The Friendly Neighbor - Very patient' },
+  PRO: { multiplier: 1.5, unlockLevel: 7, mistakes: 3, description: 'The Busy Parent - Realistic pressure' },
+  ELITE: { multiplier: 2.0, unlockLevel: 12, mistakes: 2, description: 'The Skeptic - Low tolerance' },
+  NIGHTMARE: { multiplier: 3.0, unlockLevel: 20, mistakes: 1, description: 'The Lawyer - Instant slam' }
+};
+
+// Agnes-21 Personas for each difficulty
+const AGNES_PERSONAS: Record<string, { name: string; icon: string; description: string }[]> = {
+  BEGINNER: [{
+    name: 'The Eager Learner',
+    icon: '🌱',
+    description: `You are a homeowner who WANTS roofing help and guides the rep to success.
+You've been looking for a roofer and are excited someone knocked on your door. You actively help them practice.
+- Enthusiastically engage: "Oh great! I've been meaning to get my roof looked at!"
+- Ask guiding questions: "So you do inspections? That's perfect!"
+- Celebrate their successes: "That makes total sense!"
+- NEVER slam the door - infinite patience`
+  }],
+  ROOKIE: [{
+    name: 'The Friendly Neighbor',
+    icon: '🏡',
+    description: `You are a retired homeowner who enjoys chatting and wants them to succeed.
+- Be warm and welcoming: "Oh hello! How are you today?"
+- Ask gentle questions to help them
+- Agree to inspection easily if they ask properly
+- Door slam after 5 major mistakes`
+  }],
+  PRO: [{
+    name: 'The Busy Parent',
+    icon: '👨‍👩‍👧',
+    description: `You are making dinner with loud kids in background. Limited time.
+- Show time pressure: "I've only got a few minutes"
+- Interrupt if they ramble
+- Get impatient if too salesy
+- Door slam after 3 mistakes`
+  }],
+  ELITE: [{
+    name: 'The Skeptic',
+    icon: '😠',
+    description: `You were scammed before. You lost money to a fake roofer. HOSTILE and suspicious.
+- Hostile from first word: "What do you want?"
+- Interrupt constantly
+- Assume they're scammers
+- Door slam after 2 mistakes`
+  }],
+  NIGHTMARE: [{
+    name: 'The Lawyer',
+    icon: '⚖️',
+    description: `You are an actual attorney who knows consumer protection laws.
+- Cite specific laws
+- Record the conversation
+- Analyze every word for legal liability
+- Door slam after 1 mistake (any false claim = instant)`
+  }]
+};
+
+// Agnes-21 XP and Gamification Functions
+function getXPForLevel(level: number): number {
+  if (level <= 1) return 0;
+  return 50 * Math.pow(level, 2);
+}
+
+function getLevelForXP(totalXP: number): number {
+  if (totalXP <= 0) return 1;
+  let level = 1;
+  while (getXPForLevel(level + 1) <= totalXP) level++;
+  return level;
+}
+
+function getAgnesUserProgress(): { totalXP: number; currentLevel: number; xpToNext: number } {
+  const stored = localStorage.getItem('agnes_xp_progress');
+  if (!stored) return { totalXP: 0, currentLevel: 1, xpToNext: getXPForLevel(2) };
+  const { totalXP } = JSON.parse(stored);
+  const currentLevel = getLevelForXP(totalXP);
+  return { totalXP, currentLevel, xpToNext: getXPForLevel(currentLevel + 1) - totalXP };
+}
+
+function calculateAgnesSessionXP(score: number, difficulty: string, streakDays: number): number {
+  const baseXP = 50;
+  const scoreBonus = Math.max(0, Math.min(30, score - 70));
+  const perfectBonus = score >= 100 ? 50 : 0;
+  const streakBonus = streakDays * 10;
+  const multiplier = AGNES_DIFFICULTY_LEVELS[difficulty]?.multiplier || 1.0;
+  return Math.round((baseXP + scoreBonus + perfectBonus + streakBonus) * multiplier);
+}
+
+function awardAgnesXP(xp: number): { leveledUp: boolean; newLevel: number; previousLevel: number; newUnlocks: string[] } {
+  const progress = getAgnesUserProgress();
+  const previousLevel = progress.currentLevel;
+  const newTotalXP = progress.totalXP + xp;
+  const newLevel = getLevelForXP(newTotalXP);
+  localStorage.setItem('agnes_xp_progress', JSON.stringify({ totalXP: newTotalXP }));
+  const newUnlocks: string[] = [];
+  Object.entries(AGNES_DIFFICULTY_LEVELS).forEach(([diff, config]) => {
+    if (config.unlockLevel > previousLevel && config.unlockLevel <= newLevel) {
+      newUnlocks.push(`${diff} Difficulty Unlocked!`);
+    }
+  });
+  return { leveledUp: newLevel > previousLevel, newLevel, previousLevel, newUnlocks };
+}
+
+function isDifficultyUnlocked(difficulty: string): boolean {
+  if (isManagerMode()) return true;
+  const progress = getAgnesUserProgress();
+  const config = AGNES_DIFFICULTY_LEVELS[difficulty];
+  return config ? progress.currentLevel >= config.unlockLevel : false;
+}
+
+// Agnes-21 Streak Functions
+function getAgnesStreak(): { current: number; longest: number; lastDate: string } {
+  const stored = localStorage.getItem('agnes_streak');
+  if (!stored) return { current: 0, longest: 0, lastDate: '' };
+  return JSON.parse(stored);
+}
+
+function updateAgnesStreak(): { streakIncreased: boolean; newStreak: number; newMilestone: number | null } {
+  const today = new Date().toISOString().split('T')[0];
+  const streak = getAgnesStreak();
+  if (streak.lastDate === today) {
+    return { streakIncreased: false, newStreak: streak.current, newMilestone: null };
+  }
+  let newCurrent = streak.current;
+  if (streak.lastDate) {
+    const lastDate = new Date(streak.lastDate);
+    const todayDate = new Date(today);
+    const diff = Math.floor((todayDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
+    newCurrent = diff === 1 ? streak.current + 1 : 1;
+  } else {
+    newCurrent = 1;
+  }
+  const newLongest = Math.max(newCurrent, streak.longest);
+  localStorage.setItem('agnes_streak', JSON.stringify({ current: newCurrent, longest: newLongest, lastDate: today }));
+  let newMilestone: number | null = null;
+  if (newCurrent === 7 || newCurrent === 30 || newCurrent === 100) newMilestone = newCurrent;
+  return { streakIncreased: true, newStreak: newCurrent, newMilestone };
+}
+
+// Agnes-21 IndexedDB Video Storage
+const AGNES_VIDEO_DB_VERSION = 1;
+const AGNES_VIDEO_STORE = 'recordings';
+const MAX_AGNES_VIDEOS = 20;
+
+interface AgnesVideoRecording {
+  sessionId: string;
+  recordedAt: Date;
+  duration: number;
+  size: number;
+  mimeType: string;
+  videoBlob: Blob;
+  thumbnail?: string;
+  metadata?: { difficulty?: string; finalScore?: number };
+}
+
+function openAgnesVideoDb(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('agnes_videos', AGNES_VIDEO_DB_VERSION);
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+    request.onupgradeneeded = (event) => {
+      const db = (event.target as IDBOpenDBRequest).result;
+      if (!db.objectStoreNames.contains(AGNES_VIDEO_STORE)) {
+        const store = db.createObjectStore(AGNES_VIDEO_STORE, { keyPath: 'sessionId' });
+        store.createIndex('recordedAt', 'recordedAt', { unique: false });
+      }
+    };
+  });
+}
+
+async function countAgnesVideos(db: IDBDatabase): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction([AGNES_VIDEO_STORE], 'readonly');
+    const store = tx.objectStore(AGNES_VIDEO_STORE);
+    const request = store.count();
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function cleanupOldestAgnesVideo(db: IDBDatabase): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction([AGNES_VIDEO_STORE], 'readwrite');
+    const store = tx.objectStore(AGNES_VIDEO_STORE);
+    const index = store.index('recordedAt');
+    const request = index.openCursor();
+    request.onsuccess = (event) => {
+      const cursor = (event.target as IDBRequest).result;
+      if (cursor) {
+        cursor.delete();
+        resolve();
+      } else {
+        resolve();
+      }
+    };
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function saveAgnesVideo(recording: AgnesVideoRecording): Promise<boolean> {
+  try {
+    const db = await openAgnesVideoDb();
+    const count = await countAgnesVideos(db);
+    if (count >= MAX_AGNES_VIDEOS) await cleanupOldestAgnesVideo(db);
+    const tx = db.transaction([AGNES_VIDEO_STORE], 'readwrite');
+    const store = tx.objectStore(AGNES_VIDEO_STORE);
+    await new Promise<void>((resolve, reject) => {
+      const request = store.put(recording);
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+    db.close();
+    console.log(`Video saved: ${recording.sessionId}`);
+    return true;
+  } catch (e) {
+    console.error('Failed to save video:', e);
+    return false;
+  }
+}
+
+function getSupportedVideoMimeType(): string {
+  const types = ['video/webm;codecs=vp8,opus', 'video/webm;codecs=h264,opus', 'video/webm', 'video/mp4'];
+  for (const type of types) {
+    if (MediaRecorder.isTypeSupported(type)) return type;
+  }
+  return 'video/webm';
+}
+
+// Agnes-21 System Instruction Builder
+function buildAgnesSystemInstruction(difficulty: string, script: string): string {
+  const personas = AGNES_PERSONAS[difficulty] || AGNES_PERSONAS.BEGINNER;
+  const persona = personas[Math.floor(Math.random() * personas.length)];
+  const doorSlamInfo = AGNES_DIFFICULTY_LEVELS[difficulty];
+
+  return `You are Agnes 21, roleplaying as a homeowner for a sales training simulation.
+
+## PRONUNCIATION NOTE:
+Our company name "Roof-ER" should be pronounced as three separate sounds: "Roof" then "E" then "R" (like the letters E-R). Never say it as one word "Roofer".
+
+## YOUR CHARACTER: ${persona.name} ${persona.icon}
+${persona.description}
+
+## TRAINING SCRIPT THE USER IS PRACTICING:
+"""
+${script}
+"""
+
+## DOOR SLAM MECHANIC:
+Threshold: ${doorSlamInfo.description}
+- If the rep makes major mistakes (being pushy, ignoring concerns, lying), track them
+- Warn before slamming: "I'm starting to get frustrated..."
+- At threshold: Slam door and say "This conversation is over"
+
+## YOUR BEHAVIOR:
+1. Stay in character 100% until they say "score me" or you slam the door
+2. React naturally to what they say
+3. Use progressive objections - start mild, escalate based on their responses
+4. Interrupt according to your persona
+
+## TRANSCRIPT SUMMARY (IMPORTANT):
+Before EVERY response, start with a brief summary of what the rep just said in square brackets:
+[Rep: introduced themselves as ___, mentioned ___, asked about ___]
+Then provide your in-character response on a new line. This helps track the conversation in the transcript.
+
+## THE 5 NON-NEGOTIABLES (For Scoring):
+1. Who you are (name introduction) - 10 pts
+2. Who we are (Roof E.R. + what we do) - 10 pts
+3. Make it relatable (storm mention OR local context) - 10 pts
+4. Purpose (free inspection offer) - 10 pts
+5. Go for the close (get agreement) - 10 pts
+
+## WHEN TO BREAK CHARACTER:
+When user says "score me", "how did I do?", or "end simulation", provide:
+
+CRITICAL SCORING RULE: The AGNES SCORE must EXACTLY equal the sum of all breakdown categories. Calculate each category first, add them up, then use that EXACT total for the AGNES SCORE line. Double-check your math - the numbers must add up precisely!
+
+**AGNES SCORE: [TOTAL]/100** (where TOTAL = Non-negotiables pts + Delivery pts + Objection pts)
+
+**BREAKDOWN:**
+- Non-negotiables: [X/5] covered = [A] pts (each item worth 10 pts, max 50)
+- Delivery & Confidence: [B]/30 pts
+- Objection Handling: [C]/20 pts
+- TOTAL: [A] + [B] + [C] = [TOTAL] (this MUST match the score above)
+
+**3 STRENGTHS:**
+1. [Specific example]
+2. [Specific technique]
+3. [Strong moment]
+
+**3 AREAS FOR IMPROVEMENT:**
+1. [Specific mistake + how to fix]
+2. [Missed opportunity]
+3. [Technique to practice]
+
+Now begin. The sales rep just rang your doorbell.`;
+}
+
+// Training Scripts for Agnes-21
+const AGNES_TRAINING_SCRIPTS: Record<string, string> = {
+  'door-knock': `DOOR KNOCK PITCH:
+Hi, my name is [NAME] with Roof E.R. We're a local roofing company that helps homeowners get their roofs replaced using their insurance.
+
+We're out here today because there was a storm that came through about [X] weeks ago and we've been helping a lot of your neighbors file claims and get their roofs replaced.
+
+I was wondering if you'd let me take a quick look at your roof - it's completely free and takes about 15 minutes. If there's no damage, I'll let you know and be on my way. But if there is damage, I can help you file a claim with your insurance company.
+
+Would that be okay with you?`,
+
+  'homeowner': `HOMEOWNER PRACTICE:
+Practice responding to common homeowner objections and questions about:
+- Insurance coverage concerns
+- Timing and scheduling
+- Trust and company reputation
+- Cost and out-of-pocket expenses
+- Process questions`,
+
+  'rep': `SALES REP PRACTICE:
+Practice your pitch delivery including:
+- Introduction and company presentation
+- Value proposition
+- Handling objections smoothly
+- Building rapport
+- Closing techniques`,
+
+  'adjuster': `ADJUSTER PRACTICE:
+Practice working with insurance adjusters:
+- Technical damage documentation
+- Negotiation techniques
+- Supplement requests
+- Professional communication`
+};
+
+// Training script mapping for contextual AI hints
+const trainingScriptMap: Record<string, { scripts: string[]; keyPhrases: string[]; framework?: string }> = {
+  inspection: {
+    scripts: [
+      "Safety First: Check ladder stability, wear harness if needed",
+      "360 Walk: Walk entire perimeter, document whole structure",
+      "Shingle Inspection: Look for missing granules, cracks, lifting, bruising",
+      "Flashing Check: Inspect all flashing around chimneys, vents, valleys",
+      "Photo Documentation: Take 20-40 photos covering all findings",
+      "Test Square: Chalk 10x10 area to count and document hits"
+    ],
+    keyPhrases: [
+      "I'm checking for storm damage indicators...",
+      "This circular mark is a hail hit...",
+      "The granule loss here shows impact...",
+      "Let me show you the evidence..."
+    ]
+  },
+  initialPitch: {
+    scripts: [
+      "5 Non-Negotiables: Who you are, Who we are, Make it relatable, What you're doing, Go for the close",
+      "Hi! I'm [Name] with Roof E.R. We're working in your neighborhood helping homeowners file insurance claims for storm damage.",
+      "We've had a lot of storms here in [Region] over the past few months that have done a lot of damage!",
+      "We're working with a lot of your neighbors in the area.",
+      "While I'm here, I'm conducting a completely free inspection..."
+    ],
+    keyPhrases: [
+      "I'm working in your neighborhood today...",
+      "Your neighbors at [address] just got approved...",
+      "This will only take 2 minutes from the ground...",
+      "Worst case, I give you peace of mind...",
+      "Would today or tomorrow work better for you?"
+    ]
+  },
+  postInspection: {
+    scripts: [
+      "Set Expectations: 'I found some damage up there. Let me show you the photos...'",
+      "Walk Through Photos: Show overview, then close-ups with context",
+      "Explain Consequences: UV damage, leaks within 2-3 years, interior damage costs",
+      "Present Solution: Insurance covers this, deductible only, we handle everything",
+      "Build the Story: Collateral → Overview → Close-ups → Pattern"
+    ],
+    keyPhrases: [
+      "Here's your south-facing slope...",
+      "See these dark spots? That's granule loss...",
+      "The good news is your insurance will cover this...",
+      "Your only cost is the deductible..."
+    ]
+  },
+  objections: {
+    scripts: [
+      "L.E.A.R.N. Framework: Listen, Empathize, Ask, Respond, Navigate",
+      "Always acknowledge their concern before responding",
+      "Frame insurance as value and peace-of-mind, not cost",
+      "Offer two specific times when scheduling"
+    ],
+    keyPhrases: [
+      "I completely understand...",
+      "That's a great question...",
+      "Here's what most people don't know...",
+      "Would 4pm today or 10am tomorrow work?"
+    ],
+    framework: "L.E.A.R.N."
+  }
+};
 
 // Store all training content in an object
 const trainingContent = {
@@ -286,7 +1124,7 @@ const trainingContent = {
       <h2>The Initial Pitch Script - Detailed</h2>
       <div class="pitch-script">
         <p><strong>Opening (30 seconds):</strong></p>
-        <p>"Hi! I'm [Name] with Roof-ER. We're working in your neighborhood helping homeowners file insurance claims for storm damage. I noticed [specific damage observation - dented gutter, lifted shingles, etc.]. Mind if I take a quick look from the ground? It'll only take 2 minutes and could save you thousands."</p>
+        <p>"Hi! I'm [Name] with Roof E.R. We're working in your neighborhood helping homeowners file insurance claims for storm damage. I noticed [specific damage observation - dented gutter, lifted shingles, etc.]. Mind if I take a quick look from the ground? It'll only take 2 minutes and could save you thousands."</p>
 
         <p><strong>Permission Secured:</strong></p>
         <p>"Great! Let me grab my ladder. I'll do a thorough inspection - check shingles, flashing, vents, everything. Takes about 15 minutes. If I find damage, I'll show you photos and explain your options. Sound good?"</p>
@@ -1368,218 +2206,479 @@ const trainingContent = {
     </div>
   `,
   'role-play': `
-    <div class="content-card">
-        <h1>Agnes 21 Role-Play Training System</h1>
-        <div id="roleplay-live-region" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+    <div class="content-card agnes-roleplay-container">
+        <h1>🎙️ Agnes 21 AI Role-Play Training</h1>
+        <p class="agnes-subtitle">Practice your sales pitch with real-time AI feedback. Choose your training mode below.</p>
 
-        <!-- Screen 1: Role Selection -->
-        <div id="roleplay-setup" style="display: block;">
-            <h2>Select Your Training Role</h2>
-            <p>Choose a role to practice. Each role has multiple scenarios with AI-powered feedback.</p>
-            <div class="role-selection-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 30px 0;">
-                <button class="role-btn" data-role="homeowner" style="padding: 30px; border: 2px solid #8b4fbe; border-radius: 10px; background: linear-gradient(135deg, #8b4fbe 0%, #a370d1 100%); color: white; font-size: 18px; cursor: pointer; transition: all 0.3s;">
-                    <div style="font-size: 48px; margin-bottom: 10px;">🏠</div>
-                    <div style="font-weight: bold; margin-bottom: 10px;">Homeowner</div>
-                    <div style="font-size: 14px; opacity: 0.9;">Practice handling common objections and concerns</div>
+        <!-- Error Display -->
+        <div id="agnes-error" class="agnes-error" style="display: none;"></div>
+
+        <!-- Step 1: Training Type Selector -->
+        <div id="agnes-mode-selector" style="display: block;">
+            <div id="agnes-xp-bar" class="agnes-xp-bar"></div>
+
+            <h2>How Do You Want to Train?</h2>
+            <div class="agnes-mode-grid">
+                <button id="agnes-roleplay-btn" class="agnes-mode-card voice-mode">
+                    <div class="mode-icon">🎭</div>
+                    <div class="mode-title">Role Play</div>
+                    <div class="mode-subtitle">Free Practice</div>
+                    <div class="mode-desc">
+                        <ul>
+                            <li>🗣️ Jump right into conversation</li>
+                            <li>🎯 Real-time AI feedback</li>
+                            <li>📊 Scoring after each response</li>
+                            <li>💪 Build confidence fast</li>
+                        </ul>
+                    </div>
+                    <div class="mode-badge">RECOMMENDED</div>
                 </button>
-                <button class="role-btn" data-role="rep" style="padding: 30px; border: 2px solid #8b4fbe; border-radius: 10px; background: linear-gradient(135deg, #8b4fbe 0%, #a370d1 100%); color: white; font-size: 18px; cursor: pointer; transition: all 0.3s;">
-                    <div style="font-size: 48px; margin-bottom: 10px;">💼</div>
-                    <div style="font-weight: bold; margin-bottom: 10px;">Sales Rep</div>
-                    <div style="font-size: 14px; opacity: 0.9;">Refine your pitch and closing techniques</div>
-                </button>
-                <button class="role-btn" data-role="adjuster" style="padding: 30px; border: 2px solid #8b4fbe; border-radius: 10px; background: linear-gradient(135deg, #8b4fbe 0%, #a370d1 100%); color: white; font-size: 18px; cursor: pointer; transition: all 0.3s;">
-                    <div style="font-size: 48px; margin-bottom: 10px;">📋</div>
-                    <div style="font-weight: bold; margin-bottom: 10px;">Adjuster</div>
-                    <div style="font-size: 14px; opacity: 0.9;">Master technical documentation and negotiation</div>
+
+                <button id="agnes-walkthrough-btn" class="agnes-mode-card text-mode">
+                    <div class="mode-icon">📚</div>
+                    <div class="mode-title">Walk Through</div>
+                    <div class="mode-subtitle">Guided Practice</div>
+                    <div class="mode-desc">
+                        <ul>
+                            <li>📝 See example responses first</li>
+                            <li>🎓 Learn the ideal approach</li>
+                            <li>🔄 Then practice yourself</li>
+                            <li>✅ Compare your response</li>
+                        </ul>
+                    </div>
                 </button>
             </div>
         </div>
 
-        <!-- Screen 1.5: Personality Selection -->
-        <div id="personality-selector" style="display: none;">
-            <h2>Choose Your Agnes AI Coach</h2>
-            <p>Select the AI personality that best matches your training goals. Each personality provides different levels of challenge and feedback styles.</p>
-
-            <div class="personality-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 30px 0;">
-                <button class="personality-card" data-personality="supportive" data-difficulty="1" style="padding: 25px; border: 3px solid #4caf50; border-radius: 12px; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); cursor: pointer; text-align: left; transition: all 0.3s;">
-                    <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                        <div style="font-size: 42px; margin-right: 15px;">😊</div>
-                        <div>
-                            <div style="font-weight: bold; font-size: 18px; color: #2e7d32;">Agnes the Supportive Coach</div>
-                            <div style="font-size: 14px; color: #1b5e20; margin-top: 5px;">⭐ Easy - Beginner Friendly</div>
-                        </div>
+        <!-- Step 2: Input Mode Selector (Role Play only) -->
+        <div id="agnes-input-mode-selector" style="display: none;">
+            <h2>Choose Your Input Method</h2>
+            <p>How would you like to practice?</p>
+            <div class="agnes-mode-grid">
+                <button id="agnes-voice-mode-btn" class="agnes-mode-card voice-mode">
+                    <div class="mode-icon">🎤</div>
+                    <div class="mode-title">Voice Mode</div>
+                    <div class="mode-subtitle">Speak with Agnes</div>
+                    <div class="mode-desc">
+                        <ul>
+                            <li>🗣️ Real conversation practice</li>
+                            <li>📹 Optional video recording</li>
+                            <li>⚡ Instant audio feedback</li>
+                        </ul>
                     </div>
-                    <p style="margin: 0; font-size: 14px; color: #555;">Encouraging, patient, and positive. Perfect for building confidence and learning fundamentals.</p>
+                    <div class="mode-badge">BEST FOR REALISM</div>
                 </button>
 
-                <button class="personality-card" data-personality="realistic" data-difficulty="2" style="padding: 25px; border: 3px solid #2196f3; border-radius: 12px; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); cursor: pointer; text-align: left; transition: all 0.3s;">
-                    <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                        <div style="font-size: 42px; margin-right: 15px;">🏠</div>
-                        <div>
-                            <div style="font-weight: bold; font-size: 18px; color: #1565c0;">Agnes the Real Homeowner</div>
-                            <div style="font-size: 14px; color: #0d47a1; margin-top: 5px;">⭐⭐ Medium - Realistic Practice</div>
-                        </div>
+                <button id="agnes-text-mode-btn" class="agnes-mode-card text-mode">
+                    <div class="mode-icon">⌨️</div>
+                    <div class="mode-title">Text Mode</div>
+                    <div class="mode-subtitle">Type Your Responses</div>
+                    <div class="mode-desc">
+                        <ul>
+                            <li>✍️ Think at your own pace</li>
+                            <li>📝 Review before submitting</li>
+                            <li>📊 Detailed scoring</li>
+                        </ul>
                     </div>
-                    <p style="margin: 0; font-size: 14px; color: #555;">Acts like a typical homeowner with real concerns. Balanced feedback and moderate objections.</p>
-                </button>
-
-                <button class="personality-card" data-personality="skeptical" data-difficulty="3" style="padding: 25px; border: 3px solid #ff9800; border-radius: 12px; background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); cursor: pointer; text-align: left; transition: all 0.3s;">
-                    <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                        <div style="font-size: 42px; margin-right: 15px;">🤔</div>
-                        <div>
-                            <div style="font-weight: bold; font-size: 18px; color: #e65100;">Agnes the Skeptical Buyer</div>
-                            <div style="font-size: 14px; color: #bf360c; margin-top: 5px;">⭐⭐⭐ Hard - Advanced Practice</div>
-                        </div>
-                    </div>
-                    <p style="margin: 0; font-size: 14px; color: #555;">Questioning, doubtful, and requires strong persuasion. Pushes you to refine your techniques.</p>
-                </button>
-
-                <button class="personality-card" data-personality="rushed" data-difficulty="4" style="padding: 25px; border: 3px solid #f44336; border-radius: 12px; background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%); cursor: pointer; text-align: left; transition: all 0.3s;">
-                    <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                        <div style="font-size: 42px; margin-right: 15px;">⏰</div>
-                        <div>
-                            <div style="font-weight: bold; font-size: 18px; color: #c62828;">Agnes the Rushed Decision-Maker</div>
-                            <div style="font-size: 14px; color: #b71c1c; margin-top: 5px;">⭐⭐⭐⭐ Expert - High Pressure</div>
-                        </div>
-                    </div>
-                    <p style="margin: 0; font-size: 14px; color: #555;">Impatient, time-sensitive, and easily distracted. Tests your ability to handle pressure and be concise.</p>
-                </button>
-
-                <button class="personality-card" data-personality="final-boss" data-difficulty="5" style="padding: 25px; border: 3px solid #9c27b0; border-radius: 12px; background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); cursor: pointer; text-align: left; transition: all 0.3s;">
-                    <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                        <div style="font-size: 42px; margin-right: 15px;">👑</div>
-                        <div>
-                            <div style="font-weight: bold; font-size: 18px; color: #6a1b9a;">Agnes the Final Boss</div>
-                            <div style="font-size: 14px; color: #4a148c; margin-top: 5px;">⭐⭐⭐⭐⭐ Master - Ultimate Challenge</div>
-                        </div>
-                    </div>
-                    <p style="margin: 0; font-size: 14px; color: #555;">Combines all objection types with rapid-fire challenges. Only for certified experts ready to prove mastery.</p>
                 </button>
             </div>
-
-            <button id="back-to-roles" style="padding: 12px 24px; background: #f5f5f5; color: #666; border: 2px solid #ddd; border-radius: 5px; font-size: 14px; cursor: pointer; margin-top: 10px;">← Back to Role Selection</button>
+            <button onclick="showAgnesScreen('agnes-mode-selector')" class="btn-secondary" style="margin-top: 20px;">← Back</button>
         </div>
 
-        <!-- Screen 2: Scenario Display -->
-        <div id="scenario-display" style="display: none;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <div id="scenario-progress" style="font-weight: 500; color: #8b4fbe;"></div>
-                <div id="turn-counter" style="font-weight: 600; color: #8b4fbe; background: #f8f4fc; padding: 8px 16px; border-radius: 20px; border: 2px solid #8b4fbe;">Turn 1 of 5</div>
+        <!-- Step 3: Module Selector -->
+        <div id="agnes-module-selector" style="display: none;">
+            <h2>What Do You Want to Practice?</h2>
+            <p>Agnes will auto-select scenarios from your chosen module.</p>
+            <div class="agnes-module-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 25px 0;">
+                <button class="agnes-module-card" data-module="7" style="padding: 25px; border: 2px solid #e5e7eb; border-radius: 12px; background: white; cursor: pointer; text-align: left; transition: all 0.3s;">
+                    <div style="font-size: 36px; margin-bottom: 10px;">🚪</div>
+                    <div style="font-weight: 700; font-size: 16px; color: #1f2937;">Module 7</div>
+                    <div style="font-size: 14px; color: #6b7280; margin-top: 5px;">Door Knock & Inspection</div>
+                    <div style="font-size: 12px; color: #8b4fbe; margin-top: 8px;">9 scenarios</div>
+                </button>
+                <button class="agnes-module-card" data-module="8" style="padding: 25px; border: 2px solid #e5e7eb; border-radius: 12px; background: white; cursor: pointer; text-align: left; transition: all 0.3s;">
+                    <div style="font-size: 36px; margin-bottom: 10px;">📋</div>
+                    <div style="font-weight: 700; font-size: 16px; color: #1f2937;">Module 8</div>
+                    <div style="font-size: 14px; color: #6b7280; margin-top: 5px;">Post-Inspection Pitch</div>
+                    <div style="font-size: 12px; color: #8b4fbe; margin-top: 8px;">3 scenarios</div>
+                </button>
+                <button class="agnes-module-card" data-module="9" style="padding: 25px; border: 2px solid #e5e7eb; border-radius: 12px; background: white; cursor: pointer; text-align: left; transition: all 0.3s;">
+                    <div style="font-size: 36px; margin-bottom: 10px;">🛑</div>
+                    <div style="font-weight: 700; font-size: 16px; color: #1f2937;">Module 9</div>
+                    <div style="font-size: 14px; color: #6b7280; margin-top: 5px;">Objection Handling</div>
+                    <div style="font-size: 12px; color: #8b4fbe; margin-top: 8px;">14 scenarios</div>
+                </button>
+                <button class="agnes-module-card" data-module="12" style="padding: 25px; border: 2px solid #e5e7eb; border-radius: 12px; background: white; cursor: pointer; text-align: left; transition: all 0.3s;">
+                    <div style="font-size: 36px; margin-bottom: 10px;">✍️</div>
+                    <div style="font-weight: 700; font-size: 16px; color: #1f2937;">Module 12</div>
+                    <div style="font-size: 14px; color: #6b7280; margin-top: 5px;">Closing the Deal</div>
+                    <div style="font-size: 12px; color: #8b4fbe; margin-top: 8px;">12 scenarios</div>
+                </button>
             </div>
+            <button id="agnes-module-back-btn" class="btn-secondary">← Back</button>
+        </div>
 
-            <div class="roleplay-container-with-feedback">
-                <div class="roleplay-main-content">
-                    <div style="background: #f8f4fc; border-left: 4px solid #8b4fbe; padding: 20px; margin-bottom: 20px; border-radius: 5px;">
-                        <h3 id="scenario-title" style="margin: 0 0 10px 0; color: #8b4fbe;">Scenario</h3>
-                        <p id="scenario-context" style="margin: 0 0 15px 0; color: #555;"></p>
+        <!-- Step 4: Personality/Difficulty Selector -->
+        <div id="agnes-difficulty-selector" style="display: none;">
+            <h2>Choose Your Agnes</h2>
+            <p>Each personality has different difficulty. Higher difficulty = more XP!</p>
+            <div id="agnes-difficulty-grid" class="agnes-difficulty-grid">
+                <!-- Dynamically populated -->
+            </div>
+            <button onclick="showAgnesScreen('agnes-module-selector')" class="btn-secondary">← Back to Module Selection</button>
+        </div>
+
+        <!-- Voice UI Screen -->
+        <div id="agnes-voice-ui" style="display: none;">
+            <div class="agnes-voice-header">
+                <div class="agnes-status-bar">
+                    <div class="connection-status">
+                        <span id="agnes-connection-dot" class="connection-dot"></span>
+                        <span id="agnes-status-text" class="agnes-status connecting">Connecting...</span>
                     </div>
-
-                    <!-- Conversation Thread Container -->
-                    <div style="margin-bottom: 20px;">
-                        <h4 style="color: #8b4fbe; margin-bottom: 10px;">Conversation:</h4>
-                        <div id="conversation-thread" style="max-height: 400px; overflow-y: auto; background: white; border: 2px solid #e0d4f0; border-radius: 8px; padding: 15px; margin-bottom: 15px;">
-                            <!-- Conversation messages will be dynamically inserted here -->
-                        </div>
+                    <div id="agnes-recording-indicator" class="recording-indicator" style="display: none;">
+                        <span class="rec-dot"></span> REC
                     </div>
-
-                    <div style="margin-bottom: 20px;">
-                        <label for="user-response" style="display: block; font-weight: 500; margin-bottom: 10px;">Your Response:</label>
-                        <textarea id="user-response" rows="4" style="width: 100%; padding: 15px; border: 2px solid #e0d4f0; border-radius: 5px; font-size: 16px; font-family: inherit;" placeholder="Type your response here..."></textarea>
-                    </div>
-
-                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                        <button id="submit-response" style="flex: 1; padding: 15px 30px; background: #8b4fbe; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: 500; cursor: pointer;">Submit Response</button>
-                        <button id="voice-input-btn" style="padding: 15px 30px; background: #f8f4fc; color: #8b4fbe; border: 2px solid #8b4fbe; border-radius: 5px; font-size: 16px; cursor: pointer;">🎤 Voice Input</button>
-                        <button id="hint-btn" style="padding: 15px 30px; background: #f8f4fc; color: #8b4fbe; border: 2px solid #8b4fbe; border-radius: 5px; font-size: 16px; cursor: pointer;">💡 Hint</button>
-                    </div>
-
-                    <div id="hint-display" style="display: none; background: #fff9e6; border-left: 4px solid #ffc107; padding: 15px; margin-bottom: 20px; border-radius: 5px;"></div>
                 </div>
 
-                <!-- Live Feedback Panel -->
-                <div id="live-feedback-panel" class="live-feedback-panel">
-                    <div class="panel-header">
-                        <h3>Live Feedback</h3>
-                        <button class="panel-toggle-btn" id="toggle-feedback-panel" aria-label="Toggle feedback panel">−</button>
+                <div class="agnes-controls">
+                    <button id="agnes-mute-btn" class="control-btn">🎤 Mute</button>
+                    <button id="agnes-video-btn" class="control-btn">📹 Hide Video</button>
+                    <button id="agnes-end-session-btn" class="control-btn end-btn">🛑 End & Score</button>
+                </div>
+            </div>
+
+            <div class="agnes-voice-main">
+                <div class="agnes-video-section">
+                    <video id="agnes-video-preview" autoplay muted playsinline class="video-preview"></video>
+                    <div class="agnes-avatar-container">
+                        <div class="agnes-avatar">👩‍💼</div>
+                        <div class="agnes-name">Agnes</div>
+                        <div id="agnes-speaking-indicator" class="speaking-indicator">Speaking...</div>
                     </div>
+                </div>
 
-                    <div class="panel-content">
-                        <div class="live-score-display">
-                            <div id="live-score-circle" class="live-score-circle score-low">0</div>
-                            <div class="score-label">Current Score</div>
+                <div class="agnes-transcript-section">
+                    <h3>Conversation Transcript</h3>
+                    <div id="agnes-transcript" class="agnes-transcript">
+                        <div class="transcript-placeholder">
+                            <p>🎤 Start speaking to begin the roleplay...</p>
+                            <p class="hint">Say "Hi, my name is..." to start your pitch</p>
                         </div>
+                    </div>
+                    <div id="agnes-score-display" class="agnes-score-display" style="display: none;"></div>
+                </div>
 
-                        <div class="key-points-live">
-                            <h4>📋 Key Points</h4>
-                            <ul id="live-key-points" class="points-list">
-                                <!-- Dynamically populated -->
-                            </ul>
-                        </div>
-
-                        <div class="tone-indicator">
-                            <h4>💬 Tone</h4>
-                            <div class="tone-bar-container">
-                                <div id="tone-bar" class="tone-bar neutral" style="width: 100%;">Neutral</div>
+                <!-- Voice Mode Live Feedback Panel -->
+                <div id="voice-live-feedback" class="voice-live-feedback" style="display: none;">
+                    <div class="voice-feedback-header">
+                        <span class="feedback-icon">📊</span>
+                        <span>Live Performance</span>
+                        <div id="voice-live-score" class="voice-live-score">--</div>
+                    </div>
+                    <div class="voice-feedback-body">
+                        <div class="feedback-section">
+                            <div class="feedback-label">Key Points Covered:</div>
+                            <div id="voice-key-points" class="key-points-checklist">
+                                <div class="kp-item pending"><span class="kp-check">○</span> Introduction</div>
+                                <div class="kp-item pending"><span class="kp-check">○</span> Urgency</div>
+                                <div class="kp-item pending"><span class="kp-check">○</span> Evidence</div>
+                                <div class="kp-item pending"><span class="kp-check">○</span> Insurance benefits</div>
+                                <div class="kp-item pending"><span class="kp-check">○</span> Next steps</div>
                             </div>
                         </div>
-
-                        <div class="confidence-meter">
-                            <h4>🎯 Confidence Level</h4>
-                            <div class="confidence-bar-container">
-                                <div id="confidence-bar" class="confidence-bar" style="width: 0%;" data-confidence="0"></div>
-                            </div>
+                        <div class="feedback-section">
+                            <div class="feedback-label">Tone Analysis:</div>
+                            <div id="voice-tone-feedback" class="tone-feedback">Start speaking to see tone feedback...</div>
                         </div>
-
-                        <div class="word-count-indicator">
-                            <div>Word Count: <strong id="live-word-count">0</strong></div>
-                            <div style="font-size: 0.75rem; margin-top: 5px; color: #999;">Recommended: 50-150 words</div>
+                        <div id="voice-live-tip" class="voice-live-tip" style="display: none;">
+                            <span class="tip-icon">💡</span>
+                            <span class="tip-text"></span>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Screen 3: Feedback Display -->
-        <div id="feedback-area" style="display: none;">
-            <h2 style="text-align: center; color: #8b4fbe; margin-bottom: 30px;">Performance Feedback</h2>
-
-            <div style="text-align: center; margin-bottom: 30px;">
-                <div id="score-circle" style="display: inline-block; width: 120px; height: 120px; border-radius: 50%; border: 8px solid #8b4fbe; display: flex; align-items: center; justify-content: center; font-size: 48px; font-weight: bold; color: #8b4fbe; margin-bottom: 10px;"></div>
-                <p id="score-text" style="font-size: 18px; font-weight: 500;"></p>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
-                <div style="background: #e8f5e9; padding: 20px; border-radius: 8px; border-left: 4px solid #4caf50;">
-                    <h3 style="margin: 0 0 15px 0; color: #2e7d32;">Matched Key Points</h3>
-                    <ul id="matched-points-list" style="list-style: none; padding: 0; margin: 0;"></ul>
-                </div>
-                <div style="background: #fff3e0; padding: 20px; border-radius: 8px; border-left: 4px solid #ff9800;">
-                    <h3 style="margin: 0 0 15px 0; color: #e65100;">Areas to Improve</h3>
-                    <ul id="missed-points-list" style="list-style: none; padding: 0; margin: 0;"></ul>
-                </div>
-            </div>
-
-            <div style="background: #f8f4fc; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
-                <h3 style="margin: 0 0 15px 0; color: #8b4fbe;">AI Coach Feedback</h3>
-                <div style="margin-bottom: 20px;">
-                    <h4 style="margin: 0 0 10px 0; color: #4caf50;">Strengths:</h4>
-                    <ul id="strengths-list" style="margin: 0;"></ul>
-                </div>
-                <div>
-                    <h4 style="margin: 0 0 10px 0; color: #ff9800;">Growth Opportunities:</h4>
-                    <ul id="improvements-list" style="margin: 0;"></ul>
-                </div>
-            </div>
-
-            <div style="display: flex; gap: 10px;">
-                <button id="next-scenario-btn" style="flex: 1; padding: 15px 30px; background: #8b4fbe; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: 500; cursor: pointer;">Next Scenario →</button>
-                <button id="retry-scenario-btn" style="padding: 15px 30px; background: #f8f4fc; color: #8b4fbe; border: 2px solid #8b4fbe; border-radius: 5px; font-size: 16px; cursor: pointer;">🔄 Retry</button>
+            <div class="agnes-tips">
+                <h4>💡 Tips:</h4>
+                <ul>
+                    <li>Speak clearly and at a natural pace</li>
+                    <li>Cover the 5 non-negotiables in your pitch</li>
+                    <li>Say "Score me" when ready for feedback</li>
+                </ul>
             </div>
         </div>
 
-        <!-- Screen 4: Session Summary -->
-        <div id="session-summary" style="display: none;">
-            <!-- Content will be dynamically generated -->
+        <!-- Text UI Screen (wraps original content) -->
+        <div id="agnes-text-ui" style="display: none;">
+            <div id="roleplay-live-region" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+            <!-- Screen 1: Category Selection -->
+            <div id="category-selector" style="display: block;">
+                <h2>Choose Your Training Focus</h2>
+                <p>Select a scenario category to practice. Each has AI-powered feedback and multiple difficulty levels.</p>
+                <div class="category-grid">
+                    <button class="category-card" data-category="inspection">
+                        <div class="category-icon">🔍</div>
+                        <div class="category-title">Inspection Process</div>
+                        <div class="category-source">From Module 7</div>
+                        <div class="category-count">5 scenarios</div>
+                    </button>
+                    <button class="category-card" data-category="initialPitch">
+                        <div class="category-icon">🚪</div>
+                        <div class="category-title">Door Knock & Pitch</div>
+                        <div class="category-source">From Module 7</div>
+                        <div class="category-count">4 scenarios</div>
+                    </button>
+                    <button class="category-card" data-category="postInspection">
+                        <div class="category-icon">📋</div>
+                        <div class="category-title">Post-Inspection Pitch</div>
+                        <div class="category-source">From Module 8</div>
+                        <div class="category-count">3 scenarios</div>
+                    </button>
+                    <button class="category-card" data-category="initialObjections">
+                        <div class="category-icon">🛑</div>
+                        <div class="category-title">Initial Objections</div>
+                        <div class="category-source">From Module 9</div>
+                        <div class="category-count">5 scenarios</div>
+                    </button>
+                    <button class="category-card" data-category="postInspectionObjections">
+                        <div class="category-icon">💬</div>
+                        <div class="category-title">Post-Inspection Objections</div>
+                        <div class="category-source">From Module 9</div>
+                        <div class="category-count">9 scenarios</div>
+                    </button>
+                    <button class="category-card" data-category="closingObjections">
+                        <div class="category-icon">✍️</div>
+                        <div class="category-title">Closing Objections</div>
+                        <div class="category-source">From Module 12</div>
+                        <div class="category-count">12 scenarios</div>
+                    </button>
+                </div>
+                <div class="quick-actions" style="margin-top: 25px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <button id="random-scenario-btn" class="btn-secondary">🎲 Random Scenario</button>
+                    <button id="legacy-role-btn" class="btn-secondary">👥 Browse by Role</button>
+                </div>
+                <button onclick="showAgnesScreen('agnes-mode-selector')" class="btn-secondary" style="margin-top: 20px;">← Back to Mode Selection</button>
+            </div>
+
+            <!-- Screen 1.5: Scenario List for Selected Category -->
+            <div id="scenario-list" style="display: none;">
+                <div class="scenario-list-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                    <button id="back-to-categories" class="btn-back" style="background: #f0f0f0; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">← Back</button>
+                    <h2 id="category-title-display" style="margin: 0; flex: 1; text-align: center;">Scenarios</h2>
+                    <div class="filter-controls">
+                        <select id="role-filter" style="padding: 8px 15px; border-radius: 6px; border: 1px solid #ddd;">
+                            <option value="all">All Roles</option>
+                            <option value="homeowner">Homeowner</option>
+                            <option value="rep">Sales Rep</option>
+                            <option value="adjuster">Adjuster</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="scenario-cards" class="scenario-cards-grid"></div>
+            </div>
+
+            <!-- Screen 1.75: Legacy Role Selection -->
+            <div id="roleplay-setup" style="display: none;">
+                <h2>Browse by Role</h2>
+                <p>Choose a role to see all scenarios for that perspective.</p>
+                <div class="role-selection-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 30px 0;">
+                    <button class="role-btn" data-role="homeowner" style="padding: 30px; border: 2px solid #8b4fbe; border-radius: 10px; background: linear-gradient(135deg, #8b4fbe 0%, #a370d1 100%); color: white; font-size: 18px; cursor: pointer; transition: all 0.3s;">
+                        <div style="font-size: 48px; margin-bottom: 10px;">🏠</div>
+                        <div style="font-weight: bold; margin-bottom: 10px;">Homeowner</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Practice handling common objections and concerns</div>
+                    </button>
+                    <button class="role-btn" data-role="rep" style="padding: 30px; border: 2px solid #8b4fbe; border-radius: 10px; background: linear-gradient(135deg, #8b4fbe 0%, #a370d1 100%); color: white; font-size: 18px; cursor: pointer; transition: all 0.3s;">
+                        <div style="font-size: 48px; margin-bottom: 10px;">💼</div>
+                        <div style="font-weight: bold; margin-bottom: 10px;">Sales Rep</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Refine your pitch and closing techniques</div>
+                    </button>
+                    <button class="role-btn" data-role="adjuster" style="padding: 30px; border: 2px solid #8b4fbe; border-radius: 10px; background: linear-gradient(135deg, #8b4fbe 0%, #a370d1 100%); color: white; font-size: 18px; cursor: pointer; transition: all 0.3s;">
+                        <div style="font-size: 48px; margin-bottom: 10px;">📋</div>
+                        <div style="font-weight: bold; margin-bottom: 10px;">Adjuster</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Master technical documentation and negotiation</div>
+                    </button>
+                </div>
+                <button onclick="showAgnesTextScreen('category-selector')" class="btn-secondary">← Back to Categories</button>
+            </div>
+
+            <!-- Screen 1.5: Personality Selection -->
+            <div id="personality-selector" style="display: none;">
+                <h2>Choose Your Agnes AI Coach</h2>
+                <p>Select the AI personality that best matches your training goals.</p>
+                <div class="personality-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 30px 0;">
+                    <button class="personality-card" data-personality="supportive" data-difficulty="1" style="padding: 25px; border: 3px solid #4caf50; border-radius: 12px; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); cursor: pointer; text-align: left;">
+                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                            <div style="font-size: 42px; margin-right: 15px;">😊</div>
+                            <div>
+                                <div style="font-weight: bold; font-size: 18px; color: #2e7d32;">Agnes the Supportive Coach</div>
+                                <div style="font-size: 14px; color: #1b5e20; margin-top: 5px;">⭐ Easy</div>
+                            </div>
+                        </div>
+                        <p style="margin: 0; font-size: 14px; color: #555;">Encouraging and patient. Perfect for beginners.</p>
+                    </button>
+                    <button class="personality-card" data-personality="realistic" data-difficulty="2" style="padding: 25px; border: 3px solid #2196f3; border-radius: 12px; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); cursor: pointer; text-align: left;">
+                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                            <div style="font-size: 42px; margin-right: 15px;">🏠</div>
+                            <div>
+                                <div style="font-weight: bold; font-size: 18px; color: #1565c0;">Agnes the Real Homeowner</div>
+                                <div style="font-size: 14px; color: #0d47a1; margin-top: 5px;">⭐⭐ Medium</div>
+                            </div>
+                        </div>
+                        <p style="margin: 0; font-size: 14px; color: #555;">Realistic homeowner with real concerns.</p>
+                    </button>
+                    <button class="personality-card" data-personality="skeptical" data-difficulty="3" style="padding: 25px; border: 3px solid #ff9800; border-radius: 12px; background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); cursor: pointer; text-align: left;">
+                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                            <div style="font-size: 42px; margin-right: 15px;">🤔</div>
+                            <div>
+                                <div style="font-weight: bold; font-size: 18px; color: #e65100;">Agnes the Skeptical Buyer</div>
+                                <div style="font-size: 14px; color: #bf360c; margin-top: 5px;">⭐⭐⭐ Hard</div>
+                            </div>
+                        </div>
+                        <p style="margin: 0; font-size: 14px; color: #555;">Questioning and doubtful. Requires strong persuasion.</p>
+                    </button>
+                    <button class="personality-card" data-personality="rushed" data-difficulty="4" style="padding: 25px; border: 3px solid #f44336; border-radius: 12px; background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%); cursor: pointer; text-align: left;">
+                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                            <div style="font-size: 42px; margin-right: 15px;">⏰</div>
+                            <div>
+                                <div style="font-weight: bold; font-size: 18px; color: #c62828;">Agnes the Rushed</div>
+                                <div style="font-size: 14px; color: #b71c1c; margin-top: 5px;">⭐⭐⭐⭐ Expert</div>
+                            </div>
+                        </div>
+                        <p style="margin: 0; font-size: 14px; color: #555;">Impatient and time-sensitive. Be concise!</p>
+                    </button>
+                    <button class="personality-card" data-personality="final-boss" data-difficulty="5" style="padding: 25px; border: 3px solid #9c27b0; border-radius: 12px; background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); cursor: pointer; text-align: left;">
+                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                            <div style="font-size: 42px; margin-right: 15px;">👑</div>
+                            <div>
+                                <div style="font-weight: bold; font-size: 18px; color: #6a1b9a;">Agnes the Final Boss</div>
+                                <div style="font-size: 14px; color: #4a148c; margin-top: 5px;">⭐⭐⭐⭐⭐ Master</div>
+                            </div>
+                        </div>
+                        <p style="margin: 0; font-size: 14px; color: #555;">Ultimate challenge. All objection types combined.</p>
+                    </button>
+                </div>
+                <button id="back-to-roles" class="btn-secondary">← Back to Role Selection</button>
+            </div>
+
+            <!-- Screen 2: Scenario Display -->
+            <div id="scenario-display" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div id="scenario-progress" style="font-weight: 500; color: #8b4fbe;"></div>
+                    <div id="turn-counter" style="font-weight: 600; color: #8b4fbe; background: #f8f4fc; padding: 8px 16px; border-radius: 20px; border: 2px solid #8b4fbe;">Turn 1 of 5</div>
+                </div>
+                <div class="roleplay-container-with-feedback">
+                    <div class="roleplay-main-content">
+                        <div style="background: #f8f4fc; border-left: 4px solid #8b4fbe; padding: 20px; margin-bottom: 20px; border-radius: 5px;">
+                            <h3 id="scenario-title" style="margin: 0 0 10px 0; color: #8b4fbe;">Scenario</h3>
+                            <p id="scenario-context" style="margin: 0 0 15px 0; color: #555;"></p>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <h4 style="color: #8b4fbe; margin-bottom: 10px;">Conversation:</h4>
+                            <div id="conversation-thread" style="max-height: 400px; overflow-y: auto; background: white; border: 2px solid #e0d4f0; border-radius: 8px; padding: 15px;"></div>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label for="user-response" style="display: block; font-weight: 500; margin-bottom: 10px;">Your Response:</label>
+                            <textarea id="user-response" rows="4" style="width: 100%; padding: 15px; border: 2px solid #e0d4f0; border-radius: 5px; font-size: 16px;" placeholder="Type your response here..."></textarea>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                            <button id="submit-response" class="btn-primary" style="flex: 1;">Submit Response</button>
+                            <button id="voice-input-btn" class="btn-secondary">🎤 Voice</button>
+                            <button id="hint-btn" class="btn-secondary">💡 Hint</button>
+                        </div>
+                        <div id="hint-display" style="display: none; background: #fff9e6; border-left: 4px solid #ffc107; padding: 15px; border-radius: 5px;"></div>
+
+                        <!-- Contextual AI Hint Panel -->
+                        <div id="contextual-hint-panel" class="contextual-hint-panel" style="display: none;">
+                            <div class="hint-header">
+                                <span class="hint-icon">💡</span>
+                                <span class="hint-title">AI Coach Suggestion</span>
+                                <button class="hint-close" onclick="document.getElementById('contextual-hint-panel').style.display='none'">×</button>
+                            </div>
+                            <div class="hint-content">
+                                <div class="suggested-response">
+                                    <h4>Try saying:</h4>
+                                    <p id="hint-suggestion-text"></p>
+                                </div>
+                                <div class="key-points-reminder">
+                                    <h4>Remember to include:</h4>
+                                    <ul id="hint-key-points"></ul>
+                                </div>
+                                <div class="tone-guidance">
+                                    <h4>Tone tip:</h4>
+                                    <p id="hint-tone-text"></p>
+                                </div>
+                                <div class="script-reference">
+                                    <h4>From training:</h4>
+                                    <blockquote id="hint-script-reference"></blockquote>
+                                </div>
+                            </div>
+                            <div class="hint-footer">
+                                <button id="regenerate-hint" class="btn-secondary" onclick="showHint()">Different Suggestion</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="live-feedback-panel" class="live-feedback-panel">
+                        <div class="panel-header"><h3>Live Feedback</h3><button class="panel-toggle-btn" id="toggle-feedback-panel">−</button></div>
+                        <div class="panel-content">
+                            <div class="live-score-display"><div id="live-score-circle" class="live-score-circle score-low">0</div><div class="score-label">Score</div></div>
+                            <div class="key-points-live"><h4>📋 Key Points</h4><ul id="live-key-points" class="points-list"></ul></div>
+                            <div class="tone-indicator"><h4>💬 Tone</h4><div class="tone-bar-container"><div id="tone-bar" class="tone-bar neutral">Neutral</div></div></div>
+                            <div class="word-count-indicator"><div>Words: <strong id="live-word-count">0</strong></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screen 3: Feedback Display -->
+            <div id="feedback-area" style="display: none;">
+                <h2 style="text-align: center; color: #8b4fbe;">Performance Feedback</h2>
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div id="score-circle" class="score-circle-large"></div>
+                    <p id="score-text" style="font-size: 18px; font-weight: 500;"></p>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                    <div style="background: #e8f5e9; padding: 20px; border-radius: 8px; border-left: 4px solid #4caf50;">
+                        <h3 style="color: #2e7d32;">✅ Matched Points</h3>
+                        <ul id="matched-points-list" style="list-style: none; padding: 0;"></ul>
+                    </div>
+                    <div style="background: #fff3e0; padding: 20px; border-radius: 8px; border-left: 4px solid #ff9800;">
+                        <h3 style="color: #e65100;">📈 Areas to Improve</h3>
+                        <ul id="missed-points-list" style="list-style: none; padding: 0;"></ul>
+                    </div>
+                </div>
+                <div style="background: #f8f4fc; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+                    <h3 style="color: #8b4fbe;">AI Coach Feedback</h3>
+                    <div><h4 style="color: #4caf50;">Strengths:</h4><ul id="strengths-list"></ul></div>
+                    <div><h4 style="color: #ff9800;">Growth Areas:</h4><ul id="improvements-list"></ul></div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button id="next-scenario-btn" class="btn-primary" style="flex: 1;">Next Scenario →</button>
+                    <button id="retry-scenario-btn" class="btn-secondary">🔄 Retry</button>
+                </div>
+            </div>
+
+            <!-- Screen 4: Session Summary -->
+            <div id="session-summary" style="display: none;"></div>
+        </div>
+
+        <!-- Door Slam Modal -->
+        <div id="agnes-door-slam-modal" class="agnes-modal" style="display: none;">
+            <div class="modal-content door-slam">
+                <div class="modal-icon">🚪💥</div>
+                <h2>Door Slammed!</h2>
+                <p>The homeowner shut the door in your face. Session ended with a FAIL.</p>
+                <p class="modal-tip">Tip: Be less pushy, listen to concerns, and don't lie!</p>
+                <button id="agnes-door-slam-close" class="btn-primary">Try Again</button>
+            </div>
+        </div>
+
+        <!-- Success Modal -->
+        <div id="agnes-success-modal" class="agnes-modal" style="display: none;">
+            <div class="modal-content success">
+                <!-- Dynamically populated -->
+            </div>
         </div>
     </div>
   `,
@@ -2147,59 +3246,57 @@ trainingContent['sales-cycle-job-flow'] = trainingContent['sales-cycle'] || `
 // 16. Final Exam (new)
 trainingContent['final-exam'] = `
   <div class="content-card" id="final-exam">
-    <h1>Final Exam / Certification</h1>
+    <h1>🎯 Final Certification Exam</h1>
+    <p class="module-intro">Complete this exam to become a Certified Roof E.R. Sales Representative. You have 3 attempts to score 80% or higher.</p>
+    <div id="exam-area">
+      <!-- Dynamically populated by initFinalExam() -->
+    </div>
+  </div>
+`;
 
-    <h2>Certification Requirements</h2>
-    <div class="cert-requirements">
-      <h3>To Earn Your Roof-ER Certification:</h3>
-      <ol>
-        <li>✓ Complete all 16 training modules</li>
-        <li>✓ Watch all 5 training videos to 90% completion</li>
-        <li>✓ Complete at least 3 Agnes role-play scenarios</li>
-        <li>✓ Pass this final exam with 80% or higher</li>
-      </ol>
+// 17. Admin Dashboard (Manager Only)
+trainingContent['admin-dashboard'] = `
+  <div class="content-card" id="admin-dashboard">
+    <h1>📊 Admin Dashboard</h1>
+    <p class="module-intro">Track team progress, view analytics, and manage users.</p>
 
-      <h3>Final Exam Format:</h3>
-      <ul>
-        <li><strong>Questions:</strong> 50 multiple-choice and scenario-based</li>
-        <li><strong>Time Limit:</strong> 60 minutes (untimed practice mode available)</li>
-        <li><strong>Topics Covered:</strong> All 16 modules</li>
-        <li><strong>Passing Score:</strong> 80% (40/50 correct)</li>
-        <li><strong>Retakes:</strong> Unlimited attempts</li>
-      </ul>
-
-      <h3>After Passing:</h3>
-      <ul>
-        <li>🏆 Digital certificate emailed to you</li>
-        <li>📋 Added to Roof-ER certified sales team</li>
-        <li>💼 Ready for field assignments</li>
-        <li>📚 Ongoing training & support</li>
-      </ul>
+    <div class="admin-tabs">
+      <button class="admin-tab active" data-tab="users">👥 Users</button>
+      <button class="admin-tab" data-tab="analytics">📈 Analytics</button>
     </div>
 
-    <div class="exam-tips">
-      <h3>Exam Tips:</h3>
-      <ul>
-        <li>Review module summaries before starting</li>
-        <li>Focus on scripts, objection handling, and technical terminology</li>
-        <li>Take practice mode first to identify weak areas</li>
-        <li>Use your notes - open book in practice mode</li>
-      </ul>
+    <div class="admin-content">
+      <!-- Users Tab -->
+      <div id="admin-users-tab" class="admin-tab-content active">
+        <div class="admin-toolbar">
+          <input type="text" id="user-search" placeholder="Search users..." class="admin-search">
+          <button id="refresh-users-btn" class="btn-secondary">🔄 Refresh</button>
+        </div>
+        <div id="users-table-container">
+          <p class="loading-text">Loading users...</p>
+        </div>
+      </div>
+
+      <!-- Analytics Tab -->
+      <div id="admin-analytics-tab" class="admin-tab-content" style="display:none;">
+        <div id="analytics-container">
+          <p class="loading-text">Loading analytics...</p>
+        </div>
+      </div>
     </div>
 
-    <h2>Exam Topic Breakdown</h2>
-    <ul>
-      <li><strong>Door Knocking & Initial Pitch (10 questions):</strong> Opening scripts, objection handling, appointment setting</li>
-      <li><strong>Inspection & Documentation (12 questions):</strong> Damage identification, photo techniques, test squares</li>
-      <li><strong>Post-Inspection Pitch (8 questions):</strong> Evidence presentation, urgency creation, objection responses</li>
-      <li><strong>Filing & Closing (10 questions):</strong> Claim filing process, contingency agreement, authorization forms</li>
-      <li><strong>Special Scenarios (5 questions):</strong> Discontinued products, matching law, code compliance</li>
-      <li><strong>Sales Cycle & Job Flow (5 questions):</strong> Timeline, milestones, team coordination</li>
-    </ul>
-
-    <p>50 questions total: 35 multiple choice, 10 fill‑in‑the‑blank, 5 short answer. Auto‑graded where applicable with retake option.</p>
-    <button id="startFinalExam">Start Final Exam</button>
-    <div id="exam-area"></div>
+    <!-- User Detail Modal -->
+    <div id="user-detail-modal" class="admin-modal" style="display:none;">
+      <div class="admin-modal-content">
+        <div class="admin-modal-header">
+          <h2 id="user-detail-title">User Details</h2>
+          <button class="modal-close" id="close-user-modal">×</button>
+        </div>
+        <div id="user-detail-body">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </div>
   </div>
 `;
 
@@ -3160,9 +4257,1013 @@ function restartQuiz(quizState) {
   }
 }
 
-// --- Agnes 21 Role-Play System ---
+// ============================================================================
+// AGNES-21 LIVE SESSION MANAGEMENT
+// ============================================================================
+
+// Update Agnes Live UI based on state
+function updateAgnesLiveUI() {
+  const connectionDot = document.getElementById('agnes-connection-dot');
+  if (connectionDot) {
+    connectionDot.style.backgroundColor = agnesLiveState.isConnected ? '#4ade80' : '#ef4444';
+    connectionDot.classList.toggle('connected', agnesLiveState.isConnected);
+  }
+
+  const muteBtn = document.getElementById('agnes-mute-btn');
+  if (muteBtn) {
+    muteBtn.innerHTML = agnesLiveState.isMuted ? '🔇 Unmute' : '🎤 Mute';
+    muteBtn.classList.toggle('muted', agnesLiveState.isMuted);
+  }
+
+  const videoBtn = document.getElementById('agnes-video-btn');
+  if (videoBtn) {
+    videoBtn.innerHTML = agnesLiveState.isVideoEnabled ? '📹 Hide Video' : '📹 Show Video';
+  }
+
+  const statusText = document.getElementById('agnes-status-text');
+  if (statusText) {
+    if (agnesLiveState.aiSpeaking) {
+      statusText.textContent = 'Agnes is speaking...';
+      statusText.className = 'agnes-status speaking';
+    } else if (agnesLiveState.isSpeaking) {
+      statusText.textContent = 'Listening to you...';
+      statusText.className = 'agnes-status listening';
+    } else if (agnesLiveState.isConnected) {
+      statusText.textContent = 'Ready - Start speaking!';
+      statusText.className = 'agnes-status ready';
+    } else {
+      statusText.textContent = 'Connecting...';
+      statusText.className = 'agnes-status connecting';
+    }
+  }
+
+  const recordingIndicator = document.getElementById('agnes-recording-indicator');
+  if (recordingIndicator) {
+    recordingIndicator.style.display = agnesMediaRecorder?.state === 'recording' ? 'flex' : 'none';
+  }
+
+  // Toggle speaking animation on the avatar orb
+  const agnesAvatar = document.querySelector('.agnes-avatar');
+  if (agnesAvatar) {
+    agnesAvatar.classList.toggle('speaking', agnesLiveState.aiSpeaking);
+  }
+
+  // Show/hide speaking indicator text
+  const speakingIndicator = document.getElementById('agnes-speaking-indicator');
+  if (speakingIndicator) {
+    speakingIndicator.classList.toggle('visible', agnesLiveState.aiSpeaking);
+  }
+}
+
+// Analyze voice transcript for live feedback
+function analyzeVoiceTranscript() {
+  const feedbackPanel = document.getElementById('voice-live-feedback');
+  if (!feedbackPanel) return;
+
+  // Get user messages only
+  const userMessages = agnesLiveState.transcript
+    .filter(msg => msg.role === 'user')
+    .map(msg => msg.text)
+    .join(' ');
+
+  if (!userMessages || userMessages.length < 10) {
+    feedbackPanel.style.display = 'none';
+    return;
+  }
+
+  // Show the panel
+  feedbackPanel.style.display = 'block';
+
+  // Key points to check for
+  const keyPoints = [
+    { name: 'Introduction', patterns: ['my name is', 'i\'m', 'hi', 'hello', 'good morning', 'good afternoon'] },
+    { name: 'Urgency', patterns: ['today', 'now', 'immediately', 'soon', 'right away', 'before', 'storm', 'deadline'] },
+    { name: 'Evidence', patterns: ['damage', 'photo', 'picture', 'found', 'discovered', 'see', 'look', 'hail', 'wind'] },
+    { name: 'Insurance benefits', patterns: ['insurance', 'claim', 'covered', 'deductible', 'policy', 'no cost', 'free'] },
+    { name: 'Next steps', patterns: ['file', 'claim', 'schedule', 'call', 'adjuster', 'sign', 'agreement', 'contract'] }
+  ];
+
+  const lowerText = userMessages.toLowerCase();
+  let coveredCount = 0;
+
+  // Update key points checklist
+  const checklistContainer = document.getElementById('voice-key-points');
+  if (checklistContainer) {
+    checklistContainer.innerHTML = keyPoints.map(kp => {
+      const covered = kp.patterns.some(p => lowerText.includes(p));
+      if (covered) coveredCount++;
+      return `
+        <div class="kp-item ${covered ? 'covered' : 'pending'}">
+          <span class="kp-check">${covered ? '✓' : '○'}</span> ${kp.name}
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Calculate and display score
+  const scoreEl = document.getElementById('voice-live-score');
+  if (scoreEl) {
+    const score = Math.round((coveredCount / keyPoints.length) * 100);
+    scoreEl.textContent = `${score}%`;
+    scoreEl.style.color = score >= 80 ? '#22c55e' : score >= 50 ? '#eab308' : '#ef4444';
+  }
+
+  // Tone analysis
+  const toneEl = document.getElementById('voice-tone-feedback');
+  if (toneEl) {
+    const wordCount = userMessages.split(/\s+/).length;
+    const hasQuestions = (userMessages.match(/\?/g) || []).length;
+    const hasExclamations = (userMessages.match(/!/g) || []).length;
+
+    let toneAnalysis = '';
+    if (wordCount < 20) {
+      toneAnalysis = 'Keep going! Add more detail to your pitch.';
+    } else if (hasQuestions > 2) {
+      toneAnalysis = '👍 Good use of questions to engage the homeowner.';
+    } else if (hasExclamations > 1) {
+      toneAnalysis = '⚡ Enthusiastic tone detected - keep the energy!';
+    } else {
+      toneAnalysis = '📢 Try varying your tone and asking questions.';
+    }
+    toneEl.textContent = toneAnalysis;
+  }
+
+  // Show tips based on what's missing
+  const tipEl = document.getElementById('voice-live-tip');
+  if (tipEl) {
+    const missingPoints = keyPoints.filter(kp => !kp.patterns.some(p => lowerText.includes(p)));
+    if (missingPoints.length > 0 && missingPoints.length < 5) {
+      tipEl.style.display = 'block';
+      const tipText = tipEl.querySelector('.tip-text');
+      if (tipText) {
+        tipText.textContent = `Try mentioning: ${missingPoints.slice(0, 2).map(p => p.name).join(', ')}`;
+      }
+    } else {
+      tipEl.style.display = 'none';
+    }
+  }
+}
+
+// Update transcript display
+function updateAgnesTranscriptDisplay() {
+  const container = document.getElementById('agnes-transcript');
+  if (!container) return;
+
+  // Process transcript to extract rep summaries from Agnes messages
+  let processedMessages: { role: string; text: string; isRepSummary?: boolean }[] = [];
+
+  agnesLiveState.transcript.forEach(msg => {
+    if (msg.role === 'agnes') {
+      // Check for [Rep: ...] summary at the start
+      const repMatch = msg.text.match(/^\[Rep:\s*([^\]]+)\]/i);
+      if (repMatch) {
+        // Add the rep summary as a "You" message
+        processedMessages.push({
+          role: 'user',
+          text: repMatch[1].trim(),
+          isRepSummary: true
+        });
+        // Add Agnes's response (without the [Rep: ...] part)
+        const agnesText = msg.text.replace(/^\[Rep:[^\]]+\]\s*/i, '').trim();
+        if (agnesText) {
+          processedMessages.push({
+            role: 'agnes',
+            text: agnesText
+          });
+        }
+      } else {
+        processedMessages.push(msg);
+      }
+    } else {
+      processedMessages.push(msg);
+    }
+  });
+
+  container.innerHTML = processedMessages.map(msg => `
+    <div class="transcript-message ${msg.role === 'agnes' ? 'agnes-msg' : 'user-msg'}${msg.isRepSummary ? ' rep-summary' : ''}">
+      <span class="msg-role">${msg.role === 'agnes' ? 'Agnes' : 'You'}:</span>
+      <span class="msg-text">${msg.text}</span>
+    </div>
+  `).join('');
+
+  container.scrollTop = container.scrollHeight;
+
+  // Update live feedback whenever transcript changes
+  analyzeVoiceTranscript();
+}
+
+// Play audio chunk from Gemini
+async function playAgnesAudioChunk(base64Audio: string) {
+  if (!agnesLiveState.sessionActive || !agnesOutputAudioContext) return;
+  if (agnesOutputAudioContext.state === 'closed') return;
+
+  try {
+    const audioBuffer = await decodeAudioDataPCM(base64ToUint8Array(base64Audio), agnesOutputAudioContext);
+    const source = agnesOutputAudioContext.createBufferSource();
+    source.buffer = audioBuffer;
+
+    if (agnesAnalyserNode) {
+      source.connect(agnesAnalyserNode);
+    } else {
+      source.connect(agnesOutputAudioContext.destination);
+    }
+
+    const currentTime = agnesOutputAudioContext.currentTime;
+    if (agnesNextStartTime < currentTime) {
+      agnesNextStartTime = currentTime;
+    }
+
+    source.start(agnesNextStartTime);
+    agnesNextStartTime += audioBuffer.duration;
+
+    agnesLiveState.aiSpeaking = true;
+    updateAgnesLiveUI();
+
+    source.onended = () => {
+      agnesAudioSources.delete(source);
+      if (agnesAudioSources.size === 0) {
+        agnesLiveState.aiSpeaking = false;
+        updateAgnesLiveUI();
+      }
+    };
+    agnesAudioSources.add(source);
+  } catch (error) {
+    console.error('Error playing audio chunk:', error);
+  }
+}
+
+// Start audio input to Gemini
+function startAgnesAudioInput() {
+  if (!agnesInputAudioContext || !agnesMediaStream) return;
+
+  const source = agnesInputAudioContext.createMediaStreamSource(agnesMediaStream);
+  const processor = agnesInputAudioContext.createScriptProcessor(4096, 1, 1);
+
+  agnesMicAnalyserNode = agnesInputAudioContext.createAnalyser();
+  agnesMicAnalyserNode.fftSize = 256;
+  source.connect(agnesMicAnalyserNode);
+
+  processor.onaudioprocess = (e) => {
+    if (agnesLiveState.isMuted || !agnesLiveState.sessionActive) return;
+
+    const inputData = e.inputBuffer.getChannelData(0);
+    const pcmBlob = createPcmBlob(inputData);
+
+    if (agnesSessionPromise) {
+      agnesSessionPromise.then(session => {
+        // Double-check session is still active before sending
+        if (!agnesLiveState.sessionActive) return;
+        try {
+          session.sendRealtimeInput({ media: pcmBlob });
+        } catch (e) {
+          // Ignore WebSocket errors during session close
+        }
+      });
+    }
+  };
+
+  source.connect(processor);
+  processor.connect(agnesInputAudioContext.destination);
+
+  startAgnesVoiceActivityDetection();
+}
+
+// Voice activity detection
+function startAgnesVoiceActivityDetection() {
+  const checkVoiceActivity = () => {
+    if (!agnesMicAnalyserNode || !agnesLiveState.sessionActive) return;
+
+    const dataArray = new Uint8Array(agnesMicAnalyserNode.frequencyBinCount);
+    agnesMicAnalyserNode.getByteFrequencyData(dataArray);
+
+    const average = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+    const VOICE_THRESHOLD = 15;
+
+    const wasSpeaking = agnesLiveState.isSpeaking;
+    agnesLiveState.isSpeaking = average > VOICE_THRESHOLD && !agnesLiveState.isMuted;
+
+    if (wasSpeaking !== agnesLiveState.isSpeaking) {
+      updateAgnesLiveUI();
+    }
+
+    if (agnesLiveState.sessionActive) {
+      requestAnimationFrame(checkVoiceActivity);
+    }
+  };
+
+  checkVoiceActivity();
+}
+
+// Start video input to Gemini
+function startAgnesVideoInput() {
+  const FPS = 1;
+  const videoEl = document.getElementById('agnes-video-preview') as HTMLVideoElement;
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+
+  if (!ctx || !videoEl) return;
+
+  agnesFrameIntervalId = window.setInterval(async () => {
+    if (!agnesLiveState.isVideoEnabled || !agnesSessionPromise || !agnesLiveState.sessionActive) return;
+
+    canvas.width = videoEl.videoWidth / 4;
+    canvas.height = videoEl.videoHeight / 4;
+    ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+
+    canvas.toBlob(async (blob) => {
+      if (blob && agnesSessionPromise && agnesLiveState.sessionActive) {
+        const base64Data = await blobToBase64(blob);
+        agnesSessionPromise.then(session => {
+          // Double-check session is still active before sending
+          if (!agnesLiveState.sessionActive) return;
+          try {
+            session.sendRealtimeInput({
+              media: {
+                mimeType: 'image/jpeg',
+                data: base64Data
+              }
+            });
+          } catch (e) {
+            // Ignore WebSocket errors during session close
+          }
+        });
+      }
+    }, 'image/jpeg', 0.5);
+  }, 1000 / FPS);
+}
+
+// Start video recording
+function startAgnesRecording() {
+  if (!agnesMediaStream) return;
+
+  const mimeType = getSupportedVideoMimeType();
+
+  try {
+    agnesMediaRecorder = new MediaRecorder(agnesMediaStream, {
+      mimeType,
+      videoBitsPerSecond: 2500000
+    });
+  } catch (e) {
+    console.warn('MediaRecorder not supported with mimeType:', mimeType);
+    return;
+  }
+
+  agnesRecordedChunks = [];
+
+  agnesMediaRecorder.ondataavailable = (e) => {
+    if (e.data.size > 0) {
+      agnesRecordedChunks.push(e.data);
+    }
+  };
+
+  agnesMediaRecorder.onstart = () => {
+    updateAgnesLiveUI();
+  };
+
+  agnesMediaRecorder.onstop = () => {
+    updateAgnesLiveUI();
+  };
+
+  agnesMediaRecorder.start(1000);
+}
+
+// Stop video recording
+async function stopAgnesRecording(): Promise<Blob | null> {
+  return new Promise((resolve) => {
+    if (!agnesMediaRecorder || agnesMediaRecorder.state === 'inactive') {
+      resolve(null);
+      return;
+    }
+
+    agnesMediaRecorder.onstop = () => {
+      if (agnesRecordedChunks.length > 0) {
+        const blob = new Blob(agnesRecordedChunks, { type: getSupportedVideoMimeType() });
+        resolve(blob);
+      } else {
+        resolve(null);
+      }
+      updateAgnesLiveUI();
+    };
+
+    agnesMediaRecorder.stop();
+  });
+}
+
+// Initialize Agnes Live Session
+async function initAgnesLiveSession() {
+  try {
+    const apiKey = rawApiKey;
+    if (!apiKey) {
+      showAgnesError('API key not configured. Please add GEMINI_API_KEY to environment.');
+      return;
+    }
+
+    agnesAiClient = new GoogleGenAI({ apiKey });
+    agnesLiveState.sessionActive = true;
+    agnesLiveState.sessionStartTime = Date.now();
+    agnesLiveState.transcript = [];
+    agnesLiveState.currentScore = null;
+    agnesLiveState.mistakeCount = 0;
+
+    // Track roleplay session in API (async, don't await to avoid blocking)
+    startRoleplaySessionAPI(
+      agnesLiveState.selectedRole || 'default',
+      agnesLiveState.difficulty,
+      agnesLiveState.inputMode
+    );
+
+    // Request media permissions
+    agnesMediaStream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: agnesLiveState.isVideoEnabled ? { width: 640, height: 480 } : false
+    });
+
+    // Setup video preview
+    const videoEl = document.getElementById('agnes-video-preview') as HTMLVideoElement;
+    if (videoEl && agnesLiveState.isVideoEnabled) {
+      videoEl.srcObject = agnesMediaStream;
+      videoEl.play().catch(() => {});
+    }
+
+    // Setup audio contexts
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    agnesInputAudioContext = new AudioContextClass({ sampleRate: 16000 });
+    agnesOutputAudioContext = new AudioContextClass({ sampleRate: 24000 });
+
+    // Setup analyser for AI voice
+    agnesAnalyserNode = agnesOutputAudioContext.createAnalyser();
+    agnesAnalyserNode.fftSize = 256;
+    agnesAnalyserNode.connect(agnesOutputAudioContext.destination);
+
+    // Build system instruction
+    const script = AGNES_TRAINING_SCRIPTS[agnesLiveState.selectedRole || 'door-knock'] || AGNES_TRAINING_SCRIPTS['door-knock'];
+    const systemInstruction = buildAgnesSystemInstruction(agnesLiveState.difficulty, script);
+
+    // Connect to Gemini Live
+    agnesSessionPromise = agnesAiClient.live.connect({
+      model: 'gemini-2.5-flash-native-audio-preview-09-2025',
+      callbacks: {
+        onopen: () => {
+          console.log('Agnes Live Session Connected');
+          agnesLiveState.isConnected = true;
+          updateAgnesLiveUI();
+          startAgnesAudioInput();
+          if (agnesLiveState.isVideoEnabled) {
+            startAgnesVideoInput();
+          }
+          startAgnesRecording();
+        },
+        onmessage: async (message: any) => {
+          await handleAgnesMessage(message);
+        },
+        onclose: () => {
+          console.log('Agnes Live Session Closed');
+          agnesLiveState.isConnected = false;
+          updateAgnesLiveUI();
+        },
+        onerror: (err: any) => {
+          console.error('Agnes Live Error:', err);
+          showAgnesError('Connection error. Please restart the session.');
+        }
+      },
+      config: {
+        responseModalities: ['AUDIO'],
+        speechConfig: {
+          voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } }
+        },
+        systemInstruction: systemInstruction,
+      }
+    });
+
+  } catch (err: any) {
+    handleAgnesInitError(err);
+  }
+}
+
+// Handle messages from Gemini
+async function handleAgnesMessage(message: any) {
+  const serverContent = message.serverContent;
+
+  // Handle Interruption
+  if (serverContent?.interrupted) {
+    agnesAudioSources.forEach(source => {
+      try { source.stop(); } catch (e) {}
+    });
+    agnesAudioSources.clear();
+    agnesLiveState.aiSpeaking = false;
+    agnesNextStartTime = 0;
+    updateAgnesLiveUI();
+    return;
+  }
+
+  // Handle Text Output
+  const textContent = serverContent?.modelTurn?.parts?.[0]?.text;
+  if (textContent) {
+    // Parse score if present
+    const scoreMatch = textContent.match(/AGNES SCORE:?\s*(\d+)/i);
+    if (scoreMatch) {
+      agnesLiveState.currentScore = parseInt(scoreMatch[1]);
+      // Show score UI
+      const scoreDisplay = document.getElementById('agnes-score-display');
+      if (scoreDisplay) {
+        scoreDisplay.innerHTML = `<div class="final-score">${agnesLiveState.currentScore}/100</div>`;
+        scoreDisplay.style.display = 'block';
+      }
+    }
+
+    // Check for door slam
+    if (textContent.toLowerCase().includes('door slam') || textContent.includes('🚪💥')) {
+      handleAgnesDoorSlam();
+    }
+
+    // Add to transcript
+    agnesLiveState.transcript.push({
+      role: 'agnes',
+      text: textContent,
+      timestamp: new Date()
+    });
+    updateAgnesTranscriptDisplay();
+  }
+
+  // Handle Audio Output
+  const base64Audio = serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
+  if (base64Audio && agnesLiveState.sessionActive) {
+    await playAgnesAudioChunk(base64Audio);
+  }
+}
+
+// Handle door slam
+function handleAgnesDoorSlam() {
+  agnesLiveState.currentScore = 0;
+  showAgnesDoorSlamModal();
+}
+
+// Show door slam modal
+function showAgnesDoorSlamModal() {
+  const modal = document.getElementById('agnes-door-slam-modal');
+  if (modal) {
+    modal.style.display = 'flex';
+  }
+}
+
+// Handle initialization errors
+function handleAgnesInitError(err: any) {
+  console.error('Agnes Init Error:', err);
+
+  let errorMsg = 'Failed to initialize Agnes session.';
+  if (err.name === 'NotAllowedError') {
+    errorMsg = '🎤 Microphone/Camera access denied. Please enable permissions.';
+  } else if (err.name === 'NotFoundError') {
+    errorMsg = '🎤 No microphone or camera detected.';
+  } else if (err.name === 'NotReadableError') {
+    errorMsg = '🎥 Camera/mic is being used by another app.';
+  } else if (err.message?.includes('API')) {
+    errorMsg = '🌐 AI connection failed. Check your API key.';
+  }
+
+  showAgnesError(errorMsg);
+}
+
+// Show error message
+function showAgnesError(message: string) {
+  const errorDiv = document.getElementById('agnes-error');
+  if (errorDiv) {
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+  }
+}
+
+// End Agnes session
+async function endAgnesSession(saveSession: boolean = true) {
+  agnesLiveState.sessionActive = false;
+
+  // Stop all audio sources
+  agnesAudioSources.forEach(source => {
+    try { source.stop(); } catch (e) {}
+  });
+  agnesAudioSources.clear();
+
+  // Stop video recording and save
+  const videoBlob = await stopAgnesRecording();
+
+  if (saveSession && agnesLiveState.currentScore !== null) {
+    const duration = Math.floor((Date.now() - agnesLiveState.sessionStartTime) / 1000);
+    const sessionId = `agnes_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+    // Save video to IndexedDB
+    if (videoBlob) {
+      await saveAgnesVideo({
+        sessionId,
+        recordedAt: new Date(agnesLiveState.sessionStartTime),
+        duration,
+        size: videoBlob.size,
+        mimeType: videoBlob.type,
+        videoBlob,
+        metadata: {
+          difficulty: agnesLiveState.difficulty,
+          finalScore: agnesLiveState.currentScore
+        }
+      });
+    }
+
+    // Update streak
+    const streakResult = updateAgnesStreak();
+
+    // Calculate and award XP
+    const xpEarned = calculateAgnesSessionXP(
+      agnesLiveState.currentScore || 0,
+      agnesLiveState.difficulty,
+      streakResult.newStreak
+    );
+    const xpResult = awardAgnesXP(xpEarned);
+
+    // Track session end in API
+    endRoleplaySessionAPI(
+      currentRoleplaySessionId,
+      agnesLiveState.currentScore || 0,
+      xpEarned,
+      false // Not a door slam if we're saving session
+    );
+
+    // Show success modal
+    showAgnesSessionComplete(xpEarned, xpResult, streakResult);
+  } else if (!saveSession) {
+    // Track door slam or aborted session in API
+    endRoleplaySessionAPI(
+      currentRoleplaySessionId,
+      agnesLiveState.currentScore || 0,
+      0,
+      true // Door slammed or aborted
+    );
+  }
+
+  // Cleanup resources
+  cleanupAgnesLive();
+}
+
+// Show session complete modal
+function showAgnesSessionComplete(xpEarned: number, xpResult: any, streakResult: any) {
+  const modal = document.getElementById('agnes-success-modal');
+  if (!modal) return;
+
+  const content = modal.querySelector('.modal-content');
+  if (content) {
+    content.innerHTML = `
+      <h2>🎉 Session Complete!</h2>
+      <div class="session-stats">
+        <div class="stat"><span class="label">Score:</span> <span class="value">${agnesLiveState.currentScore}/100</span></div>
+        <div class="stat"><span class="label">XP Earned:</span> <span class="value">+${xpEarned} XP</span></div>
+        <div class="stat"><span class="label">Streak:</span> <span class="value">${streakResult.newStreak} days 🔥</span></div>
+        ${xpResult.leveledUp ? `<div class="level-up">🎊 Level Up! Now Level ${xpResult.newLevel}!</div>` : ''}
+        ${xpResult.newUnlocks.length > 0 ? `<div class="unlocks">${xpResult.newUnlocks.join('<br>')}</div>` : ''}
+      </div>
+      <button onclick="document.getElementById('agnes-success-modal').style.display='none'; showAgnesScreen('agnes-mode-selector');" class="btn-primary">Continue</button>
+    `;
+  }
+  modal.style.display = 'flex';
+}
+
+// Cleanup Agnes Live resources
+function cleanupAgnesLive() {
+  if (agnesInputAudioContext && agnesInputAudioContext.state !== 'closed') {
+    agnesInputAudioContext.close();
+  }
+  if (agnesOutputAudioContext && agnesOutputAudioContext.state !== 'closed') {
+    agnesOutputAudioContext.close();
+  }
+
+  if (agnesMediaStream) {
+    agnesMediaStream.getTracks().forEach(track => track.stop());
+  }
+
+  if (agnesFrameIntervalId) {
+    clearInterval(agnesFrameIntervalId);
+  }
+
+  agnesInputAudioContext = null;
+  agnesOutputAudioContext = null;
+  agnesMediaStream = null;
+  agnesSessionPromise = null;
+  agnesAnalyserNode = null;
+  agnesMicAnalyserNode = null;
+
+  agnesLiveState.isConnected = false;
+  agnesLiveState.aiSpeaking = false;
+  agnesLiveState.isSpeaking = false;
+
+  updateAgnesLiveUI();
+}
+
+// Show Agnes screen
+function showAgnesScreen(screenId: string) {
+  const screens = [
+    'agnes-mode-selector',
+    'agnes-training-type-selector',
+    'agnes-input-mode-selector',
+    'agnes-module-selector',
+    'agnes-difficulty-selector',
+    'agnes-voice-ui',
+    'agnes-text-ui'
+  ];
+
+  screens.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.style.display = id === screenId ? 'block' : 'none';
+    }
+  });
+}
+// Expose globally for HTML onclick handlers
+(window as any).showAgnesScreen = showAgnesScreen;
+
+// Render difficulty cards
+function renderAgnesDifficultyCards() {
+  const container = document.getElementById('agnes-difficulty-grid');
+  if (!container) return;
+
+  const progress = getAgnesUserProgress();
+
+  const difficulties = [
+    { id: 'BEGINNER', name: 'Beginner', icon: '🌱', color: '#22d3ee', desc: 'The Eager Learner' },
+    { id: 'ROOKIE', name: 'Rookie', icon: '🏡', color: '#4ade80', desc: 'The Friendly Neighbor' },
+    { id: 'PRO', name: 'Pro', icon: '👨‍👩‍👧', color: '#facc15', desc: 'The Busy Parent' },
+    { id: 'ELITE', name: 'Elite', icon: '😠', color: '#ef4444', desc: 'The Skeptic' },
+    { id: 'NIGHTMARE', name: 'Nightmare', icon: '⚖️', color: '#f97316', desc: 'The Lawyer' }
+  ];
+
+  container.innerHTML = difficulties.map(d => {
+    const unlocked = isDifficultyUnlocked(d.id);
+    const config = AGNES_DIFFICULTY_LEVELS[d.id];
+
+    return `
+      <button class="difficulty-card ${unlocked ? '' : 'locked'}"
+              data-difficulty="${d.id}"
+              ${unlocked ? '' : 'disabled'}
+              style="border-color: ${unlocked ? d.color : '#666'}">
+        <div class="difficulty-icon" style="color: ${d.color}">${d.icon}</div>
+        <div class="difficulty-name">${d.name}</div>
+        <div class="difficulty-desc">${d.desc}</div>
+        <div class="difficulty-multiplier">${config.multiplier}x XP</div>
+        ${!unlocked ? `<div class="unlock-req">🔒 Level ${config.unlockLevel}</div>` : ''}
+      </button>
+    `;
+  }).join('');
+
+  // Add click handlers
+  container.querySelectorAll('.difficulty-card:not(.locked)').forEach(card => {
+    card.addEventListener('click', () => {
+      agnesLiveState.difficulty = (card as HTMLElement).dataset.difficulty || 'BEGINNER';
+
+      // Pick a random scenario from the selected module
+      if (agnesSessionConfig.selectedScenarios.length > 0) {
+        const randomIndex = Math.floor(Math.random() * agnesSessionConfig.selectedScenarios.length);
+        agnesSessionConfig.currentScenarioIndex = randomIndex;
+      }
+
+      console.log(`🎯 Starting ${agnesSessionConfig.trainingType} mode (${agnesSessionConfig.inputMode}) with difficulty ${agnesLiveState.difficulty}`);
+
+      // Start the appropriate mode
+      if (agnesSessionConfig.inputMode === 'voice') {
+        showAgnesScreen('agnes-voice-ui');
+        initAgnesLiveSession();
+      } else {
+        // Text mode - load scenarios and show text UI
+        showAgnesScreen('agnes-text-ui');
+        initRolePlayWithScenarios(agnesSessionConfig.selectedScenarios, agnesSessionConfig.trainingType);
+      }
+    });
+  });
+
+  // Render XP bar
+  renderAgnesXPBar();
+}
+
+// Render XP progress bar
+function renderAgnesXPBar() {
+  const container = document.getElementById('agnes-xp-bar');
+  if (!container) return;
+
+  const progress = getAgnesUserProgress();
+  const currentLevelXP = getXPForLevel(progress.currentLevel);
+  const nextLevelXP = getXPForLevel(progress.currentLevel + 1);
+  const xpInLevel = progress.totalXP - currentLevelXP;
+  const xpNeeded = nextLevelXP - currentLevelXP;
+  const percentage = Math.round((xpInLevel / xpNeeded) * 100);
+
+  container.innerHTML = `
+    <div class="xp-bar-container">
+      <div class="xp-bar-fill" style="width: ${percentage}%"></div>
+    </div>
+    <div class="xp-label">
+      <span>Level ${progress.currentLevel}</span>
+      <span>${xpInLevel} / ${xpNeeded} XP</span>
+    </div>
+  `;
+}
+
+// Module to categories mapping
+const moduleToCategories: Record<string, string[]> = {
+  '7': ['inspection', 'initialPitch'],
+  '8': ['postInspection'],
+  '9': ['initialObjections', 'postInspectionObjections'],
+  '12': ['closingObjections']
+};
+
+// Session state for the new simplified flow
+let agnesSessionConfig = {
+  trainingType: 'roleplay' as 'roleplay' | 'walkthrough',
+  inputMode: 'text' as 'voice' | 'text',
+  selectedModule: '' as string,
+  selectedScenarios: [] as any[],
+  currentScenarioIndex: 0
+};
+
+// Get scenarios for a module
+function getScenariosForModule(moduleId: string): any[] {
+  const categories = moduleToCategories[moduleId] || [];
+  let scenarios: any[] = [];
+
+  categories.forEach(cat => {
+    const catScenarios = (window as any).getScenariosByCategory?.(cat) || [];
+    scenarios = scenarios.concat(catScenarios);
+  });
+
+  return scenarios;
+}
+
+// Get random scenario from module
+function getRandomScenarioFromModule(moduleId: string): any {
+  const scenarios = getScenariosForModule(moduleId);
+  if (scenarios.length === 0) return null;
+  return scenarios[Math.floor(Math.random() * scenarios.length)];
+}
+
+// Initialize Agnes-21 Live Role-Play (NEW ENTRY POINT)
+function initAgnesLiveRolePlay() {
+  console.log('🎙️ Initializing Agnes-21 Live Role-Play System...');
+
+  // Step 1: Training Type selector handlers
+  const roleplayBtn = document.getElementById('agnes-roleplay-btn');
+  const walkthroughBtn = document.getElementById('agnes-walkthrough-btn');
+
+  roleplayBtn?.addEventListener('click', () => {
+    agnesSessionConfig.trainingType = 'roleplay';
+    showAgnesScreen('agnes-input-mode-selector');
+  });
+
+  walkthroughBtn?.addEventListener('click', () => {
+    agnesSessionConfig.trainingType = 'walkthrough';
+    agnesSessionConfig.inputMode = 'text'; // Walk through is always text mode
+    showAgnesScreen('agnes-module-selector');
+  });
+
+  // Step 2: Input Mode selector handlers
+  const voiceModeBtn = document.getElementById('agnes-voice-mode-btn');
+  const textModeBtn = document.getElementById('agnes-text-mode-btn');
+
+  voiceModeBtn?.addEventListener('click', () => {
+    localStorage.setItem('agnes_input_mode', 'voice');
+    agnesLiveState.inputMode = 'voice';
+    agnesSessionConfig.inputMode = 'voice';
+    showAgnesScreen('agnes-module-selector');
+  });
+
+  textModeBtn?.addEventListener('click', () => {
+    localStorage.setItem('agnes_input_mode', 'text');
+    agnesLiveState.inputMode = 'text';
+    agnesSessionConfig.inputMode = 'text';
+    showAgnesScreen('agnes-module-selector');
+  });
+
+  // Step 3: Module selector handlers
+  const moduleCards = document.querySelectorAll('.agnes-module-card');
+  moduleCards.forEach(card => {
+    card.addEventListener('click', () => {
+      const moduleId = (card as HTMLElement).dataset.module;
+      if (!moduleId) return;
+
+      agnesSessionConfig.selectedModule = moduleId;
+      agnesSessionConfig.selectedScenarios = getScenariosForModule(moduleId);
+
+      console.log(`📚 Selected Module ${moduleId} with ${agnesSessionConfig.selectedScenarios.length} scenarios`);
+
+      showAgnesScreen('agnes-difficulty-selector');
+      renderAgnesDifficultyCards();
+    });
+
+    // Hover effects
+    card.addEventListener('mouseenter', () => {
+      (card as HTMLElement).style.borderColor = '#8b4fbe';
+      (card as HTMLElement).style.transform = 'translateY(-2px)';
+      (card as HTMLElement).style.boxShadow = '0 4px 12px rgba(139, 79, 190, 0.15)';
+    });
+    card.addEventListener('mouseleave', () => {
+      (card as HTMLElement).style.borderColor = '#e5e7eb';
+      (card as HTMLElement).style.transform = 'translateY(0)';
+      (card as HTMLElement).style.boxShadow = 'none';
+    });
+  });
+
+  // Module back button
+  const moduleBackBtn = document.getElementById('agnes-module-back-btn');
+  moduleBackBtn?.addEventListener('click', () => {
+    if (agnesSessionConfig.trainingType === 'walkthrough') {
+      showAgnesScreen('agnes-mode-selector');
+    } else {
+      showAgnesScreen('agnes-input-mode-selector');
+    }
+  });
+
+  // Setup control buttons in voice UI
+  const muteBtn = document.getElementById('agnes-mute-btn');
+  muteBtn?.addEventListener('click', () => {
+    agnesLiveState.isMuted = !agnesLiveState.isMuted;
+    updateAgnesLiveUI();
+  });
+
+  const videoBtn = document.getElementById('agnes-video-btn');
+  videoBtn?.addEventListener('click', () => {
+    agnesLiveState.isVideoEnabled = !agnesLiveState.isVideoEnabled;
+    const videoEl = document.getElementById('agnes-video-preview') as HTMLVideoElement;
+    if (videoEl) {
+      videoEl.style.display = agnesLiveState.isVideoEnabled ? 'block' : 'none';
+    }
+    updateAgnesLiveUI();
+  });
+
+  const endBtn = document.getElementById('agnes-end-session-btn');
+  endBtn?.addEventListener('click', () => {
+    if (confirm('End this session and see your results?')) {
+      // Send "score me" to get final score
+      if (agnesSessionPromise) {
+        agnesSessionPromise.then(session => {
+          session.sendRealtimeInput({
+            media: {
+              mimeType: 'text/plain',
+              data: btoa('Score me now and end the simulation.')
+            }
+          });
+          // Wait for response then end session
+          setTimeout(() => endAgnesSession(true), 3000);
+        });
+      } else {
+        endAgnesSession(false);
+      }
+    }
+  });
+
+  // Setup door slam modal close
+  const doorSlamClose = document.getElementById('agnes-door-slam-close');
+  doorSlamClose?.addEventListener('click', () => {
+    document.getElementById('agnes-door-slam-modal')!.style.display = 'none';
+    showAgnesScreen('agnes-mode-selector');
+  });
+
+  // Show mode selector
+  showAgnesScreen('agnes-mode-selector');
+  console.log('✅ Agnes-21 Live Role-Play System initialized');
+}
+
+// --- New Simplified Text Mode Entry Point ---
+function initRolePlayWithScenarios(scenarios: any[], trainingType: 'roleplay' | 'walkthrough') {
+  console.log(`🎭 Starting ${trainingType} with ${scenarios.length} scenarios...`);
+
+  if (!scenarios || scenarios.length === 0) {
+    alert('No scenarios available for this module. Please try another.');
+    showAgnesScreen('agnes-module-selector');
+    return;
+  }
+
+  // Pick a random scenario
+  const randomIndex = Math.floor(Math.random() * scenarios.length);
+  const scenario = scenarios[randomIndex];
+
+  // Store in window for access by existing functions
+  (window as any)._agnesActiveScenarios = scenarios;
+  (window as any)._agnesCurrentIndex = randomIndex;
+  (window as any)._agnesTrainingType = trainingType;
+
+  // Initialize the text roleplay system with these scenarios
+  initRolePlay();
+
+  // After init, directly load the scenario
+  setTimeout(() => {
+    // Find the internal state and set scenarios
+    const textUI = document.getElementById('agnes-text-ui');
+    if (textUI) {
+      // Skip to personality selector with scenarios preloaded
+      const personalitySelector = document.getElementById('personality-selector');
+      const categorySelector = document.getElementById('category-selector');
+
+      if (categorySelector) categorySelector.style.display = 'none';
+      if (personalitySelector) personalitySelector.style.display = 'block';
+    }
+  }, 100);
+}
+
+// --- Agnes 21 Role-Play System (TEXT MODE - Original) ---
 function initRolePlay() {
-  console.log('🎭 Initializing Agnes Role-Play System...');
+  console.log('🎭 Initializing Agnes Text Role-Play System...');
 
   // Verify that agnes-scenarios.js loaded successfully
   if (typeof getAllAgnesScenarios !== 'function') {
@@ -3180,6 +5281,7 @@ function initRolePlay() {
   // Session state management
   const sessionState: {
     selectedRole: string | null;
+    selectedCategory: string | null;
     selectedPersonality: string | null;
     difficulty: string;
     scenarios: any[];
@@ -3196,10 +5298,12 @@ function initRolePlay() {
     maxTurns: number;
   } = {
     selectedRole: null,
+    selectedCategory: null,
     selectedPersonality: null,
     difficulty: 'beginner',
-    scenarios: [],
-    currentScenarioIndex: 0,
+    // Check for preloaded scenarios from simplified flow
+    scenarios: (window as any)._agnesActiveScenarios || [],
+    currentScenarioIndex: (window as any)._agnesCurrentIndex || 0,
     currentScenario: null,
     responses: [],
     scores: [],
@@ -3212,9 +5316,14 @@ function initRolePlay() {
     maxTurns: 5
   };
 
+  // Clear the window variables after use
+  const hasPreloadedScenarios = (window as any)._agnesActiveScenarios?.length > 0;
+  delete (window as any)._agnesActiveScenarios;
+  delete (window as any)._agnesCurrentIndex;
+
   // Screen management functions
   function showScreen(screenId: string) {
-    const screens = ['roleplay-setup', 'personality-selector', 'scenario-display', 'feedback-area', 'session-summary'];
+    const screens = ['category-selector', 'scenario-list', 'roleplay-setup', 'personality-selector', 'scenario-display', 'feedback-area', 'session-summary'];
     screens.forEach(id => {
       const screen = document.getElementById(id);
       if (screen) {
@@ -3222,6 +5331,9 @@ function initRolePlay() {
       }
     });
   }
+
+  // Make showScreen accessible globally for onclick handlers
+  (window as any).showAgnesTextScreen = showScreen;
 
   function showRoleSelection() {
     console.log('📋 Showing role selection');
@@ -3488,6 +5600,8 @@ Be specific, actionable, and encouraging.`;
 
       const prompt = `You are Agnes, a homeowner in a sales roleplay scenario. The sales rep is practicing their pitch with you.
 
+PRONUNCIATION NOTE: The company name "Roof-ER" should be pronounced as three separate sounds: "Roof" then "E" then "R" (like the letters E-R). Never say it as one word "Roofer".
+
 Scenario: ${scenario.id}
 Personality: ${personality}
 Current Turn: ${sessionState.currentTurn} of ${sessionState.maxTurns}
@@ -3617,19 +5731,306 @@ Response (plain text only, no JSON):`;
     }
   }
 
-  function showHint() {
+  // Generate contextual AI hint based on conversation
+  async function generateContextualHint(): Promise<{
+    suggestedResponse: string;
+    keyPointsToInclude: string[];
+    toneGuidance: string;
+    scriptReference: string;
+  } | null> {
     const scenario = sessionState.currentScenario;
-    if (!scenario?.followUps || scenario.followUps.length === 0) {
-      alert('No hints available for this scenario.');
+    if (!scenario) return null;
+
+    // Determine category for training content
+    const category = (scenario as any).category || 'objections';
+    const trainingContent = trainingScriptMap[category] || trainingScriptMap.objections;
+
+    // Build conversation context
+    const conversationContext = sessionState.conversationHistory
+      .map(msg => `${msg.sender === 'user' ? 'Rep' : 'Homeowner'}: ${msg.message}`)
+      .join('\n');
+
+    // If AI available, generate contextual hint
+    if (ai) {
+      try {
+        const prompt = `You are a roofing sales training coach. Analyze this roleplay conversation and suggest what the sales rep should say next.
+
+Scenario: ${scenario.prompt}
+Category: ${category}
+
+Conversation so far:
+${conversationContext || '(No conversation yet - this is the opening)'}
+
+Training content to reference:
+${JSON.stringify(trainingContent, null, 2)}
+
+Expected key points for this scenario:
+${scenario.expectedKeyPoints.join(', ')}
+
+Provide a JSON response with these exact fields:
+{
+  "suggestedResponse": "A 2-3 sentence suggested response the rep should say",
+  "keyPointsToInclude": ["point1", "point2"],
+  "toneGuidance": "Brief tone advice (e.g., 'Empathetic and confident')",
+  "scriptReference": "One relevant training script excerpt"
+}`;
+
+        const response = await ai.models.generateContent({
+          model: 'gemini-2.0-flash-exp',
+          contents: prompt,
+          config: { temperature: 0.7, maxOutputTokens: 500 }
+        });
+
+        let jsonText = response.text?.trim() || '';
+        // Extract JSON from markdown code block if present
+        if (jsonText.includes('```json')) {
+          jsonText = jsonText.match(/```json\n([\s\S]*?)\n```/)?.[1] || jsonText;
+        } else if (jsonText.includes('```')) {
+          jsonText = jsonText.match(/```\n?([\s\S]*?)\n?```/)?.[1] || jsonText;
+        }
+        return JSON.parse(jsonText);
+      } catch (e) {
+        console.warn('AI hint generation failed, using fallback', e);
+      }
+    }
+
+    // Fallback hint (no AI or AI failed)
+    const allUserText = sessionState.conversationHistory
+      .filter(m => m.sender === 'user')
+      .map(m => m.message.toLowerCase())
+      .join(' ');
+
+    const missedPoints = scenario.expectedKeyPoints.filter(point => {
+      const words = point.toLowerCase().split(' ');
+      return !words.some(word => word.length > 3 && allUserText.includes(word));
+    });
+
+    return {
+      suggestedResponse: scenario.followUps?.[0] || 'Try addressing their main concern with empathy, then offer a clear next step.',
+      keyPointsToInclude: missedPoints.slice(0, 3),
+      toneGuidance: 'Be empathetic and professional',
+      scriptReference: trainingContent.keyPhrases?.[0] || 'Use the L.E.A.R.N. framework'
+    };
+  }
+
+  // Show contextual hint panel
+  async function showHint() {
+    const scenario = sessionState.currentScenario;
+    if (!scenario) {
+      alert('No scenario loaded.');
       return;
     }
-    const hint = scenario.followUps[Math.floor(Math.random() * scenario.followUps.length)];
-    const hintDisplay = document.getElementById('hint-display');
-    if (hintDisplay) {
-      hintDisplay.innerHTML = `<strong>💡 Hint:</strong> ${hint}`;
-      hintDisplay.style.display = 'block';
+
+    const hintPanel = document.getElementById('contextual-hint-panel');
+    const loadingEl = document.getElementById('hint-display');
+
+    // Show loading state
+    if (loadingEl) {
+      loadingEl.innerHTML = '<strong>💡 Generating AI hint...</strong>';
+      loadingEl.style.display = 'block';
+    }
+
+    try {
+      const hint = await generateContextualHint();
+
+      // Hide loading
+      if (loadingEl) loadingEl.style.display = 'none';
+
+      if (!hint) {
+        // Basic fallback
+        if (loadingEl) {
+          loadingEl.innerHTML = `<strong>💡 Tip:</strong> ${scenario.followUps?.[0] || 'Address their concern, then offer two time options.'}`;
+          loadingEl.style.display = 'block';
+          setTimeout(() => { loadingEl.style.display = 'none'; }, 10000);
+        }
+        return;
+      }
+
+      // Populate hint panel if it exists
+      if (hintPanel) {
+        const suggestionEl = document.getElementById('hint-suggestion-text');
+        const keyPointsEl = document.getElementById('hint-key-points');
+        const toneEl = document.getElementById('hint-tone-text');
+        const scriptEl = document.getElementById('hint-script-reference');
+
+        if (suggestionEl) suggestionEl.textContent = hint.suggestedResponse;
+        if (keyPointsEl) keyPointsEl.innerHTML = hint.keyPointsToInclude.map(p => `<li>${p}</li>`).join('');
+        if (toneEl) toneEl.textContent = hint.toneGuidance;
+        if (scriptEl) scriptEl.textContent = hint.scriptReference;
+
+        hintPanel.style.display = 'block';
+      } else {
+        // Fallback to simple hint display
+        if (loadingEl) {
+          loadingEl.innerHTML = `<strong>💡 Try saying:</strong> "${hint.suggestedResponse}"<br><br><strong>Key points:</strong> ${hint.keyPointsToInclude.join(', ')}<br><br><em>Tip: ${hint.toneGuidance}</em>`;
+          loadingEl.style.display = 'block';
+          setTimeout(() => { loadingEl.style.display = 'none'; }, 15000);
+        }
+      }
+
       sessionState.hintsUsed++;
-      setTimeout(() => { hintDisplay.style.display = 'none'; }, 10000);
+    } catch (error) {
+      console.error('Hint generation failed:', error);
+      // Fall back to basic hint
+      const basicHint = scenario.followUps?.[0] || 'Try addressing their main concern directly.';
+      if (loadingEl) {
+        loadingEl.innerHTML = `<strong>💡 Hint:</strong> ${basicHint}`;
+        loadingEl.style.display = 'block';
+        setTimeout(() => { loadingEl.style.display = 'none'; }, 10000);
+      }
+    }
+  }
+
+  // Show scenarios for a selected category
+  function showScenarioList(categoryId: string) {
+    sessionState.selectedCategory = categoryId;
+
+    // Get category info
+    const categoryInfo = (window as any).getCategoryInfo?.(categoryId) || { title: categoryId, icon: '' };
+    const titleEl = document.getElementById('category-title-display');
+    if (titleEl) {
+      titleEl.textContent = `${categoryInfo.icon} ${categoryInfo.title}`;
+    }
+
+    // Get scenarios for this category
+    const scenarios = (window as any).getScenariosByCategory?.(categoryId) || [];
+    const container = document.getElementById('scenario-cards');
+    if (!container) return;
+
+    if (scenarios.length === 0) {
+      container.innerHTML = '<p style="text-align: center; color: #666;">No scenarios found for this category.</p>';
+      showScreen('scenario-list');
+      return;
+    }
+
+    // Render scenario cards
+    container.innerHTML = scenarios.map((scenario: any, index: number) => {
+      const roleColors: Record<string, string> = {
+        'homeowner': '#8b4fbe',
+        'rep': '#2563eb',
+        'adjuster': '#059669'
+      };
+      const roleColor = roleColors[scenario.role] || '#666';
+
+      return `
+        <div class="scenario-card" data-scenario-index="${index}" style="
+          padding: 20px;
+          border: 2px solid #e5e7eb;
+          border-radius: 12px;
+          background: white;
+          cursor: pointer;
+          transition: all 0.3s;
+          position: relative;
+        ">
+          <div class="scenario-role-badge" style="
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: ${roleColor};
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: capitalize;
+          ">${scenario.role}</div>
+          <h3 style="margin: 0 0 10px 0; font-size: 16px; color: #1f2937; padding-right: 80px;">${scenario.id || `Scenario ${index + 1}`}</h3>
+          <p style="margin: 0; font-size: 14px; color: #6b7280; line-height: 1.5;">${scenario.prompt.substring(0, 100)}${scenario.prompt.length > 100 ? '...' : ''}</p>
+        </div>
+      `;
+    }).join('');
+
+    // Add click handlers to scenario cards
+    container.querySelectorAll('.scenario-card').forEach((card) => {
+      card.addEventListener('click', () => {
+        const index = parseInt((card as HTMLElement).dataset.scenarioIndex || '0');
+        sessionState.scenarios = scenarios;
+        sessionState.currentScenarioIndex = index;
+
+        // Show personality selector
+        showScreen('personality-selector');
+      });
+
+      // Hover effects
+      card.addEventListener('mouseenter', () => {
+        (card as HTMLElement).style.borderColor = '#8b4fbe';
+        (card as HTMLElement).style.transform = 'translateY(-2px)';
+        (card as HTMLElement).style.boxShadow = '0 4px 12px rgba(139, 79, 190, 0.15)';
+      });
+      card.addEventListener('mouseleave', () => {
+        (card as HTMLElement).style.borderColor = '#e5e7eb';
+        (card as HTMLElement).style.transform = 'translateY(0)';
+        (card as HTMLElement).style.boxShadow = 'none';
+      });
+    });
+
+    showScreen('scenario-list');
+  }
+
+  // Setup category selection
+  function setupCategorySelection() {
+    // Category card clicks
+    const categoryCards = document.querySelectorAll('.category-card');
+    categoryCards.forEach(card => {
+      card.addEventListener('click', () => {
+        const categoryId = (card as HTMLElement).dataset.category;
+        if (categoryId) {
+          showScenarioList(categoryId);
+        }
+      });
+    });
+
+    // Random scenario button
+    const randomBtn = document.getElementById('random-scenario-btn');
+    if (randomBtn) {
+      randomBtn.addEventListener('click', () => {
+        const allScenarios = (window as any).getAllCategorizedScenarios?.() || [];
+        if (allScenarios.length > 0) {
+          const randomIndex = Math.floor(Math.random() * allScenarios.length);
+          const randomScenario = allScenarios[randomIndex];
+          sessionState.scenarios = [randomScenario];
+          sessionState.currentScenarioIndex = 0;
+          sessionState.selectedCategory = randomScenario.category || 'random';
+          showScreen('personality-selector');
+        }
+      });
+    }
+
+    // Legacy role browser button
+    const legacyBtn = document.getElementById('legacy-role-btn');
+    if (legacyBtn) {
+      legacyBtn.addEventListener('click', () => {
+        showScreen('roleplay-setup');
+      });
+    }
+
+    // Back to categories button
+    const backToCategoriesBtn = document.getElementById('back-to-categories');
+    if (backToCategoriesBtn) {
+      backToCategoriesBtn.addEventListener('click', () => {
+        showScreen('category-selector');
+        sessionState.selectedCategory = null;
+      });
+    }
+
+    // Role filter in scenario list
+    const roleFilter = document.getElementById('role-filter') as HTMLSelectElement;
+    if (roleFilter) {
+      roleFilter.addEventListener('change', () => {
+        const selectedRole = roleFilter.value;
+        const cards = document.querySelectorAll('.scenario-card');
+        cards.forEach(card => {
+          const badge = card.querySelector('.scenario-role-badge');
+          if (badge) {
+            const cardRole = badge.textContent?.toLowerCase();
+            if (selectedRole === 'all' || cardRole === selectedRole) {
+              (card as HTMLElement).style.display = 'block';
+            } else {
+              (card as HTMLElement).style.display = 'none';
+            }
+          }
+        });
+      });
     }
   }
 
@@ -3668,9 +6069,14 @@ Response (plain text only, no JSON):`;
         console.log(`✨ Selected personality: ${personality} (difficulty: ${difficulty})`);
 
         try {
-          const scenarios = (window as any).getAgnesScenariosByRole(sessionState.selectedRole);
+          // Use already-loaded scenarios if available (from category/module selection)
+          // Otherwise fetch by role (legacy path)
+          let scenarios = sessionState.scenarios;
           if (!scenarios || scenarios.length === 0) {
-            throw new Error(`No scenarios found for role: ${sessionState.selectedRole}`);
+            scenarios = (window as any).getAgnesScenariosByRole(sessionState.selectedRole);
+          }
+          if (!scenarios || scenarios.length === 0) {
+            throw new Error(`No scenarios found. Please select a module first.`);
           }
           sessionState.scenarios = scenarios;
           sessionState.currentScenarioIndex = 0;
@@ -3712,6 +6118,7 @@ Response (plain text only, no JSON):`;
 
   // Initialize
   try {
+    setupCategorySelection();
     setupRoleSelection();
     setupPersonalitySelection();
 
@@ -3735,7 +6142,8 @@ Response (plain text only, no JSON):`;
       hintButton.addEventListener('click', showHint);
     }
 
-    showRoleSelection();
+    // Start with category selector (new default)
+    showScreen('category-selector');
     console.log('✅ Agnes Role-Play System initialized successfully');
   } catch (error) {
     console.error('❌ Error initializing Agnes system:', error);
@@ -3843,12 +6251,16 @@ function renderQuiz(quizData: QuizQuestion[]) {
 function renderModule(moduleName: string) {
   if (!mainContent) return;
   mainContent.innerHTML = trainingContent[moduleName] || '<div>Content not found.</div>';
-  
+
   // Cancel any ongoing speech when changing modules
   if (synth.speaking) {
       synth.cancel();
       currentUtterance = null;
   }
+
+  // Track module start and activity
+  trackModuleStart(moduleName);
+  startActivityTracking(moduleName);
 
   // Initialize interactive elements for specific modules
   switch (moduleName) {
@@ -3862,7 +6274,7 @@ function renderModule(moduleName: string) {
           initObjectionMatcher();
           break;
       case 'role-play':
-          initRolePlay();
+          initAgnesLiveRolePlay();
           break;
       case 'welcome':
           initQuickQuiz1();
@@ -3892,6 +6304,9 @@ function renderModule(moduleName: string) {
       case 'commitment':
           initCommitmentGate();
           break;
+      case 'admin-dashboard':
+          initAdminDashboard();
+          break;
   }
 }
 
@@ -3919,24 +6334,45 @@ function initManagerModeUI() {
   const sidebarHeader = document.querySelector('.sidebar-header');
   if (!sidebarHeader) return;
 
-  // Add manager mode toggle button (subtle)
-  const modeIndicator = document.createElement('div');
-  modeIndicator.id = 'manager-mode-indicator';
-  modeIndicator.className = isManagerMode() ? 'manager-active' : '';
-  modeIndicator.innerHTML = isManagerMode()
-    ? '<span class="manager-badge">MANAGER MODE</span><button id="exit-manager-btn">Exit</button>'
-    : '<button id="manager-login-btn">Manager Login</button>';
-  sidebarHeader.appendChild(modeIndicator);
+  // Remove existing elements if present
+  document.getElementById('manager-mode-indicator')?.remove();
+  document.querySelector('.admin-sidebar-item')?.remove();
 
-  // Add click handlers
-  setTimeout(() => {
-    document.getElementById('manager-login-btn')?.addEventListener('click', showManagerLogin);
-    document.getElementById('exit-manager-btn')?.addEventListener('click', () => {
-      exitManagerMode();
-      initManagerModeUI();
-      location.reload();
-    });
-  }, 0);
+  const user = getCurrentUser();
+  const isManager = user?.isManager || isManagerMode();
+
+  // Add manager mode toggle button (subtle) - only if not using new login system
+  if (!user) {
+    const modeIndicator = document.createElement('div');
+    modeIndicator.id = 'manager-mode-indicator';
+    modeIndicator.className = isManagerMode() ? 'manager-active' : '';
+    modeIndicator.innerHTML = isManagerMode()
+      ? '<span class="manager-badge">MANAGER MODE</span><button id="exit-manager-btn">Exit</button>'
+      : '<button id="manager-login-btn">Manager Login</button>';
+    sidebarHeader.appendChild(modeIndicator);
+
+    // Add click handlers
+    setTimeout(() => {
+      document.getElementById('manager-login-btn')?.addEventListener('click', showManagerLogin);
+      document.getElementById('exit-manager-btn')?.addEventListener('click', () => {
+        exitManagerMode();
+        initManagerModeUI();
+        location.reload();
+      });
+    }, 0);
+  }
+
+  // Add admin dashboard link for managers
+  if (isManager) {
+    const sidebarNav = document.querySelector('.sidebar-nav');
+    if (sidebarNav) {
+      const adminItem = document.createElement('li');
+      adminItem.className = 'admin-sidebar-item';
+      adminItem.dataset.module = 'admin-dashboard';
+      adminItem.innerHTML = '📊 Admin Dashboard';
+      sidebarNav.appendChild(adminItem);
+    }
+  }
 }
 
 // Show manager login prompt
@@ -3953,6 +6389,13 @@ function showManagerLogin() {
 // Mark module as complete and unlock next
 function completeModule(moduleName: string) {
   unlockNextModule(moduleName);
+
+  // Track module completion via API
+  apiCall('/progress/module', {
+    method: 'POST',
+    body: JSON.stringify({ moduleName, action: 'complete' })
+  }).catch(err => console.log('Module completion tracking failed (offline mode):', err));
+
   const currentIndex = MODULE_ORDER.indexOf(moduleName);
   if (currentIndex < MODULE_ORDER.length - 1) {
     const nextModule = MODULE_ORDER[currentIndex + 1];
@@ -3965,19 +6408,706 @@ function completeModule(moduleName: string) {
   }
 }
 
-// --- Initial Load ---
-document.addEventListener('DOMContentLoaded', () => {
+// Track module start
+function trackModuleStart(moduleName: string) {
+  apiCall('/progress/module', {
+    method: 'POST',
+    body: JSON.stringify({ moduleName, action: 'start' })
+  }).catch(err => console.log('Module start tracking failed (offline mode):', err));
+}
+
+// Activity heartbeat for time tracking
+let activityHeartbeatInterval: number | null = null;
+let currentModuleForTracking: string | null = null;
+
+function startActivityTracking(moduleName: string) {
+  currentModuleForTracking = moduleName;
+
+  // Clear existing interval
+  if (activityHeartbeatInterval) {
+    clearInterval(activityHeartbeatInterval);
+  }
+
+  // Send heartbeat every 30 seconds
+  activityHeartbeatInterval = window.setInterval(() => {
+    if (currentModuleForTracking) {
+      apiCall('/progress/heartbeat', {
+        method: 'POST',
+        body: JSON.stringify({ moduleName: currentModuleForTracking, timeSpent: 30 })
+      }).catch(() => {}); // Silent fail for heartbeats
+    }
+  }, 30000);
+}
+
+function stopActivityTracking() {
+  if (activityHeartbeatInterval) {
+    clearInterval(activityHeartbeatInterval);
+    activityHeartbeatInterval = null;
+  }
+  currentModuleForTracking = null;
+}
+
+// ============================================================================
+// LOGIN SCREEN UI
+// ============================================================================
+
+function showLoginScreen(): void {
+  // Hide main app
+  const appContainer = document.querySelector('.app-container') as HTMLElement;
+  if (appContainer) appContainer.style.display = 'none';
+
+  // Remove existing login screen if present
+  const existingLogin = document.getElementById('login-screen');
+  if (existingLogin) existingLogin.remove();
+
+  // Create login screen
+  const loginScreen = document.createElement('div');
+  loginScreen.id = 'login-screen';
+  loginScreen.className = 'login-screen';
+  loginScreen.innerHTML = `
+    <div class="login-container">
+      <div class="login-header">
+        <div class="login-logo">🏠</div>
+        <h1>Roof-ER Training Hub</h1>
+        <p>Welcome to the sales training platform</p>
+      </div>
+
+      <form id="login-form" class="login-form">
+        <div class="form-group">
+          <label for="login-name">Your Name</label>
+          <input
+            type="text"
+            id="login-name"
+            placeholder="Enter your full name"
+            required
+            minlength="2"
+            autocomplete="name"
+          />
+        </div>
+
+        <div class="form-group manager-code-group">
+          <label for="login-manager-code">
+            Manager Code <span class="optional">(optional)</span>
+          </label>
+          <input
+            type="password"
+            id="login-manager-code"
+            placeholder="Enter manager code if applicable"
+            autocomplete="off"
+          />
+          <small class="hint">Managers: Enter your access code to unlock admin features</small>
+        </div>
+
+        <button type="submit" class="login-btn" id="login-submit-btn">
+          <span class="btn-text">Start Training</span>
+          <span class="btn-loading" style="display:none;">Signing in...</span>
+        </button>
+
+        <div id="login-error" class="login-error" style="display:none;"></div>
+      </form>
+
+      <div class="login-footer">
+        <p>First time here? Just enter your name to get started!</p>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(loginScreen);
+
+  // Add form submit handler
+  const form = document.getElementById('login-form') as HTMLFormElement;
+  form?.addEventListener('submit', handleLoginSubmit);
+
+  // Focus name input
+  setTimeout(() => {
+    (document.getElementById('login-name') as HTMLInputElement)?.focus();
+  }, 100);
+}
+
+async function handleLoginSubmit(e: Event): Promise<void> {
+  e.preventDefault();
+
+  const nameInput = document.getElementById('login-name') as HTMLInputElement;
+  const managerCodeInput = document.getElementById('login-manager-code') as HTMLInputElement;
+  const submitBtn = document.getElementById('login-submit-btn') as HTMLButtonElement;
+  const errorDiv = document.getElementById('login-error') as HTMLElement;
+  const btnText = submitBtn.querySelector('.btn-text') as HTMLElement;
+  const btnLoading = submitBtn.querySelector('.btn-loading') as HTMLElement;
+
+  const name = nameInput.value.trim();
+  const managerCode = managerCodeInput.value.trim();
+
+  if (!name || name.length < 2) {
+    errorDiv.textContent = 'Please enter your name (at least 2 characters)';
+    errorDiv.style.display = 'block';
+    return;
+  }
+
+  // Show loading state
+  submitBtn.disabled = true;
+  btnText.style.display = 'none';
+  btnLoading.style.display = 'inline';
+  errorDiv.style.display = 'none';
+
+  const result = await login(name, managerCode || undefined);
+
+  if (result.success) {
+    // Hide login screen and show app
+    hideLoginScreen();
+    initializeApp();
+  } else {
+    // Show error
+    errorDiv.textContent = result.error || 'Login failed. Please try again.';
+    errorDiv.style.display = 'block';
+    submitBtn.disabled = false;
+    btnText.style.display = 'inline';
+    btnLoading.style.display = 'none';
+  }
+}
+
+function hideLoginScreen(): void {
+  const loginScreen = document.getElementById('login-screen');
+  if (loginScreen) loginScreen.remove();
+
+  const appContainer = document.querySelector('.app-container') as HTMLElement;
+  if (appContainer) appContainer.style.display = 'flex';
+}
+
+function updateUserDisplay(): void {
+  const user = getCurrentUser();
+  if (!user) return;
+
+  // Add user info to sidebar header
+  const sidebarHeader = document.querySelector('.sidebar-header');
+  if (!sidebarHeader) return;
+
+  let userInfo = document.getElementById('user-info');
+  if (!userInfo) {
+    userInfo = document.createElement('div');
+    userInfo.id = 'user-info';
+    userInfo.className = 'user-info';
+    sidebarHeader.appendChild(userInfo);
+  }
+
+  userInfo.innerHTML = `
+    <span class="user-name">👤 ${user.name}</span>
+    ${user.isManager ? '<span class="manager-badge-small">Manager</span>' : ''}
+    <button id="logout-btn" class="logout-btn" title="Log out">↪</button>
+  `;
+
+  // Add logout handler
+  document.getElementById('logout-btn')?.addEventListener('click', logout);
+}
+
+// ============================================================================
+// ADMIN DASHBOARD FUNCTIONALITY
+// ============================================================================
+
+interface AdminUser {
+  id: string;
+  name: string;
+  isManager: boolean;
+  registrationDate: string;
+  lastLogin: string | null;
+  commitmentSigned: boolean;
+  modulesCompleted: number;
+  examAttempts: number;
+  isCertified: boolean;
+  totalXP: number;
+}
+
+interface AdminAnalytics {
+  overview: {
+    totalUsers: number;
+    newUsersThisWeek: number;
+    activeUsers: number;
+    certifiedUsers: number;
+  };
+  exam: {
+    totalAttempts: number;
+    totalPassed: number;
+    passRate: number;
+    averageScore: number;
+  };
+  modules: Array<{
+    name: string;
+    started: number;
+    completed: number;
+    completionRate: number;
+  }>;
+  roleplay: {
+    totalSessions: number;
+    completedSessions: number;
+    averageScore: number;
+    totalXPAwarded: number;
+  };
+}
+
+let adminUsersCache: AdminUser[] = [];
+let adminAnalyticsCache: AdminAnalytics | null = null;
+
+async function initAdminDashboard(): Promise<void> {
+  const user = getCurrentUser();
+  if (!user?.isManager && !isManagerMode()) {
+    mainContent!.innerHTML = '<div class="content-card"><h1>Access Denied</h1><p>Admin dashboard is only available to managers.</p></div>';
+    return;
+  }
+
+  // Set up tab switching
+  const tabs = document.querySelectorAll('.admin-tab');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const tabName = (tab as HTMLElement).dataset.tab;
+      switchAdminTab(tabName || 'users');
+    });
+  });
+
+  // Set up search
+  const searchInput = document.getElementById('user-search') as HTMLInputElement;
+  searchInput?.addEventListener('input', () => filterUsers(searchInput.value));
+
+  // Set up refresh
+  document.getElementById('refresh-users-btn')?.addEventListener('click', () => loadAdminUsers());
+
+  // Set up modal close
+  document.getElementById('close-user-modal')?.addEventListener('click', closeUserModal);
+
+  // Load initial data
+  await loadAdminUsers();
+}
+
+function switchAdminTab(tabName: string): void {
+  // Update tab buttons
+  document.querySelectorAll('.admin-tab').forEach(tab => {
+    tab.classList.toggle('active', (tab as HTMLElement).dataset.tab === tabName);
+  });
+
+  // Update tab content
+  document.querySelectorAll('.admin-tab-content').forEach(content => {
+    content.style.display = 'none';
+  });
+
+  const targetContent = document.getElementById(`admin-${tabName}-tab`);
+  if (targetContent) {
+    targetContent.style.display = 'block';
+  }
+
+  // Load data if needed
+  if (tabName === 'analytics' && !adminAnalyticsCache) {
+    loadAdminAnalytics();
+  }
+}
+
+async function loadAdminUsers(): Promise<void> {
+  const container = document.getElementById('users-table-container');
+  if (!container) return;
+
+  container.innerHTML = '<p class="loading-text">Loading users...</p>';
+
+  const result = await apiCall<{ users: AdminUser[]; totalUsers: number }>('/admin/users');
+
+  if (!result) {
+    container.innerHTML = '<p class="error-text">Failed to load users. Server may be unavailable.</p>';
+    return;
+  }
+
+  adminUsersCache = result.users;
+  renderUsersTable(adminUsersCache);
+}
+
+function renderUsersTable(users: AdminUser[]): void {
+  const container = document.getElementById('users-table-container');
+  if (!container) return;
+
+  if (users.length === 0) {
+    container.innerHTML = '<p class="empty-text">No users found.</p>';
+    return;
+  }
+
+  const html = `
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Role</th>
+          <th>Progress</th>
+          <th>Certified</th>
+          <th>Last Login</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${users.map(user => `
+          <tr data-user-id="${user.id}">
+            <td class="user-name-cell">
+              <strong>${escapeHtml(user.name)}</strong>
+              ${user.isCertified ? '<span class="cert-icon" title="Certified">🏆</span>' : ''}
+            </td>
+            <td>${user.isManager ? '<span class="role-badge manager">Manager</span>' : '<span class="role-badge user">User</span>'}</td>
+            <td>
+              <div class="progress-cell">
+                <span class="modules-count">${user.modulesCompleted}/16 modules</span>
+                <span class="exam-count">${user.examAttempts}/3 attempts</span>
+              </div>
+            </td>
+            <td>${user.isCertified ? '✅ Yes' : '❌ No'}</td>
+            <td>${user.lastLogin ? formatRelativeDate(user.lastLogin) : 'Never'}</td>
+            <td>
+              <button class="btn-view-user" data-user-id="${user.id}">View Details</button>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+
+  container.innerHTML = html;
+
+  // Add click handlers for view buttons
+  container.querySelectorAll('.btn-view-user').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const userId = (btn as HTMLElement).dataset.userId;
+      if (userId) showUserDetail(userId);
+    });
+  });
+}
+
+function filterUsers(searchTerm: string): void {
+  const filtered = adminUsersCache.filter(user =>
+    user.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  renderUsersTable(filtered);
+}
+
+async function showUserDetail(userId: string): Promise<void> {
+  const modal = document.getElementById('user-detail-modal');
+  const body = document.getElementById('user-detail-body');
+  const title = document.getElementById('user-detail-title');
+
+  if (!modal || !body || !title) return;
+
+  body.innerHTML = '<p class="loading-text">Loading user details...</p>';
+  modal.style.display = 'flex';
+
+  const result = await apiCall<{
+    user: any;
+    modules: any[];
+    examAttempts: any[];
+    roleplaySessions: any[];
+    certification: any;
+    gamification: any;
+    loginHistory: any[];
+  }>(`/admin/users/${userId}`);
+
+  if (!result) {
+    body.innerHTML = '<p class="error-text">Failed to load user details.</p>';
+    return;
+  }
+
+  title.textContent = `${result.user.name} - Details`;
+
+  body.innerHTML = `
+    <div class="user-detail-sections">
+      <div class="detail-section">
+        <h3>📋 Overview</h3>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="label">Role:</span>
+            <span class="value">${result.user.isManager ? 'Manager' : 'User'}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Registered:</span>
+            <span class="value">${formatDate(result.user.registrationDate)}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Last Login:</span>
+            <span class="value">${result.user.lastLogin ? formatDate(result.user.lastLogin) : 'Never'}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Commitment Signed:</span>
+            <span class="value">${result.user.commitmentSigned ? '✅ Yes' : '❌ No'}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <h3>📚 Module Progress (${result.modules.filter(m => m.status === 'completed').length}/${result.modules.length})</h3>
+        <div class="module-progress-list">
+          ${result.modules.map(m => `
+            <div class="module-item ${m.status}">
+              <span class="module-name">${m.name}</span>
+              <span class="module-status">${m.status}</span>
+              ${m.timeSpentSeconds ? `<span class="module-time">${Math.round(m.timeSpentSeconds / 60)} min</span>` : ''}
+            </div>
+          `).join('') || '<p>No module progress recorded.</p>'}
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <h3>📝 Exam Attempts (${result.examAttempts.length}/3)</h3>
+        ${result.examAttempts.length > 0 ? `
+          <table class="mini-table">
+            <tr><th>#</th><th>Score</th><th>Passed</th><th>Date</th></tr>
+            ${result.examAttempts.map(a => `
+              <tr>
+                <td>${a.attemptNumber}</td>
+                <td>${a.totalScore}%</td>
+                <td>${a.passed ? '✅' : '❌'}</td>
+                <td>${a.completedAt ? formatDate(a.completedAt) : 'In progress'}</td>
+              </tr>
+            `).join('')}
+          </table>
+        ` : '<p>No exam attempts.</p>'}
+        ${result.certification ? `<p class="cert-notice">🏆 Certified on ${formatDate(result.certification.certifiedAt)} with score ${result.certification.score}%</p>` : ''}
+      </div>
+
+      <div class="detail-section">
+        <h3>🎭 Roleplay Sessions (${result.roleplaySessions.length})</h3>
+        ${result.roleplaySessions.length > 0 ? `
+          <div class="roleplay-summary">
+            <span>Total Sessions: ${result.roleplaySessions.length}</span>
+            <span>Completed: ${result.roleplaySessions.filter(r => r.completedAt).length}</span>
+            <span>Total XP: ${result.roleplaySessions.reduce((sum, r) => sum + (r.xpEarned || 0), 0)}</span>
+          </div>
+        ` : '<p>No roleplay sessions.</p>'}
+      </div>
+
+      <div class="detail-section actions-section">
+        <h3>⚙️ Actions</h3>
+        <div class="action-buttons">
+          <button class="btn-action btn-reset-exam" data-user-id="${userId}">Reset Exam Attempts</button>
+          <button class="btn-action btn-reset-progress" data-user-id="${userId}">Reset All Progress</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Add action handlers
+  body.querySelector('.btn-reset-exam')?.addEventListener('click', () => resetUserExam(userId));
+  body.querySelector('.btn-reset-progress')?.addEventListener('click', () => resetUserProgress(userId));
+}
+
+function closeUserModal(): void {
+  const modal = document.getElementById('user-detail-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+async function resetUserExam(userId: string): Promise<void> {
+  if (!confirm('Are you sure you want to reset this user\'s exam attempts? This will remove all exam history and certification.')) {
+    return;
+  }
+
+  const result = await apiCall<{ success: boolean }>(`/admin/users/${userId}/reset-exam`, { method: 'POST' });
+
+  if (result?.success) {
+    alert('Exam attempts reset successfully.');
+    showUserDetail(userId); // Refresh detail view
+    loadAdminUsers(); // Refresh users list
+  } else {
+    alert('Failed to reset exam attempts.');
+  }
+}
+
+async function resetUserProgress(userId: string): Promise<void> {
+  if (!confirm('Are you sure you want to reset ALL progress for this user? This cannot be undone!')) {
+    return;
+  }
+
+  const result = await apiCall<{ success: boolean }>(`/admin/users/${userId}/reset-progress`, { method: 'POST' });
+
+  if (result?.success) {
+    alert('All progress reset successfully.');
+    showUserDetail(userId); // Refresh detail view
+    loadAdminUsers(); // Refresh users list
+  } else {
+    alert('Failed to reset progress.');
+  }
+}
+
+async function loadAdminAnalytics(): Promise<void> {
+  const container = document.getElementById('analytics-container');
+  if (!container) return;
+
+  container.innerHTML = '<p class="loading-text">Loading analytics...</p>';
+
+  const result = await apiCall<AdminAnalytics>('/admin/analytics');
+
+  if (!result) {
+    container.innerHTML = '<p class="error-text">Failed to load analytics. Server may be unavailable.</p>';
+    return;
+  }
+
+  adminAnalyticsCache = result;
+  renderAnalytics(result);
+}
+
+function renderAnalytics(data: AdminAnalytics): void {
+  const container = document.getElementById('analytics-container');
+  if (!container) return;
+
+  container.innerHTML = `
+    <div class="analytics-grid">
+      <div class="analytics-card overview-card">
+        <h3>👥 Users Overview</h3>
+        <div class="stat-grid">
+          <div class="stat-item">
+            <span class="stat-value">${data.overview.totalUsers}</span>
+            <span class="stat-label">Total Users</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">${data.overview.newUsersThisWeek}</span>
+            <span class="stat-label">New This Week</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">${data.overview.activeUsers}</span>
+            <span class="stat-label">Active (7 days)</span>
+          </div>
+          <div class="stat-item highlight">
+            <span class="stat-value">${data.overview.certifiedUsers}</span>
+            <span class="stat-label">Certified</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-card exam-card">
+        <h3>📝 Exam Stats</h3>
+        <div class="stat-grid">
+          <div class="stat-item">
+            <span class="stat-value">${data.exam.totalAttempts}</span>
+            <span class="stat-label">Total Attempts</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">${data.exam.totalPassed}</span>
+            <span class="stat-label">Passed</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">${data.exam.passRate}%</span>
+            <span class="stat-label">Pass Rate</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">${data.exam.averageScore || 0}%</span>
+            <span class="stat-label">Avg Score</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-card roleplay-card">
+        <h3>🎭 Roleplay Stats</h3>
+        <div class="stat-grid">
+          <div class="stat-item">
+            <span class="stat-value">${data.roleplay.totalSessions}</span>
+            <span class="stat-label">Total Sessions</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">${data.roleplay.completedSessions}</span>
+            <span class="stat-label">Completed</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">${data.roleplay.averageScore || 0}</span>
+            <span class="stat-label">Avg Score</span>
+          </div>
+          <div class="stat-item highlight">
+            <span class="stat-value">${data.roleplay.totalXPAwarded}</span>
+            <span class="stat-label">Total XP</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-card modules-card">
+        <h3>📚 Module Completion Rates</h3>
+        <div class="module-bars">
+          ${data.modules.map(m => `
+            <div class="module-bar-item">
+              <span class="module-bar-name">${formatModuleName(m.name)}</span>
+              <div class="module-bar-track">
+                <div class="module-bar-fill" style="width: ${m.completionRate}%"></div>
+              </div>
+              <span class="module-bar-rate">${m.completionRate}%</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// Helper functions for admin
+function escapeHtml(str: string): string {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function formatDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+}
+
+function formatRelativeDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) return 'Today';
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7) return `${diffDays} days ago`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+  return formatDate(dateStr);
+}
+
+function formatModuleName(name: string): string {
+  return name
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase())
+    .slice(0, 20);
+}
+
+function initializeApp(): void {
+  currentUser = getCurrentUser();
+
   if (sidebar) {
     sidebar.addEventListener('click', handleNavigation);
   }
   mainContent?.addEventListener('click', handleSpeak);
 
+  // Update user display
+  updateUserDisplay();
+
   // Initialize manager mode UI and sidebar locks
   initManagerModeUI();
   updateSidebarLocks();
 
+  // Check certified status
+  const examState = getExamState();
+  if (examState.isCertified) {
+    updateSidebarCertifiedBadge(true);
+  }
+
   renderModule('welcome');
   document.querySelector('#sidebar li[data-module="welcome"]')?.classList.add('active');
+}
+
+// --- Initial Load ---
+document.addEventListener('DOMContentLoaded', async () => {
+  // Check if user is logged in
+  if (isLoggedIn()) {
+    // Validate session with server (if available)
+    const isValid = await validateSession();
+    if (isValid) {
+      hideLoginScreen();
+      initializeApp();
+    } else {
+      // Session invalid, show login
+      showLoginScreen();
+    }
+  } else {
+    // Not logged in, show login screen
+    showLoginScreen();
+  }
 });
 
 // --- New helpers and initializers ---
@@ -4133,121 +7263,1096 @@ function initQuickQuiz2() {
   });
 }
 
+// ============================================================================
+// FINAL EXAM STATE MANAGEMENT
+// ============================================================================
+
+function getExamState(): ExamState {
+  return {
+    attempts: JSON.parse(localStorage.getItem(STORAGE_KEYS.finalExamHistory) || '[]'),
+    isCertified: localStorage.getItem(STORAGE_KEYS.certifiedStatus) === 'true',
+    certificationDate: localStorage.getItem(STORAGE_KEYS.certificationDate),
+    userName: localStorage.getItem(STORAGE_KEYS.examUserName) || ''
+  };
+}
+
+// Track current exam attempt ID from API
+let currentExamAttemptId: string | null = null;
+
+function saveExamAttempt(attempt: ExamAttempt): void {
+  const state = getExamState();
+  state.attempts.push(attempt);
+  localStorage.setItem(STORAGE_KEYS.finalExamHistory, JSON.stringify(state.attempts));
+
+  if (attempt.passed) {
+    localStorage.setItem(STORAGE_KEYS.certifiedStatus, 'true');
+    localStorage.setItem(STORAGE_KEYS.certificationDate, new Date().toISOString());
+    updateSidebarCertifiedBadge(true);
+  }
+}
+
+// Submit exam to API
+async function submitExamToAPI(
+  attemptId: string | null,
+  results: { mcqCorrect: number; fibCorrect: number; saPoints: number; totalScore: number; passed: boolean },
+  timeTaken: number,
+  mcqAnswers?: any[],
+  fibAnswers?: any[],
+  saAnswers?: any[]
+): Promise<void> {
+  if (!attemptId) return;
+
+  await apiCall('/exam/submit', {
+    method: 'POST',
+    body: JSON.stringify({
+      attemptId,
+      timeTaken,
+      results,
+      mcqAnswers,
+      fibAnswers,
+      saAnswers
+    })
+  }).catch(err => console.log('Exam submission tracking failed (offline mode):', err));
+}
+
+// Start exam attempt via API
+async function startExamAttemptAPI(): Promise<{ attemptId: string | null; remainingAttempts: number }> {
+  const result = await apiCall<{ attemptId: string; attemptNumber: number; remainingAttempts: number } | { error: string; lockedOut?: boolean; isCertified?: boolean }>('/exam/start', {
+    method: 'POST'
+  });
+
+  if (!result) {
+    // Offline mode - use local tracking
+    return { attemptId: null, remainingAttempts: getRemainingAttempts() };
+  }
+
+  if ('error' in result) {
+    return { attemptId: null, remainingAttempts: 0 };
+  }
+
+  currentExamAttemptId = result.attemptId;
+  return { attemptId: result.attemptId, remainingAttempts: result.remainingAttempts };
+}
+
+// ============================================================================
+// ROLEPLAY SESSION API TRACKING
+// ============================================================================
+
+let currentRoleplaySessionId: string | null = null;
+
+// Start roleplay session via API
+async function startRoleplaySessionAPI(personality: string, difficulty: string, inputMode: string): Promise<string | null> {
+  const result = await apiCall<{ sessionId: string }>('/roleplay/start', {
+    method: 'POST',
+    body: JSON.stringify({ personality, difficulty, inputMode })
+  }).catch(err => {
+    console.log('Roleplay session start tracking failed (offline mode):', err);
+    return null;
+  });
+
+  if (result?.sessionId) {
+    currentRoleplaySessionId = result.sessionId;
+    return result.sessionId;
+  }
+  return null;
+}
+
+// End roleplay session via API
+async function endRoleplaySessionAPI(sessionId: string | null, score: number, xpEarned: number, doorSlammed: boolean): Promise<void> {
+  if (!sessionId) return;
+
+  await apiCall('/roleplay/end', {
+    method: 'POST',
+    body: JSON.stringify({
+      sessionId,
+      finalScore: score,
+      xpEarned,
+      doorSlammed
+    })
+  }).catch(err => console.log('Roleplay session end tracking failed (offline mode):', err));
+
+  currentRoleplaySessionId = null;
+}
+
+// Update roleplay score during session
+async function updateRoleplayScoreAPI(sessionId: string | null, score: number): Promise<void> {
+  if (!sessionId) return;
+
+  await apiCall('/roleplay/score', {
+    method: 'POST',
+    body: JSON.stringify({ sessionId, score })
+  }).catch(() => {}); // Silent fail for score updates
+}
+
+function getRemainingAttempts(): number {
+  const state = getExamState();
+  if (state.isCertified) return 0; // Already passed
+  return Math.max(0, 3 - state.attempts.length);
+}
+
+function isExamLockedOut(): boolean {
+  const state = getExamState();
+  return !state.isCertified && state.attempts.length >= 3;
+}
+
+function updateSidebarCertifiedBadge(isCertified: boolean): void {
+  // Add badge to sidebar header
+  const sidebarHeader = document.querySelector('.sidebar-header');
+  let badge = document.getElementById('cert-badge');
+
+  if (isCertified) {
+    if (!badge && sidebarHeader) {
+      badge = document.createElement('div');
+      badge.id = 'cert-badge';
+      badge.className = 'cert-badge';
+      badge.innerHTML = '<span class="badge-icon">🏆</span><span class="badge-text">Certified</span>';
+      sidebarHeader.appendChild(badge);
+    }
+    if (badge) badge.style.display = 'inline-flex';
+
+    // Add trophy to Module 16
+    const examModule = document.querySelector('li[data-module="final-exam"]');
+    if (examModule) examModule.classList.add('certified');
+  } else if (badge) {
+    badge.style.display = 'none';
+  }
+}
+
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+function formatExamDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+// ============================================================================
+// FINAL EXAM UI & LOGIC
+// ============================================================================
+
+let currentExamData: { mcq: MCQQuestion[], fib: FIBQuestion[], sa: SAQuestion[] } | null = null;
+
 function initFinalExam() {
-  const start = document.getElementById('startFinalExam');
-  const area = document.getElementById('exam-area');
-  if (!start || !area) return;
-  start.addEventListener('click', async () => {
-    if (!ai) {
-      area.innerHTML = '<p style="color:red">Final exam generation requires an API key. Set GEMINI_API_KEY in .env.local.</p>';
+  const examArea = document.getElementById('exam-area');
+  if (!examArea) return;
+
+  const state = getExamState();
+
+  // Show appropriate screen based on state
+  if (state.isCertified) {
+    showCertifiedScreen(examArea, state);
+  } else if (isExamLockedOut()) {
+    showLockoutScreen(examArea, state);
+  } else {
+    showExamStartScreen(examArea, state);
+  }
+
+  // Check certification badge on load
+  updateSidebarCertifiedBadge(state.isCertified);
+}
+
+function showExamStartScreen(root: HTMLElement, state: ExamState) {
+  const remaining = getRemainingAttempts();
+  const attemptsHtml = state.attempts.length > 0 ? `
+    <div class="exam-history">
+      <h4>Previous Attempts:</h4>
+      <ul>
+        ${state.attempts.map(a => `
+          <li class="${a.passed ? 'passed' : 'failed'}">
+            Attempt ${a.attemptNumber}: ${a.totalScore}% on ${formatExamDate(a.date)} - ${a.passed ? '✓ PASSED' : '✗ Failed'}
+          </li>
+        `).join('')}
+      </ul>
+    </div>
+  ` : '';
+
+  root.innerHTML = `
+    <div class="exam-start-screen">
+      <div class="exam-status-panel">
+        <div class="attempts-remaining">
+          <span class="attempts-number">${remaining}</span>
+          <span class="attempts-label">Attempts Remaining</span>
+        </div>
+        ${attemptsHtml}
+      </div>
+
+      <div class="exam-info-panel">
+        <h3>📋 Exam Format</h3>
+        <ul>
+          <li><strong>35 Multiple Choice Questions</strong> (2 points each)</li>
+          <li><strong>10 Fill-in-the-Blank Questions</strong> (2 points each)</li>
+          <li><strong>5 Short Answer Questions</strong> (2 points each)</li>
+          <li><strong>Total: 100 points</strong></li>
+          <li><strong>Passing Score: 80%</strong></li>
+        </ul>
+      </div>
+
+      <div class="name-entry-section">
+        <label for="exam-user-name">Your Full Name (for certificate):</label>
+        <input type="text" id="exam-user-name" placeholder="Enter your full name" value="${state.userName}" />
+      </div>
+
+      <button id="startFinalExam" class="exam-start-btn">🎯 Start Final Exam</button>
+    </div>
+  `;
+
+  document.getElementById('startFinalExam')?.addEventListener('click', () => {
+    const nameInput = document.getElementById('exam-user-name') as HTMLInputElement;
+    const userName = nameInput?.value?.trim();
+
+    if (!userName) {
+      alert('Please enter your name for the certificate.');
+      nameInput?.focus();
       return;
     }
-    area.innerHTML = '<div id="loader">Preparing your 50‑question exam…</div>';
-    try {
-      const trainingSummary = Object.values(trainingContent).join(' ');
-      const result = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: `Create a final exam for Roof‑ER training with exactly: 35 multiple‑choice (options+answer), 10 fill‑in‑the‑blank (answer string), 5 short‑answer (keywords array for rubric). Return JSON matching the schema.`,
-        config: {
-          responseMimeType: 'application/json',
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              multipleChoice: { type: Type.ARRAY, items: { type: Type.OBJECT, properties: {
-                question: { type: Type.STRING },
-                options: { type: Type.ARRAY, items: { type: Type.STRING } },
-                answer: { type: Type.STRING }
-              }, required: ['question','options','answer'] } },
-              fillBlank: { type: Type.ARRAY, items: { type: Type.OBJECT, properties: {
-                question: { type: Type.STRING },
-                answer: { type: Type.STRING }
-              }, required: ['question','answer'] } },
-              shortAnswer: { type: Type.ARRAY, items: { type: Type.OBJECT, properties: {
-                prompt: { type: Type.STRING },
-                keywords: { type: Type.ARRAY, items: { type: Type.STRING } }
-              }, required: ['prompt','keywords'] } }
-            }, required: ['multipleChoice','fillBlank','shortAnswer']
-          }
-        }
-      });
-      const exam = JSON.parse(result.text.trim());
-      renderFinalExam(area, exam);
-    } catch (e) {
-      console.error(e);
-      area.innerHTML = '<p style="color:red">Failed to generate exam. Please try again.</p>';
+
+    localStorage.setItem(STORAGE_KEYS.examUserName, userName);
+    startExam(root);
+  });
+}
+
+function showLockoutScreen(root: HTMLElement, state: ExamState) {
+  // Find weak modules from failed attempts
+  const failedAttempts = state.attempts.filter(a => !a.passed);
+
+  root.innerHTML = `
+    <div class="exam-lockout-screen">
+      <div class="lockout-icon">🔒</div>
+      <h2>Exam Locked</h2>
+      <p>You have used all 3 attempts without passing.</p>
+
+      <div class="lockout-message">
+        <h3>📚 Time to Review</h3>
+        <p>Please review the training modules to strengthen your knowledge, then contact your manager to request additional attempts.</p>
+
+        <div class="review-suggestions">
+          <h4>Recommended Review Areas:</h4>
+          <ul>
+            <li>Module 5: Initial Pitch & 5 Non-Negotiables</li>
+            <li>Module 6-9: Objection Handling</li>
+            <li>Module 12: Closing Objections</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="lockout-history">
+        <h4>Your Attempts:</h4>
+        <ul>
+          ${state.attempts.map(a => `
+            <li>Attempt ${a.attemptNumber}: ${a.totalScore}% on ${formatExamDate(a.date)}</li>
+          `).join('')}
+        </ul>
+      </div>
+
+      <button onclick="renderModule('welcome')" class="btn-secondary">📖 Return to Training</button>
+    </div>
+  `;
+}
+
+function showCertifiedScreen(root: HTMLElement, state: ExamState) {
+  const passingAttempt = state.attempts.find(a => a.passed);
+  const savedWrongAnswers = localStorage.getItem(STORAGE_KEYS.lastExamWrongAnswers);
+  const wrongAnswers: WrongAnswer[] = savedWrongAnswers ? JSON.parse(savedWrongAnswers) : [];
+
+  // Build review HTML
+  const buildReviewHTML = () => {
+    if (wrongAnswers.length === 0) {
+      return '<p class="perfect-score-banner">🎯 Perfect Score! You answered all questions correctly!</p>';
+    }
+
+    const mcqWrong = wrongAnswers.filter(w => w.type === 'mcq');
+    const fibWrong = wrongAnswers.filter(w => w.type === 'fib');
+    const saWrong = wrongAnswers.filter(w => w.type === 'sa');
+
+    let html = '';
+
+    if (mcqWrong.length > 0) {
+      html += `
+        <div class="review-section">
+          <h4>📝 Multiple Choice (${mcqWrong.length} incorrect)</h4>
+          ${mcqWrong.map(w => `
+            <div class="wrong-answer-item">
+              <div class="question-header">
+                <span class="q-number">Q${w.questionNumber}</span>
+                <span class="q-text">${w.question}</span>
+              </div>
+              <div class="answer-comparison">
+                <div class="your-answer wrong">
+                  <span class="label">❌ Your Answer:</span>
+                  <span class="value">${w.userAnswer}</span>
+                </div>
+                <div class="correct-answer">
+                  <span class="label">✅ Correct Answer:</span>
+                  <span class="value">${w.correctAnswer}</span>
+                </div>
+              </div>
+              <div class="explanation">
+                <strong>💡 Explanation:</strong> ${w.explanation}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    if (fibWrong.length > 0) {
+      html += `
+        <div class="review-section">
+          <h4>✏️ Fill-in-the-Blank (${fibWrong.length} incorrect)</h4>
+          ${fibWrong.map(w => `
+            <div class="wrong-answer-item">
+              <div class="question-header">
+                <span class="q-number">Q${w.questionNumber}</span>
+                <span class="q-text">${w.question}</span>
+              </div>
+              <div class="answer-comparison">
+                <div class="your-answer wrong">
+                  <span class="label">❌ Your Answer:</span>
+                  <span class="value">${w.userAnswer}</span>
+                </div>
+                <div class="correct-answer">
+                  <span class="label">✅ Correct Answer:</span>
+                  <span class="value">${w.correctAnswer}</span>
+                </div>
+              </div>
+              <div class="explanation">
+                <strong>💡 Explanation:</strong> ${w.explanation}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    if (saWrong.length > 0) {
+      html += `
+        <div class="review-section">
+          <h4>📄 Short Answer (${saWrong.length} need improvement)</h4>
+          ${saWrong.map(w => `
+            <div class="wrong-answer-item sa-review">
+              <div class="question-header">
+                <span class="q-number">Q${w.questionNumber}</span>
+                <span class="q-text">${w.question}</span>
+              </div>
+              <div class="answer-comparison">
+                <div class="your-answer partial">
+                  <span class="label">📝 Your Answer:</span>
+                  <div class="value sa-value">${w.userAnswer}</div>
+                </div>
+                <div class="correct-answer">
+                  <span class="label">✅ Expected Response:</span>
+                  <div class="value sa-value">${w.correctAnswer.replace(/\n/g, '<br>')}</div>
+                </div>
+              </div>
+              <div class="explanation">
+                <strong>💡 Feedback:</strong> ${w.explanation}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    return html;
+  };
+
+  root.innerHTML = `
+    <div class="certified-screen">
+      <div class="confetti-container" id="confetti"></div>
+
+      <div class="cert-badge-large">🏆</div>
+      <h1>Congratulations!</h1>
+      <h2>You are a Certified Roof E.R. Sales Representative</h2>
+
+      <div class="cert-details">
+        <p><strong>Name:</strong> ${state.userName}</p>
+        <p><strong>Certified:</strong> ${state.certificationDate ? formatExamDate(state.certificationDate) : 'N/A'}</p>
+        <p><strong>Score:</strong> ${passingAttempt?.totalScore || 0}%</p>
+      </div>
+
+      <button id="downloadCert" class="cert-download-btn">📄 Download Certificate</button>
+
+      ${wrongAnswers.length > 0 ? `
+        <div class="answer-review-section" style="margin-top: 30px;">
+          <button id="toggleCertReview" class="btn-toggle-review">📋 Review My Exam (${wrongAnswers.length} questions to review)</button>
+          <div id="certReviewContent" class="answer-review-content hidden">
+            <h3>📚 Questions You Missed</h3>
+            <p class="review-intro">Even though you passed, here are the questions you can improve on:</p>
+            ${buildReviewHTML()}
+          </div>
+        </div>
+      ` : `
+        <div class="answer-review-section" style="margin-top: 30px;">
+          <div class="perfect-score-banner">🎯 Perfect Score! You answered all questions correctly!</div>
+        </div>
+      `}
+
+      <div class="cert-actions">
+        <button onclick="renderModule('welcome')" class="btn-secondary">Return to Training</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('downloadCert')?.addEventListener('click', () => {
+    generateCertificatePDF(state.userName, passingAttempt?.totalScore || 80, state.certificationDate || new Date().toISOString());
+  });
+
+  document.getElementById('toggleCertReview')?.addEventListener('click', () => {
+    const content = document.getElementById('certReviewContent');
+    const btn = document.getElementById('toggleCertReview');
+    if (content && btn) {
+      content.classList.toggle('hidden');
+      btn.textContent = content.classList.contains('hidden')
+        ? `📋 Review My Exam (${wrongAnswers.length} questions to review)`
+        : '📋 Hide Answer Review';
+    }
+  });
+
+  // Trigger confetti
+  setTimeout(() => triggerConfetti(), 300);
+}
+
+async function startExam(root: HTMLElement) {
+  // Start exam attempt in API to track it
+  const { attemptId, remainingAttempts } = await startExamAttemptAPI();
+  currentExamAttemptId = attemptId;
+
+  if (remainingAttempts === 0 && !attemptId) {
+    // User is locked out - refresh to show lockout screen
+    initFinalExam();
+    return;
+  }
+
+  // Shuffle questions for this attempt
+  currentExamData = {
+    mcq: shuffleArray(FINAL_EXAM_MCQ),
+    fib: shuffleArray(FINAL_EXAM_FIB),
+    sa: shuffleArray(FINAL_EXAM_SA)
+  };
+
+  renderFinalExam(root);
+}
+
+function renderFinalExam(root: HTMLElement) {
+  if (!currentExamData) return;
+
+  const { mcq, fib, sa } = currentExamData;
+
+  root.innerHTML = `
+    <div class="exam-container">
+      <div class="exam-header">
+        <h2>🎯 Final Certification Exam</h2>
+        <div class="exam-progress">
+          <span id="exam-progress-text">Answer all 50 questions</span>
+        </div>
+      </div>
+
+      <div class="exam-sections">
+        <!-- Multiple Choice Section -->
+        <div class="exam-section">
+          <h3>📝 Section 1: Multiple Choice (35 questions - 2 pts each)</h3>
+          <div class="mcq-questions">
+            ${mcq.map((q, idx) => `
+              <div class="exam-question mcq-question" data-id="${q.id}">
+                <p class="question-text"><strong>${idx + 1}.</strong> ${q.question}</p>
+                <div class="options-group">
+                  ${q.options.map((opt, optIdx) => `
+                    <label class="option-label">
+                      <input type="radio" name="mcq-${idx}" value="${optIdx}">
+                      <span class="option-text">${opt}</span>
+                    </label>
+                  `).join('')}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Fill in the Blank Section -->
+        <div class="exam-section">
+          <h3>✏️ Section 2: Fill in the Blank (10 questions - 2 pts each)</h3>
+          <div class="fib-questions">
+            ${fib.map((q, idx) => `
+              <div class="exam-question fib-question" data-id="${q.id}">
+                <p class="question-text"><strong>${idx + 1}.</strong> ${q.question}</p>
+                <input type="text" name="fib-${idx}" class="fib-input" placeholder="Type your answer..." />
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Short Answer Section -->
+        <div class="exam-section">
+          <h3>📄 Section 3: Short Answer (5 questions - 2 pts each)</h3>
+          <div class="sa-questions">
+            ${sa.map((q, idx) => `
+              <div class="exam-question sa-question" data-id="${q.id}">
+                <p class="question-text"><strong>${idx + 1}.</strong> ${q.prompt}</p>
+                <textarea name="sa-${idx}" class="sa-input" rows="4" placeholder="Write your answer..."></textarea>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+
+      <div class="exam-submit-section">
+        <button id="submitExam" class="exam-submit-btn">✅ Submit Exam</button>
+        <p class="submit-warning">⚠️ You cannot change answers after submitting.</p>
+      </div>
+
+      <div id="exam-result"></div>
+    </div>
+  `;
+
+  document.getElementById('submitExam')?.addEventListener('click', () => {
+    if (confirm('Are you sure you want to submit your exam? You cannot change answers after submitting.')) {
+      gradeFinalExam(root);
     }
   });
 }
 
-function renderFinalExam(root: HTMLElement, exam: any) {
-  root.innerHTML = '';
-  const sections: string[] = [];
-  if (Array.isArray(exam.multipleChoice)) sections.push('multipleChoice');
-  if (Array.isArray(exam.fillBlank)) sections.push('fillBlank');
-  if (Array.isArray(exam.shortAnswer)) sections.push('shortAnswer');
-  sections.forEach((sec) => {
-    const wrap = document.createElement('div');
-    wrap.className = 'exam-section';
-    wrap.innerHTML = `<h3>${sec === 'multipleChoice' ? 'Multiple Choice' : sec === 'fillBlank' ? 'Fill in the Blank' : 'Short Answer'}</h3>`;
-    const items = exam[sec];
-    items.forEach((q: any, idx: number) => {
-      const item = document.createElement('div');
-      item.className = 'exam-item';
-      if (sec === 'multipleChoice') {
-        item.innerHTML = `
-          <p>${idx + 1}. ${q.question}</p>
-          ${q.options.map((opt: string, i: number) => `<label><input type="radio" name="mcq-${idx}" value="${opt}"> ${opt}</label>`).join('')}
-        `;
-      } else if (sec === 'fillBlank') {
-        item.innerHTML = `<p>${idx + 1}. ${q.question}</p><input type="text" name="fib-${idx}" />`;
-      } else {
-        item.innerHTML = `<p>${idx + 1}. ${q.prompt}</p><textarea name="sa-${idx}" rows="2"></textarea>`;
-      }
-      wrap.appendChild(item);
-    });
-    root.appendChild(wrap);
+function gradeFinalExam(root: HTMLElement) {
+  if (!currentExamData) return;
+
+  const { mcq, fib, sa } = currentExamData;
+  const wrongAnswers: WrongAnswer[] = [];
+
+  // Grade MCQ (35 questions, 2 pts each = 70 pts max)
+  let mcqCorrect = 0;
+  mcq.forEach((q, idx) => {
+    const selected = root.querySelector(`input[name="mcq-${idx}"]:checked`) as HTMLInputElement;
+    const userAnswerIdx = selected ? parseInt(selected.value) : -1;
+    if (userAnswerIdx === q.correctAnswer) {
+      mcqCorrect++;
+    } else {
+      wrongAnswers.push({
+        type: 'mcq',
+        questionNumber: idx + 1,
+        question: q.question,
+        userAnswer: userAnswerIdx >= 0 ? q.options[userAnswerIdx] : '(No answer selected)',
+        correctAnswer: q.options[q.correctAnswer],
+        explanation: q.explanation
+      });
+    }
   });
-  const submit = document.createElement('button');
-  submit.textContent = 'Submit Exam';
-  submit.addEventListener('click', () => gradeFinalExam(root, exam));
-  root.appendChild(submit);
-  root.appendChild(Object.assign(document.createElement('div'), { id: 'examResult' }));
+
+  // Grade FIB (10 questions, 2 pts each = 20 pts max)
+  let fibCorrect = 0;
+  fib.forEach((q, idx) => {
+    const input = root.querySelector(`input[name="fib-${idx}"]`) as HTMLInputElement;
+    const userAnswer = input?.value?.trim() || '';
+    const isCorrect = q.acceptableAnswers.some(a => a.toLowerCase() === userAnswer.toLowerCase());
+    if (isCorrect) {
+      fibCorrect++;
+    } else {
+      wrongAnswers.push({
+        type: 'fib',
+        questionNumber: idx + 1,
+        question: q.question,
+        userAnswer: userAnswer || '(No answer provided)',
+        correctAnswer: q.acceptableAnswers[0],
+        explanation: q.explanation
+      });
+    }
+  });
+
+  // Grade SA (5 questions, 2 pts each = 10 pts max) - keyword matching
+  let saPoints = 0;
+  sa.forEach((q, idx) => {
+    const textarea = root.querySelector(`textarea[name="sa-${idx}"]`) as HTMLTextAreaElement;
+    const userAnswer = textarea?.value?.trim() || '';
+    const answerLower = userAnswer.toLowerCase();
+    const keywordsFound = q.keywords.filter(kw => answerLower.includes(kw.toLowerCase()));
+    const scoreRatio = Math.min(keywordsFound.length / q.minKeywords, 1);
+    const questionPoints = scoreRatio * 2; // 2 pts max per question
+    saPoints += questionPoints;
+
+    // If didn't get full credit, show as wrong/partial
+    if (scoreRatio < 1) {
+      const missingKeywords = q.keywords.filter(kw => !answerLower.includes(kw.toLowerCase()));
+      wrongAnswers.push({
+        type: 'sa',
+        questionNumber: idx + 1,
+        question: q.prompt,
+        userAnswer: userAnswer || '(No answer provided)',
+        correctAnswer: `Sample: ${q.sampleAnswer}\n\nKey points to include: ${q.keywords.join(', ')}\n(You mentioned ${keywordsFound.length}/${q.minKeywords} required keywords${missingKeywords.length > 0 ? `. Missing: ${missingKeywords.join(', ')}` : ''})`,
+        explanation: `This question required at least ${q.minKeywords} key concepts. You earned ${Math.round(questionPoints * 10) / 10}/2 points.`
+      });
+    }
+  });
+
+  // Calculate total score (out of 100)
+  const mcqScore = mcqCorrect * 2;      // 70 pts max
+  const fibScore = fibCorrect * 2;      // 20 pts max
+  const saScore = Math.round(saPoints); // 10 pts max
+  const totalScore = mcqScore + fibScore + saScore;
+  const passed = totalScore >= 80;
+
+  // Save attempt
+  const state = getExamState();
+  const attempt: ExamAttempt = {
+    attemptNumber: state.attempts.length + 1,
+    date: new Date().toISOString(),
+    mcqScore: mcqCorrect,
+    fibScore: fibCorrect,
+    saScore: Math.round(saPoints / 2), // Store as question count
+    totalScore,
+    passed
+  };
+  saveExamAttempt(attempt);
+
+  // Submit exam results to API
+  const mcqAnswerData = mcq.map((q, idx) => {
+    const selected = root.querySelector(`input[name="mcq-${idx}"]:checked`) as HTMLInputElement;
+    const userAnswerIdx = selected ? parseInt(selected.value) : -1;
+    return {
+      questionId: q.id,
+      questionNumber: idx + 1,
+      questionText: q.question,
+      userAnswer: userAnswerIdx >= 0 ? q.options[userAnswerIdx] : '',
+      correctAnswer: q.options[q.correctAnswer],
+      isCorrect: userAnswerIdx === q.correctAnswer
+    };
+  });
+
+  const fibAnswerData = fib.map((q, idx) => {
+    const input = root.querySelector(`input[name="fib-${idx}"]`) as HTMLInputElement;
+    const userAnswer = input?.value?.trim() || '';
+    const isCorrect = q.acceptableAnswers.some(a => a.toLowerCase() === userAnswer.toLowerCase());
+    return {
+      questionId: q.id,
+      questionNumber: idx + 1,
+      questionText: q.question,
+      userAnswer,
+      correctAnswer: q.acceptableAnswers[0],
+      isCorrect
+    };
+  });
+
+  const saAnswerData = sa.map((q, idx) => {
+    const textarea = root.querySelector(`textarea[name="sa-${idx}"]`) as HTMLTextAreaElement;
+    const userAnswer = textarea?.value?.trim() || '';
+    const answerLower = userAnswer.toLowerCase();
+    const keywordsFound = q.keywords.filter(kw => answerLower.includes(kw.toLowerCase()));
+    const scoreRatio = Math.min(keywordsFound.length / q.minKeywords, 1);
+    return {
+      questionId: q.id,
+      questionNumber: idx + 1,
+      questionText: q.prompt,
+      userAnswer,
+      correctAnswer: q.sampleAnswer,
+      isCorrect: scoreRatio >= 1,
+      pointsEarned: Math.round(scoreRatio * 2 * 10) / 10
+    };
+  });
+
+  // Calculate time taken (would need exam start time tracking for accurate value)
+  const timeTaken = 0; // Placeholder - could track actual time
+
+  submitExamToAPI(
+    currentExamAttemptId,
+    { mcqCorrect, fibCorrect, saPoints: Math.round(saPoints), totalScore, passed },
+    timeTaken,
+    mcqAnswerData,
+    fibAnswerData,
+    saAnswerData
+  );
+
+  // Save wrong answers to localStorage for later review
+  localStorage.setItem(STORAGE_KEYS.lastExamWrongAnswers, JSON.stringify(wrongAnswers));
+
+  // Create detailed results
+  const detailedResults: ExamDetailedResults = {
+    mcqCorrect,
+    fibCorrect,
+    saPoints,
+    totalScore,
+    passed,
+    wrongAnswers
+  };
+
+  // Show results with detailed feedback
+  showExamResults(root, attempt, detailedResults);
 }
 
-function gradeFinalExam(root: HTMLElement, exam: any) {
-  let mcqCorrect = 0, mcqTotal = Array.isArray(exam.multipleChoice) ? exam.multipleChoice.length : 0;
-  if (exam.multipleChoice) {
-    exam.multipleChoice.forEach((q: any, idx: number) => {
-      const sel = (root.querySelector(`input[name="mcq-${idx}"]:checked`) as HTMLInputElement)?.value;
-      if (sel && sel === q.answer) mcqCorrect++;
+function showExamResults(root: HTMLElement, attempt: ExamAttempt, detailedResults?: ExamDetailedResults) {
+  const state = getExamState();
+  const remaining = getRemainingAttempts();
+  const wrongAnswers = detailedResults?.wrongAnswers || [];
+
+  // Build the answer review HTML
+  const buildAnswerReview = () => {
+    if (wrongAnswers.length === 0) {
+      return '<p class="perfect-score">🎯 Perfect Score! You answered all questions correctly!</p>';
+    }
+
+    const mcqWrong = wrongAnswers.filter(w => w.type === 'mcq');
+    const fibWrong = wrongAnswers.filter(w => w.type === 'fib');
+    const saWrong = wrongAnswers.filter(w => w.type === 'sa');
+
+    let html = '';
+
+    if (mcqWrong.length > 0) {
+      html += `
+        <div class="review-section">
+          <h4>📝 Multiple Choice (${mcqWrong.length} incorrect)</h4>
+          ${mcqWrong.map(w => `
+            <div class="wrong-answer-item">
+              <div class="question-header">
+                <span class="q-number">Q${w.questionNumber}</span>
+                <span class="q-text">${w.question}</span>
+              </div>
+              <div class="answer-comparison">
+                <div class="your-answer wrong">
+                  <span class="label">❌ Your Answer:</span>
+                  <span class="value">${w.userAnswer}</span>
+                </div>
+                <div class="correct-answer">
+                  <span class="label">✅ Correct Answer:</span>
+                  <span class="value">${w.correctAnswer}</span>
+                </div>
+              </div>
+              <div class="explanation">
+                <strong>💡 Explanation:</strong> ${w.explanation}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    if (fibWrong.length > 0) {
+      html += `
+        <div class="review-section">
+          <h4>✏️ Fill-in-the-Blank (${fibWrong.length} incorrect)</h4>
+          ${fibWrong.map(w => `
+            <div class="wrong-answer-item">
+              <div class="question-header">
+                <span class="q-number">Q${w.questionNumber}</span>
+                <span class="q-text">${w.question}</span>
+              </div>
+              <div class="answer-comparison">
+                <div class="your-answer wrong">
+                  <span class="label">❌ Your Answer:</span>
+                  <span class="value">${w.userAnswer}</span>
+                </div>
+                <div class="correct-answer">
+                  <span class="label">✅ Correct Answer:</span>
+                  <span class="value">${w.correctAnswer}</span>
+                </div>
+              </div>
+              <div class="explanation">
+                <strong>💡 Explanation:</strong> ${w.explanation}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    if (saWrong.length > 0) {
+      html += `
+        <div class="review-section">
+          <h4>📄 Short Answer (${saWrong.length} need improvement)</h4>
+          ${saWrong.map(w => `
+            <div class="wrong-answer-item sa-review">
+              <div class="question-header">
+                <span class="q-number">Q${w.questionNumber}</span>
+                <span class="q-text">${w.question}</span>
+              </div>
+              <div class="answer-comparison">
+                <div class="your-answer partial">
+                  <span class="label">📝 Your Answer:</span>
+                  <div class="value sa-value">${w.userAnswer}</div>
+                </div>
+                <div class="correct-answer">
+                  <span class="label">✅ Expected Response:</span>
+                  <div class="value sa-value">${w.correctAnswer.replace(/\n/g, '<br>')}</div>
+                </div>
+              </div>
+              <div class="explanation">
+                <strong>💡 Feedback:</strong> ${w.explanation}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    return html;
+  };
+
+  if (attempt.passed) {
+    // Show celebration
+    root.innerHTML = `
+      <div class="exam-results passed">
+        <div class="confetti-container" id="confetti"></div>
+
+        <div class="result-badge success">🎉</div>
+        <h1>Congratulations!</h1>
+        <h2>You Passed!</h2>
+
+        <div class="score-display">
+          <div class="score-circle passed">
+            <span class="score-number">${attempt.totalScore}</span>
+            <span class="score-label">%</span>
+          </div>
+        </div>
+
+        <div class="score-breakdown">
+          <h4>Score Breakdown:</h4>
+          <ul>
+            <li>Multiple Choice: ${attempt.mcqScore}/35 correct (${attempt.mcqScore * 2}/70 pts)</li>
+            <li>Fill-in-the-Blank: ${attempt.fibScore}/10 correct (${attempt.fibScore * 2}/20 pts)</li>
+            <li>Short Answer: ${attempt.saScore * 2}/10 pts</li>
+          </ul>
+        </div>
+
+        <div class="cert-section">
+          <h3>🏆 You are now a Certified Roof E.R. Sales Representative!</h3>
+          <button id="downloadCertResult" class="cert-download-btn">📄 Download Certificate</button>
+        </div>
+
+        ${wrongAnswers.length > 0 ? `
+          <div class="answer-review-section">
+            <button id="toggleAnswerReview" class="btn-toggle-review">📋 Review Answers (${wrongAnswers.length} to review)</button>
+            <div id="answerReviewContent" class="answer-review-content hidden">
+              <h3>📚 Answer Review</h3>
+              <p class="review-intro">Even though you passed, here are the questions you can improve on:</p>
+              ${buildAnswerReview()}
+            </div>
+          </div>
+        ` : `
+          <div class="answer-review-section">
+            <div class="perfect-score-banner">🎯 Perfect Score! You answered all questions correctly!</div>
+          </div>
+        `}
+      </div>
+    `;
+
+    document.getElementById('downloadCertResult')?.addEventListener('click', () => {
+      generateCertificatePDF(state.userName, attempt.totalScore, attempt.date);
     });
-  }
-  // Fill in the blank: case-insensitive trim compare
-  let fibCorrect = 0, fibTotal = Array.isArray(exam.fillBlank) ? exam.fillBlank.length : 0;
-  if (exam.fillBlank) {
-    exam.fillBlank.forEach((q: any, idx: number) => {
-      const val = (root.querySelector(`input[name="fib-${idx}"]`) as HTMLInputElement)?.value?.trim().toLowerCase();
-      const ans = String(q.answer || '').trim().toLowerCase();
-      if (val && ans && val === ans) fibCorrect++;
+
+    document.getElementById('toggleAnswerReview')?.addEventListener('click', () => {
+      const content = document.getElementById('answerReviewContent');
+      const btn = document.getElementById('toggleAnswerReview');
+      if (content && btn) {
+        content.classList.toggle('hidden');
+        btn.textContent = content.classList.contains('hidden')
+          ? `📋 Review Answers (${wrongAnswers.length} to review)`
+          : '📋 Hide Answer Review';
+      }
     });
+
+    triggerConfetti();
+  } else {
+    // Show failure screen
+    const locked = remaining === 0;
+
+    root.innerHTML = `
+      <div class="exam-results failed">
+        <div class="result-badge fail">😔</div>
+        <h1>Not Quite There</h1>
+        <h2>Score: ${attempt.totalScore}% (Need 80% to pass)</h2>
+
+        <div class="score-display">
+          <div class="score-circle failed">
+            <span class="score-number">${attempt.totalScore}</span>
+            <span class="score-label">%</span>
+          </div>
+        </div>
+
+        <div class="score-breakdown">
+          <h4>Score Breakdown:</h4>
+          <ul>
+            <li>Multiple Choice: ${attempt.mcqScore}/35 correct</li>
+            <li>Fill-in-the-Blank: ${attempt.fibScore}/10 correct</li>
+            <li>Short Answer: ${attempt.saScore * 2}/10 pts</li>
+          </ul>
+        </div>
+
+        ${locked ? `
+          <div class="lockout-warning">
+            <h3>🔒 Exam Locked</h3>
+            <p>You've used all 3 attempts. Please review the training modules and contact your manager for additional attempts.</p>
+          </div>
+        ` : `
+          <div class="retry-section">
+            <p><strong>${remaining} attempt${remaining !== 1 ? 's' : ''} remaining</strong></p>
+            <p>Review the questions below, study the modules you struggled with, and try again!</p>
+          </div>
+        `}
+
+        <div class="answer-review-section expanded">
+          <h3>📚 Answer Review - See What You Got Wrong</h3>
+          <p class="review-intro">Study these carefully before your next attempt:</p>
+          <div id="answerReviewContent" class="answer-review-content">
+            ${buildAnswerReview()}
+          </div>
+        </div>
+
+        <div class="review-suggestions">
+          <h4>📚 Recommended Modules to Review:</h4>
+          <ul>
+            <li>Module 5: Initial Pitch & 5 Non-Negotiables</li>
+            <li>Module 6-9: Handling Objections</li>
+            <li>Module 12: Closing Techniques</li>
+          </ul>
+        </div>
+
+        <div class="result-actions">
+          ${!locked ? '<button onclick="initFinalExam()" class="btn-primary">🔄 Try Again</button>' : ''}
+          <button onclick="renderModule(\'welcome\')" class="btn-secondary">📖 Review Training</button>
+        </div>
+      </div>
+    `;
   }
-  // Short answer: keyword heuristic
-  let saScore = 0, saTotal = Array.isArray(exam.shortAnswer) ? exam.shortAnswer.length : 0;
-  if (exam.shortAnswer) {
-    exam.shortAnswer.forEach((q: any, idx: number) => {
-      const text = (root.querySelector(`textarea[name="sa-${idx}"]`) as HTMLTextAreaElement)?.value?.toLowerCase() || '';
-      const kws: string[] = Array.isArray(q.keywords) ? q.keywords.map((k: string) => String(k).toLowerCase()) : [];
-      const hits = kws.filter(k => text.includes(k)).length;
-      saScore += hits / Math.max(kws.length, 1);
-    });
+}
+
+// ============================================================================
+// CERTIFICATE GENERATION (Canvas API)
+// ============================================================================
+
+function generateCertificatePDF(userName: string, score: number, dateStr: string) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1056;  // 11" at 96dpi (landscape)
+  canvas.height = 816;  // 8.5" at 96dpi
+  const ctx = canvas.getContext('2d')!;
+
+  // Background
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Outer border (Roof-ER red)
+  ctx.strokeStyle = '#D90429';
+  ctx.lineWidth = 12;
+  ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+
+  // Inner border
+  ctx.strokeStyle = '#1a1a2e';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(40, 40, canvas.width - 80, canvas.height - 80);
+
+  // Decorative corners
+  ctx.fillStyle = '#D90429';
+  [[50, 50], [canvas.width - 70, 50], [50, canvas.height - 70], [canvas.width - 70, canvas.height - 70]].forEach(([x, y]) => {
+    ctx.beginPath();
+    ctx.arc(x + 10, y + 10, 8, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // Title
+  ctx.fillStyle = '#1a1a2e';
+  ctx.font = 'bold 42px Georgia, serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('CERTIFICATE OF COMPLETION', canvas.width / 2, 120);
+
+  // Trophy icon (text-based)
+  ctx.font = '60px Arial';
+  ctx.fillText('🏆', canvas.width / 2, 200);
+
+  // Company name
+  ctx.fillStyle = '#D90429';
+  ctx.font = 'bold 48px Arial, sans-serif';
+  ctx.fillText('ROOF E.R.', canvas.width / 2, 280);
+
+  // "This certifies that"
+  ctx.fillStyle = '#1a1a2e';
+  ctx.font = '22px Georgia, serif';
+  ctx.fillText('This certifies that', canvas.width / 2, 340);
+
+  // User name
+  ctx.font = 'bold 44px Georgia, serif';
+  ctx.fillText(userName, canvas.width / 2, 400);
+
+  // Line under name
+  ctx.strokeStyle = '#D90429';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(250, 420);
+  ctx.lineTo(canvas.width - 250, 420);
+  ctx.stroke();
+
+  // Certification text
+  ctx.font = '20px Georgia, serif';
+  ctx.fillStyle = '#1a1a2e';
+  ctx.fillText('has successfully completed the', canvas.width / 2, 470);
+
+  ctx.font = 'bold 26px Georgia, serif';
+  ctx.fillText('Roof E.R. Sales Representative Training Program', canvas.width / 2, 510);
+
+  ctx.font = '20px Georgia, serif';
+  ctx.fillText('and is hereby certified as a', canvas.width / 2, 550);
+
+  // Certification title
+  ctx.fillStyle = '#D90429';
+  ctx.font = 'bold 32px Georgia, serif';
+  ctx.fillText('Certified Sales Representative', canvas.width / 2, 595);
+
+  // Score and date
+  ctx.fillStyle = '#666666';
+  ctx.font = '16px Arial, sans-serif';
+  ctx.fillText(`Score: ${score}%  |  Date: ${formatExamDate(dateStr)}`, canvas.width / 2, 650);
+
+  // Signature lines
+  ctx.fillStyle = '#1a1a2e';
+  ctx.font = '14px Arial, sans-serif';
+
+  // Left signature
+  ctx.strokeStyle = '#333';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(180, 730);
+  ctx.lineTo(380, 730);
+  ctx.stroke();
+  ctx.fillText('Oliver Brown, CEO', 280, 755);
+
+  // Right signature
+  ctx.beginPath();
+  ctx.moveTo(canvas.width - 380, 730);
+  ctx.lineTo(canvas.width - 180, 730);
+  ctx.stroke();
+  ctx.fillText('Reese Samala, Director of Sales', canvas.width - 280, 755);
+
+  // Download
+  const link = document.createElement('a');
+  link.download = `RoofER_Certificate_${userName.replace(/\s+/g, '_')}.png`;
+  link.href = canvas.toDataURL('image/png', 1.0);
+  link.click();
+}
+
+function triggerConfetti() {
+  const container = document.getElementById('confetti');
+  if (!container) return;
+
+  const colors = ['#D90429', '#FFD700', '#4CAF50', '#2196F3', '#9C27B0'];
+
+  for (let i = 0; i < 100; i++) {
+    const confetti = document.createElement('div');
+    confetti.className = 'confetti-piece';
+    confetti.style.cssText = `
+      position: absolute;
+      width: ${Math.random() * 10 + 5}px;
+      height: ${Math.random() * 10 + 5}px;
+      background: ${colors[Math.floor(Math.random() * colors.length)]};
+      left: ${Math.random() * 100}%;
+      top: -20px;
+      opacity: ${Math.random() * 0.5 + 0.5};
+      transform: rotate(${Math.random() * 360}deg);
+      animation: confetti-fall ${Math.random() * 2 + 2}s linear forwards;
+    `;
+    container.appendChild(confetti);
+
+    // Remove after animation
+    setTimeout(() => confetti.remove(), 4000);
   }
-  const totalAuto = mcqTotal + fibTotal;
-  const autoCorrect = mcqCorrect + fibCorrect;
-  const autoPct = totalAuto ? Math.round((autoCorrect / totalAuto) * 100) : 0;
-  const saPct = saTotal ? Math.round((saScore / saTotal) * 100) : 0;
-  const overall = Math.round((autoPct * 0.8) + (saPct * 0.2));
-  const res = root.querySelector('#examResult') as HTMLElement | null;
-  if (res) res.textContent = `MCQ: ${mcqCorrect}/${mcqTotal}, FIB: ${fibCorrect}/${fibTotal}, SA Score: ${saPct}%. Overall: ${overall}%.`;
 }
 
 function initQuickQuiz1() {

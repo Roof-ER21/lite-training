@@ -1,25 +1,37 @@
 {
-  "name": "flashcard-maker",
+  "name": "lite-training",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "engines": {
     "node": "20.x"
   },
   "scripts": {
-    "dev": "vite",
-    "dev:3002": "vite --port 3002 --host localhost",
-    "build": "vite build",
+    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "dev:client": "vite",
+    "dev:server": "tsx watch server/index.ts",
+    "build": "npm run build:client && npm run build:server",
+    "build:client": "vite build",
+    "build:server": "tsc -p server/tsconfig.json",
+    "start": "node dist-server/index.js",
     "preview": "vite preview"
   },
   "dependencies": {
-    "@google/genai": "^0.12.0"
+    "@google/genai": "^1.30.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "pg": "^8.11.3"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
     "@types/node": "^22.14.0",
+    "@types/pg": "^8.10.9",
     "autoprefixer": "^10.4.21",
+    "concurrently": "^8.2.2",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.18",
+    "tsx": "^4.6.0",
     "typescript": "~5.8.2",
     "vite": "^6.2.0"
   }
