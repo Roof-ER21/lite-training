@@ -93,9 +93,14 @@ router.post('/login', async (req: Request, res: Response) => {
       isManager: user.is_manager,
       token
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Login error:', error);
-    res.status(500).json({ error: 'Login failed' });
+    // Return more details in development/for debugging
+    res.status(500).json({
+      error: 'Login failed',
+      details: error?.message || 'Unknown error',
+      code: error?.code
+    });
   }
 });
 
