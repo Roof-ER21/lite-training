@@ -45,7 +45,8 @@ interface User {
 let currentUser: User | null = null;
 
 // API call helper with auth token
-async function apiCall<T>(endpoint: string, options?: RequestInit): Promise<T | null> {
+async function apiCall<T>(endpoint: string, options?: RequestInit & { silent?: boolean }): Promise<T | null> {
+  const silent = (options as any)?.silent;
   try {
     const token = localStorage.getItem(STORAGE_KEYS.sessionToken);
     const res = await fetch(`${API_BASE}${endpoint}`, {
@@ -59,13 +60,27 @@ async function apiCall<T>(endpoint: string, options?: RequestInit): Promise<T | 
 
     if (!res.ok) {
       const errorData = await res.json().catch(() => ({}));
-      console.error('API error:', errorData);
+
+      // Handle database unavailable - silently fail for tracking calls
+      if (res.status === 503 || errorData.offline) {
+        return null; // Database not available, use localStorage fallback
+      }
+
+      // Handle invalid token - clear session so user can re-login
+      if (res.status === 401 && errorData.error === 'Invalid token') {
+        // Don't clear session automatically - let user continue with localStorage
+        if (!silent) console.warn('Session invalid - using offline mode');
+        return null;
+      }
+
+      if (!silent) console.error('API error:', errorData);
       return null;
     }
 
     return res.json();
   } catch (error) {
-    console.error('API call failed:', error);
+    // Network errors are expected when offline - don't spam console
+    if (!silent) console.warn('API unavailable, using offline mode');
     return null;
   }
 }
@@ -6393,11 +6408,12 @@ function showManagerLogin() {
 function completeModule(moduleName: string) {
   unlockNextModule(moduleName);
 
-  // Track module completion via API
+  // Track module completion via API (silent - don't spam console)
   apiCall('/progress/module', {
     method: 'POST',
-    body: JSON.stringify({ moduleName, action: 'complete' })
-  }).catch(err => console.log('Module completion tracking failed (offline mode):', err));
+    body: JSON.stringify({ moduleName, action: 'complete' }),
+    silent: true
+  } as any);
 
   const currentIndex = MODULE_ORDER.indexOf(moduleName);
   if (currentIndex < MODULE_ORDER.length - 1) {
@@ -6415,8 +6431,9 @@ function completeModule(moduleName: string) {
 function trackModuleStart(moduleName: string) {
   apiCall('/progress/module', {
     method: 'POST',
-    body: JSON.stringify({ moduleName, action: 'start' })
-  }).catch(err => console.log('Module start tracking failed (offline mode):', err));
+    body: JSON.stringify({ moduleName, action: 'start' }),
+    silent: true
+  } as any);
 }
 
 // Activity heartbeat for time tracking
@@ -6431,13 +6448,14 @@ function startActivityTracking(moduleName: string) {
     clearInterval(activityHeartbeatInterval);
   }
 
-  // Send heartbeat every 30 seconds
+  // Send heartbeat every 30 seconds (silent - don't spam console)
   activityHeartbeatInterval = window.setInterval(() => {
     if (currentModuleForTracking) {
       apiCall('/progress/heartbeat', {
         method: 'POST',
-        body: JSON.stringify({ moduleName: currentModuleForTracking, timeSpent: 30 })
-      }).catch(() => {}); // Silent fail for heartbeats
+        body: JSON.stringify({ moduleName: currentModuleForTracking, timeSpent: 30 }),
+        silent: true
+      } as any);
     }
   }, 30000);
 }
@@ -7314,8 +7332,9 @@ async function submitExamToAPI(
       mcqAnswers,
       fibAnswers,
       saAnswers
-    })
-  }).catch(err => console.log('Exam submission tracking failed (offline mode):', err));
+    }),
+    silent: true
+  } as any);
 }
 
 // Start exam attempt via API
@@ -7347,11 +7366,9 @@ let currentRoleplaySessionId: string | null = null;
 async function startRoleplaySessionAPI(personality: string, difficulty: string, inputMode: string): Promise<string | null> {
   const result = await apiCall<{ sessionId: string }>('/roleplay/start', {
     method: 'POST',
-    body: JSON.stringify({ personality, difficulty, inputMode })
-  }).catch(err => {
-    console.log('Roleplay session start tracking failed (offline mode):', err);
-    return null;
-  });
+    body: JSON.stringify({ personality, difficulty, inputMode }),
+    silent: true
+  } as any);
 
   if (result?.sessionId) {
     currentRoleplaySessionId = result.sessionId;
@@ -7371,8 +7388,9 @@ async function endRoleplaySessionAPI(sessionId: string | null, score: number, xp
       finalScore: score,
       xpEarned,
       doorSlammed
-    })
-  }).catch(err => console.log('Roleplay session end tracking failed (offline mode):', err));
+    }),
+    silent: true
+  } as any);
 
   currentRoleplaySessionId = null;
 }
@@ -7383,8 +7401,9 @@ async function updateRoleplayScoreAPI(sessionId: string | null, score: number): 
 
   await apiCall('/roleplay/score', {
     method: 'POST',
-    body: JSON.stringify({ sessionId, score })
-  }).catch(() => {}); // Silent fail for score updates
+    body: JSON.stringify({ sessionId, score }),
+    silent: true
+  } as any);
 }
 
 function getRemainingAttempts(): number {

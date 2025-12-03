@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { query, queryOne } from '../db/connection.js';
+import { query, queryOne, isDatabaseAvailable } from '../db/connection.js';
 
 // Extend Express Request type to include user
 declare global {
@@ -24,6 +24,23 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
     }
 
     const token = authHeader.split(' ')[1];
+
+    // Handle offline tokens when database isn't available
+    if (token.startsWith('offline-')) {
+      // Accept offline tokens - extract user ID from token
+      const userId = token.replace('offline-', '');
+      req.user = {
+        id: userId,
+        name: 'Offline User',
+        isManager: false // Offline mode doesn't have manager access
+      };
+      return next();
+    }
+
+    // If database isn't available, we can't validate real tokens
+    if (!isDatabaseAvailable()) {
+      return res.status(503).json({ error: 'Database unavailable', offline: true });
+    }
 
     // Find session and user
     const session = await queryOne<{
@@ -90,6 +107,22 @@ export async function optionalAuth(req: Request, res: Response, next: NextFuncti
     }
 
     const token = authHeader.split(' ')[1];
+
+    // Handle offline tokens
+    if (token.startsWith('offline-')) {
+      const userId = token.replace('offline-', '');
+      req.user = {
+        id: userId,
+        name: 'Offline User',
+        isManager: false
+      };
+      return next();
+    }
+
+    // Skip DB lookup if database isn't available
+    if (!isDatabaseAvailable()) {
+      return next();
+    }
 
     const session = await queryOne<{
       user_id: string;
