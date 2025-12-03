@@ -3281,6 +3281,8 @@ trainingContent['admin-dashboard'] = `
     <div class="admin-tabs">
       <button class="admin-tab active" data-tab="users">👥 Users</button>
       <button class="admin-tab" data-tab="analytics">📈 Analytics</button>
+      <button class="admin-tab" data-tab="time-tracker">⏱️ Time Tracker</button>
+      <button class="admin-tab" data-tab="progress-grid">📊 Progress Grid</button>
     </div>
 
     <div class="admin-content">
@@ -3299,6 +3301,37 @@ trainingContent['admin-dashboard'] = `
       <div id="admin-analytics-tab" class="admin-tab-content" style="display:none;">
         <div id="analytics-container">
           <p class="loading-text">Loading analytics...</p>
+        </div>
+      </div>
+
+      <!-- Time Tracker Tab -->
+      <div id="admin-time-tracker-tab" class="admin-tab-content" style="display:none;">
+        <div class="time-tracker-header">
+          <h3>Module Time Tracker</h3>
+          <p>See how long each module takes reps to complete</p>
+        </div>
+        <div id="time-tracker-container">
+          <p class="loading-text">Loading time analytics...</p>
+        </div>
+      </div>
+
+      <!-- Progress Grid Tab -->
+      <div id="admin-progress-grid-tab" class="admin-tab-content" style="display:none;">
+        <div class="progress-grid-header">
+          <h3>User Progress Grid</h3>
+          <div class="progress-grid-toolbar">
+            <input type="text" id="progress-grid-search" placeholder="Search by name..." class="admin-search">
+            <button id="refresh-progress-grid-btn" class="btn-secondary">🔄 Refresh</button>
+          </div>
+        </div>
+        <div class="progress-grid-legend">
+          <span class="legend-item"><span class="status-icon completed">✅</span> Complete</span>
+          <span class="legend-item"><span class="status-icon in-progress">🟡</span> In Progress</span>
+          <span class="legend-item"><span class="status-icon stale">🔴</span> Stale (>48hrs)</span>
+          <span class="legend-item"><span class="status-icon not-started">⬜</span> Not Started</span>
+        </div>
+        <div id="progress-grid-container">
+          <p class="loading-text">Loading progress grid...</p>
         </div>
       </div>
     </div>
@@ -6393,7 +6426,7 @@ function initManagerModeUI() {
     const sidebarNav = document.querySelector('.sidebar-nav');
     if (sidebarNav) {
       const adminItem = document.createElement('li');
-      adminItem.className = 'admin-sidebar-item';
+      adminItem.className = 'admin-sidebar-item unlocked';
       adminItem.dataset.module = 'admin-dashboard';
       adminItem.innerHTML = '📊 Admin Dashboard';
       sidebarNav.appendChild(adminItem);
@@ -6674,6 +6707,43 @@ interface AdminAnalytics {
 
 let adminUsersCache: AdminUser[] = [];
 let adminAnalyticsCache: AdminAnalytics | null = null;
+let adminTimeTrackerCache: ModuleTimeAnalytics | null = null;
+let adminProgressGridCache: ProgressGridData | null = null;
+
+// Types for new admin tabs
+interface ModuleTimeAnalytics {
+  totalUsers: number;
+  modules: {
+    name: string;
+    usersStarted: number;
+    usersCompleted: number;
+    usersInProgress: number;
+    usersStale: number;
+    avgTimeSeconds: number;
+    minTimeSeconds: number;
+    maxTimeSeconds: number;
+    totalTimeSeconds: number;
+    completionRate: number;
+  }[];
+}
+
+interface ProgressGridData {
+  totalUsers: number;
+  userProgress: {
+    userId: string;
+    userName: string;
+    lastLogin: string | null;
+    registrationDate: string;
+    moduleStatus: {
+      module: string;
+      status: string;
+      timeSpent: number;
+      startedAt: string | null;
+      completedAt: string | null;
+      lastActivity: string | null;
+    }[];
+  }[];
+}
 
 async function initAdminDashboard(): Promise<void> {
   const user = getCurrentUser();
@@ -6701,8 +6771,27 @@ async function initAdminDashboard(): Promise<void> {
   // Set up modal close
   document.getElementById('close-user-modal')?.addEventListener('click', closeUserModal);
 
+  // Set up progress grid search and refresh
+  const progressGridSearch = document.getElementById('progress-grid-search') as HTMLInputElement;
+  progressGridSearch?.addEventListener('input', debounce(() => {
+    loadProgressGrid(progressGridSearch.value);
+  }, 300));
+  document.getElementById('refresh-progress-grid-btn')?.addEventListener('click', () => {
+    const search = (document.getElementById('progress-grid-search') as HTMLInputElement)?.value || '';
+    loadProgressGrid(search);
+  });
+
   // Load initial data
   await loadAdminUsers();
+}
+
+// Debounce helper for search
+function debounce(fn: (...args: any[]) => void, delay: number): (...args: any[]) => void {
+  let timeoutId: ReturnType<typeof setTimeout>;
+  return (...args: any[]) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => fn(...args), delay);
+  };
 }
 
 function switchAdminTab(tabName: string): void {
@@ -6713,7 +6802,7 @@ function switchAdminTab(tabName: string): void {
 
   // Update tab content
   document.querySelectorAll('.admin-tab-content').forEach(content => {
-    content.style.display = 'none';
+    (content as HTMLElement).style.display = 'none';
   });
 
   const targetContent = document.getElementById(`admin-${tabName}-tab`);
@@ -6724,6 +6813,12 @@ function switchAdminTab(tabName: string): void {
   // Load data if needed
   if (tabName === 'analytics' && !adminAnalyticsCache) {
     loadAdminAnalytics();
+  }
+  if (tabName === 'time-tracker' && !adminTimeTrackerCache) {
+    loadTimeTracker();
+  }
+  if (tabName === 'progress-grid' && !adminProgressGridCache) {
+    loadProgressGrid();
   }
 }
 
@@ -6835,6 +6930,40 @@ async function showUserDetail(userId: string): Promise<void> {
 
   title.textContent = `${result.user.name} - Details`;
 
+  // Module order for transcript
+  const moduleOrder = [
+    'welcome', 'commitment', 'general-knowledge', 'sales-process', 'storm-types',
+    'qualifying', 'roof-101', 'other-trades', 'insurance', 'damage-identification',
+    'objection-handling', 'inspection', 'role-play', 'resources', 'agnes-quiz', 'final-exam'
+  ];
+
+  // Sort modules by defined order
+  const sortedModules = moduleOrder.map(name => {
+    const found = result.modules.find(m => m.name === name);
+    return found || { name, status: 'not_started', timeSpentSeconds: 0, startedAt: null, completedAt: null };
+  });
+
+  // Calculate total time
+  const totalTimeSeconds = result.modules.reduce((sum, m) => sum + (m.timeSpentSeconds || 0), 0);
+  const completedCount = result.modules.filter(m => m.status === 'completed').length;
+
+  // Format short date
+  function formatShortDate(dateStr: string | null): string {
+    if (!dateStr) return '-';
+    const date = new Date(dateStr);
+    return `${date.getMonth() + 1}/${date.getDate()}`;
+  }
+
+  // Get status badge
+  function getStatusBadge(status: string): string {
+    switch (status) {
+      case 'completed': return '<span class="status-badge completed">✅ Done</span>';
+      case 'in_progress': return '<span class="status-badge in-progress">🟡 Active</span>';
+      case 'unlocked': return '<span class="status-badge unlocked">🔓 Ready</span>';
+      default: return '<span class="status-badge locked">⬜ Locked</span>';
+    }
+  }
+
   body.innerHTML = `
     <div class="user-detail-sections">
       <div class="detail-section">
@@ -6850,62 +6979,98 @@ async function showUserDetail(userId: string): Promise<void> {
           </div>
           <div class="detail-item">
             <span class="label">Last Login:</span>
-            <span class="value">${result.user.lastLogin ? formatDate(result.user.lastLogin) : 'Never'}</span>
+            <span class="value">${result.user.lastLogin ? formatRelativeDate(result.user.lastLogin) : 'Never'}</span>
           </div>
           <div class="detail-item">
-            <span class="label">Commitment Signed:</span>
-            <span class="value">${result.user.commitmentSigned ? '✅ Yes' : '❌ No'}</span>
+            <span class="label">Commitment:</span>
+            <span class="value">${result.user.commitmentSigned ? '✅ Signed' : '❌ Not signed'}</span>
           </div>
         </div>
       </div>
 
-      <div class="detail-section">
-        <h3>📚 Module Progress (${result.modules.filter(m => m.status === 'completed').length}/${result.modules.length})</h3>
-        <div class="module-progress-list">
-          ${result.modules.map(m => `
-            <div class="module-item ${m.status}">
-              <span class="module-name">${m.name}</span>
-              <span class="module-status">${m.status}</span>
-              ${m.timeSpentSeconds ? `<span class="module-time">${Math.round(m.timeSpentSeconds / 60)} min</span>` : ''}
-            </div>
-          `).join('') || '<p>No module progress recorded.</p>'}
+      <div class="detail-section transcript-section">
+        <h3>📚 Training Transcript</h3>
+        <div class="transcript-summary">
+          <span class="summary-item"><strong>Total Time:</strong> ${formatSeconds(totalTimeSeconds)}</span>
+          <span class="summary-item"><strong>Modules:</strong> ${completedCount}/16 Complete</span>
         </div>
-      </div>
-
-      <div class="detail-section">
-        <h3>📝 Exam Attempts (${result.examAttempts.length}/3)</h3>
-        ${result.examAttempts.length > 0 ? `
-          <table class="mini-table">
-            <tr><th>#</th><th>Score</th><th>Passed</th><th>Date</th></tr>
-            ${result.examAttempts.map(a => `
-              <tr>
-                <td>${a.attemptNumber}</td>
-                <td>${a.totalScore}%</td>
-                <td>${a.passed ? '✅' : '❌'}</td>
-                <td>${a.completedAt ? formatDate(a.completedAt) : 'In progress'}</td>
+        <table class="transcript-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Module</th>
+              <th>Status</th>
+              <th>Time</th>
+              <th>Completed</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${sortedModules.map((m, i) => `
+              <tr class="module-row ${m.status}">
+                <td class="module-num">${i + 1}</td>
+                <td class="module-name">${formatModuleName(m.name)}</td>
+                <td>${getStatusBadge(m.status)}</td>
+                <td class="time-cell">${m.timeSpentSeconds ? formatSeconds(m.timeSpentSeconds) : '-'}</td>
+                <td class="date-cell">${formatShortDate(m.completedAt)}</td>
               </tr>
             `).join('')}
-          </table>
-        ` : '<p>No exam attempts.</p>'}
-        ${result.certification ? `<p class="cert-notice">🏆 Certified on ${formatDate(result.certification.certifiedAt)} with score ${result.certification.score}%</p>` : ''}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="detail-section exam-section">
+        <h3>📝 Exam Records (${result.examAttempts.length}/3 attempts)</h3>
+        ${result.certification ? `<div class="cert-banner">🏆 Certified on ${formatDate(result.certification.certifiedAt)} with score ${result.certification.score}%</div>` : ''}
+        ${result.examAttempts.length > 0 ? `
+          <div class="exam-attempts-list">
+            ${result.examAttempts.map(a => `
+              <div class="exam-attempt-card ${a.passed ? 'passed' : 'failed'}">
+                <div class="attempt-header">
+                  <span class="attempt-num">Attempt ${a.attemptNumber}</span>
+                  <span class="attempt-score">${a.totalScore}%</span>
+                  <span class="attempt-status">${a.passed ? '✅ Passed' : '❌ Failed'}</span>
+                  <span class="attempt-date">${a.completedAt ? formatDate(a.completedAt) : 'In progress'}</span>
+                  ${a.completedAt ? `<button class="btn-view-answers" data-user-id="${userId}" data-attempt-id="${a.id}">View Answers</button>` : ''}
+                </div>
+                <div class="attempt-breakdown">
+                  <span>MCQ: ${a.mcqScore || 0}/20</span>
+                  <span>Fill-in: ${a.fibScore || 0}/10</span>
+                  <span>Short Answer: ${a.saScore || 0}/15 pts</span>
+                </div>
+                <div class="exam-answers-container" id="exam-answers-${a.id}" style="display:none;">
+                  <p class="loading-text">Loading answers...</p>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        ` : '<p class="no-data">No exam attempts yet.</p>'}
       </div>
 
       <div class="detail-section">
         <h3>🎭 Roleplay Sessions (${result.roleplaySessions.length})</h3>
         ${result.roleplaySessions.length > 0 ? `
-          <div class="roleplay-summary">
-            <span>Total Sessions: ${result.roleplaySessions.length}</span>
-            <span>Completed: ${result.roleplaySessions.filter(r => r.completedAt).length}</span>
-            <span>Total XP: ${result.roleplaySessions.reduce((sum, r) => sum + (r.xpEarned || 0), 0)}</span>
+          <div class="roleplay-stats">
+            <div class="stat-box">
+              <span class="stat-value">${result.roleplaySessions.length}</span>
+              <span class="stat-label">Total</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-value">${result.roleplaySessions.filter(r => r.completedAt).length}</span>
+              <span class="stat-label">Completed</span>
+            </div>
+            <div class="stat-box highlight">
+              <span class="stat-value">${result.roleplaySessions.reduce((sum, r) => sum + (r.xpEarned || 0), 0)}</span>
+              <span class="stat-label">Total XP</span>
+            </div>
           </div>
-        ` : '<p>No roleplay sessions.</p>'}
+        ` : '<p class="no-data">No roleplay sessions yet.</p>'}
       </div>
 
       <div class="detail-section actions-section">
         <h3>⚙️ Actions</h3>
         <div class="action-buttons">
           <button class="btn-action btn-reset-exam" data-user-id="${userId}">Reset Exam Attempts</button>
-          <button class="btn-action btn-reset-progress" data-user-id="${userId}">Reset All Progress</button>
+          <button class="btn-action btn-reset-progress btn-danger" data-user-id="${userId}">Reset All Progress</button>
         </div>
       </div>
     </div>
@@ -6914,6 +7079,127 @@ async function showUserDetail(userId: string): Promise<void> {
   // Add action handlers
   body.querySelector('.btn-reset-exam')?.addEventListener('click', () => resetUserExam(userId));
   body.querySelector('.btn-reset-progress')?.addEventListener('click', () => resetUserProgress(userId));
+
+  // Add View Answers handlers
+  body.querySelectorAll('.btn-view-answers').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const button = e.target as HTMLElement;
+      const attemptId = button.dataset.attemptId;
+      const userId = button.dataset.userId;
+      if (attemptId && userId) {
+        await loadExamAnswers(userId, attemptId);
+      }
+    });
+  });
+}
+
+// Load and display exam answers
+async function loadExamAnswers(userId: string, attemptId: string): Promise<void> {
+  const container = document.getElementById(`exam-answers-${attemptId}`);
+  if (!container) return;
+
+  // Toggle visibility
+  if (container.style.display === 'block') {
+    container.style.display = 'none';
+    return;
+  }
+
+  container.style.display = 'block';
+  container.innerHTML = '<p class="loading-text">Loading answers...</p>';
+
+  const result = await apiCall<{
+    attemptId: string;
+    attemptNumber: number;
+    totalScore: number;
+    passed: boolean;
+    timeTaken: number;
+    sections: {
+      mcq: { correct: number; total: number; points: number };
+      fib: { correct: number; total: number; points: number };
+      sa: { correct: number; total: number; points: number };
+    };
+    answers: {
+      questionType: string;
+      questionNumber: number;
+      questionText: string;
+      userAnswer: string;
+      correctAnswer: string;
+      isCorrect: boolean;
+      pointsEarned: number;
+    }[];
+  }>(`/admin/users/${userId}/exam/${attemptId}/answers`);
+
+  if (!result) {
+    container.innerHTML = '<p class="error-text">Failed to load exam answers.</p>';
+    return;
+  }
+
+  // Group answers by type
+  const mcqAnswers = result.answers.filter(a => a.questionType === 'mcq');
+  const fibAnswers = result.answers.filter(a => a.questionType === 'fib');
+  const saAnswers = result.answers.filter(a => a.questionType === 'sa');
+
+  container.innerHTML = `
+    <div class="answers-detail">
+      <div class="section-scores">
+        <span class="section-score">MCQ: ${result.sections.mcq.correct}/${result.sections.mcq.total}</span>
+        <span class="section-score">Fill-in-Blank: ${result.sections.fib.correct}/${result.sections.fib.total}</span>
+        <span class="section-score">Short Answer: ${result.sections.sa.points} pts</span>
+        ${result.timeTaken ? `<span class="time-taken">Time: ${formatSeconds(result.timeTaken)}</span>` : ''}
+      </div>
+
+      ${mcqAnswers.length > 0 ? `
+        <div class="answer-section">
+          <h4>Multiple Choice (${result.sections.mcq.correct}/${result.sections.mcq.total})</h4>
+          <div class="answer-list">
+            ${mcqAnswers.map(a => `
+              <div class="answer-item ${a.isCorrect ? 'correct' : 'incorrect'}">
+                <span class="q-num">Q${a.questionNumber}:</span>
+                <span class="answer-icon">${a.isCorrect ? '✅' : '❌'}</span>
+                <span class="user-ans">${escapeHtml(a.userAnswer || '-')}</span>
+                ${!a.isCorrect && a.correctAnswer ? `<span class="correct-ans">→ ${escapeHtml(a.correctAnswer)}</span>` : ''}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+
+      ${fibAnswers.length > 0 ? `
+        <div class="answer-section">
+          <h4>Fill-in-the-Blank (${result.sections.fib.correct}/${result.sections.fib.total})</h4>
+          <div class="answer-list">
+            ${fibAnswers.map(a => `
+              <div class="answer-item ${a.isCorrect ? 'correct' : 'incorrect'}">
+                <span class="q-num">Q${a.questionNumber}:</span>
+                <span class="answer-icon">${a.isCorrect ? '✅' : '❌'}</span>
+                <span class="user-ans">"${escapeHtml(a.userAnswer || '-')}"</span>
+                ${!a.isCorrect && a.correctAnswer ? `<span class="correct-ans">→ "${escapeHtml(a.correctAnswer)}"</span>` : ''}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+
+      ${saAnswers.length > 0 ? `
+        <div class="answer-section">
+          <h4>Short Answer (${result.sections.sa.points} pts)</h4>
+          <div class="answer-list sa-answers">
+            ${saAnswers.map(a => `
+              <div class="answer-item sa-item ${a.isCorrect ? 'correct' : 'partial'}">
+                <div class="sa-header">
+                  <span class="q-num">Q${a.questionNumber}:</span>
+                  <span class="points-earned">${a.pointsEarned} pts</span>
+                </div>
+                <div class="sa-answer">${escapeHtml(a.userAnswer || 'No answer provided')}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+
+      ${result.answers.length === 0 ? '<p class="no-data">No answer details recorded for this attempt.</p>' : ''}
+    </div>
+  `;
 }
 
 function closeUserModal(): void {
@@ -7058,6 +7344,261 @@ function renderAnalytics(data: AdminAnalytics): void {
       </div>
     </div>
   `;
+}
+
+// Time Tracker Tab Functions
+async function loadTimeTracker(): Promise<void> {
+  const container = document.getElementById('time-tracker-container');
+  if (!container) return;
+
+  container.innerHTML = '<p class="loading-text">Loading time analytics...</p>';
+
+  const result = await apiCall<ModuleTimeAnalytics>('/admin/module-analytics');
+
+  if (!result) {
+    container.innerHTML = '<p class="error-text">Failed to load time analytics. Server may be unavailable.</p>';
+    return;
+  }
+
+  adminTimeTrackerCache = result;
+  renderTimeTracker(result);
+}
+
+function renderTimeTracker(data: ModuleTimeAnalytics): void {
+  const container = document.getElementById('time-tracker-container');
+  if (!container) return;
+
+  // Module order for sorting
+  const moduleOrder = [
+    'welcome', 'commitment', 'general-knowledge', 'sales-process', 'storm-types',
+    'qualifying', 'roof-101', 'other-trades', 'insurance', 'damage-identification',
+    'objection-handling', 'inspection', 'role-play', 'resources', 'agnes-quiz', 'final-exam'
+  ];
+
+  // Sort modules by the defined order
+  const sortedModules = [...data.modules].sort((a, b) => {
+    const indexA = moduleOrder.indexOf(a.name);
+    const indexB = moduleOrder.indexOf(b.name);
+    return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+  });
+
+  // Calculate difficulty color based on avg time (green = fast, yellow = medium, red = slow)
+  function getDifficultyColor(avgSeconds: number): string {
+    if (avgSeconds === 0) return '#9ca3af'; // gray for no data
+    if (avgSeconds < 120) return '#22c55e'; // green - under 2 min
+    if (avgSeconds < 300) return '#84cc16'; // lime - 2-5 min
+    if (avgSeconds < 600) return '#eab308'; // yellow - 5-10 min
+    if (avgSeconds < 1200) return '#f97316'; // orange - 10-20 min
+    return '#ef4444'; // red - over 20 min
+  }
+
+  container.innerHTML = `
+    <div class="time-tracker-summary">
+      <div class="summary-stat">
+        <span class="stat-value">${data.totalUsers}</span>
+        <span class="stat-label">Total Reps</span>
+      </div>
+      <div class="summary-stat">
+        <span class="stat-value">${sortedModules.filter(m => m.usersInProgress > 0).length}</span>
+        <span class="stat-label">Modules In Progress</span>
+      </div>
+      <div class="summary-stat warning">
+        <span class="stat-value">${sortedModules.reduce((sum, m) => sum + m.usersStale, 0)}</span>
+        <span class="stat-label">Stale Users (>48hrs)</span>
+      </div>
+    </div>
+
+    <table class="time-tracker-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Module</th>
+          <th>Started</th>
+          <th>Completed</th>
+          <th>In Progress</th>
+          <th>Stale</th>
+          <th>Avg Time</th>
+          <th>Fastest</th>
+          <th>Slowest</th>
+          <th>Completion %</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${sortedModules.map((m, i) => `
+          <tr>
+            <td class="module-num">${i + 1}</td>
+            <td class="module-name-cell">
+              <span class="difficulty-dot" style="background-color: ${getDifficultyColor(m.avgTimeSeconds)}" title="Difficulty based on avg time"></span>
+              ${formatModuleName(m.name)}
+            </td>
+            <td>${m.usersStarted}</td>
+            <td>${m.usersCompleted}</td>
+            <td>${m.usersInProgress}</td>
+            <td class="${m.usersStale > 0 ? 'stale-warning' : ''}">${m.usersStale > 0 ? '⚠️ ' + m.usersStale : '0'}</td>
+            <td class="time-cell">${formatSeconds(m.avgTimeSeconds)}</td>
+            <td class="time-cell fastest">${formatSeconds(m.minTimeSeconds)}</td>
+            <td class="time-cell slowest">${formatSeconds(m.maxTimeSeconds)}</td>
+            <td>
+              <div class="completion-bar-mini">
+                <div class="completion-fill" style="width: ${m.completionRate}%"></div>
+                <span class="completion-text">${m.completionRate}%</span>
+              </div>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+
+    <div class="time-tracker-legend">
+      <h4>Difficulty Legend (based on avg completion time)</h4>
+      <div class="legend-items">
+        <span><span class="difficulty-dot" style="background-color: #22c55e"></span> Fast (&lt;2 min)</span>
+        <span><span class="difficulty-dot" style="background-color: #84cc16"></span> Quick (2-5 min)</span>
+        <span><span class="difficulty-dot" style="background-color: #eab308"></span> Medium (5-10 min)</span>
+        <span><span class="difficulty-dot" style="background-color: #f97316"></span> Long (10-20 min)</span>
+        <span><span class="difficulty-dot" style="background-color: #ef4444"></span> Complex (&gt;20 min)</span>
+      </div>
+    </div>
+  `;
+}
+
+// Progress Grid Tab Functions
+async function loadProgressGrid(searchTerm: string = ''): Promise<void> {
+  const container = document.getElementById('progress-grid-container');
+  if (!container) return;
+
+  container.innerHTML = '<p class="loading-text">Loading progress grid...</p>';
+
+  const url = searchTerm ? `/admin/progress-grid?search=${encodeURIComponent(searchTerm)}` : '/admin/progress-grid';
+  const result = await apiCall<ProgressGridData>(url);
+
+  if (!result) {
+    container.innerHTML = '<p class="error-text">Failed to load progress grid. Server may be unavailable.</p>';
+    return;
+  }
+
+  adminProgressGridCache = result;
+  renderProgressGrid(result);
+}
+
+function renderProgressGrid(data: ProgressGridData): void {
+  const container = document.getElementById('progress-grid-container');
+  if (!container) return;
+
+  if (data.userProgress.length === 0) {
+    container.innerHTML = '<p class="empty-text">No users found matching your search.</p>';
+    return;
+  }
+
+  // Module order for grid columns
+  const moduleOrder = [
+    'welcome', 'commitment', 'general-knowledge', 'sales-process', 'storm-types',
+    'qualifying', 'roof-101', 'other-trades', 'insurance', 'damage-identification',
+    'objection-handling', 'inspection', 'role-play', 'resources', 'agnes-quiz', 'final-exam'
+  ];
+
+  // Short names for header
+  const shortNames: Record<string, string> = {
+    'welcome': '1',
+    'commitment': '2',
+    'general-knowledge': '3',
+    'sales-process': '4',
+    'storm-types': '5',
+    'qualifying': '6',
+    'roof-101': '7',
+    'other-trades': '8',
+    'insurance': '9',
+    'damage-identification': '10',
+    'objection-handling': '11',
+    'inspection': '12',
+    'role-play': '13',
+    'resources': '14',
+    'agnes-quiz': '15',
+    'final-exam': '16'
+  };
+
+  function getStatusIcon(status: string): string {
+    switch (status) {
+      case 'completed': return '✅';
+      case 'in_progress': return '🟡';
+      case 'stale': return '🔴';
+      case 'unlocked': return '🔓';
+      default: return '⬜';
+    }
+  }
+
+  function getStatusClass(status: string): string {
+    switch (status) {
+      case 'completed': return 'status-completed';
+      case 'in_progress': return 'status-in-progress';
+      case 'stale': return 'status-stale';
+      case 'unlocked': return 'status-unlocked';
+      default: return 'status-not-started';
+    }
+  }
+
+  container.innerHTML = `
+    <div class="progress-grid-stats">
+      <span>Showing ${data.userProgress.length} user${data.userProgress.length !== 1 ? 's' : ''}</span>
+    </div>
+    <div class="progress-grid-wrapper">
+      <table class="progress-grid-table">
+        <thead>
+          <tr>
+            <th class="user-col sticky-col">User</th>
+            ${moduleOrder.map(m => `<th class="module-col" title="${formatModuleName(m)}">${shortNames[m]}</th>`).join('')}
+            <th class="progress-col">Progress</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.userProgress.map(user => {
+            // Create a map for quick lookup
+            const statusMap = new Map(user.moduleStatus.map(m => [m.module, m]));
+            const completedCount = user.moduleStatus.filter(m => m.status === 'completed').length;
+            const progressPct = Math.round((completedCount / 16) * 100);
+
+            return `
+              <tr>
+                <td class="user-col sticky-col">
+                  <div class="user-info">
+                    <span class="user-name">${escapeHtml(user.userName)}</span>
+                    <span class="user-login">${user.lastLogin ? formatRelativeDate(user.lastLogin) : 'Never'}</span>
+                  </div>
+                </td>
+                ${moduleOrder.map(moduleName => {
+                  const moduleData = statusMap.get(moduleName);
+                  const status = moduleData?.status || 'not_started';
+                  const timeSpent = moduleData?.timeSpent || 0;
+                  const tooltip = `${formatModuleName(moduleName)}\\nStatus: ${status}\\nTime: ${formatSeconds(timeSpent)}`;
+                  return `<td class="module-cell ${getStatusClass(status)}" title="${tooltip}">${getStatusIcon(status)}</td>`;
+                }).join('')}
+                <td class="progress-col">
+                  <div class="mini-progress-bar">
+                    <div class="mini-progress-fill" style="width: ${progressPct}%"></div>
+                  </div>
+                  <span class="progress-text">${completedCount}/16</span>
+                </td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+// Format seconds to human readable time
+function formatSeconds(seconds: number): string {
+  if (!seconds || seconds === 0) return '-';
+  if (seconds < 60) return `${seconds}s`;
+  if (seconds < 3600) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
+  }
+  const hours = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
 }
 
 // Helper functions for admin

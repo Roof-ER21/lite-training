@@ -477,6 +477,256 @@ router.post('/users/:id/reset-progress', async (req: Request, res: Response) => 
   }
 });
 
+// GET /api/admin/module-analytics - Get detailed time analytics per module
+router.get('/module-analytics', async (req: Request, res: Response) => {
+  try {
+    // Get all users count for reference
+    const totalUsersResult = await queryOne<{ count: string }>(`
+      SELECT COUNT(*) as count FROM users WHERE is_manager = false
+    `);
+    const totalUsers = parseInt(totalUsersResult?.count || '0');
+
+    // Get module time analytics
+    const moduleStats = await query<{
+      module_name: string;
+      users_started: string;
+      users_completed: string;
+      users_in_progress: string;
+      avg_time: string;
+      min_time: string;
+      max_time: string;
+      total_time: string;
+    }>(`
+      SELECT
+        module_name,
+        COUNT(*) FILTER (WHERE status IN ('in_progress', 'completed')) as users_started,
+        COUNT(*) FILTER (WHERE status = 'completed') as users_completed,
+        COUNT(*) FILTER (WHERE status = 'in_progress') as users_in_progress,
+        ROUND(AVG(time_spent_seconds) FILTER (WHERE status = 'completed'), 0) as avg_time,
+        MIN(time_spent_seconds) FILTER (WHERE status = 'completed' AND time_spent_seconds > 0) as min_time,
+        MAX(time_spent_seconds) FILTER (WHERE status = 'completed') as max_time,
+        SUM(time_spent_seconds) as total_time
+      FROM module_progress
+      GROUP BY module_name
+      ORDER BY module_name
+    `);
+
+    // Get stale users (in_progress but last_accessed > 48 hours ago)
+    const staleStats = await query<{
+      module_name: string;
+      stale_count: string;
+    }>(`
+      SELECT
+        module_name,
+        COUNT(*) as stale_count
+      FROM module_progress
+      WHERE status = 'in_progress'
+        AND last_accessed < NOW() - INTERVAL '48 hours'
+      GROUP BY module_name
+    `);
+
+    // Create lookup for stale counts
+    const staleLookup = new Map(staleStats.map(s => [s.module_name, parseInt(s.stale_count)]));
+
+    res.json({
+      totalUsers,
+      modules: moduleStats.map(m => ({
+        name: m.module_name,
+        usersStarted: parseInt(m.users_started || '0'),
+        usersCompleted: parseInt(m.users_completed || '0'),
+        usersInProgress: parseInt(m.users_in_progress || '0'),
+        usersStale: staleLookup.get(m.module_name) || 0,
+        avgTimeSeconds: parseInt(m.avg_time || '0'),
+        minTimeSeconds: parseInt(m.min_time || '0'),
+        maxTimeSeconds: parseInt(m.max_time || '0'),
+        totalTimeSeconds: parseInt(m.total_time || '0'),
+        completionRate: parseInt(m.users_started || '0') > 0
+          ? Math.round((parseInt(m.users_completed || '0') / parseInt(m.users_started || '0')) * 100)
+          : 0
+      }))
+    });
+  } catch (error) {
+    console.error('Get module analytics error:', error);
+    res.status(500).json({ error: 'Failed to get module analytics' });
+  }
+});
+
+// GET /api/admin/progress-grid - Get all users with module progress grid
+router.get('/progress-grid', async (req: Request, res: Response) => {
+  try {
+    const { search } = req.query;
+
+    // Get all non-manager users with optional search filter
+    let userQuery = `
+      SELECT id, name, last_login, registration_date
+      FROM users
+      WHERE is_manager = false
+    `;
+    const params: any[] = [];
+
+    if (search && typeof search === 'string' && search.trim()) {
+      userQuery += ` AND LOWER(name) LIKE LOWER($1)`;
+      params.push(`%${search.trim()}%`);
+    }
+
+    userQuery += ` ORDER BY name ASC`;
+
+    const users = await query<{
+      id: string;
+      name: string;
+      last_login: Date | null;
+      registration_date: Date;
+    }>(userQuery, params);
+
+    // Get all module progress for all users
+    const allProgress = await query<{
+      user_id: string;
+      module_name: string;
+      status: string;
+      time_spent_seconds: number;
+      started_at: Date | null;
+      completed_at: Date | null;
+      last_accessed: Date | null;
+    }>(`
+      SELECT user_id, module_name, status, time_spent_seconds, started_at, completed_at, last_accessed
+      FROM module_progress
+      WHERE user_id = ANY($1::uuid[])
+    `, [users.map(u => u.id)]);
+
+    // Group progress by user
+    const progressByUser = new Map<string, typeof allProgress>();
+    for (const p of allProgress) {
+      if (!progressByUser.has(p.user_id)) {
+        progressByUser.set(p.user_id, []);
+      }
+      progressByUser.get(p.user_id)!.push(p);
+    }
+
+    // Determine stale status (>48 hours since last_accessed for in_progress modules)
+    const STALE_THRESHOLD_MS = 48 * 60 * 60 * 1000; // 48 hours
+
+    const userProgress = users.map(u => {
+      const modules = progressByUser.get(u.id) || [];
+      return {
+        userId: u.id,
+        userName: u.name,
+        lastLogin: u.last_login,
+        registrationDate: u.registration_date,
+        moduleStatus: modules.map(m => {
+          const isStale = m.status === 'in_progress' &&
+            m.last_accessed &&
+            (Date.now() - new Date(m.last_accessed).getTime()) > STALE_THRESHOLD_MS;
+
+          return {
+            module: m.module_name,
+            status: isStale ? 'stale' : m.status,
+            timeSpent: m.time_spent_seconds || 0,
+            startedAt: m.started_at,
+            completedAt: m.completed_at,
+            lastActivity: m.last_accessed
+          };
+        })
+      };
+    });
+
+    res.json({
+      totalUsers: users.length,
+      userProgress
+    });
+  } catch (error) {
+    console.error('Get progress grid error:', error);
+    res.status(500).json({ error: 'Failed to get progress grid' });
+  }
+});
+
+// GET /api/admin/users/:userId/exam/:attemptId/answers - Get detailed exam answers
+router.get('/users/:userId/exam/:attemptId/answers', async (req: Request, res: Response) => {
+  try {
+    const { userId, attemptId } = req.params;
+
+    // Get the exam attempt info
+    const attempt = await queryOne<{
+      id: string;
+      attempt_number: number;
+      total_score: number;
+      passed: boolean;
+      time_taken_seconds: number;
+      mcq_correct: number;
+      fib_correct: number;
+      sa_points: number;
+    }>(`
+      SELECT id, attempt_number, total_score, passed, time_taken_seconds,
+             mcq_correct, fib_correct, sa_points
+      FROM exam_attempts
+      WHERE id = $1 AND user_id = $2
+    `, [attemptId, userId]);
+
+    if (!attempt) {
+      return res.status(404).json({ error: 'Exam attempt not found' });
+    }
+
+    // Get all answers for this attempt
+    const answers = await query<{
+      question_type: string;
+      question_id: string;
+      question_number: number;
+      question_text: string;
+      user_answer: string;
+      correct_answer: string;
+      is_correct: boolean;
+      points_earned: number;
+    }>(`
+      SELECT question_type, question_id, question_number, question_text,
+             user_answer, correct_answer, is_correct, points_earned
+      FROM exam_answers
+      WHERE attempt_id = $1
+      ORDER BY question_type, question_number
+    `, [attemptId]);
+
+    // Group answers by type
+    const mcqAnswers = answers.filter(a => a.question_type === 'mcq');
+    const fibAnswers = answers.filter(a => a.question_type === 'fib');
+    const saAnswers = answers.filter(a => a.question_type === 'sa');
+
+    res.json({
+      attemptId: attempt.id,
+      attemptNumber: attempt.attempt_number,
+      totalScore: attempt.total_score,
+      passed: attempt.passed,
+      timeTaken: attempt.time_taken_seconds,
+      sections: {
+        mcq: {
+          correct: attempt.mcq_correct || mcqAnswers.filter(a => a.is_correct).length,
+          total: mcqAnswers.length || 20,
+          points: mcqAnswers.reduce((sum, a) => sum + (a.points_earned || 0), 0)
+        },
+        fib: {
+          correct: attempt.fib_correct || fibAnswers.filter(a => a.is_correct).length,
+          total: fibAnswers.length || 10,
+          points: fibAnswers.reduce((sum, a) => sum + (a.points_earned || 0), 0)
+        },
+        sa: {
+          correct: saAnswers.filter(a => a.is_correct).length,
+          total: saAnswers.length || 5,
+          points: attempt.sa_points || saAnswers.reduce((sum, a) => sum + (a.points_earned || 0), 0)
+        }
+      },
+      answers: answers.map(a => ({
+        questionType: a.question_type,
+        questionNumber: a.question_number,
+        questionText: a.question_text || '',
+        userAnswer: a.user_answer || '',
+        correctAnswer: a.correct_answer || '',
+        isCorrect: a.is_correct,
+        pointsEarned: a.points_earned || 0
+      }))
+    });
+  } catch (error) {
+    console.error('Get exam answers error:', error);
+    res.status(500).json({ error: 'Failed to get exam answers' });
+  }
+});
+
 // DELETE /api/admin/users/:id - Delete a user entirely
 router.delete('/users/:id', async (req: Request, res: Response) => {
   try {
