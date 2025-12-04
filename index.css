@@ -273,12 +273,15 @@ body {
 .sidebar-logo {
   display: flex;
   justify-content: center;
+  background: white;
+  border-radius: 8px;
+  padding: 10px;
   margin-bottom: 15px;
 }
 
 .sidebar-logo svg {
-  width: 60px;
-  height: 45px;
+  width: 180px;
+  height: 90px;
 }
 
 .sidebar-nav {

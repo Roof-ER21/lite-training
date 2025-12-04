@@ -1062,15 +1062,45 @@ async function initMyPage() {
   const greetingEl = document.getElementById('profile-greeting');
   if (greetingEl) greetingEl.textContent = `Welcome back, ${userName}!`;
 
-  // Get user stats from localStorage/API
-  const completedModules = JSON.parse(localStorage.getItem('roof-er.completedModules') || '[]');
-  const totalXp = parseInt(localStorage.getItem('roof-er.totalXp') || '0');
-  const streak = parseInt(localStorage.getItem('roof-er.currentStreak') || '0');
-  const trainingMinutes = parseInt(localStorage.getItem('roof-er.trainingMinutes') || '0');
-  const quizScores = JSON.parse(localStorage.getItem('roof-er.quizScores') || '[]');
-  const avgScore = quizScores.length > 0
-    ? Math.round(quizScores.reduce((a: number, b: number) => a + b, 0) / quizScores.length)
-    : 0;
+  // Fetch stats from API instead of localStorage
+  let completedModulesCount = 0;
+  let totalXp = 0;
+  let streak = 0;
+  let trainingMinutes = 0;
+  let avgScore = 0;
+  let hasExamScores = false;
+
+  try {
+    const progressData = await apiCall<{
+      modules: Array<{ name: string; status: string; timeSpentSeconds: number }>;
+      examAttempts: Array<{ totalScore: number }>;
+      gamification: { totalXP: number; currentStreak: number } | null;
+    }>('/progress', { silent: true });
+
+    if (progressData) {
+      // Count completed modules
+      completedModulesCount = progressData.modules.filter(m => m.status === 'completed').length;
+
+      // Calculate total training time from modules
+      const totalSeconds = progressData.modules.reduce((sum, m) => sum + (m.timeSpentSeconds || 0), 0);
+      trainingMinutes = Math.round(totalSeconds / 60);
+
+      // Get XP and streak from gamification
+      if (progressData.gamification) {
+        totalXp = progressData.gamification.totalXP || 0;
+        streak = progressData.gamification.currentStreak || 0;
+      }
+
+      // Calculate average exam score
+      if (progressData.examAttempts && progressData.examAttempts.length > 0) {
+        const totalScore = progressData.examAttempts.reduce((sum, e) => sum + (e.totalScore || 0), 0);
+        avgScore = Math.round(totalScore / progressData.examAttempts.length);
+        hasExamScores = true;
+      }
+    }
+  } catch (error) {
+    console.log('Could not fetch progress data, using defaults');
+  }
 
   // Calculate level
   const levelInfo = calculateLevel(totalXp);
@@ -1090,7 +1120,7 @@ async function initMyPage() {
 
   // Update stats
   const modulesEl = document.getElementById('stat-modules');
-  if (modulesEl) modulesEl.textContent = `${completedModules.length}/16`;
+  if (modulesEl) modulesEl.textContent = `${completedModulesCount}/16`;
 
   const streakEl = document.getElementById('stat-streak');
   if (streakEl) streakEl.textContent = streak.toString();
@@ -1099,7 +1129,7 @@ async function initMyPage() {
   if (timeEl) timeEl.textContent = formatTrainingTime(trainingMinutes);
 
   const avgScoreEl = document.getElementById('stat-avg-score');
-  if (avgScoreEl) avgScoreEl.textContent = quizScores.length > 0 ? `${avgScore}%` : '--%';
+  if (avgScoreEl) avgScoreEl.textContent = hasExamScores ? `${avgScore}%` : '--%';
 
   const totalXpEl = document.getElementById('stat-total-xp');
   if (totalXpEl) totalXpEl.textContent = totalXp.toLocaleString();
@@ -1107,8 +1137,8 @@ async function initMyPage() {
   // Determine next milestone
   const milestoneEl = document.getElementById('stat-milestone');
   if (milestoneEl) {
-    if (completedModules.length < 16) {
-      const remaining = 16 - completedModules.length;
+    if (completedModulesCount < 16) {
+      const remaining = 16 - completedModulesCount;
       milestoneEl.textContent = `${remaining} modules`;
     } else {
       milestoneEl.textContent = 'Complete!';
@@ -1119,9 +1149,9 @@ async function initMyPage() {
   const nextModule = getNextTrainingModule();
   const continueBtnText = document.getElementById('continue-btn-text');
   if (continueBtnText) {
-    if (completedModules.length === 0) {
+    if (completedModulesCount === 0) {
       continueBtnText.textContent = 'Start Training';
-    } else if (completedModules.length >= 16) {
+    } else if (completedModulesCount >= 16) {
       continueBtnText.textContent = 'Review Training';
     } else {
       continueBtnText.textContent = `Continue - ${nextModule.displayName}`;
