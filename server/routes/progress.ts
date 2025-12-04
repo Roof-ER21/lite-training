@@ -206,4 +206,409 @@ router.post('/commitment', async (req: Request, res: Response) => {
   }
 });
 
+// ============================================
+// BADGE SYSTEM
+// ============================================
+
+// Badge definitions
+const BADGE_DEFINITIONS: Record<string, { name: string; description: string; icon: string }> = {
+  'first-steps': { name: 'First Steps', description: 'Complete your first module', icon: '👣' },
+  'damage-detective': { name: 'Damage Detective', description: 'Score 100% on Module 10 hotspot quiz', icon: '🔍' },
+  'agnes-whisperer': { name: 'Agnes Whisperer', description: 'Pass 10 Agnes roleplay scenarios', icon: '🎭' },
+  'speed-demon': { name: 'Speed Demon', description: 'Complete any module in under 15 minutes', icon: '⚡' },
+  'perfect-score': { name: 'Perfect Score', description: '100% on final exam', icon: '💯' },
+  'streak-master': { name: 'Streak Master', description: '7-day learning streak', icon: '🔥' },
+  'night-owl': { name: 'Night Owl', description: 'Complete training after 9 PM', icon: '🦉' },
+  'early-bird': { name: 'Early Bird', description: 'Complete training before 7 AM', icon: '🐦' },
+  'video-scholar': { name: 'Video Scholar', description: 'Watch all 7 training videos', icon: '📺' },
+  'certified-pro': { name: 'Certified Pro', description: 'Complete entire certification', icon: '🏆' },
+  'streak-3': { name: 'Getting Started', description: '3-day learning streak', icon: '🌱' },
+  'streak-14': { name: 'Dedicated Learner', description: '14-day learning streak', icon: '💪' },
+  'streak-30': { name: 'Training Champion', description: '30-day learning streak', icon: '👑' }
+};
+
+// GET /api/progress/badges - Get user's badges
+router.get('/badges', async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.id;
+
+    const userBadges = await query<{ badge_id: string; earned_at: Date }>(`
+      SELECT badge_id, earned_at FROM user_badges WHERE user_id = $1
+    `, [userId]);
+
+    const badges = userBadges.map(b => ({
+      id: b.badge_id,
+      ...BADGE_DEFINITIONS[b.badge_id],
+      earnedAt: b.earned_at
+    }));
+
+    res.json({
+      earned: badges,
+      available: Object.entries(BADGE_DEFINITIONS).map(([id, def]) => ({
+        id,
+        ...def,
+        earned: badges.some(b => b.id === id)
+      }))
+    });
+  } catch (error) {
+    console.error('Get badges error:', error);
+    res.status(500).json({ error: 'Failed to get badges' });
+  }
+});
+
+// POST /api/progress/badges/award - Award a badge
+router.post('/badges/award', async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.id;
+    const { badgeId } = req.body;
+
+    if (!badgeId || !BADGE_DEFINITIONS[badgeId]) {
+      return res.status(400).json({ error: 'Invalid badge ID' });
+    }
+
+    // Check if already earned
+    const existing = await queryOne(`
+      SELECT id FROM user_badges WHERE user_id = $1 AND badge_id = $2
+    `, [userId, badgeId]);
+
+    if (existing) {
+      return res.json({ awarded: false, message: 'Badge already earned' });
+    }
+
+    // Award the badge
+    await query(`
+      INSERT INTO user_badges (user_id, badge_id) VALUES ($1, $2)
+    `, [userId, badgeId]);
+
+    res.json({
+      awarded: true,
+      badge: { id: badgeId, ...BADGE_DEFINITIONS[badgeId] }
+    });
+  } catch (error) {
+    console.error('Award badge error:', error);
+    res.status(500).json({ error: 'Failed to award badge' });
+  }
+});
+
+// POST /api/progress/badges/check - Check and award any earned badges
+router.post('/badges/check', async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.id;
+    const newBadges: string[] = [];
+
+    // Get user's current stats
+    const [modules, gamification, exams, roleplays, certs] = await Promise.all([
+      query<{ module_name: string; status: string; time_spent_seconds: number; completed_at: Date }>(`
+        SELECT module_name, status, time_spent_seconds, completed_at FROM module_progress WHERE user_id = $1
+      `, [userId]),
+      queryOne<{ current_streak: number; longest_streak: number }>(`
+        SELECT current_streak, longest_streak FROM user_gamification WHERE user_id = $1
+      `, [userId]),
+      query<{ passed: boolean; total_score: number }>(`
+        SELECT passed, total_score FROM exam_attempts WHERE user_id = $1
+      `, [userId]),
+      query<{ final_score: number }>(`
+        SELECT final_score FROM roleplay_sessions WHERE user_id = $1 AND final_score >= 70
+      `, [userId]),
+      queryOne(`SELECT id FROM certifications WHERE user_id = $1`, [userId])
+    ]);
+
+    // Get already earned badges
+    const earnedBadges = await query<{ badge_id: string }>(`
+      SELECT badge_id FROM user_badges WHERE user_id = $1
+    `, [userId]);
+    const earned = new Set(earnedBadges.map(b => b.badge_id));
+
+    // Check each badge condition
+    const completedModules = modules.filter(m => m.status === 'completed');
+    const currentHour = new Date().getHours();
+
+    // First Steps - complete first module
+    if (!earned.has('first-steps') && completedModules.length >= 1) {
+      newBadges.push('first-steps');
+    }
+
+    // Speed Demon - any module in under 15 minutes
+    if (!earned.has('speed-demon') && modules.some(m => m.status === 'completed' && m.time_spent_seconds < 900)) {
+      newBadges.push('speed-demon');
+    }
+
+    // Streak badges
+    const streak = gamification?.current_streak || gamification?.longest_streak || 0;
+    if (!earned.has('streak-3') && streak >= 3) newBadges.push('streak-3');
+    if (!earned.has('streak-master') && streak >= 7) newBadges.push('streak-master');
+    if (!earned.has('streak-14') && streak >= 14) newBadges.push('streak-14');
+    if (!earned.has('streak-30') && streak >= 30) newBadges.push('streak-30');
+
+    // Perfect Score - 100% on exam
+    if (!earned.has('perfect-score') && exams.some(e => e.total_score === 100)) {
+      newBadges.push('perfect-score');
+    }
+
+    // Agnes Whisperer - 10 passed roleplays
+    if (!earned.has('agnes-whisperer') && roleplays.length >= 10) {
+      newBadges.push('agnes-whisperer');
+    }
+
+    // Certified Pro - has certification
+    if (!earned.has('certified-pro') && certs) {
+      newBadges.push('certified-pro');
+    }
+
+    // Night Owl / Early Bird based on current time
+    if (!earned.has('night-owl') && currentHour >= 21 && completedModules.length > 0) {
+      newBadges.push('night-owl');
+    }
+    if (!earned.has('early-bird') && currentHour < 7 && completedModules.length > 0) {
+      newBadges.push('early-bird');
+    }
+
+    // Award new badges
+    for (const badgeId of newBadges) {
+      await query(`
+        INSERT INTO user_badges (user_id, badge_id) VALUES ($1, $2)
+        ON CONFLICT (user_id, badge_id) DO NOTHING
+      `, [userId, badgeId]);
+    }
+
+    res.json({
+      newBadges: newBadges.map(id => ({ id, ...BADGE_DEFINITIONS[id] })),
+      totalBadges: earned.size + newBadges.length
+    });
+  } catch (error) {
+    console.error('Check badges error:', error);
+    res.status(500).json({ error: 'Failed to check badges' });
+  }
+});
+
+// ============================================
+// LEADERBOARD SYSTEM
+// ============================================
+
+// GET /api/progress/leaderboard - Get leaderboard data
+router.get('/leaderboard', async (req: Request, res: Response) => {
+  try {
+    const { type = 'weekly' } = req.query;
+    const userId = req.user!.id;
+
+    let leaderboard;
+
+    if (type === 'weekly') {
+      // Weekly XP leaders (last 7 days activity)
+      leaderboard = await query<{ user_id: string; name: string; total_xp: number; current_streak: number }>(`
+        SELECT u.id as user_id, u.name, COALESCE(g.total_xp, 0) as total_xp, COALESCE(g.current_streak, 0) as current_streak
+        FROM users u
+        LEFT JOIN user_gamification g ON u.id = g.user_id
+        WHERE g.last_activity_date >= NOW() - INTERVAL '7 days'
+        ORDER BY g.total_xp DESC NULLS LAST
+        LIMIT 25
+      `);
+    } else if (type === 'alltime') {
+      // All-time XP
+      leaderboard = await query<{ user_id: string; name: string; total_xp: number; current_streak: number }>(`
+        SELECT u.id as user_id, u.name, COALESCE(g.total_xp, 0) as total_xp, COALESCE(g.current_streak, 0) as current_streak
+        FROM users u
+        LEFT JOIN user_gamification g ON u.id = g.user_id
+        ORDER BY g.total_xp DESC NULLS LAST
+        LIMIT 25
+      `);
+    } else if (type === 'streaks') {
+      // Longest streaks
+      leaderboard = await query<{ user_id: string; name: string; total_xp: number; current_streak: number; longest_streak: number }>(`
+        SELECT u.id as user_id, u.name, COALESCE(g.total_xp, 0) as total_xp,
+               COALESCE(g.current_streak, 0) as current_streak,
+               COALESCE(g.longest_streak, 0) as longest_streak
+        FROM users u
+        LEFT JOIN user_gamification g ON u.id = g.user_id
+        WHERE g.longest_streak > 0
+        ORDER BY g.longest_streak DESC, g.current_streak DESC
+        LIMIT 25
+      `);
+    } else if (type === 'exams') {
+      // Highest exam scores
+      leaderboard = await query<{ user_id: string; name: string; total_score: number; completed_at: Date }>(`
+        SELECT DISTINCT ON (u.id) u.id as user_id, u.name, e.total_score, e.completed_at
+        FROM users u
+        JOIN exam_attempts e ON u.id = e.user_id
+        WHERE e.passed = true
+        ORDER BY u.id, e.total_score DESC
+      `);
+      // Re-sort by score
+      leaderboard.sort((a: any, b: any) => b.total_score - a.total_score);
+      leaderboard = leaderboard.slice(0, 25);
+    } else {
+      return res.status(400).json({ error: 'Invalid leaderboard type' });
+    }
+
+    // Find current user's rank
+    const userRank = leaderboard.findIndex((l: any) => l.user_id === userId) + 1;
+
+    res.json({
+      type,
+      leaderboard: leaderboard.map((l: any, idx: number) => ({
+        rank: idx + 1,
+        userId: l.user_id,
+        name: l.name,
+        xp: l.total_xp,
+        streak: l.current_streak,
+        longestStreak: l.longest_streak,
+        examScore: l.total_score,
+        isCurrentUser: l.user_id === userId
+      })),
+      userRank: userRank > 0 ? userRank : null
+    });
+  } catch (error) {
+    console.error('Get leaderboard error:', error);
+    res.status(500).json({ error: 'Failed to get leaderboard' });
+  }
+});
+
+// ============================================
+// SPACED REPETITION SYSTEM
+// ============================================
+
+// GET /api/progress/review - Get cards due for review
+router.get('/review', async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.id;
+
+    const dueCards = await query<{
+      id: string;
+      question_type: string;
+      question_id: string;
+      question_text: string;
+      correct_answer: string;
+      interval_days: number;
+      repetitions: number;
+    }>(`
+      SELECT id, question_type, question_id, question_text, correct_answer, interval_days, repetitions
+      FROM review_cards
+      WHERE user_id = $1 AND next_review_at <= NOW()
+      ORDER BY next_review_at ASC
+      LIMIT 20
+    `, [userId]);
+
+    // Get total counts
+    const counts = await queryOne<{ due: string; total: string }>(`
+      SELECT
+        COUNT(*) FILTER (WHERE next_review_at <= NOW()) as due,
+        COUNT(*) as total
+      FROM review_cards WHERE user_id = $1
+    `, [userId]);
+
+    res.json({
+      cards: dueCards.map(c => ({
+        id: c.id,
+        questionType: c.question_type,
+        questionId: c.question_id,
+        questionText: c.question_text,
+        correctAnswer: c.correct_answer,
+        intervalDays: c.interval_days,
+        repetitions: c.repetitions
+      })),
+      dueCount: parseInt(counts?.due || '0'),
+      totalCount: parseInt(counts?.total || '0')
+    });
+  } catch (error) {
+    console.error('Get review cards error:', error);
+    res.status(500).json({ error: 'Failed to get review cards' });
+  }
+});
+
+// POST /api/progress/review/add - Add a card for review (when user gets something wrong)
+router.post('/review/add', async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.id;
+    const { questionType, questionId, questionText, correctAnswer } = req.body;
+
+    if (!questionType || !questionId) {
+      return res.status(400).json({ error: 'questionType and questionId required' });
+    }
+
+    await query(`
+      INSERT INTO review_cards (user_id, question_type, question_id, question_text, correct_answer)
+      VALUES ($1, $2, $3, $4, $5)
+      ON CONFLICT (user_id, question_type, question_id)
+      DO UPDATE SET
+        ease_factor = 2.5,
+        interval_days = 1,
+        repetitions = 0,
+        next_review_at = NOW()
+    `, [userId, questionType, questionId, questionText || '', correctAnswer || '']);
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Add review card error:', error);
+    res.status(500).json({ error: 'Failed to add review card' });
+  }
+});
+
+// POST /api/progress/review/answer - Record answer to review card (SM-2 algorithm)
+router.post('/review/answer', async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.id;
+    const { cardId, quality } = req.body; // quality: 0-5 (0=complete blackout, 5=perfect)
+
+    if (!cardId || quality === undefined || quality < 0 || quality > 5) {
+      return res.status(400).json({ error: 'cardId and quality (0-5) required' });
+    }
+
+    // Get current card state
+    const card = await queryOne<{
+      ease_factor: number;
+      interval_days: number;
+      repetitions: number;
+    }>(`
+      SELECT ease_factor, interval_days, repetitions FROM review_cards
+      WHERE id = $1 AND user_id = $2
+    `, [cardId, userId]);
+
+    if (!card) {
+      return res.status(404).json({ error: 'Card not found' });
+    }
+
+    // SM-2 Algorithm
+    let { ease_factor, interval_days, repetitions } = card;
+    const easeFactor = parseFloat(String(ease_factor));
+
+    if (quality < 3) {
+      // Failed - reset
+      repetitions = 0;
+      interval_days = 1;
+    } else {
+      // Passed
+      if (repetitions === 0) {
+        interval_days = 1;
+      } else if (repetitions === 1) {
+        interval_days = 3;
+      } else {
+        interval_days = Math.round(interval_days * easeFactor);
+      }
+      repetitions++;
+    }
+
+    // Update ease factor
+    const newEaseFactor = Math.max(1.3, easeFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)));
+
+    // Calculate next review date
+    const nextReview = new Date();
+    nextReview.setDate(nextReview.getDate() + interval_days);
+
+    await query(`
+      UPDATE review_cards
+      SET ease_factor = $3, interval_days = $4, repetitions = $5, next_review_at = $6, last_quality = $7
+      WHERE id = $1 AND user_id = $2
+    `, [cardId, userId, newEaseFactor, interval_days, repetitions, nextReview, quality]);
+
+    res.json({
+      success: true,
+      nextReviewAt: nextReview,
+      intervalDays: interval_days
+    });
+  } catch (error) {
+    console.error('Answer review card error:', error);
+    res.status(500).json({ error: 'Failed to record answer' });
+  }
+});
+
 export default router;

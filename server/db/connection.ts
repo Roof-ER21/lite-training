@@ -256,6 +256,46 @@ export async function initDatabase(): Promise<void> {
         score INTEGER,
         feedback TEXT
       );
+
+      -- User badges table for achievement system
+      CREATE TABLE IF NOT EXISTS user_badges (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+        badge_id VARCHAR(50) NOT NULL,
+        earned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, badge_id)
+      );
+      CREATE INDEX IF NOT EXISTS idx_user_badges_user ON user_badges(user_id);
+
+      -- Spaced repetition review cards
+      CREATE TABLE IF NOT EXISTS review_cards (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+        question_type VARCHAR(20) NOT NULL,
+        question_id VARCHAR(100) NOT NULL,
+        question_text TEXT,
+        correct_answer TEXT,
+        ease_factor DECIMAL DEFAULT 2.5,
+        interval_days INTEGER DEFAULT 1,
+        repetitions INTEGER DEFAULT 0,
+        next_review_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        last_quality INTEGER,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, question_type, question_id)
+      );
+      CREATE INDEX IF NOT EXISTS idx_review_cards_user ON review_cards(user_id);
+      CREATE INDEX IF NOT EXISTS idx_review_cards_next_review ON review_cards(next_review_at);
+
+      -- Push notification subscriptions for PWA
+      CREATE TABLE IF NOT EXISTS push_subscriptions (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+        endpoint TEXT NOT NULL,
+        p256dh TEXT NOT NULL,
+        auth TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, endpoint)
+      );
     `;
 
     await pool.query(migrations);

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 import { GoogleGenAI, Type, Chat } from '@google/genai';
+import confetti from 'canvas-confetti';
 
 // Resolve API key from injected env. Falls back gracefully if missing.
 const rawApiKey = (process.env.API_KEY as string | undefined) || (process.env.GEMINI_API_KEY as string | undefined);
@@ -700,6 +701,301 @@ function updateAgnesStreak(): { streakIncreased: boolean; newStreak: number; new
   let newMilestone: number | null = null;
   if (newCurrent === 7 || newCurrent === 30 || newCurrent === 100) newMilestone = newCurrent;
   return { streakIncreased: true, newStreak: newCurrent, newMilestone };
+}
+
+// ============================================================================
+// CELEBRATIONS & CONFETTI
+// ============================================================================
+
+function triggerConfetti(type: 'module' | 'levelup' | 'streak' | 'exam' | 'perfect' = 'module') {
+  const defaults = { origin: { y: 0.7 } };
+
+  switch (type) {
+    case 'levelup':
+      // Big celebration for level up
+      confetti({ ...defaults, particleCount: 150, spread: 100, colors: ['#FFD700', '#FFA500', '#FF6347'] });
+      setTimeout(() => confetti({ ...defaults, particleCount: 100, spread: 120 }), 200);
+      break;
+    case 'streak':
+      // Fire-themed for streaks
+      confetti({ ...defaults, particleCount: 80, spread: 70, colors: ['#FF4500', '#FF6347', '#FFA500', '#FFD700'] });
+      break;
+    case 'exam':
+      // Green/success colors for passing exam
+      confetti({ ...defaults, particleCount: 120, spread: 90, colors: ['#4CAF50', '#8BC34A', '#CDDC39', '#FFD700'] });
+      break;
+    case 'perfect':
+      // Gold star shower for perfect score
+      const duration = 3000;
+      const end = Date.now() + duration;
+      (function frame() {
+        confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#FFD700', '#FFC700', '#FFE700'] });
+        confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#FFD700', '#FFC700', '#FFE700'] });
+        if (Date.now() < end) requestAnimationFrame(frame);
+      })();
+      break;
+    default:
+      // Standard module completion
+      confetti({ ...defaults, particleCount: 80, spread: 70 });
+  }
+}
+
+// Badge notification toast
+function showBadgeToast(badge: { id: string; name: string; icon: string; description: string }) {
+  const toast = document.createElement('div');
+  toast.className = 'badge-toast';
+  toast.innerHTML = `
+    <div class="badge-toast-icon">${badge.icon}</div>
+    <div class="badge-toast-content">
+      <div class="badge-toast-title">Badge Earned!</div>
+      <div class="badge-toast-name">${badge.name}</div>
+      <div class="badge-toast-desc">${badge.description}</div>
+    </div>
+  `;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.classList.add('show'), 100);
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+
+// Check and award badges after actions
+async function checkAndAwardBadges() {
+  const result = await apiCall<{ newBadges: Array<{ id: string; name: string; icon: string; description: string }>; totalBadges: number }>('/progress/badges/check', {
+    method: 'POST',
+    silent: true
+  } as any);
+
+  if (result?.newBadges && result.newBadges.length > 0) {
+    result.newBadges.forEach((badge, idx) => {
+      setTimeout(() => {
+        showBadgeToast(badge);
+        triggerConfetti('levelup');
+      }, idx * 1500);
+    });
+  }
+  return result;
+}
+
+// ============================================================================
+// GAMIFICATION UI COMPONENTS
+// ============================================================================
+
+// Render badges section for welcome/dashboard
+async function renderBadgesSection(container: HTMLElement) {
+  const badges = await apiCall<{ earned: Array<{ id: string; name: string; icon: string; earnedAt: string }>; available: Array<{ id: string; name: string; icon: string; description: string; earned: boolean }> }>('/progress/badges', { silent: true } as any);
+
+  if (!badges) return;
+
+  const section = document.createElement('div');
+  section.className = 'gamification-section badges-section';
+  section.innerHTML = `
+    <h3>🏆 Achievements <span class="badge-count">${badges.earned.length}/${badges.available.length}</span></h3>
+    <div class="badges-grid">
+      ${badges.available.map(b => `
+        <div class="badge-item ${b.earned ? 'earned' : 'locked'}" title="${b.description}">
+          <span class="badge-icon">${b.icon}</span>
+          <span class="badge-name">${b.name}</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  container.appendChild(section);
+}
+
+// Render leaderboard section
+async function renderLeaderboardSection(container: HTMLElement) {
+  const section = document.createElement('div');
+  section.className = 'gamification-section leaderboard-section';
+  section.innerHTML = `
+    <h3>📊 Leaderboard</h3>
+    <div class="leaderboard-tabs">
+      <button class="lb-tab active" data-type="weekly">This Week</button>
+      <button class="lb-tab" data-type="alltime">All Time</button>
+      <button class="lb-tab" data-type="streaks">Streaks</button>
+    </div>
+    <div class="leaderboard-content">
+      <div class="loading">Loading...</div>
+    </div>
+  `;
+  container.appendChild(section);
+
+  const loadLeaderboard = async (type: string) => {
+    const content = section.querySelector('.leaderboard-content') as HTMLElement;
+    content.innerHTML = '<div class="loading">Loading...</div>';
+
+    const data = await apiCall<{ leaderboard: Array<{ rank: number; name: string; xp: number; streak: number; isCurrentUser: boolean }>; userRank: number | null }>(`/progress/leaderboard?type=${type}`, { silent: true } as any);
+
+    if (!data || data.leaderboard.length === 0) {
+      content.innerHTML = '<div class="empty-state">No data yet. Start training!</div>';
+      return;
+    }
+
+    content.innerHTML = `
+      <div class="leaderboard-list">
+        ${data.leaderboard.slice(0, 10).map(entry => `
+          <div class="lb-entry ${entry.isCurrentUser ? 'current-user' : ''}">
+            <span class="lb-rank">${entry.rank <= 3 ? ['🥇', '🥈', '🥉'][entry.rank - 1] : '#' + entry.rank}</span>
+            <span class="lb-name">${entry.name}${entry.isCurrentUser ? ' (You)' : ''}</span>
+            <span class="lb-stat">${type === 'streaks' ? entry.streak + '🔥' : entry.xp + ' XP'}</span>
+          </div>
+        `).join('')}
+      </div>
+      ${data.userRank && data.userRank > 10 ? `<div class="your-rank">Your rank: #${data.userRank}</div>` : ''}
+    `;
+  };
+
+  // Tab click handlers
+  section.querySelectorAll('.lb-tab').forEach(tab => {
+    tab.addEventListener('click', (e) => {
+      section.querySelectorAll('.lb-tab').forEach(t => t.classList.remove('active'));
+      (e.target as HTMLElement).classList.add('active');
+      loadLeaderboard((e.target as HTMLElement).dataset.type || 'weekly');
+    });
+  });
+
+  // Load initial data
+  loadLeaderboard('weekly');
+}
+
+// Render daily review section
+async function renderDailyReviewSection(container: HTMLElement) {
+  const review = await apiCall<{ cards: Array<{ id: string; questionText: string; correctAnswer: string }>; dueCount: number; totalCount: number }>('/progress/review', { silent: true } as any);
+
+  if (!review || review.totalCount === 0) return; // Don't show if no review cards
+
+  const section = document.createElement('div');
+  section.className = 'gamification-section review-section';
+  section.innerHTML = `
+    <h3>📚 Daily Review ${review.dueCount > 0 ? `<span class="review-badge">${review.dueCount} due</span>` : '<span class="review-complete">✓ All caught up!</span>'}</h3>
+    ${review.dueCount > 0 ? `
+      <p>You have ${review.dueCount} question${review.dueCount > 1 ? 's' : ''} to review for better retention.</p>
+      <button class="start-review-btn" onclick="window.startDailyReview()">Start Review</button>
+    ` : `
+      <p>Great job! You've completed all your reviews for today.</p>
+    `}
+  `;
+  container.appendChild(section);
+}
+
+// Daily review modal
+(window as any).startDailyReview = async function() {
+  const review = await apiCall<{ cards: Array<{ id: string; questionText: string; correctAnswer: string; questionType: string }>; dueCount: number }>('/progress/review', { silent: true } as any);
+
+  if (!review || review.cards.length === 0) {
+    alert('No cards to review!');
+    return;
+  }
+
+  let currentIndex = 0;
+  const cards = review.cards;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'review-modal-overlay';
+  overlay.innerHTML = `
+    <div class="review-modal">
+      <div class="review-header">
+        <span>Review Card ${currentIndex + 1}/${cards.length}</span>
+        <button class="close-review" onclick="this.closest('.review-modal-overlay').remove()">×</button>
+      </div>
+      <div class="review-card-content">
+        <div class="review-question">${cards[currentIndex].questionText}</div>
+        <div class="review-answer" style="display:none;">${cards[currentIndex].correctAnswer}</div>
+        <button class="show-answer-btn">Show Answer</button>
+      </div>
+      <div class="review-rating" style="display:none;">
+        <p>How well did you know this?</p>
+        <div class="rating-buttons">
+          <button class="rate-btn" data-quality="1">Forgot</button>
+          <button class="rate-btn" data-quality="3">Hard</button>
+          <button class="rate-btn" data-quality="4">Good</button>
+          <button class="rate-btn" data-quality="5">Easy</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const showNextCard = () => {
+    currentIndex++;
+    if (currentIndex >= cards.length) {
+      overlay.innerHTML = `
+        <div class="review-modal">
+          <div class="review-complete-screen">
+            <div style="font-size: 48px; margin-bottom: 20px;">🎉</div>
+            <h3>Review Complete!</h3>
+            <p>You've reviewed all ${cards.length} cards.</p>
+            <button onclick="this.closest('.review-modal-overlay').remove()">Close</button>
+          </div>
+        </div>
+      `;
+      triggerConfetti('module');
+      return;
+    }
+    const content = overlay.querySelector('.review-card-content') as HTMLElement;
+    const rating = overlay.querySelector('.review-rating') as HTMLElement;
+    const header = overlay.querySelector('.review-header span') as HTMLElement;
+    header.textContent = `Review Card ${currentIndex + 1}/${cards.length}`;
+    content.innerHTML = `
+      <div class="review-question">${cards[currentIndex].questionText}</div>
+      <div class="review-answer" style="display:none;">${cards[currentIndex].correctAnswer}</div>
+      <button class="show-answer-btn">Show Answer</button>
+    `;
+    rating.style.display = 'none';
+    content.querySelector('.show-answer-btn')?.addEventListener('click', () => {
+      (content.querySelector('.review-answer') as HTMLElement).style.display = 'block';
+      (content.querySelector('.show-answer-btn') as HTMLElement).style.display = 'none';
+      rating.style.display = 'block';
+    });
+  };
+
+  overlay.querySelector('.show-answer-btn')?.addEventListener('click', () => {
+    (overlay.querySelector('.review-answer') as HTMLElement).style.display = 'block';
+    (overlay.querySelector('.show-answer-btn') as HTMLElement).style.display = 'none';
+    (overlay.querySelector('.review-rating') as HTMLElement).style.display = 'block';
+  });
+
+  overlay.querySelectorAll('.rate-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const quality = parseInt((e.target as HTMLElement).dataset.quality || '3');
+      await apiCall('/progress/review/answer', {
+        method: 'POST',
+        body: JSON.stringify({ cardId: cards[currentIndex].id, quality }),
+        silent: true
+      } as any);
+      showNextCard();
+    });
+  });
+};
+
+// Initialize gamification sections on welcome module
+async function initGamificationUI() {
+  const mainContent = document.getElementById('main-content');
+  if (!mainContent) return;
+
+  // Find or create a gamification container
+  let gamificationContainer = document.getElementById('gamification-container');
+  if (!gamificationContainer) {
+    gamificationContainer = document.createElement('div');
+    gamificationContainer.id = 'gamification-container';
+    gamificationContainer.className = 'gamification-container';
+    // Insert after the welcome content
+    const welcomeContent = mainContent.querySelector('.content-card');
+    if (welcomeContent) {
+      welcomeContent.after(gamificationContainer);
+    } else {
+      mainContent.appendChild(gamificationContainer);
+    }
+  }
+  gamificationContainer.innerHTML = '';
+
+  // Render sections in parallel
+  await Promise.all([
+    renderDailyReviewSection(gamificationContainer),
+    renderBadgesSection(gamificationContainer),
+    renderLeaderboardSection(gamificationContainer)
+  ]);
 }
 
 // Agnes-21 IndexedDB Video Storage
@@ -6357,6 +6653,7 @@ function renderModule(moduleName: string) {
           initQuickQuiz1();
           initWelcomeModals();
           initLeadershipBios();
+          initGamificationUI();
           break;
       case 'post-inspection-objections':
           initModule9RoleplayButtons();
@@ -6481,6 +6778,12 @@ function completeModule(moduleName: string) {
     body: JSON.stringify({ moduleName, action: 'complete' }),
     silent: true
   } as any);
+
+  // Trigger confetti celebration
+  triggerConfetti('module');
+
+  // Check for new badges
+  checkAndAwardBadges();
 
   const currentIndex = MODULE_ORDER.indexOf(moduleName);
   if (currentIndex < MODULE_ORDER.length - 1) {
@@ -9058,33 +9361,6 @@ function generateCertificatePDF(userName: string, score: number, dateStr: string
   link.download = `RoofER_Certificate_${userName.replace(/\s+/g, '_')}.png`;
   link.href = canvas.toDataURL('image/png', 1.0);
   link.click();
-}
-
-function triggerConfetti() {
-  const container = document.getElementById('confetti');
-  if (!container) return;
-
-  const colors = ['#D90429', '#FFD700', '#4CAF50', '#2196F3', '#9C27B0'];
-
-  for (let i = 0; i < 100; i++) {
-    const confetti = document.createElement('div');
-    confetti.className = 'confetti-piece';
-    confetti.style.cssText = `
-      position: absolute;
-      width: ${Math.random() * 10 + 5}px;
-      height: ${Math.random() * 10 + 5}px;
-      background: ${colors[Math.floor(Math.random() * colors.length)]};
-      left: ${Math.random() * 100}%;
-      top: -20px;
-      opacity: ${Math.random() * 0.5 + 0.5};
-      transform: rotate(${Math.random() * 360}deg);
-      animation: confetti-fall ${Math.random() * 2 + 2}s linear forwards;
-    `;
-    container.appendChild(confetti);
-
-    // Remove after animation
-    setTimeout(() => confetti.remove(), 4000);
-  }
 }
 
 function initQuickQuiz1() {
