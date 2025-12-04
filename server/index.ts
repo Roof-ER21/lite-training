@@ -10,6 +10,7 @@ import progressRoutes from './routes/progress.js';
 import examRoutes from './routes/exam.js';
 import roleplayRoutes from './routes/roleplay.js';
 import adminRoutes from './routes/admin.js';
+import aiRoutes from './routes/ai.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -44,6 +45,7 @@ app.use('/api/progress', progressRoutes);
 app.use('/api/exam', examRoutes);
 app.use('/api/roleplay', roleplayRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/ai', aiRoutes);
 
 // Serve static files from the dist directory (built frontend)
 const distPath = path.join(__dirname, '..', 'dist');
@@ -78,6 +80,7 @@ async function start() {
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
       console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`OpenAI: ${process.env.OPENAI_API_KEY ? 'configured' : 'not configured (AI scoring will use fallback)'}`);
     });
   } catch (error) {
     console.error('Failed to start server:', error);

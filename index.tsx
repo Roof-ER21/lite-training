@@ -5505,21 +5505,47 @@ function initRolePlay() {
 
       // Check if we've reached max turns
       if (sessionState.currentTurn >= sessionState.maxTurns) {
-        // Final scoring and feedback
-        const scoreResult = (window as any).scoreResponse(
-          userResponse,
-          scenario.expectedKeyPoints || [],
-          scenario.rubric?.keywords || [],
-          scenario.rubric?.passThreshold || 70
-        );
-
-        // Generate AI feedback if available
+        // Final scoring and feedback - use AI scoring if available
+        let scoreResult;
         let aiFeedback = null;
-        if (ai) {
+
+        // Try AI scoring first
+        if ((window as any).scoreResponseWithAI) {
           try {
-            aiFeedback = await generateAIFeedback(userResponse, scenario, scoreResult);
+            scoreResult = await (window as any).scoreResponseWithAI(
+              userResponse,
+              scenario,
+              scenario.rubric?.passThreshold || 70
+            );
+            // AI feedback is included in scoreResult
+            if (scoreResult.aiScored) {
+              aiFeedback = {
+                strengths: scoreResult.strengths || [],
+                improvements: scoreResult.improvements || [],
+                feedback: scoreResult.feedback
+              };
+            }
           } catch (e) {
-            console.warn('AI feedback unavailable:', e);
+            console.warn('AI scoring failed, using keyword fallback:', e);
+          }
+        }
+
+        // Fallback to keyword scoring if AI scoring failed or unavailable
+        if (!scoreResult) {
+          scoreResult = (window as any).scoreResponse(
+            userResponse,
+            scenario.expectedKeyPoints || [],
+            scenario.rubric?.keywords || [],
+            scenario.rubric?.passThreshold || 70
+          );
+
+          // Generate AI feedback separately if AI scoring failed but Gemini is available
+          if (ai && !aiFeedback) {
+            try {
+              aiFeedback = await generateAIFeedback(userResponse, scenario, scoreResult);
+            } catch (e) {
+              console.warn('AI feedback unavailable:', e);
+            }
           }
         }
 
@@ -8444,14 +8470,27 @@ function renderFinalExam(root: HTMLElement) {
     </div>
   `;
 
-  document.getElementById('submitExam')?.addEventListener('click', () => {
+  document.getElementById('submitExam')?.addEventListener('click', async () => {
     if (confirm('Are you sure you want to submit your exam? You cannot change answers after submitting.')) {
-      gradeFinalExam(root);
+      // Show loading state
+      const submitBtn = document.getElementById('submitExam') as HTMLButtonElement;
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Grading with AI...';
+      }
+      try {
+        await gradeFinalExam(root);
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Submit Exam';
+        }
+      }
     }
   });
 }
 
-function gradeFinalExam(root: HTMLElement) {
+async function gradeFinalExam(root: HTMLElement) {
   if (!currentExamData) return;
 
   const { mcq, fib, sa } = currentExamData;
@@ -8496,27 +8535,86 @@ function gradeFinalExam(root: HTMLElement) {
     }
   });
 
-  // Grade SA (5 questions, 2 pts each = 10 pts max) - keyword matching
+  // Grade SA (5 questions, 2 pts each = 10 pts max) - AI scoring with fallback
   let saPoints = 0;
-  sa.forEach((q, idx) => {
+  const saResults: Array<{score: number; feedback: string; strengths: string[]; improvements: string[]; aiScored: boolean}> = [];
+
+  // Score all SA questions (in parallel for speed)
+  const saPromises = sa.map(async (q, idx) => {
     const textarea = root.querySelector(`textarea[name="sa-${idx}"]`) as HTMLTextAreaElement;
     const userAnswer = textarea?.value?.trim() || '';
+
+    try {
+      // Try AI scoring first
+      const response = await fetch('/api/ai/score-response', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: q.prompt,
+          userAnswer,
+          sampleAnswer: q.sampleAnswer,
+          maxPoints: 2,
+          rubric: {
+            keywords: q.keywords,
+            criteria: [
+              'Completeness - addresses all key points',
+              'Accuracy - information is correct',
+              'Professionalism - appropriate tone',
+              'Persuasiveness - would be effective with homeowner'
+            ]
+          },
+          context: 'exam'
+        })
+      });
+
+      if (response.ok) {
+        return await response.json();
+      }
+    } catch (err) {
+      console.log('AI scoring failed, using fallback:', err);
+    }
+
+    // Fallback to keyword scoring
     const answerLower = userAnswer.toLowerCase();
     const keywordsFound = q.keywords.filter(kw => answerLower.includes(kw.toLowerCase()));
     const scoreRatio = Math.min(keywordsFound.length / q.minKeywords, 1);
-    const questionPoints = scoreRatio * 2; // 2 pts max per question
-    saPoints += questionPoints;
+    return {
+      score: scoreRatio * 2,
+      percentage: Math.round(scoreRatio * 100),
+      feedback: `Found ${keywordsFound.length}/${q.minKeywords} key concepts.`,
+      strengths: keywordsFound.length > 0 ? [`Mentioned: ${keywordsFound.slice(0, 3).join(', ')}`] : [],
+      improvements: [],
+      keyPointsHit: keywordsFound,
+      keyPointsMissed: q.keywords.filter(kw => !answerLower.includes(kw.toLowerCase())),
+      aiScored: false
+    };
+  });
 
-    // If didn't get full credit, show as wrong/partial
-    if (scoreRatio < 1) {
-      const missingKeywords = q.keywords.filter(kw => !answerLower.includes(kw.toLowerCase()));
+  const aiResults = await Promise.all(saPromises);
+
+  // Process AI results
+  sa.forEach((q, idx) => {
+    const textarea = root.querySelector(`textarea[name="sa-${idx}"]`) as HTMLTextAreaElement;
+    const userAnswer = textarea?.value?.trim() || '';
+    const result = aiResults[idx];
+    const questionPoints = result.score;
+    saPoints += questionPoints;
+    saResults.push(result);
+
+    // If didn't get full credit, show feedback
+    if (questionPoints < 2) {
+      const feedbackParts = [];
+      if (result.feedback) feedbackParts.push(result.feedback);
+      if (result.improvements?.length) feedbackParts.push(`\n\nSuggestions:\n- ${result.improvements.join('\n- ')}`);
+      if (result.keyPointsMissed?.length) feedbackParts.push(`\n\nMissing concepts: ${result.keyPointsMissed.join(', ')}`);
+
       wrongAnswers.push({
         type: 'sa',
         questionNumber: idx + 1,
         question: q.prompt,
         userAnswer: userAnswer || '(No answer provided)',
-        correctAnswer: `Sample: ${q.sampleAnswer}\n\nKey points to include: ${q.keywords.join(', ')}\n(You mentioned ${keywordsFound.length}/${q.minKeywords} required keywords${missingKeywords.length > 0 ? `. Missing: ${missingKeywords.join(', ')}` : ''})`,
-        explanation: `This question required at least ${q.minKeywords} key concepts. You earned ${Math.round(questionPoints * 10) / 10}/2 points.`
+        correctAnswer: `Sample: ${q.sampleAnswer}${result.strengths?.length ? `\n\nStrengths: ${result.strengths.join(', ')}` : ''}`,
+        explanation: `${result.aiScored ? '🤖 AI Scored' : '📝 Keyword Scored'}: ${Math.round(questionPoints * 10) / 10}/2 points.\n${feedbackParts.join('')}`
       });
     }
   });
@@ -8572,17 +8670,17 @@ function gradeFinalExam(root: HTMLElement) {
   const saAnswerData = sa.map((q, idx) => {
     const textarea = root.querySelector(`textarea[name="sa-${idx}"]`) as HTMLTextAreaElement;
     const userAnswer = textarea?.value?.trim() || '';
-    const answerLower = userAnswer.toLowerCase();
-    const keywordsFound = q.keywords.filter(kw => answerLower.includes(kw.toLowerCase()));
-    const scoreRatio = Math.min(keywordsFound.length / q.minKeywords, 1);
+    const result = saResults[idx] || { score: 0 };
     return {
       questionId: q.id,
       questionNumber: idx + 1,
       questionText: q.prompt,
       userAnswer,
       correctAnswer: q.sampleAnswer,
-      isCorrect: scoreRatio >= 1,
-      pointsEarned: Math.round(scoreRatio * 2 * 10) / 10
+      isCorrect: result.score >= 2,
+      pointsEarned: Math.round(result.score * 10) / 10,
+      aiFeedback: result.feedback,
+      aiScored: result.aiScored
     };
   });
 

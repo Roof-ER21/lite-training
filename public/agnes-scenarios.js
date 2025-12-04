@@ -1957,6 +1957,66 @@ function scoreResponse(userResponse, expectedKeyPoints, rubricKeywords, passThre
   };
 }
 
+/**
+ * Score a roleplay response using AI (with keyword fallback)
+ * @param {string} userResponse - The trainee's response
+ * @param {Object} scenario - The scenario object with prompt, expectedKeyPoints, rubric
+ * @param {number} passThreshold - Minimum score to pass (0-100)
+ * @returns {Promise<Object>} - Scoring result with AI feedback
+ */
+async function scoreResponseWithAI(userResponse, scenario, passThreshold = 70) {
+  const expectedKeyPoints = scenario.expectedKeyPoints || [];
+  const rubricKeywords = scenario.rubric?.keywords || [];
+
+  try {
+    // Try AI scoring first
+    const response = await fetch('/api/ai/score-response', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        prompt: scenario.prompt,
+        userAnswer: userResponse,
+        sampleAnswer: expectedKeyPoints.join('. '),
+        maxPoints: 100,
+        rubric: {
+          keywords: rubricKeywords,
+          criteria: [
+            'Addresses the homeowner concern directly',
+            'Uses professional and empathetic language',
+            'Provides clear value proposition',
+            'Moves toward next step (appointment, inspection, etc.)'
+          ]
+        },
+        context: 'roleplay'
+      })
+    });
+
+    if (response.ok) {
+      const aiResult = await response.json();
+
+      // Convert AI result to expected format
+      return {
+        score: Math.round(aiResult.score || aiResult.percentage || 0),
+        matchedPoints: aiResult.strengths || [],
+        missedPoints: aiResult.improvements || [],
+        matchedKeywords: aiResult.keyPointsHit || [],
+        passed: (aiResult.score || aiResult.percentage || 0) >= passThreshold,
+        feedback: aiResult.feedback,
+        strengths: aiResult.strengths || [],
+        improvements: aiResult.improvements || [],
+        aiScored: true
+      };
+    }
+  } catch (err) {
+    console.log('AI scoring failed, using keyword fallback:', err);
+  }
+
+  // Fallback to keyword scoring
+  const fallbackResult = scoreResponse(userResponse, expectedKeyPoints, rubricKeywords, passThreshold);
+  fallbackResult.aiScored = false;
+  return fallbackResult;
+}
+
 // ========================================
 // AGNES-SPECIFIC HELPER FUNCTIONS
 // ========================================
@@ -2006,6 +2066,7 @@ if (typeof window !== 'undefined') {
   window.getAllPracticeSequences = getAllPracticeSequences;
   window.getScenarioStatistics = getScenarioStatistics;
   window.scoreResponse = scoreResponse;
+  window.scoreResponseWithAI = scoreResponseWithAI;
   window.getAllAgnesScenarios = getAllAgnesScenarios;
   window.getAgnesScenariosByRole = getAgnesScenariosByRole;
   // New categorized scenario functions
