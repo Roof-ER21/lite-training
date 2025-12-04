@@ -6993,6 +6993,7 @@ async function showUserDetail(userId: string): Promise<void> {
         <div class="transcript-summary">
           <span class="summary-item"><strong>Total Time:</strong> ${formatSeconds(totalTimeSeconds)}</span>
           <span class="summary-item"><strong>Modules:</strong> ${completedCount}/16 Complete</span>
+          <button class="btn-unlock-all" data-user-id="${userId}">🔓 Unlock All Modules</button>
         </div>
         <table class="transcript-table">
           <thead>
@@ -7002,6 +7003,7 @@ async function showUserDetail(userId: string): Promise<void> {
               <th>Status</th>
               <th>Time</th>
               <th>Completed</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -7012,6 +7014,11 @@ async function showUserDetail(userId: string): Promise<void> {
                 <td>${getStatusBadge(m.status)}</td>
                 <td class="time-cell">${m.timeSpentSeconds ? formatSeconds(m.timeSpentSeconds) : '-'}</td>
                 <td class="date-cell">${formatShortDate(m.completedAt)}</td>
+                <td class="action-cell">
+                  ${m.status === 'locked' || m.status === 'not_started' ?
+                    `<button class="btn-unlock-module" data-user-id="${userId}" data-module="${m.name}">🔓 Unlock</button>` :
+                    '<span class="already-unlocked">✓</span>'}
+                </td>
               </tr>
             `).join('')}
           </tbody>
@@ -7079,6 +7086,62 @@ async function showUserDetail(userId: string): Promise<void> {
   // Add action handlers
   body.querySelector('.btn-reset-exam')?.addEventListener('click', () => resetUserExam(userId));
   body.querySelector('.btn-reset-progress')?.addEventListener('click', () => resetUserProgress(userId));
+
+  // Add unlock all modules handler
+  body.querySelector('.btn-unlock-all')?.addEventListener('click', async () => {
+    if (!confirm('Unlock all modules for this user?')) return;
+    try {
+      const response = await fetch(`/api/admin/users/${userId}/unlock-all-modules`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        }
+      });
+      if (response.ok) {
+        alert('All modules unlocked!');
+        showUserDetail(userId); // Refresh modal
+      } else {
+        const error = await response.json();
+        alert('Failed to unlock modules: ' + (error.error || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Unlock all error:', error);
+      alert('Failed to unlock modules');
+    }
+  });
+
+  // Add individual module unlock handlers
+  body.querySelectorAll('.btn-unlock-module').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const button = e.target as HTMLElement;
+      const userId = button.dataset.userId;
+      const moduleName = button.dataset.module;
+      if (!userId || !moduleName) return;
+
+      try {
+        const response = await fetch(`/api/admin/users/${userId}/unlock-module`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          },
+          body: JSON.stringify({ moduleName })
+        });
+        if (response.ok) {
+          button.innerHTML = '✓';
+          button.classList.add('unlocked');
+          (button as HTMLButtonElement).disabled = true;
+        } else {
+          const error = await response.json();
+          alert('Failed to unlock: ' + (error.error || 'Unknown error'));
+        }
+      } catch (error) {
+        console.error('Unlock error:', error);
+        alert('Failed to unlock module');
+      }
+    });
+  });
 
   // Add View Answers handlers
   body.querySelectorAll('.btn-view-answers').forEach(btn => {

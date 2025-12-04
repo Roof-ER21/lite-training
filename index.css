@@ -7693,6 +7693,65 @@ button:disabled {
   color: #6b7280;
 }
 
+/* Unlock Module Buttons */
+.btn-unlock-all {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: auto;
+}
+
+.btn-unlock-all:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.transcript-summary {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.btn-unlock-module {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-unlock-module:hover {
+  background: #2563eb;
+  transform: scale(1.05);
+}
+
+.btn-unlock-module.unlocked,
+.btn-unlock-module:disabled {
+  background: #10b981;
+  cursor: default;
+}
+
+.already-unlocked {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.action-cell {
+  text-align: center;
+  width: 80px;
+}
+
 /* ============================================================================
    EXAM RECORDS STYLES
    ============================================================================ */

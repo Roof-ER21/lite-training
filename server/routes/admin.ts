@@ -727,6 +727,88 @@ router.get('/users/:userId/exam/:attemptId/answers', async (req: Request, res: R
   }
 });
 
+// POST /api/admin/users/:id/unlock-module - Unlock a specific module for a user
+router.post('/users/:id/unlock-module', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { moduleName } = req.body;
+
+    if (!moduleName) {
+      return res.status(400).json({ error: 'moduleName is required' });
+    }
+
+    // Check if user exists
+    const user = await queryOne<{ id: string }>(`
+      SELECT id FROM users WHERE id = $1
+    `, [id]);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Upsert module progress to unlock
+    await query(`
+      INSERT INTO module_progress (user_id, module_name, status, last_accessed)
+      VALUES ($1, $2, 'unlocked', NOW())
+      ON CONFLICT (user_id, module_name)
+      DO UPDATE SET
+        status = CASE
+          WHEN module_progress.status = 'locked' THEN 'unlocked'
+          ELSE module_progress.status
+        END,
+        last_accessed = NOW()
+    `, [id, moduleName]);
+
+    res.json({ success: true, message: `Module "${moduleName}" unlocked for user` });
+  } catch (error) {
+    console.error('Unlock module error:', error);
+    res.status(500).json({ error: 'Failed to unlock module' });
+  }
+});
+
+// POST /api/admin/users/:id/unlock-all-modules - Unlock all modules for a user
+router.post('/users/:id/unlock-all-modules', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    // Check if user exists
+    const user = await queryOne<{ id: string }>(`
+      SELECT id FROM users WHERE id = $1
+    `, [id]);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // List of all modules
+    const allModules = [
+      'welcome', 'commitment', 'general-knowledge', 'sales-process', 'storm-types',
+      'qualifying', 'roof-101', 'other-trades', 'insurance', 'damage-identification',
+      'objection-handling', 'inspection', 'role-play', 'resources', 'agnes-quiz', 'final-exam'
+    ];
+
+    // Unlock all modules
+    for (const moduleName of allModules) {
+      await query(`
+        INSERT INTO module_progress (user_id, module_name, status, last_accessed)
+        VALUES ($1, $2, 'unlocked', NOW())
+        ON CONFLICT (user_id, module_name)
+        DO UPDATE SET
+          status = CASE
+            WHEN module_progress.status = 'locked' THEN 'unlocked'
+            ELSE module_progress.status
+          END,
+          last_accessed = NOW()
+      `, [id, moduleName]);
+    }
+
+    res.json({ success: true, message: 'All modules unlocked for user' });
+  } catch (error) {
+    console.error('Unlock all modules error:', error);
+    res.status(500).json({ error: 'Failed to unlock all modules' });
+  }
+});
+
 // DELETE /api/admin/users/:id - Delete a user entirely
 router.delete('/users/:id', async (req: Request, res: Response) => {
   try {
