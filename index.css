@@ -264,10 +264,21 @@ body {
 }
 
 .sidebar-header h2 {
-  margin: 0 0 20px 0;
+  margin: 0 0 10px 0;
   text-align: center;
   color: var(--primary-color);
   font-weight: 700;
+}
+
+.sidebar-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.sidebar-logo svg {
+  width: 60px;
+  height: 45px;
 }
 
 .sidebar-nav {
@@ -8240,7 +8251,8 @@ button:disabled {
 .lb-tab {
   padding: 8px 16px;
   border: none;
-  background: #f3f4f6;
+  background: #e5e7eb;
+  color: #374151;
   border-radius: 20px;
   cursor: pointer;
   font-size: 0.85rem;
@@ -8249,7 +8261,8 @@ button:disabled {
 }
 
 .lb-tab:hover {
-  background: #e5e7eb;
+  background: #d1d5db;
+  color: #1f2937;
 }
 
 .lb-tab.active {
