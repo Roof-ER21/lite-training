@@ -6769,7 +6769,8 @@ button:disabled {
 .admin-tab {
   padding: 10px 20px;
   border: none;
-  background: #f3f4f6;
+  background: #e5e7eb;
+  color: #374151;
   border-radius: 8px 8px 0 0;
   cursor: pointer;
   font-weight: 500;
@@ -6777,7 +6778,8 @@ button:disabled {
 }
 
 .admin-tab:hover {
-  background: #e5e7eb;
+  background: #d1d5db;
+  color: #1f2937;
 }
 
 .admin-tab.active {
@@ -6876,18 +6878,21 @@ button:disabled {
 
 .btn-view-user {
   padding: 6px 12px;
-  background: #f3f4f6;
-  border: 1px solid #d1d5db;
+  background: var(--primary-color);
+  color: white;
+  border: 1px solid var(--primary-color);
   border-radius: 6px;
   cursor: pointer;
   font-size: 12px;
+  font-weight: 500;
   transition: all 0.2s;
 }
 
 .btn-view-user:hover {
-  background: var(--primary-color);
+  background: #991b1b;
   color: white;
-  border-color: var(--primary-color);
+  border-color: #991b1b;
+  transform: translateY(-1px);
 }
 
 /* Admin modal */
