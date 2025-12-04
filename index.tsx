@@ -998,6 +998,173 @@ async function initGamificationUI() {
   ]);
 }
 
+// Get next training module for continue button
+function getNextTrainingModule(): { module: string; displayName: string } {
+  const unlockedModules = getUnlockedModules();
+  const completedModules = JSON.parse(localStorage.getItem('roof-er.completedModules') || '[]');
+
+  const moduleNames: Record<string, string> = {
+    'welcome': 'Welcome & Company Intro',
+    'commitment': 'Your Commitment',
+    'general-knowledge': 'General Roofing Knowledge',
+    'shingle-types-materials': 'Shingle Types & Materials',
+    'initial-pitch': 'The Initial Pitch',
+    'handling-initial-pitch-objections': 'Initial Pitch Objections',
+    'inspection-process': 'The Inspection Process',
+    'post-inspection-pitch': 'Post-Inspection Pitch',
+    'post-inspection-objections': 'Post-Inspection Objections',
+    'damage-identification': 'Damage Identification',
+    'filing-claim-closing': 'Filing the Claim & Closing',
+    'closing-objections': 'Closing Objections',
+    'discontinued-products': 'Discontinued Products',
+    'sales-cycle-job-flow': 'The Sales Cycle & Job Flow',
+    'role-play': 'AI Role-Play',
+    'final-exam': 'Final Exam'
+  };
+
+  for (const moduleName of MODULE_ORDER) {
+    if (unlockedModules.includes(moduleName) && !completedModules.includes(moduleName)) {
+      return { module: moduleName, displayName: moduleNames[moduleName] || moduleName };
+    }
+  }
+
+  // All complete - return to welcome
+  return { module: 'welcome', displayName: 'Welcome & Company Intro' };
+}
+
+// Calculate level from XP
+function calculateLevel(xp: number): { level: number; currentXp: number; nextLevelXp: number } {
+  const XP_PER_LEVEL = 500;
+  const level = Math.floor(xp / XP_PER_LEVEL) + 1;
+  const currentXp = xp % XP_PER_LEVEL;
+  const nextLevelXp = XP_PER_LEVEL;
+  return { level, currentXp, nextLevelXp };
+}
+
+// Format time for display
+function formatTrainingTime(minutes: number): string {
+  if (minutes < 60) return `${minutes}m`;
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+}
+
+// Initialize My Page dashboard
+async function initMyPage() {
+  const user = getCurrentUser();
+  const userName = user?.name || 'Trainee';
+
+  // Update greeting
+  const greetingEl = document.getElementById('profile-greeting');
+  if (greetingEl) greetingEl.textContent = `Welcome back, ${userName}!`;
+
+  // Get user stats from localStorage/API
+  const completedModules = JSON.parse(localStorage.getItem('roof-er.completedModules') || '[]');
+  const totalXp = parseInt(localStorage.getItem('roof-er.totalXp') || '0');
+  const streak = parseInt(localStorage.getItem('roof-er.currentStreak') || '0');
+  const trainingMinutes = parseInt(localStorage.getItem('roof-er.trainingMinutes') || '0');
+  const quizScores = JSON.parse(localStorage.getItem('roof-er.quizScores') || '[]');
+  const avgScore = quizScores.length > 0
+    ? Math.round(quizScores.reduce((a: number, b: number) => a + b, 0) / quizScores.length)
+    : 0;
+
+  // Calculate level
+  const levelInfo = calculateLevel(totalXp);
+
+  // Update profile section
+  const levelTextEl = document.getElementById('profile-level-text');
+  if (levelTextEl) levelTextEl.textContent = `Level ${levelInfo.level}`;
+
+  const xpTextEl = document.getElementById('profile-xp-text');
+  if (xpTextEl) xpTextEl.textContent = `${totalXp} XP`;
+
+  const xpBarEl = document.getElementById('xp-progress-bar');
+  if (xpBarEl) xpBarEl.style.width = `${(levelInfo.currentXp / levelInfo.nextLevelXp) * 100}%`;
+
+  const xpToNextEl = document.getElementById('xp-to-next');
+  if (xpToNextEl) xpToNextEl.textContent = `${levelInfo.nextLevelXp - levelInfo.currentXp} XP to Level ${levelInfo.level + 1}`;
+
+  // Update stats
+  const modulesEl = document.getElementById('stat-modules');
+  if (modulesEl) modulesEl.textContent = `${completedModules.length}/16`;
+
+  const streakEl = document.getElementById('stat-streak');
+  if (streakEl) streakEl.textContent = streak.toString();
+
+  const timeEl = document.getElementById('stat-time');
+  if (timeEl) timeEl.textContent = formatTrainingTime(trainingMinutes);
+
+  const avgScoreEl = document.getElementById('stat-avg-score');
+  if (avgScoreEl) avgScoreEl.textContent = quizScores.length > 0 ? `${avgScore}%` : '--%';
+
+  const totalXpEl = document.getElementById('stat-total-xp');
+  if (totalXpEl) totalXpEl.textContent = totalXp.toLocaleString();
+
+  // Determine next milestone
+  const milestoneEl = document.getElementById('stat-milestone');
+  if (milestoneEl) {
+    if (completedModules.length < 16) {
+      const remaining = 16 - completedModules.length;
+      milestoneEl.textContent = `${remaining} modules`;
+    } else {
+      milestoneEl.textContent = 'Complete!';
+    }
+  }
+
+  // Setup continue training button
+  const nextModule = getNextTrainingModule();
+  const continueBtnText = document.getElementById('continue-btn-text');
+  if (continueBtnText) {
+    if (completedModules.length === 0) {
+      continueBtnText.textContent = 'Start Training';
+    } else if (completedModules.length >= 16) {
+      continueBtnText.textContent = 'Review Training';
+    } else {
+      continueBtnText.textContent = `Continue - ${nextModule.displayName}`;
+    }
+  }
+
+  const continueBtn = document.getElementById('continue-training-btn');
+  if (continueBtn) {
+    continueBtn.onclick = () => {
+      // Navigate to the next module
+      const sidebar = document.getElementById('sidebar');
+      const targetItem = sidebar?.querySelector(`[data-module="${nextModule.module}"]`) as HTMLElement;
+      if (targetItem) {
+        targetItem.click();
+      }
+    };
+  }
+
+  const startOverBtn = document.getElementById('start-over-btn');
+  if (startOverBtn) {
+    startOverBtn.onclick = () => {
+      const sidebar = document.getElementById('sidebar');
+      const targetItem = sidebar?.querySelector('[data-module="welcome"]') as HTMLElement;
+      if (targetItem) {
+        targetItem.click();
+      }
+    };
+  }
+
+  // Render gamification sections
+  const gamificationContainer = document.getElementById('dashboard-gamification');
+  if (gamificationContainer) {
+    gamificationContainer.innerHTML = '';
+    await Promise.all([
+      renderBadgesSection(gamificationContainer),
+      renderLeaderboardSection(gamificationContainer)
+    ]);
+  }
+
+  // Render daily review
+  const reviewContainer = document.getElementById('dashboard-review');
+  if (reviewContainer) {
+    reviewContainer.innerHTML = '';
+    await renderDailyReviewSection(reviewContainer);
+  }
+}
+
 // Agnes-21 IndexedDB Video Storage
 const AGNES_VIDEO_DB_VERSION = 1;
 const AGNES_VIDEO_STORE = 'recordings';
@@ -1259,6 +1426,95 @@ const trainingScriptMap: Record<string, { scripts: string[]; keyPhrases: string[
 
 // Store all training content in an object
 const trainingContent = {
+  'my-page': `
+    <div class="my-page-container">
+      <!-- Profile Header -->
+      <div class="profile-header">
+        <div class="profile-avatar">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+          </svg>
+        </div>
+        <div class="profile-info">
+          <h1 id="profile-greeting">Welcome back!</h1>
+          <div class="profile-level">
+            <span id="profile-level-text">Level 1</span>
+            <span class="xp-separator">•</span>
+            <span id="profile-xp-text">0 XP</span>
+          </div>
+          <div class="xp-progress-container">
+            <div class="xp-progress-bar" id="xp-progress-bar" style="width: 0%"></div>
+          </div>
+          <p class="xp-to-next" id="xp-to-next">0 XP to next level</p>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon modules-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/></svg>
+          </div>
+          <div class="stat-value" id="stat-modules">0/16</div>
+          <div class="stat-label">Modules Completed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon streak-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/></svg>
+          </div>
+          <div class="stat-value" id="stat-streak">0</div>
+          <div class="stat-label">Day Streak</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon time-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+          </div>
+          <div class="stat-value" id="stat-time">0m</div>
+          <div class="stat-label">Time Trained</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon score-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+          </div>
+          <div class="stat-value" id="stat-avg-score">--%</div>
+          <div class="stat-label">Avg Quiz Score</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon xp-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+          </div>
+          <div class="stat-value" id="stat-total-xp">0</div>
+          <div class="stat-label">Total XP</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon milestone-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/></svg>
+          </div>
+          <div class="stat-value" id="stat-milestone">--</div>
+          <div class="stat-label">Next Milestone</div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button class="continue-training-btn" id="continue-training-btn">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          <span id="continue-btn-text">Start Training</span>
+        </button>
+        <button class="start-over-btn" id="start-over-btn">Start from Beginning</button>
+      </div>
+
+      <!-- Gamification Section -->
+      <div class="dashboard-gamification" id="dashboard-gamification">
+        <!-- Leaderboard and Badges will be rendered here -->
+      </div>
+
+      <!-- Daily Review -->
+      <div class="dashboard-review" id="dashboard-review">
+        <!-- Daily review section will be rendered here -->
+      </div>
+    </div>
+  `,
   welcome: `
     <div class="content-card">
       <h1>Welcome to Roof-ER!</h1>
@@ -6637,6 +6893,9 @@ function renderModule(moduleName: string) {
 
   // Initialize interactive elements for specific modules
   switch (moduleName) {
+      case 'my-page':
+          initMyPage();
+          break;
       case 'quiz':
           document.getElementById('generateQuizButton')?.addEventListener('click', generateQuiz);
           break;
@@ -6653,7 +6912,6 @@ function renderModule(moduleName: string) {
           initQuickQuiz1();
           initWelcomeModals();
           initLeadershipBios();
-          initGamificationUI();
           break;
       case 'post-inspection-objections':
           initModule9RoleplayButtons();
@@ -8049,8 +8307,8 @@ function initializeApp(): void {
     updateSidebarCertifiedBadge(true);
   }
 
-  renderModule('welcome');
-  document.querySelector('#sidebar li[data-module="welcome"]')?.classList.add('active');
+  renderModule('my-page');
+  document.querySelector('#sidebar li[data-module="my-page"]')?.classList.add('active');
 }
 
 // --- Initial Load ---
