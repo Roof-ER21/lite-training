@@ -230,6 +230,32 @@ export async function initDatabase(): Promise<void> {
         certified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         score INTEGER
       );
+
+      -- Add missing columns to module_progress table
+      ALTER TABLE module_progress ADD COLUMN IF NOT EXISTS last_accessed TIMESTAMP;
+
+      -- Add missing columns to user_gamification table
+      ALTER TABLE user_gamification ADD COLUMN IF NOT EXISTS unlocked_difficulties TEXT[] DEFAULT ARRAY['easy'];
+
+      -- Add missing columns to exam_attempts table
+      ALTER TABLE exam_attempts ADD COLUMN IF NOT EXISTS started_at TIMESTAMP;
+      ALTER TABLE exam_attempts ADD COLUMN IF NOT EXISTS mcq_correct INTEGER DEFAULT 0;
+      ALTER TABLE exam_attempts ADD COLUMN IF NOT EXISTS fib_correct INTEGER DEFAULT 0;
+      ALTER TABLE exam_attempts ADD COLUMN IF NOT EXISTS sa_points INTEGER DEFAULT 0;
+
+      -- Ensure exam_answers table has all required columns
+      ALTER TABLE exam_answers ADD COLUMN IF NOT EXISTS question_number INTEGER;
+      ALTER TABLE exam_answers ADD COLUMN IF NOT EXISTS question_text TEXT;
+      ALTER TABLE exam_answers ADD COLUMN IF NOT EXISTS points_earned INTEGER DEFAULT 0;
+
+      -- Create roleplay_scores table if not exists (referenced in reset-progress)
+      CREATE TABLE IF NOT EXISTS roleplay_scores (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        session_id UUID REFERENCES roleplay_sessions(id) ON DELETE CASCADE,
+        category VARCHAR(50),
+        score INTEGER,
+        feedback TEXT
+      );
     `;
 
     await pool.query(migrations);
