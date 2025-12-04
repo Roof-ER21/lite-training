@@ -415,7 +415,11 @@ function updateSidebarLocks() {
   const items = sidebar?.querySelectorAll('li[data-module]');
   items?.forEach(item => {
     const moduleName = (item as HTMLElement).dataset.module || '';
-    if (unlocked.includes(moduleName)) {
+    // My Page and admin-dashboard are never locked
+    if (moduleName === 'my-page' || moduleName === 'admin-dashboard') {
+      item.classList.remove('locked');
+      item.classList.add('unlocked');
+    } else if (unlocked.includes(moduleName)) {
       item.classList.remove('locked');
       item.classList.add('unlocked');
     } else {
@@ -6947,8 +6951,11 @@ function handleNavigation(event: Event) {
   if (target.tagName === 'LI' && target.dataset.module) {
     const moduleName = target.dataset.module;
 
-    // Admin dashboard is always accessible for managers
-    if (moduleName === 'admin-dashboard') {
+    // My Page is always accessible - it's a dashboard, not a training module
+    if (moduleName === 'my-page') {
+      // Always allow access to My Page
+    } else if (moduleName === 'admin-dashboard') {
+      // Admin dashboard is always accessible for managers
       if (!isManagerMode()) {
         alert('Admin dashboard is only accessible to managers.');
         return;
