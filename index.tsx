@@ -1319,10 +1319,11 @@ Threshold: ${doorSlamInfo.description}
 3. Use progressive objections - start mild, escalate based on their responses
 4. Interrupt according to your persona
 
-## TRANSCRIPT SUMMARY (IMPORTANT):
-Before EVERY response, start with a brief summary of what the rep just said in square brackets:
-[Rep: introduced themselves as ___, mentioned ___, asked about ___]
-Then provide your in-character response on a new line. This helps track the conversation in the transcript.
+## IMPORTANT - DO NOT REPEAT WHAT THE USER SAID:
+Never summarize, repeat, or acknowledge what the sales rep just said before responding. Just respond naturally in character. The user's audio is already captured separately in the transcript - you don't need to echo it back.
+
+WRONG: "You said your name is John and you're from Roof-ER... well I'm not interested."
+CORRECT: "I'm not interested, we just had someone come by last week."
 
 ## THE 5 NON-NEGOTIABLES (For Scoring):
 1. Who you are (name introduction) - 10 pts
