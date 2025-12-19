@@ -10514,7 +10514,7 @@ button:disabled {
 .flip-card {
   background: transparent;
   perspective: 1000px;
-  height: 160px;
+  height: 100px;
   cursor: pointer;
 }
 
@@ -10552,8 +10552,7 @@ button:disabled {
 }
 
 .flip-card-front .flip-icon {
-  font-size: 2rem;
-  margin-bottom: 10px;
+  display: none;
 }
 
 .flip-card-front h3 {
@@ -10607,6 +10606,7 @@ button:disabled {
 .diagram-container {
   text-align: center;
   margin-bottom: 20px;
+  position: relative;
 }
 
 .diagram-container img {
@@ -10614,9 +10614,20 @@ button:disabled {
   height: auto;
   border-radius: 8px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  object-fit: cover;
-  object-position: top;
-  max-height: 400px;
+}
+
+/* Black bar to cover watermark at bottom */
+.diagram-container::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 40px);
+  max-width: 600px;
+  height: 30px;
+  background: #000;
+  border-radius: 0 0 6px 6px;
 }
 
 .roof-parts-legend {
