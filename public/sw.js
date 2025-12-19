@@ -45,14 +45,23 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Skip video/audio files - they use range requests (206) which can't be cached
+  const url = new URL(event.request.url);
+  const isMediaFile = url.pathname.match(/\.(mp4|webm|ogg|mp3|wav|m4a)$/i);
+  if (isMediaFile) {
+    return; // Let browser handle media files directly
+  }
+
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // Clone the response to cache it
-        const responseClone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseClone);
-        });
+        // Only cache successful full responses (not partial 206)
+        if (response.status === 200) {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseClone);
+          });
+        }
         return response;
       })
       .catch(() => {

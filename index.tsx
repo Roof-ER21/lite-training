@@ -266,28 +266,28 @@ const FINAL_EXAM_MCQ: MCQQuestion[] = [
   { id: 'mcq-6', module: 4, question: 'What is the typical warranty period for architectural shingles?', options: ['10 years', '25-30 years', '50 years', 'Lifetime'], correctAnswer: 1, explanation: 'Most architectural shingles carry a 25-30 year warranty.' },
 
   // Module 5: Initial Pitch (4 MCQ)
-  { id: 'mcq-7', module: 5, question: 'What are the 5 Non-Negotiables of the initial pitch?', options: ['Name, Company, Price, Timeline, Close', 'Who you are, Who we are, Make it relatable, Purpose, Go for the close', 'Greeting, Inspect, Photo, File, Sign', 'Introduction, Benefits, Price, Warranty, Close'], correctAnswer: 1, explanation: 'The 5 Non-Negotiables: Who you are, Who we are, Make it relatable, Purpose (inspection), Go for the close.' },
-  { id: 'mcq-8', module: 5, question: 'What should you mention to make your pitch relatable?', options: ['Your personal story', 'Recent storms or helping neighbors', 'Company awards', 'Competitor weaknesses'], correctAnswer: 1, explanation: 'Mention recent storms or that you\'ve been helping their neighbors to create local relevance.' },
-  { id: 'mcq-9', module: 5, question: 'What is the primary purpose mentioned in the pitch?', options: ['Selling a roof', 'Getting a signature', 'Offering a free inspection', 'Collecting payment'], correctAnswer: 2, explanation: 'The purpose is offering a FREE inspection - no commitment, no pressure.' },
-  { id: 'mcq-10', module: 5, question: 'How long should you say the initial inspection takes?', options: ['5 minutes', '15 minutes', '45 minutes', '2 hours'], correctAnswer: 1, explanation: 'Tell them the inspection takes about 15 minutes - quick and easy.' },
+  { id: 'mcq-7', module: 5, question: 'During the post-inspection script, what is the most important thing you are prepping the homeowner for?', options: ['Signing the contract immediately', 'The adjuster will reach out to schedule an inspection, and it is critical that we are present', 'Paying the deductible upfront', 'Calling their insurance company themselves'], correctAnswer: 1, explanation: 'Prepping the homeowner that the adjuster will reach out to schedule an inspection, and the most important part is that we are present for that inspection.' },
+  { id: 'mcq-8', module: 5, question: 'What GAF certification does Rufiar have?', options: ['GAF Certified Contractor', 'GAF Master Elite', 'GAF Preferred Partner', 'GAF Basic Installer'], correctAnswer: 1, explanation: 'Rufiar holds the GAF Master Elite certification, the highest level of GAF contractor certification.' },
+  { id: 'mcq-9', module: 5, question: 'What does hail damage look like on asphalt shingles?', options: ['Straight line cracks', 'Round circular divots', 'Only color fading', 'Curled edges only'], correctAnswer: 1, explanation: 'Hail damage appears as round circular divots on asphalt shingles.' },
+  { id: 'mcq-10', module: 5, question: 'If a homeowner says "Will my rates go up?", what is the best response?', options: ['Yes, they probably will', 'I understand your concern - rates cannot go up and an individual homeowner cannot be penalized for an act of God claim', 'You should not file then', 'I am not sure about insurance rates'], correctAnswer: 1, explanation: 'Following the objection framework, empathize and explain that rates cannot go up for act of God claims - individual homeowners are not penalized.' },
 
   // Module 6: Handling Initial Objections (4 MCQ)
-  { id: 'mcq-11', module: 6, question: 'What is the L.E.A.R.N. framework for handling objections?', options: ['Look, Evaluate, Analyze, Report, Notify', 'Listen, Empathize, Ask, Respond, Navigate', 'Learn, Educate, Assist, Repair, Negotiate', 'List, Examine, Address, Resolve, Note'], correctAnswer: 1, explanation: 'L.E.A.R.N.: Listen, Empathize, Ask clarifying questions, Respond, Navigate to next step.' },
-  { id: 'mcq-12', module: 6, question: 'When a homeowner says "I\'m not interested," what should you do first?', options: ['Walk away immediately', 'Offer a discount', 'Ask what specifically concerns them', 'Call your manager'], correctAnswer: 2, explanation: 'First, ask what specifically concerns them to uncover the real objection.' },
+  { id: 'mcq-11', module: 6, question: 'When a homeowner says "We already have a roofer," what is the best response?', options: ['That is fine, we will leave', 'We hear that all the time - does the person you are working with specialize in insurance claims and storm restoration?', 'Our prices are lower than theirs', 'You should fire your current roofer'], correctAnswer: 1, explanation: 'Ask if their current roofer specializes in insurance claims and storm restoration to differentiate yourself.' },
+  { id: 'mcq-12', module: 6, question: 'What is non-negotiable number three?', options: ['Who you are', 'Who we are', 'Make it relatable', 'Go for the close'], correctAnswer: 2, explanation: 'Non-negotiable #3 is Make it relatable - connect with the homeowner through recent storms and helping neighbors.' },
   { id: 'mcq-13', module: 6, question: 'What\'s the best response to "I don\'t have time right now"?', options: ['Leave your card', 'Insist on doing it now', 'Offer to schedule a specific time that works for them', 'Say you\'ll only be 5 minutes'], correctAnswer: 2, explanation: 'Offer to schedule a specific time - respect their time while keeping the opportunity alive.' },
-  { id: 'mcq-14', module: 6, question: 'How should you handle "We already have a roofer"?', options: ['Criticize their roofer', 'Ask if they\'ve gotten a second opinion from a storm specialist', 'Give up and leave', 'Offer a lower price'], correctAnswer: 1, explanation: 'Ask about getting a second opinion - position yourself as a storm damage specialist.' },
+  { id: 'mcq-14', module: 6, question: 'What value proposition do we provide to our customers at Rufiar?', options: ['Lowest prices in the market', 'We handle everything from working with your insurance company all the way to the highest quality installation in the DC area', 'We only do installations', 'We file claims but do not install roofs'], correctAnswer: 1, explanation: 'Rufiar handles everything from the front end of working with insurance all the way to the highest quality installation in the DC area.' },
 
   // Module 7: Inspection Process (4 MCQ)
-  { id: 'mcq-15', module: 7, question: 'What is the first thing you should do during a roof inspection?', options: ['Start taking photos', 'Check for safety hazards and proper equipment', 'Knock on the door', 'Call the insurance company'], correctAnswer: 1, explanation: 'Safety first - always check for hazards and ensure you have proper equipment.' },
-  { id: 'mcq-16', module: 7, question: 'What size is a standard test square for damage documentation?', options: ['5x5 feet', '10x10 feet', '15x15 feet', '20x20 feet'], correctAnswer: 1, explanation: 'A 10x10 foot test square is the industry standard for counting damage.' },
-  { id: 'mcq-17', module: 7, question: 'How many photos should you typically take during an inspection?', options: ['5-10', '10-15', '20-40', '50+'], correctAnswer: 2, explanation: 'Take 20-40 photos to thoroughly document all damage and roof conditions.' },
-  { id: 'mcq-18', module: 7, question: 'What are the key areas to inspect for storm damage?', options: ['Only the shingles', 'Shingles, flashing, gutters, vents, and valleys', 'Just the gutters', 'Only visible damage from ground'], correctAnswer: 1, explanation: 'Inspect all components: shingles, flashing, gutters, vents, valleys, and accessories.' },
+  { id: 'mcq-15', module: 7, question: 'Which of the following is NOT important to inspect during your initial inspection for storm damage?', options: ['Shingles and gutters', 'Damage to wood fences and concrete structures', 'Flashing and downspouts', 'Vents and valleys'], correctAnswer: 1, explanation: 'Wood fences and concrete are not part of the roof inspection - focus on shingles, gutters, flashing, downspouts, vents, and valleys.' },
+  { id: 'mcq-16', module: 7, question: 'What is the first step to overcoming an objection?', options: ['Argue with the homeowner', 'React positively', 'Walk away', 'Offer a discount'], correctAnswer: 1, explanation: 'The first step to overcoming an objection is to react positively - stay calm and empathize.' },
+  { id: 'mcq-17', module: 7, question: 'What is an appropriate response to the objection "I\'ll think about it"?', options: ['Leave your card and hope they call', 'Ask what specifically they need to think about to address their concern', 'Apply heavy pressure to sign now', 'Tell them they are making a mistake'], correctAnswer: 1, explanation: 'Ask what specifically they need to think about - this helps uncover and address their real concern.' },
+  { id: 'mcq-18', module: 7, question: 'Based on the initial pitch, how long does the initial inspection take?', options: ['5 minutes', '15 minutes', '30 minutes', '1 hour'], correctAnswer: 1, explanation: 'According to the initial pitch, tell the homeowner the inspection takes about 15 minutes.' },
 
   // Module 8: Post-Inspection Pitch (4 MCQ)
-  { id: 'mcq-19', module: 8, question: 'After finding damage, what should you show the homeowner first?', options: ['Your contract', 'The photos of damage on their roof', 'Your pricing', 'Competitor reviews'], correctAnswer: 1, explanation: 'Show them the actual photos of damage on THEIR roof - visual evidence is powerful.' },
-  { id: 'mcq-20', module: 8, question: 'What is the main benefit to emphasize about filing an insurance claim?', options: ['You get paid more', 'They can get their roof replaced with little to no out-of-pocket cost', 'Insurance rates always go down', 'It\'s required by law'], correctAnswer: 1, explanation: 'Emphasize they can get a new roof with often just their deductible out-of-pocket.' },
-  { id: 'mcq-21', module: 8, question: 'When explaining the process, what should you emphasize about Roof E.R.\'s role?', options: ['We handle everything with the insurance company', 'They must do all paperwork themselves', 'We only do the installation', 'Insurance handles everything'], correctAnswer: 0, explanation: 'We handle everything - filing, adjusters, supplements, making it easy for homeowners.' },
-  { id: 'mcq-22', module: 8, question: 'What document do you need signed to file a claim on their behalf?', options: ['A check', 'Direction to Pay / Assignment of Benefits', 'Their insurance policy', 'A loan application'], correctAnswer: 1, explanation: 'The Direction to Pay / Assignment of Benefits allows us to work directly with their insurance.' },
+  { id: 'mcq-19', module: 8, question: 'Which of the following is a tip to ensure you create a comfortable environment for the homeowner when knocking?', options: ['Stand very close to the door', 'Keep a reasonable amount of space between you and the homeowner', 'Block the doorway so they cannot close it', 'Lean against the door frame'], correctAnswer: 1, explanation: 'Keep a reasonable amount of space between you and the homeowner to avoid being intrusive.' },
+  { id: 'mcq-20', module: 8, question: 'What is the best response to "I don\'t have time right now"?', options: ['Leave and never return', 'Say you understand and offer to schedule a specific time that works for them', 'Insist on doing it now', 'Tell them they are losing money'], correctAnswer: 1, explanation: 'Following the objection framework - understand their position and offer to schedule a specific time.' },
+  { id: 'mcq-21', module: 8, question: 'Which of the following is an example of wind damage on a roof?', options: ['Round circular divots', 'Missing tabs', 'Granule loss in a circle', 'Soft spots'], correctAnswer: 1, explanation: 'Missing tabs are a sign of wind damage on a roof.' },
+  { id: 'mcq-22', module: 8, question: 'What is the name of the form the customer signs that protects them by saying we only do work if we get them fully approved through their insurance?', options: ['Work Order Agreement', 'Contingency Agreement', 'Insurance Form', 'Payment Contract'], correctAnswer: 1, explanation: 'The Contingency Agreement protects the customer - we only do the work if they get fully approved by insurance.' },
 
   // Module 9: Post-Inspection Objections (4 MCQ)
   { id: 'mcq-23', module: 9, question: 'When a homeowner says "My rates will go up," what\'s the best response?', options: ['That\'s probably true', 'Rates increase due to regional claims, not individual claims, and not filing means $20K+ later', 'Don\'t file then', 'I don\'t know about insurance'], correctAnswer: 1, explanation: 'Explain rates increase regionally regardless, and not filing now means huge out-of-pocket costs later.' },
@@ -312,48 +312,67 @@ const FINAL_EXAM_MCQ: MCQQuestion[] = [
 ];
 
 const FINAL_EXAM_FIB: FIBQuestion[] = [
-  // Module 1-4: Basics (2 FIB)
-  { id: 'fib-1', module: 1, question: 'Roof E.R. was founded by _____ _____ in 2019.', acceptableAnswers: ['Oliver Brown', 'oliver brown', 'OLIVER BROWN'], explanation: 'Oliver Brown founded Roof E.R. in 2019.' },
-  { id: 'fib-2', module: 2, question: 'Roof E.R.\'s mission is to hold _____ responsibility to our customers.', acceptableAnswers: ['fiduciary', 'Fiduciary', 'FIDUCIARY'], explanation: 'Fiduciary responsibility means putting customer interests first.' },
+  // Hail damage presentation
+  { id: 'fib-1', module: 7, question: 'When presenting a hail damage photo to your customer, you should say: "This is exactly what I was looking for. As you can see, it is _____."', acceptableAnswers: ['round', 'Round', 'ROUND'], explanation: 'Hail damage appears as round circular divots on asphalt shingles.' },
 
-  // Module 5: Initial Pitch (1 FIB)
-  { id: 'fib-3', module: 5, question: 'The initial pitch should always end with going for the _____.', acceptableAnswers: ['close', 'Close', 'CLOSE'], explanation: 'Always go for the close - getting them to agree to the inspection.' },
+  // Non-negotiable #2
+  { id: 'fib-2', module: 5, question: 'Non-negotiable number two states who we are and what we _____.', acceptableAnswers: ['do', 'Do', 'DO'], explanation: 'Non-negotiable #2 covers who we are (Rufiar Roofing) and what we do (handle insurance claims and roofing).' },
 
-  // Module 6: Handling Initial Objections (1 FIB)
-  { id: 'fib-4', module: 6, question: 'The L.E.A.R.N. framework stands for Listen, _____, Ask, Respond, Navigate.', acceptableAnswers: ['Empathize', 'empathize', 'EMPATHIZE'], explanation: 'Empathize - show you understand their concerns before responding.' },
+  // Non-negotiable #5 - going for the close
+  { id: 'fib-3', module: 5, question: 'Non-negotiable number five is going for the close. That means you want to secure the _____.', acceptableAnswers: ['inspection', 'Inspection', 'INSPECTION'], explanation: 'Going for the close means securing the inspection appointment.' },
 
-  // Module 7: Inspection Process (1 FIB)
-  { id: 'fib-5', module: 7, question: 'A test square for damage documentation is _____x_____ feet.', acceptableAnswers: ['10x10', '10 x 10', '10 by 10', '10X10'], explanation: 'A 10x10 foot test square is standard for counting hail hits.' },
+  // Talk to spouse objection
+  { id: 'fib-4', module: 6, question: 'If the objection you get at the door is that they need to talk to their spouse, you should let them know that you understand and ask them "_____ are they available?"', acceptableAnswers: ['when', 'When', 'WHEN'], explanation: 'Ask when the spouse will be available so you can schedule a follow-up.' },
 
-  // Module 9: Post-Inspection Objections (1 FIB)
-  { id: 'fib-6', module: 9, question: 'When a homeowner needs to talk to their spouse, you should schedule a time when both _____ _____ are present.', acceptableAnswers: ['decision makers', 'decision-makers', 'Decision Makers', 'decisionmakers'], explanation: 'Both decision makers need to be present to avoid delays.' },
+  // Company leadership - GM
+  { id: 'fib-5', module: 1, question: 'The general manager of Rufiar is _____ _____.', acceptableAnswers: ['Ford Barce', 'ford barce', 'FORD BARCE', 'Ford barce'], explanation: 'Ford Barce is the General Manager of Rufiar Roofing.' },
 
-  // Module 10-11: Damage ID & Claims (1 FIB)
-  { id: 'fib-7', module: 10, question: 'Hail damage on shingles appears as round _____ with granule loss.', acceptableAnswers: ['bruises', 'Bruises', 'BRUISES', 'marks', 'spots'], explanation: 'Hail creates round bruises with exposed mat under the granules.' },
+  // Company leadership - Founder
+  { id: 'fib-6', module: 1, question: 'Rufiar was founded by _____ _____.', acceptableAnswers: ['Oliver Brown', 'oliver brown', 'OLIVER BROWN', 'Oliver brown'], explanation: 'Oliver Brown is the founder of Rufiar Roofing.' },
 
-  // Module 12: Closing Objections (1 FIB)
-  { id: 'fib-8', module: 12, question: 'The _____ close means acting as if they\'ve already agreed and moving forward.', acceptableAnswers: ['assumptive', 'Assumptive', 'ASSUMPTIVE'], explanation: 'The assumptive close proceeds as if they\'ve already said yes.' },
+  // Company leadership - Director of Sales
+  { id: 'fib-7', module: 1, question: 'The director of sales of Rufiar is _____ _____.', acceptableAnswers: ['Reese Samala', 'reese samala', 'REESE SAMALA', 'Reese samala'], explanation: 'Reese Samala is the Director of Sales at Rufiar Roofing.' },
 
-  // Module 13-14: Products & Sales Cycle (2 FIB)
-  { id: 'fib-9', module: 13, question: 'When a shingle is discontinued, insurance must pay for _____ roof replacement.', acceptableAnswers: ['full', 'Full', 'FULL', 'complete', 'Complete'], explanation: 'Discontinued products require full replacement to maintain warranty.' },
-  { id: 'fib-10', module: 14, question: 'After installation, the final step is _____ from the insurance company.', acceptableAnswers: ['collection', 'Collection', 'COLLECTION', 'payment', 'Payment'], explanation: 'Collection of the final payment completes the sales cycle.' }
+  // Wind damage
+  { id: 'fib-8', module: 10, question: 'Examples of _____ damage are missing tabs and creased shingles.', acceptableAnswers: ['wind', 'Wind', 'WIND'], explanation: 'Wind damage is characterized by missing tabs and creased shingles.' },
+
+  // Depreciation holdback
+  { id: 'fib-9', module: 11, question: 'The remaining insurance funds that the insurance company holds until we complete the work are called _____.', acceptableAnswers: ['depreciation', 'Depreciation', 'DEPRECIATION', 'depreciation holdback', 'Depreciation Holdback'], explanation: 'The depreciation holdback is released by the insurance company after the work is completed.' },
+
+  // Assumptive close
+  { id: 'fib-10', module: 12, question: 'The _____ close means acting as if they\'ve already agreed and moving forward.', acceptableAnswers: ['assumptive', 'Assumptive', 'ASSUMPTIVE'], explanation: 'The assumptive close proceeds as if they\'ve already said yes.' }
 ];
 
 const FINAL_EXAM_SA: SAQuestion[] = [
-  // Module 5: Initial Pitch (1 SA)
-  { id: 'sa-1', module: 5, prompt: 'Write a complete initial door knock pitch introducing yourself as a Roof E.R. representative. Include all 5 non-negotiables.', keywords: ['name', 'Roof E.R.', 'storm', 'neighbors', 'free', 'inspection', '15 minutes', 'insurance', 'damage', 'schedule', 'today', 'tomorrow'], minKeywords: 6, sampleAnswer: 'Hi, my name is [Name] with Roof E.R. We\'re a local roofing company helping homeowners get their roofs replaced using their insurance. We\'ve had some big storms recently and we\'ve been helping a lot of your neighbors file claims. I\'d like to offer you a completely free inspection - takes about 15 minutes. If there\'s damage, I can help you file a claim. If not, at least you\'ll have peace of mind. Would today or tomorrow work better for you?' },
+  // Non-negotiable #1 - Who you are
+  { id: 'sa-1', module: 5, prompt: 'Please write the section of your pitch that covers Non-Negotiable #1: Who you are.', keywords: ['name', 'my name is', 'hi', 'hello', 'introduce'], minKeywords: 2, sampleAnswer: 'Hi, my name is [Name].' },
 
-  // Module 8: Post-Inspection Pitch (1 SA)
-  { id: 'sa-2', module: 8, prompt: 'After finding storm damage, explain to the homeowner why they should file an insurance claim and how Roof E.R. helps.', keywords: ['damage', 'insurance', 'claim', 'deductible', 'out-of-pocket', 'free', 'handle', 'adjuster', 'file', 'replacement', 'cost', 'leak'], minKeywords: 5, sampleAnswer: 'I found clear storm damage on your roof. The good news is your insurance should cover the replacement - you\'d typically only pay your deductible. If you don\'t file now, you could be looking at $15-20K out of pocket when it starts leaking in a year or two. We handle everything with the insurance company - we file the claim, meet with the adjuster, and fight for you to get the full coverage you deserve.' },
+  // Non-negotiable #2 - Who we are and what we do
+  { id: 'sa-2', module: 5, prompt: 'Please write the section of your pitch that covers Non-Negotiable #2: Who we are and what we do.', keywords: ['Rufiar', 'roofing', 'company', 'insurance', 'claims', 'storm', 'restoration', 'DC area', 'local'], minKeywords: 3, sampleAnswer: 'I\'m with Rufiar Roofing. We\'re a local roofing company that specializes in insurance claims and storm restoration in the DC area.' },
 
-  // Module 9: Post-Inspection Objections (1 SA)
-  { id: 'sa-3', module: 9, prompt: 'A homeowner says: "I don\'t want to file a claim because my rates will go up." How do you respond?', keywords: ['rates', 'regional', 'claims', 'area', 'increase', 'regardless', 'pay', 'insurance', 'purpose', 'deductible', 'out-of-pocket', 'leak', 'thousands'], minKeywords: 4, sampleAnswer: 'I understand that concern. Here\'s what most people don\'t realize: rates are based on regional claims, not just your individual claim. Your rates may increase whether you file or not because of all the claims in your area. The real question is: would you rather pay your $1,000 deductible now, or $20,000 out of pocket when the roof fails? You pay premiums specifically for situations like this - it\'s your right to use your coverage.' },
+  // Non-negotiable #3 - Make it relatable
+  { id: 'sa-3', module: 5, prompt: 'Please write the section of your pitch that covers Non-Negotiable #3: Make it relatable.', keywords: ['storm', 'storms', 'neighbors', 'neighborhood', 'area', 'recently', 'helping', 'claims'], minKeywords: 3, sampleAnswer: 'We\'ve had some big storms recently and we\'ve been helping a lot of your neighbors file claims. We\'ve been working all through the neighborhood.' },
 
-  // Module 12: Closing Objections (1 SA)
-  { id: 'sa-4', module: 12, prompt: 'The homeowner says: "I need to think about it." How do you handle this objection?', keywords: ['think', 'specifically', 'concern', 'address', 'timeline', 'claim', 'deadline', 'help', 'question', 'worry', 'understand'], minKeywords: 4, sampleAnswer: 'I completely understand wanting to think it over. To make sure I can help address any concerns, can you tell me specifically what you need to think about? Is it the process, the timing, or something else? I ask because storm claims have time limits for filing, and I want to make sure you don\'t miss that window. What questions can I answer right now?' },
+  // Non-negotiable #4 - What you're there to do
+  { id: 'sa-4', module: 5, prompt: 'Please write the section of your pitch that covers Non-Negotiable #4: What you\'re there to do.', keywords: ['free', 'inspection', '15 minutes', 'damage', 'roof', 'look', 'check'], minKeywords: 3, sampleAnswer: 'I\'d like to offer you a completely free inspection. It only takes about 15 minutes and I\'ll check your roof for any storm damage.' },
 
-  // Module 13-14: Products & Sales Cycle (1 SA)
-  { id: 'sa-5', module: 14, prompt: 'Describe the complete Roof E.R. sales cycle from initial contact to final payment.', keywords: ['knock', 'door', 'inspect', 'inspection', 'damage', 'claim', 'file', 'adjuster', 'supplement', 'install', 'installation', 'collect', 'payment'], minKeywords: 5, sampleAnswer: 'The Roof E.R. sales cycle: 1) Door knock - introduce yourself and offer free inspection. 2) Roof inspection - document all damage with photos and test square. 3) File claim - submit paperwork to insurance with all documentation. 4) Adjuster meeting - meet on-site to ensure all damage is noted. 5) Supplements - request additional funds for any missed items. 6) Installation - complete the roof replacement. 7) Collection - receive final payment from insurance.' }
+  // Non-negotiable #5 - Go for the close (over close)
+  { id: 'sa-5', module: 5, prompt: 'Please write the section of your pitch that covers Non-Negotiable #5: Go for the close (over close).', keywords: ['today', 'tomorrow', 'now', 'schedule', 'time', 'work', 'available', 'inspection'], minKeywords: 2, sampleAnswer: 'Would today or tomorrow work better for you to do the inspection?' },
+
+  // After homeowner agrees to inspection
+  { id: 'sa-6', module: 7, prompt: 'After the homeowner agrees to do the inspection right then, what will you tell them?', keywords: ['card', 'business card', 'roof', 'go up', 'look', 'back', 'minute', 'minutes', 'wait', 'inside'], minKeywords: 3, sampleAnswer: 'Great! Let me give you my card. I\'m going to go up on your roof and take a look. It should only take about 15 minutes. You can wait inside and I\'ll come back down to show you what I find.' },
+
+  // After handing card, before inspection
+  { id: 'sa-7', module: 7, prompt: 'After you\'ve handed your homeowner your business card, what do you let them know before you conduct the inspection?', keywords: ['roof', 'photos', 'pictures', 'damage', 'back', 'show', 'find', 'let you know', 'results'], minKeywords: 3, sampleAnswer: 'I\'m going to take some photos of your roof and document anything I find. When I\'m done, I\'ll come back and show you exactly what I found so we can go over it together.' },
+
+  // Order of inspection
+  { id: 'sa-8', module: 7, prompt: 'Please write the order of the inspection (what do you inspect and in what order?).', keywords: ['shingles', 'gutters', 'downspouts', 'flashing', 'vents', 'valleys', 'roof', 'damage'], minKeywords: 4, sampleAnswer: 'The inspection order: 1) Shingles - look for hail damage (round divots) and wind damage (missing tabs, creased shingles). 2) Gutters and downspouts. 3) Flashing around vents and edges. 4) Valleys. 5) Any other damage to roof components.' },
+
+  // Collateral damage explanation
+  { id: 'sa-9', module: 8, prompt: 'After you finish the inspection, please write what you would explain to your homeowner about collateral damage.', keywords: ['collateral', 'damage', 'siding', 'windows', 'gutters', 'other', 'insurance', 'cover', 'claim', 'include'], minKeywords: 3, sampleAnswer: 'When we file the claim, we can also include any collateral damage from the storm - that\'s damage to other parts of your property like siding, gutters, windows, or fencing. The insurance should cover all storm-related damage, not just the roof.' },
+
+  // Most important step
+  { id: 'sa-10', module: 8, prompt: 'Please explain below what is the most important step of this process moving forward.', keywords: ['adjuster', 'inspection', 'present', 'there', 'meeting', 'insurance', 'we', 'Rufiar', 'represent', 'fair'], minKeywords: 4, sampleAnswer: 'The most important step is that we are present when the insurance adjuster comes out to conduct their inspection. This is critical because we need to be there to make sure the customer gets a fair shake and that all the damage is properly documented. Without us there, the adjuster might miss damage or undervalue the claim.' }
 ];
 
 // Manager access code (managers enter this to unlock all)
@@ -378,6 +397,231 @@ const MODULE_ORDER = [
   'role-play',
   'final-exam'
 ];
+
+// ============================================================================
+// MODULE ENGAGEMENT TRACKING SYSTEM
+// ============================================================================
+
+// Requirements per module for completion button to appear
+interface ModuleRequirements {
+  needsVideo?: boolean;
+  needsQuiz?: boolean;
+  needsTime?: number; // seconds
+  needsScroll: boolean;
+}
+
+const MODULE_REQUIREMENTS: Record<string, ModuleRequirements> = {
+  'welcome': { needsVideo: true, needsScroll: true },
+  'commitment': { needsScroll: true }, // Special: handled by existing gate logic
+  'general-knowledge': { needsTime: 60, needsScroll: true },
+  'shingle-types-materials': { needsTime: 60, needsScroll: true },
+  'initial-pitch': { needsTime: 60, needsScroll: true },
+  'handling-initial-pitch-objections': { needsTime: 60, needsScroll: true },
+  'inspection-process': { needsTime: 60, needsScroll: true },
+  'post-inspection-pitch': { needsTime: 60, needsScroll: true },
+  'post-inspection-objections': { needsTime: 60, needsScroll: true },
+  'damage-identification': { needsQuiz: true, needsScroll: true },
+  'filing-claim-closing': { needsTime: 60, needsScroll: true },
+  'closing-objections': { needsTime: 60, needsScroll: true },
+  'discontinued-products': { needsTime: 60, needsScroll: true },
+  'sales-cycle-job-flow': { needsTime: 60, needsScroll: true },
+  'role-play': { needsScroll: true }, // Special: unlock when role-play starts
+  'final-exam': { needsQuiz: true, needsScroll: true },
+};
+
+// Engagement state per module
+interface ModuleEngagement {
+  scrolledToBottom: boolean;
+  timeSpent: number;
+  videoWatched: boolean;
+  quizPassed: boolean;
+}
+
+const moduleEngagement: Record<string, ModuleEngagement> = {};
+let currentModuleForEngagement: string | null = null;
+let engagementTimeInterval: number | null = null;
+let moduleStartTime: number | null = null;
+let scrollListener: (() => void) | null = null;
+
+// Initialize engagement state for a module
+function initModuleEngagement(moduleName: string) {
+  // Stop previous tracking
+  stopEngagementTracking();
+
+  currentModuleForEngagement = moduleName;
+
+  // Initialize or restore engagement state
+  if (!moduleEngagement[moduleName]) {
+    moduleEngagement[moduleName] = {
+      scrolledToBottom: false,
+      timeSpent: 0,
+      videoWatched: false,
+      quizPassed: false,
+    };
+  }
+
+  // Check if video was already watched (from localStorage)
+  const requirements = MODULE_REQUIREMENTS[moduleName];
+  if (requirements?.needsVideo) {
+    const watchedKey = `video-watched-welcome-video`;
+    if (localStorage.getItem(watchedKey) === 'true') {
+      moduleEngagement[moduleName].videoWatched = true;
+    }
+  }
+
+  // Start tracking
+  startScrollTracking(moduleName);
+  startEngagementTimeTracking(moduleName);
+
+  // Initial check
+  checkModuleCompletion(moduleName);
+}
+
+// Start scroll tracking
+function startScrollTracking(moduleName: string) {
+  const mainContentEl = document.getElementById('main-content');
+  if (!mainContentEl) return;
+
+  scrollListener = () => {
+    const scrollTop = mainContentEl.scrollTop;
+    const scrollHeight = mainContentEl.scrollHeight;
+    const clientHeight = mainContentEl.clientHeight;
+
+    // Within 100px of bottom = scrolled to bottom
+    if (scrollTop + clientHeight >= scrollHeight - 100) {
+      if (moduleEngagement[moduleName] && !moduleEngagement[moduleName].scrolledToBottom) {
+        moduleEngagement[moduleName].scrolledToBottom = true;
+        updateRequirementIndicator(moduleName, 'scroll', true);
+        checkModuleCompletion(moduleName);
+      }
+    }
+  };
+
+  mainContentEl.addEventListener('scroll', scrollListener);
+}
+
+// Start time tracking
+function startEngagementTimeTracking(moduleName: string) {
+  moduleStartTime = Date.now();
+
+  engagementTimeInterval = window.setInterval(() => {
+    if (moduleStartTime && moduleEngagement[moduleName]) {
+      const elapsed = Math.floor((Date.now() - moduleStartTime) / 1000);
+      moduleEngagement[moduleName].timeSpent = elapsed;
+
+      // Update time indicator
+      const requirements = MODULE_REQUIREMENTS[moduleName];
+      if (requirements?.needsTime) {
+        const remaining = Math.max(0, requirements.needsTime - elapsed);
+        const timeEl = document.getElementById('req-time');
+        if (timeEl) {
+          if (remaining > 0) {
+            timeEl.innerHTML = `<span class="req-icon">&#9711;</span> Read for ${remaining}s more`;
+            timeEl.className = 'requirement-item pending';
+          } else {
+            timeEl.innerHTML = `<span class="req-icon">&#10003;</span> Time requirement met`;
+            timeEl.className = 'requirement-item complete';
+          }
+        }
+      }
+
+      checkModuleCompletion(moduleName);
+    }
+  }, 1000);
+}
+
+// Stop all engagement tracking
+function stopEngagementTracking() {
+  if (engagementTimeInterval) {
+    clearInterval(engagementTimeInterval);
+    engagementTimeInterval = null;
+  }
+  moduleStartTime = null;
+
+  if (scrollListener) {
+    const mainContentEl = document.getElementById('main-content');
+    if (mainContentEl) {
+      mainContentEl.removeEventListener('scroll', scrollListener);
+    }
+    scrollListener = null;
+  }
+}
+
+// Update a requirement indicator
+function updateRequirementIndicator(moduleName: string, type: 'scroll' | 'video' | 'quiz' | 'time', complete: boolean) {
+  const elementId = `req-${type}`;
+  const el = document.getElementById(elementId);
+  if (el) {
+    el.className = `requirement-item ${complete ? 'complete' : 'pending'}`;
+    const icon = complete ? '&#10003;' : '&#9711;';
+    const text = el.getAttribute('data-text') || el.textContent || '';
+    el.innerHTML = `<span class="req-icon">${icon}</span> ${text.replace(/^[^\s]+\s*/, '')}`;
+  }
+}
+
+// Mark video as watched in engagement state
+function markVideoWatched(moduleName: string) {
+  if (moduleEngagement[moduleName]) {
+    moduleEngagement[moduleName].videoWatched = true;
+    updateRequirementIndicator(moduleName, 'video', true);
+    checkModuleCompletion(moduleName);
+  }
+}
+
+// Mark quiz as passed in engagement state
+function markQuizPassed(moduleName: string) {
+  if (moduleEngagement[moduleName]) {
+    moduleEngagement[moduleName].quizPassed = true;
+    updateRequirementIndicator(moduleName, 'quiz', true);
+    checkModuleCompletion(moduleName);
+  }
+}
+
+// Check if all requirements are met and show/hide completion button
+function checkModuleCompletion(moduleName: string) {
+  const requirements = MODULE_REQUIREMENTS[moduleName];
+  const engagement = moduleEngagement[moduleName];
+
+  if (!requirements || !engagement) return;
+
+  let canComplete = true;
+
+  // Check scroll
+  if (requirements.needsScroll && !engagement.scrolledToBottom) {
+    canComplete = false;
+  }
+
+  // Check time
+  if (requirements.needsTime && engagement.timeSpent < requirements.needsTime) {
+    canComplete = false;
+  }
+
+  // Check video
+  if (requirements.needsVideo && !engagement.videoWatched) {
+    canComplete = false;
+  }
+
+  // Check quiz
+  if (requirements.needsQuiz && !engagement.quizPassed) {
+    canComplete = false;
+  }
+
+  // Show/hide completion button
+  const section = document.getElementById('module-complete-section');
+  if (section) {
+    if (canComplete) {
+      section.style.display = 'block';
+      section.classList.add('revealed');
+    } else {
+      section.style.display = 'none';
+      section.classList.remove('revealed');
+    }
+  }
+}
+
+// Expose engagement functions globally for use in onclick handlers
+(window as any).markVideoWatched = markVideoWatched;
+(window as any).markQuizPassed = markQuizPassed;
 
 // Check if manager mode is active (either via old toggle or new login system)
 function isManagerMode(): boolean {
@@ -1102,6 +1346,18 @@ async function initMyPage() {
     console.log('Could not fetch progress data, using defaults');
   }
 
+  // Fallback to localStorage if API returned no data
+  if (completedModulesCount === 0) {
+    const localCompleted = JSON.parse(localStorage.getItem('roof-er.completedModules') || '[]');
+    completedModulesCount = localCompleted.length;
+
+    // Also try to get XP and streak from localStorage
+    const localXp = parseInt(localStorage.getItem('roof-er.totalXp') || '0', 10);
+    const localStreak = parseInt(localStorage.getItem('roof-er.streak') || '0', 10);
+    if (localXp > totalXp) totalXp = localXp;
+    if (localStreak > streak) streak = localStreak;
+  }
+
   // Calculate level
   const levelInfo = calculateLevel(totalXp);
 
@@ -1553,6 +1809,7 @@ const trainingContent = {
   welcome: `
     <div class="content-card">
       <h1>Welcome to Roof-ER!</h1>
+
       ${renderVideoPlayer('/assets/training/videos/welcome-intro.mp4', 'welcome-video', '📹 Welcome Introduction')}
       <p>My name is Oliver Brown. I founded this company in 2019, not because I have a passion for roofing, but because I saw an opportunity to change the reputation of roofing companies and contractors as a whole. This is an industry that is known for lack of communication, poor workmanship, and straight up deceit. With a little bit of modern thinking, integrity and hard work we've been able to build a strong brand and reputation in a relatively short amount of time.</p>
       <p>We have ambitions of becoming a national brand. To accomplish this we need to continue to add and develop hungry, competitive team members who are dedicated to the big picture but disciplined to execute on a day to day basis.</p>
@@ -1620,9 +1877,26 @@ const trainingContent = {
             <p>🎥 Introduction video coming soon</p>
           </div>
         </div>
+
+        <!-- Ross Renzi -->
+        <div class="leader-card">
+          <div class="leader-avatar-placeholder">RR</div>
+          <h3>Ross Renzi</h3>
+          <p class="leader-title">Regional Sales Manager</p>
+          <p class="leader-highlight">Experienced regional sales leader driving team development and market expansion across territories.</p>
+          <button class="bio-toggle-btn" data-bio="ross-bio">My Bio</button>
+          <div id="ross-bio" class="leader-bio-full" style="display: none;">
+            <p>Ross Renzi serves as Regional Sales Manager at Roof-ER, where he leads sales operations and team development across his assigned territories. His leadership focuses on building high-performing sales teams and expanding market presence.</p>
+            <p>With a strong background in sales management and team leadership, Ross brings valuable experience in coaching and developing sales professionals. He is dedicated to implementing best practices and ensuring consistent execution of Roof-ER's customer-first approach.</p>
+            <p>Ross's commitment to excellence and team success makes him an integral part of Roof-ER's growth strategy as the company continues to expand its regional footprint.</p>
+          </div>
+          <div class="video-placeholder">
+            <p>🎥 Introduction video coming soon</p>
+          </div>
+        </div>
       </div>
 
-      <h2>Our Mission & Values</h2>
+      <h2 id="mission-values-section">Our Mission & Values</h2>
       <div class="values-section">
         <h3>Mission</h3>
         <p>At Roof-ER, our mission is to hold a fiduciary responsibility to our customers - plain and simple. To restore peace of mind for homeowners through expert storm damage restoration and quality roofing services.</p>
@@ -1634,125 +1908,408 @@ const trainingContent = {
           <li><strong>Simplicity:</strong> Make the process straightforward and stress-free for every customer</li>
         </ul>
       </div>
+
+      <div class="module-completion-section" id="module-complete-section" style="display: none;">
+        <button class="complete-module-btn" onclick="completeModule('welcome')">
+          Complete Module & Continue
+        </button>
+      </div>
     </div>
   `,
   commitment: `
-    <div class="content-card">
+    <div class="content-card commitment-module">
       <h1>Your Commitment</h1>
       ${renderVideoPlayer('/assets/training/videos/module2-commitment.mp4', 'commitment-video', '📹 Your Commitment to Excellence')}
 
+      <!-- Video requirement notice -->
+      <div class="commitment-video-notice" id="commitment-video-notice">
+        <div class="notice-icon">📹</div>
+        <div class="notice-text">
+          <strong>Step 1:</strong> Please watch the commitment video above before proceeding.
+          <div class="video-progress-text" id="commitment-video-progress">Video progress: 0%</div>
+        </div>
+      </div>
+
       <h2>The Roof-ER Promise</h2>
       <div class="promise-section">
+        <div class="promise-icon">🤝</div>
         <p><strong>We promise to:</strong></p>
         <ul>
-          <li>Treat every homeowner's property as if it were our own</li>
-          <li>Provide honest assessments, even if it means no sale</li>
-          <li>Fight for maximum coverage on every claim</li>
-          <li>Complete every project with excellence and professionalism</li>
-          <li>Stand behind our work for the lifetime of the roof</li>
-          <li>Communicate clearly and promptly throughout the process</li>
+          <li><span class="promise-check">✓</span> Treat every homeowner's property as if it were our own</li>
+          <li><span class="promise-check">✓</span> Provide honest assessments, even if it means no sale</li>
+          <li><span class="promise-check">✓</span> Fight for maximum coverage on every claim</li>
+          <li><span class="promise-check">✓</span> Complete every project with excellence and professionalism</li>
+          <li><span class="promise-check">✓</span> Stand behind our work for the lifetime of the roof</li>
+          <li><span class="promise-check">✓</span> Communicate clearly and promptly throughout the process</li>
         </ul>
       </div>
 
       <h2>Your Commitment as a Roof-ER Representative</h2>
+      <p>As a member of the Roof-ER team, your commitment to our values and processes is paramount to our collective success.</p>
 
-      <p>As a member of the Roof-ER team, your commitment to our values and processes is paramount to our collective success. Here is what we expect:</p>
+      <div class="commitment-progress-bar">
+        <div class="progress-fill" id="initials-progress-fill" style="width: 0%"></div>
+        <span class="progress-text" id="initials-progress-text">0 of 8 commitments initialed</span>
+      </div>
 
-      <div class="commitment-initials-section">
-        <div class="commitment-item">
-          <input type="text" class="initial-box" maxlength="3" placeholder="Init." aria-label="Initial for first commitment" />
-          <span>I will conduct myself in alignment with the Mission and Core Values.</span>
+      <div class="commitment-initials-section" id="commitment-initials-section">
+        <div class="commitment-item" data-index="1">
+          <div class="commitment-number">1</div>
+          <input type="text" class="initial-box" id="initial-1" maxlength="3" placeholder="Init." aria-label="Initial for first commitment" />
+          <span class="commitment-text">I will conduct myself in alignment with the Mission and Core Values.</span>
+          <div class="commitment-check" id="check-1">✓</div>
         </div>
-        <div class="commitment-item">
-          <input type="text" class="initial-box" maxlength="3" placeholder="Init." aria-label="Initial for second commitment" />
-          <span>I will dedicate myself to Roof-ER's successful sales process.</span>
+        <div class="commitment-item" data-index="2">
+          <div class="commitment-number">2</div>
+          <input type="text" class="initial-box" id="initial-2" maxlength="3" placeholder="Init." aria-label="Initial for second commitment" />
+          <span class="commitment-text">I will dedicate myself to Roof-ER's successful sales process.</span>
+          <div class="commitment-check" id="check-2">✓</div>
         </div>
-        <div class="commitment-item">
-          <input type="text" class="initial-box" maxlength="3" placeholder="Init." aria-label="Initial for third commitment" />
-          <span>I will always show an exceptional level of integrity.</span>
+        <div class="commitment-item" data-index="3">
+          <div class="commitment-number">3</div>
+          <input type="text" class="initial-box" id="initial-3" maxlength="3" placeholder="Init." aria-label="Initial for third commitment" />
+          <span class="commitment-text">I will always show an exceptional level of integrity.</span>
+          <div class="commitment-check" id="check-3">✓</div>
         </div>
-        <div class="commitment-item">
-          <input type="text" class="initial-box" maxlength="3" placeholder="Init." aria-label="Initial for fourth commitment" />
-          <span>I will listen to and grow from receiving constructive feedback.</span>
+        <div class="commitment-item" data-index="4">
+          <div class="commitment-number">4</div>
+          <input type="text" class="initial-box" id="initial-4" maxlength="3" placeholder="Init." aria-label="Initial for fourth commitment" />
+          <span class="commitment-text">I will listen to and grow from receiving constructive feedback.</span>
+          <div class="commitment-check" id="check-4">✓</div>
         </div>
-        <div class="commitment-item">
-          <input type="text" class="initial-box" maxlength="3" placeholder="Init." aria-label="Initial for fifth commitment" />
-          <span>I will not be involved in gossip or "office drama."</span>
+        <div class="commitment-item" data-index="5">
+          <div class="commitment-number">5</div>
+          <input type="text" class="initial-box" id="initial-5" maxlength="3" placeholder="Init." aria-label="Initial for fifth commitment" />
+          <span class="commitment-text">I will not be involved in gossip or "office drama."</span>
+          <div class="commitment-check" id="check-5">✓</div>
         </div>
-        <div class="commitment-item">
-          <input type="text" class="initial-box" maxlength="3" placeholder="Init." aria-label="Initial for sixth commitment" />
-          <span>I will show an intense level of discipline in the work that I conduct.</span>
+        <div class="commitment-item" data-index="6">
+          <div class="commitment-number">6</div>
+          <input type="text" class="initial-box" id="initial-6" maxlength="3" placeholder="Init." aria-label="Initial for sixth commitment" />
+          <span class="commitment-text">I will show an intense level of discipline in the work that I conduct.</span>
+          <div class="commitment-check" id="check-6">✓</div>
         </div>
-        <div class="commitment-item">
-          <input type="text" class="initial-box" maxlength="3" placeholder="Init." aria-label="Initial for seventh commitment" />
-          <span>I will have pride in my work.</span>
+        <div class="commitment-item" data-index="7">
+          <div class="commitment-number">7</div>
+          <input type="text" class="initial-box" id="initial-7" maxlength="3" placeholder="Init." aria-label="Initial for seventh commitment" />
+          <span class="commitment-text">I will have pride in my work.</span>
+          <div class="commitment-check" id="check-7">✓</div>
         </div>
-        <div class="commitment-item">
-          <input type="text" class="initial-box" maxlength="3" placeholder="Init." aria-label="Initial for eighth commitment" />
-          <span><strong>I will do what it takes to commit to this. I will achieve tremendous levels of success.</strong></span>
+        <div class="commitment-item commitment-item-final" data-index="8">
+          <div class="commitment-number">8</div>
+          <input type="text" class="initial-box" id="initial-8" maxlength="3" placeholder="Init." aria-label="Initial for eighth commitment" />
+          <span class="commitment-text"><strong>I will do what it takes to commit to this. I will achieve tremendous levels of success.</strong></span>
+          <div class="commitment-check" id="check-8">✓</div>
         </div>
       </div>
 
-      <p><strong>Required:</strong> You must initial each commitment above and digitally sign below before accessing other modules.</p>
-      <p>Reference: <a href="/resources/Mission,%20Values,%20&%20Commitment.docx" target="_blank">Mission, Values, & Commitment (DOCX)</a></p>
+      <!-- Digital Signature Section - Hidden until requirements met -->
+      <div class="commitment-signature-section" id="commitment-signature-section" style="display: none;">
+        <h3>Digital Signature</h3>
+        <p>By signing below, you acknowledge and commit to upholding the Roof-ER standards and ethics outlined above.</p>
+
+        <div class="signature-form">
+          <label class="signature-label">
+            <span>Full Legal Name:</span>
+            <input type="text" id="commitment-sig-name" placeholder="Enter your full name" />
+          </label>
+
+          <label class="signature-checkbox">
+            <input type="checkbox" id="commitment-sig-agree" />
+            <span>I solemnly agree to uphold all Roof-ER standards, values, and ethics as outlined above.</span>
+          </label>
+
+          <div class="signature-error" id="commitment-sig-error"></div>
+
+          <button class="signature-submit-btn" id="commitment-sig-submit">
+            Sign & Complete Module
+          </button>
+        </div>
+      </div>
+
+      <!-- Requirements notice -->
+      <div class="commitment-requirements-notice" id="commitment-requirements-notice">
+        <h4>To complete this module:</h4>
+        <ul>
+          <li id="req-commitment-video" class="requirement-item pending">
+            <span class="req-icon">○</span> Watch the commitment video (90%+)
+          </li>
+          <li id="req-commitment-initials" class="requirement-item pending">
+            <span class="req-icon">○</span> Initial all 8 commitment statements
+          </li>
+          <li id="req-commitment-signature" class="requirement-item pending">
+            <span class="req-icon">○</span> Provide your digital signature
+          </li>
+        </ul>
+      </div>
+
+      <p class="reference-link">Reference: <a href="#" class="nav-module-link" data-module="welcome" data-scroll-to="mission-values-section">Mission, Values, & Commitment (Module 1)</a></p>
     </div>
   `,
   'initial-pitch': `
-    <div class="content-card">
+    <div class="content-card module-5-redesign">
       <h1>The Initial Pitch</h1>
-      ${renderVideoPlayer('/assets/training/module5-initial-pitch.mp4', 'initial-pitch-video', '📹 Mastering the Roof-ER Pitch')}
 
-      <h3>5 Non-Negotiables</h3>
-      <ol>
-        <li>Who you are</li>
-        <li>Who we are and what we do (Roof-ER)</li>
-        <li>Make it relatable</li>
-        <li>What you're there to do (an inspection)</li>
-        <li>Go for the close (them agreeing to the inspection)</li>
-      </ol>
-
-      <h3>Generic Script</h3>
-      <div class="script" data-text-source="true">
-        <button class="speak-btn" aria-label="Listen to script">🔊</button>
-        <p>"Hi, how are you? My Name is ______ with Roof-ER we're a local roofing company that specializes in helping homeowners get their roof and/or siding replaced, paid for by their insurance!"</p>
-        <p>"We've had a lot of storms here in [Region] over the past few months that have done a lot of damage!</p>
-        <p>"We're working with a lot of your neighbors in the area. We've been able to help them get fully approved through their insurance company to have their roof replaced."</p>
+      <!-- Video Player -->
+      <div class="video-player-container" style="margin: 20px 0; background: #f5f5f5; border-radius: 8px; padding: 20px;">
+        <h3 style="margin-top: 0;">Mastering the Roof-ER Pitch</h3>
+        <div style="position: relative;">
+          <video
+            id="initial-pitch-video"
+            controls
+            style="width: 100%; max-width: 800px; border-radius: 4px;"
+          >
+            <source src="/assets/training/module5-initial-pitch.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+        <div class="video-progress-container" style="margin-top: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-size: 14px; color: #666;">Video Progress</span>
+            <span id="initial-pitch-video-progress-text" style="font-size: 14px; font-weight: 600; color: #666;">0%</span>
+          </div>
+          <div class="video-progress-track" style="width: 100%; max-width: 800px; height: 8px; background: #e0e0e0; border-radius: 4px; overflow: hidden;">
+            <div id="initial-pitch-video-progress-bar" class="video-progress-fill" style="width: 0%; height: 100%; background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%); border-radius: 4px; transition: width 0.3s ease;"></div>
+          </div>
+        </div>
       </div>
 
-      <h3>The Inspection Proposal</h3>
-      <div class="script" data-text-source="true">
-        <button class="speak-btn" aria-label="Listen to script">🔊</button>
-        <p>"While I'm here, in the neighborhood, I am conducting a completely free inspection to see if you have similar, qualifiable damage. If you do, I'll take a bunch of photos and walk you through the rest of the process. If you don't, I wouldn't want to waste your time, I wouldn't want to waste mine! I will at least leave giving you peace of mind that you're in good shape."</p>
-        <p><strong>(Pause here – Wait for them to respond/agree.)</strong></p>
+      <!-- Progress Tracker -->
+      <div class="pitch-progress-tracker" id="pitch-progress">
+        <h3>Your Practice Progress</h3>
+        <div class="progress-items">
+          <div class="progress-item" data-script="intro">
+            <span class="progress-icon">⭕</span>
+            <span>Introduction</span>
+          </div>
+          <div class="progress-item" data-script="proposal">
+            <span class="progress-icon">⭕</span>
+            <span>Inspection Proposal</span>
+          </div>
+          <div class="progress-item" data-script="permission">
+            <span class="progress-icon">⭕</span>
+            <span>Securing Permission</span>
+          </div>
+          <div class="progress-item" data-script="handoff">
+            <span class="progress-icon">⭕</span>
+            <span>Handoff</span>
+          </div>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar" id="pitch-progress-bar" style="width: 0%"></div>
+        </div>
+        <p class="progress-label"><span id="practice-count">0</span>/4 sections practiced</p>
       </div>
 
-      <h2>The Initial Pitch Script - Detailed</h2>
-      <div class="pitch-script">
-        <p><strong>Opening (30 seconds):</strong></p>
-        <p>"Hi! I'm [Name] with Roof E.R. We're working in your neighborhood helping homeowners file insurance claims for storm damage. I noticed [specific damage observation - dented gutter, lifted shingles, etc.]. Mind if I take a quick look from the ground? It'll only take 2 minutes and could save you thousands."</p>
+      <!-- 5 Non-Negotiables Cards -->
+      <h2>The 5 Non-Negotiables</h2>
+      <p class="section-intro">Every successful pitch includes these 5 essential elements. Master them!</p>
 
-        <p><strong>Permission Secured:</strong></p>
-        <p>"Great! Let me grab my ladder. I'll do a thorough inspection - check shingles, flashing, vents, everything. Takes about 15 minutes. If I find damage, I'll show you photos and explain your options. Sound good?"</p>
+      <div class="non-negotiables-grid">
+        <div class="nn-card" data-nn="1">
+          <div class="nn-icon">👤</div>
+          <div class="nn-number">1</div>
+          <h4>Who You Are</h4>
+          <p>Introduce yourself by name - be personable and memorable</p>
+        </div>
+        <div class="nn-card" data-nn="2">
+          <div class="nn-icon">🏠</div>
+          <div class="nn-number">2</div>
+          <h4>Who We Are</h4>
+          <p>Roof-ER: Local roofing company that helps homeowners with insurance claims</p>
+        </div>
+        <div class="nn-card" data-nn="3">
+          <div class="nn-icon">🤝</div>
+          <div class="nn-number">3</div>
+          <h4>Make It Relatable</h4>
+          <p>Reference local storms, neighbors you've helped, shared experiences</p>
+        </div>
+        <div class="nn-card" data-nn="4">
+          <div class="nn-icon">🔍</div>
+          <div class="nn-number">4</div>
+          <h4>What You're Doing</h4>
+          <p>FREE inspection to check for qualifiable storm damage</p>
+        </div>
+        <div class="nn-card" data-nn="5">
+          <div class="nn-icon">✅</div>
+          <div class="nn-number">5</div>
+          <h4>Go For The Close</h4>
+          <p>Get them to agree to the inspection - that's your goal!</p>
+        </div>
       </div>
 
+      <!-- Generic Script Section -->
+      <h2>The Generic Initial Pitch</h2>
+      <p class="section-intro">This is your go-to script. Practice it until it feels natural!</p>
+
+      <div class="script-section">
+        <div class="script-card" data-text-source="true" data-script-id="intro">
+          <div class="script-header">
+            <span class="script-label">Part 1: Introduction</span>
+            <button class="speak-btn" aria-label="Listen to script">🔊</button>
+            <button class="practice-btn" onclick="markPracticed('intro')">✓ Mark Practiced</button>
+          </div>
+          <div class="script-content">
+            <p>"Hi, how are you? My Name is <span class="fill-blank">__________</span> with Roof-ER we're a local roofing company that specializes in helping homeowners get their roof replaced, paid for by their insurance!</p>
+            <p>We've had a lot of storms here in <span class="fill-blank">[Region]</span> over the past few months that have done a lot of damage!</p>
+            <p>We're already working with your neighbors. We've been able to help them get fully approved through their insurance company to have their roof replaced."</p>
+          </div>
+        </div>
+
+        <div class="script-card" data-text-source="true" data-script-id="proposal">
+          <div class="script-header">
+            <span class="script-label">Part 2: Inspection Proposal</span>
+            <button class="speak-btn" aria-label="Listen to script">🔊</button>
+            <button class="practice-btn" onclick="markPracticed('proposal')">✓ Mark Practiced</button>
+          </div>
+          <div class="script-content">
+            <p>"While I'm here, in the neighborhood, I am conducting a completely free inspection to see if you have similar, qualifiable damage.</p>
+            <p>If you do, I'll take a bunch of photos and walk you through the rest of the process.</p>
+            <p>If you don't, I wouldn't want to waste your time, I wouldn't want to waste mine!</p>
+            <p>I will at least leave giving you peace of mind that you're in good shape."</p>
+            <p class="script-note">⏸️ <strong>Pause here – Wait for them to respond/agree.</strong></p>
+          </div>
+        </div>
+
+        <div class="script-card" data-text-source="true" data-script-id="permission">
+          <div class="script-header">
+            <span class="script-label">Part 3: Securing Permission</span>
+            <button class="speak-btn" aria-label="Listen to script">🔊</button>
+            <button class="practice-btn" onclick="markPracticed('permission')">✓ Mark Practiced</button>
+          </div>
+          <div class="script-content">
+            <p>"Alright! It will take me about 10-15 minutes. I'm gonna take a look around the perimeter of your home, then grab the ladder, and take a look at your roof.</p>
+            <p>What was your name again? <span class="fill-blank">[Their name]</span> great to meet you, again I am <span class="fill-blank">[Your name]</span>.</p>
+            <p>Oh and by the way do you know who your insurance company is?"</p>
+            <p class="script-note">⏸️ <strong>Wait for their answer</strong></p>
+            <p>"Great! We work with those guys all the time."</p>
+          </div>
+        </div>
+
+        <div class="script-card" data-text-source="true" data-script-id="handoff">
+          <div class="script-header">
+            <span class="script-label">Part 4: Handoff</span>
+            <button class="speak-btn" aria-label="Listen to script">🔊</button>
+            <button class="practice-btn" onclick="markPracticed('handoff')">✓ Mark Practiced</button>
+          </div>
+          <div class="script-content">
+            <p>"Here's my card/flier, look us up while I'm conducting the inspection!</p>
+            <p>I will give you a knock when I finish up and show you what I've found."</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Specific/Storm Script -->
+      <h2>Storm-Specific Pitch Variation</h2>
+      <p class="section-intro">Use this when there was a recent notable storm in the area.</p>
+
+      <div class="script-section">
+        <div class="script-card storm-script" data-text-source="true">
+          <div class="script-header">
+            <span class="script-label">Storm Reference Opening</span>
+            <button class="speak-btn" aria-label="Listen to script">🔊</button>
+          </div>
+          <div class="script-content">
+            <p>"Were you home for the storm we had in <span class="fill-blank">[date/description]</span>?"</p>
+
+            <div class="response-branch">
+              <div class="branch if-yes">
+                <span class="branch-label">If YES:</span>
+                <p>"It was pretty crazy right?!"</p>
+              </div>
+              <div class="branch if-no">
+                <span class="branch-label">If NO:</span>
+                <p>"Oh no worries at all, we get that all the time."</p>
+                <p><em>OR</em></p>
+                <p>"That's good! It was a pretty bad one."</p>
+              </div>
+            </div>
+
+            <p class="transition-text">➡️ <strong>Then continue:</strong></p>
+            <p>"We're working with a lot of your neighbors in the area. We've been able to help them get fully approved through their insurance company to have their roof replaced."</p>
+            <p class="script-note">📌 <strong>Then proceed to Inspection Proposal (Part 2)</strong></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Practice Mode -->
+      <h2>Practice Mode</h2>
+      <div class="practice-mode-container">
+        <div class="practice-intro">
+          <p>Ready to practice? Click below to enter Practice Mode where you can rehearse your pitch out loud!</p>
+          <button class="practice-mode-btn" onclick="togglePracticeMode()">🎤 Start Practice Mode</button>
+        </div>
+        <div class="practice-active" id="practice-mode" style="display: none;">
+          <div class="practice-prompt">
+            <h4>Practice Prompt:</h4>
+            <p id="practice-prompt-text">Introduce yourself and explain who Roof-ER is...</p>
+          </div>
+          <div class="practice-controls">
+            <button onclick="showNextPrompt()">Next Prompt →</button>
+            <button onclick="togglePracticeMode()">Exit Practice</button>
+          </div>
+          <div class="practice-tips">
+            <h4>Tips:</h4>
+            <ul>
+              <li>Practice out loud - hearing yourself is key</li>
+              <li>Time yourself - aim for 30-45 seconds per part</li>
+              <li>Record yourself on your phone to review</li>
+              <li>Practice until it sounds natural, not rehearsed</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Building Rapport Tips -->
       <h2>Building Rapport Tips</h2>
-      <ul>
-        <li><strong>Mirror their energy level</strong> - Match their enthusiasm or calmness</li>
-        <li><strong>Ask about their experience with storms</strong> - Get them talking about past events</li>
-        <li><strong>Compliment their home/yard authentically</strong> - Be genuine, not salesy</li>
-        <li><strong>Use their name 2-3 times in conversation</strong> - Creates personal connection</li>
-        <li><strong>Share brief relevant stories</strong> - "I helped your neighbor two streets over last week..."</li>
-        <li><strong>Be professional but personable</strong> - You're a trusted advisor, not a pushy salesperson</li>
-      </ul>
+      <div class="tips-grid">
+        <div class="tip-card">
+          <span class="tip-icon">🪞</span>
+          <h4>Mirror Their Energy</h4>
+          <p>Match their enthusiasm or calmness</p>
+        </div>
+        <div class="tip-card">
+          <span class="tip-icon">🌧️</span>
+          <h4>Ask About Storms</h4>
+          <p>Get them talking about past weather events</p>
+        </div>
+        <div class="tip-card">
+          <span class="tip-icon">🏡</span>
+          <h4>Compliment Authentically</h4>
+          <p>Nice yard, landscaping, or home - be genuine</p>
+        </div>
+        <div class="tip-card">
+          <span class="tip-icon">📛</span>
+          <h4>Use Their Name</h4>
+          <p>2-3 times in conversation creates connection</p>
+        </div>
+        <div class="tip-card">
+          <span class="tip-icon">📖</span>
+          <h4>Share Brief Stories</h4>
+          <p>"I helped your neighbor two streets over last week..."</p>
+        </div>
+        <div class="tip-card">
+          <span class="tip-icon">👔</span>
+          <h4>Be Professional</h4>
+          <p>Trusted advisor, not a pushy salesperson</p>
+        </div>
+      </div>
 
+      <!-- Key Phrases -->
       <h2>Key Phrases That Work</h2>
-      <ul>
-        <li>"I'm working in your neighborhood today..."</li>
-        <li>"Your neighbors at [address] just got approved for a full roof replacement..."</li>
-        <li>"This will only take 2 minutes from the ground..."</li>
-        <li>"Worst case, I give you peace of mind..."</li>
-        <li>"I noticed [specific visible damage]..."</li>
-      </ul>
+      <div class="key-phrases">
+        <div class="phrase-chip">"I'm working in your neighborhood today..."</div>
+        <div class="phrase-chip">"Your neighbors at [address] just got approved..."</div>
+        <div class="phrase-chip">"This will only take 2 minutes from the ground..."</div>
+        <div class="phrase-chip">"Worst case, I give you peace of mind..."</div>
+        <div class="phrase-chip">"I noticed [specific visible damage]..."</div>
+      </div>
+
+      <div class="module-completion-section" id="module-complete-section" style="display: none;">
+        <button class="complete-module-btn" onclick="completeModule('initial-pitch')">
+          Complete Module & Continue →
+        </button>
+      </div>
     </div>
   `,
    'inspection-process': `
@@ -1803,6 +2360,12 @@ const trainingContent = {
         </ul>
 
         <p><strong>Key takeaway:</strong> Getting enough clear photos to convince the homeowner is the most important part. Without their belief, you can't file a claim.</p>
+
+        <div class="module-completion-section" id="module-complete-section" style="display: none;">
+          <button class="complete-module-btn" onclick="completeModule('inspection-process')">
+            Complete Module & Continue
+          </button>
+        </div>
     </div>
   `,
   'post-inspection-pitch': `
@@ -1846,6 +2409,12 @@ const trainingContent = {
           <li><strong>Home Value:</strong> New roof adds $15-20k to property value. Increases curb appeal and marketability if selling.</li>
           <li><strong>Energy Efficiency:</strong> Modern shingles reflect more heat, reducing cooling costs by 10-15% in summer.</li>
         </ul>
+
+        <div class="module-completion-section" id="module-complete-section" style="display: none;">
+          <button class="complete-module-btn" onclick="completeModule('post-inspection-pitch')">
+            Complete Module & Continue
+          </button>
+        </div>
     </div>
   `,
   'objection-handling': `
@@ -1928,6 +2497,12 @@ const trainingContent = {
             </div>
              <div id="objection-feedback" class="feedback-message" style="display: none;"></div>
         </div>
+
+        <div class="module-completion-section" id="module-complete-section" style="display: none;">
+          <button class="complete-module-btn" onclick="completeModule('handling-initial-pitch-objections')">
+            Complete Module & Continue
+          </button>
+        </div>
     </div>
   `,
   'shingle-types': `
@@ -1940,11 +2515,14 @@ const trainingContent = {
         <div class="shingle-card shingle-3tab">
           <div class="shingle-header">
             <h3>3-Tab Shingles</h3>
-            <span class="shingle-badge basic">Basic Option</span>
           </div>
 
           <div class="shingle-photo-container">
-            <div class="photo-placeholder">
+            <img src="/assets/shingles/3-tab-shingles.webp"
+                 alt="3-Tab Shingles - flat, uniform appearance with distinct rectangular tabs"
+                 class="shingle-photo"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="photo-placeholder" style="display: none;">
               <p>📋 3-Tab Shingle Reference</p>
               <small>Flat, uniform pattern with 3 distinct rectangular tabs</small>
               <div style="margin-top: 12px; padding: 12px; background: rgba(255,255,255,0.9); border-radius: 4px;">
@@ -1991,10 +2569,6 @@ const trainingContent = {
                   <span class="spec-value">60-70 mph</span>
                 </div>
                 <div class="spec-item">
-                  <span class="spec-label">Cost</span>
-                  <span class="spec-value">$80-100/square</span>
-                </div>
-                <div class="spec-item">
                   <span class="spec-label">Best For</span>
                   <span class="spec-value">Rentals, Budget Projects</span>
                 </div>
@@ -2015,11 +2589,10 @@ const trainingContent = {
         <div class="shingle-card shingle-architectural">
           <div class="shingle-header">
             <h3>Architectural Shingles</h3>
-            <span class="shingle-badge premium">Premium Option</span>
           </div>
 
           <div class="shingle-photo-container">
-            <img src="https://www.theroofdocs.com/wp-content/uploads/2025/03/Asphalt-Shingles-GAF-Timberline-HDZ-01-300x237.jpg"
+            <img src="/assets/shingles/architectural-shingles.jpg"
                  alt="Architectural Shingles - GAF Timberline HDZ showing dimensional, layered appearance"
                  class="shingle-photo"
                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -2070,10 +2643,6 @@ const trainingContent = {
                   <span class="spec-value">110-130 mph</span>
                 </div>
                 <div class="spec-item">
-                  <span class="spec-label">Cost</span>
-                  <span class="spec-value">$110-150/square</span>
-                </div>
-                <div class="spec-item">
                   <span class="spec-label">Best For</span>
                   <span class="spec-value">Primary Homes, Curb Appeal</span>
                 </div>
@@ -2083,10 +2652,10 @@ const trainingContent = {
             <div class="spec-group">
               <h4>Why Homeowners Choose Architectural</h4>
               <ul class="identification-list">
-                <li><span class="star-icon">★</span> Enhanced curb appeal increases home value by 1-5%</li>
+                <li><span class="star-icon">★</span> Enhanced curb appeal improves home appearance</li>
                 <li><span class="star-icon">★</span> Superior wind resistance (130 mph vs 70 mph)</li>
                 <li><span class="star-icon">★</span> Longer warranty coverage (typically 30-50 years)</li>
-                <li><span class="star-icon">★</span> Better ROI over lifetime despite higher initial cost</li>
+                <li><span class="star-icon">★</span> More durable construction with multiple layers</li>
               </ul>
             </div>
           </div>
@@ -2224,11 +2793,11 @@ const trainingContent = {
       <div class="application-section">
         <div class="application-card">
           <h4>For Homeowner Communication</h4>
-          <p>Understanding shingle construction helps you explain why architectural shingles cost more but deliver better value:</p>
+          <p>Understanding shingle construction helps you explain the key differences to homeowners:</p>
           <ul>
-            <li><strong>ROI Conversation:</strong> "The $3,000 upgrade pays for itself in 10-15 years through increased home value and avoided premature replacement"</li>
             <li><strong>Wind Resistance:</strong> "130 mph rating means your roof survives storms that would destroy 3-tab shingles"</li>
             <li><strong>Warranty Value:</strong> "30-year warranty vs. 20-year means peace of mind and transferability if you sell"</li>
+            <li><strong>Durability:</strong> "Architectural shingles have multiple layers that provide longer-lasting protection"</li>
           </ul>
         </div>
 
@@ -2294,6 +2863,59 @@ const trainingContent = {
           <li>Note any patterns (age of homes, price points, neighborhood types)</li>
         </ol>
         <p class="practice-note"><strong>Pro Tip:</strong> After identifying 100 roofs, you'll develop instant recognition ability that impresses homeowners and builds credibility.</p>
+      </div>
+
+      <!-- Interactive Shingle Challenge Game -->
+      <div class="mini-game-section" id="shingle-game">
+        <div class="game-header">
+          <h3>🎮 Shingle Type Challenge</h3>
+          <p>Test your knowledge! Identify whether each description matches 3-Tab or Architectural shingles.</p>
+        </div>
+
+        <div class="game-score-bar">
+          <span class="score-label">Score:</span>
+          <span class="score-value" id="game-score">0</span>
+          <span class="score-separator">/</span>
+          <span class="score-total" id="game-total">5</span>
+          <div class="progress-bar">
+            <div class="progress-fill" id="game-progress" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="game-question-area" id="game-question-area">
+          <div class="question-card" id="question-card">
+            <div class="question-number">Question <span id="q-num">1</span> of 5</div>
+            <div class="question-text" id="question-text">Loading question...</div>
+            <div class="answer-buttons">
+              <button class="answer-btn" data-answer="3tab" onclick="checkShingleAnswer('3tab')">
+                <span class="btn-icon">📐</span> 3-Tab
+              </button>
+              <button class="answer-btn" data-answer="arch" onclick="checkShingleAnswer('arch')">
+                <span class="btn-icon">🏔️</span> Architectural
+              </button>
+            </div>
+            <div class="feedback-area" id="feedback-area" style="display: none;">
+              <div class="feedback-icon" id="feedback-icon"></div>
+              <div class="feedback-text" id="feedback-text"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="game-complete" id="game-complete" style="display: none;">
+          <div class="complete-icon">🏆</div>
+          <h4>Challenge Complete!</h4>
+          <p class="final-score">You scored <span id="final-score">0</span> out of 5</p>
+          <p class="score-message" id="score-message"></p>
+          <div class="game-complete-actions">
+            <button class="replay-btn" onclick="restartShingleGame()">🔄 Play Again</button>
+            <button class="complete-module-btn" id="shingle-continue-btn" style="display: none;" onclick="completeModule('shingle-types-materials')">
+              Continue to Next Module →
+            </button>
+          </div>
+          <p class="passing-note" id="passing-note" style="display: none; margin-top: 10px; font-size: 0.9em; color: #666;">
+            Score 3 or higher to continue
+          </p>
+        </div>
       </div>
     </div>
   `,
@@ -2610,6 +3232,12 @@ const trainingContent = {
           <li><strong>Close-ups:</strong> Individual damage photos with size reference (penny/quarter)</li>
           <li><strong>Granule Loss:</strong> Gutters and downspouts filled with granules</li>
         </ol>
+
+        <div class="module-completion-section" id="module-complete-section" style="display: none;">
+          <button class="complete-module-btn" onclick="completeModule('damage-identification')">
+            Complete Module & Continue
+          </button>
+        </div>
     </div>
   `,
   'sales-cycle': `
@@ -2714,6 +3342,12 @@ const trainingContent = {
             </div>
             <div id="sales-cycle-feedback" class="feedback-message" style="display: none;"></div>
         </div>
+
+        <div class="module-completion-section" id="module-complete-section" style="display: none;">
+          <button class="complete-module-btn" onclick="completeModule('sales-cycle-job-flow')">
+            Complete Module & Continue
+          </button>
+        </div>
     </div>
   `,
   'claim-closing': `
@@ -2808,6 +3442,12 @@ const trainingContent = {
           <li><strong>❌ Not getting claim number:</strong> Write it down immediately, text it to homeowner</li>
           <li><strong>❌ Forgetting to ask about inspection timeline:</strong> Ask when adjuster will contact them</li>
         </ul>
+
+        <div class="module-completion-section" id="module-complete-section" style="display: none;">
+          <button class="complete-module-btn" onclick="completeModule('filing-claim-closing')">
+            Complete Module & Continue
+          </button>
+        </div>
     </div>
   `,
   'role-play': `
@@ -3392,6 +4032,12 @@ trainingContent['general-knowledge'] = `
       <button id="startQuickQuiz2">Start Quiz</button>
       <div id="quiz2-area"></div>
     </div>
+
+    <div class="module-completion-section" id="module-complete-section" style="display: none;">
+      <button class="complete-module-btn" onclick="completeModule('general-knowledge')">
+        Complete Module & Continue
+      </button>
+    </div>
   </div>
 `;
 
@@ -3672,6 +4318,12 @@ trainingContent['post-inspection-objections'] = `
       <li><strong>Evidence:</strong> "Let me show you the photos/data..."</li>
       <li><strong>Ask:</strong> "Does that make sense? Should we move forward?"</li>
     </ol>
+
+    <div class="module-completion-section" id="module-complete-section" style="display: none;">
+      <button class="complete-module-btn" onclick="completeModule('post-inspection-objections')">
+        Complete Module & Continue
+      </button>
+    </div>
   </div>
 `;
 
@@ -3757,6 +4409,12 @@ trainingContent['closing-objections'] = `
       <li>Schedule next touchpoint</li>
     </ol>
     <p>Review the prior section <em>Filing the Claim & Closing</em> for scripts and carrier variations.</p>
+
+    <div class="module-completion-section" id="module-complete-section" style="display: none;">
+      <button class="complete-module-btn" onclick="completeModule('closing-objections')">
+        Complete Module & Continue
+      </button>
+    </div>
   </div>
 `;
 
@@ -3840,6 +4498,12 @@ trainingContent['discontinued-products'] = `
       <li><a href="/resources/Training%20Manual.docx" target="_blank">Training Manual</a></li>
       <li><a href="/resources/Sales%20Operations%20and%20Tasks.docx" target="_blank">Sales Operations & Tasks</a></li>
     </ul>
+
+    <div class="module-completion-section" id="module-complete-section" style="display: none;">
+      <button class="complete-module-btn" onclick="completeModule('discontinued-products')">
+        Complete Module & Continue
+      </button>
+    </div>
   </div>
 `;
 
@@ -4015,57 +4679,241 @@ function renderVideoPlayer(videoSrc: string, videoId: string, title: string) {
         </video>
         ${isWatched ? '<div class="completion-badge" style="position: absolute; top: 10px; right: 10px; background: #4caf50; color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px;">✓ Completed</div>' : ''}
       </div>
-      <div class="video-progress" style="margin-top: 10px; font-size: 14px; color: #666;">
-        Progress: <span id="${videoId}-progress">0</span>%
+      <div class="video-progress-container" style="margin-top: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <span style="font-size: 14px; color: #666;">Video Progress</span>
+          <span id="${videoId}-progress-text" style="font-size: 14px; font-weight: 600; color: ${isWatched ? '#4caf50' : '#666'};">${isWatched ? '100%' : '0%'}</span>
+        </div>
+        <div class="video-progress-track" style="width: 100%; max-width: 800px; height: 8px; background: #e0e0e0; border-radius: 4px; overflow: hidden;">
+          <div id="${videoId}-progress-bar" class="video-progress-fill" style="width: ${isWatched ? '100' : '0'}%; height: 100%; background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%); border-radius: 4px; transition: width 0.3s ease;"></div>
+        </div>
       </div>
     </div>
-    <script>
-      (function() {
-        const video = document.getElementById('${videoId}');
-        const startTime = video.getAttribute('data-start');
-        if (startTime) video.currentTime = parseFloat(startTime);
-
-        video.addEventListener('timeupdate', function() {
-          const progress = (video.currentTime / video.duration) * 100;
-          document.getElementById('${videoId}-progress').textContent = Math.round(progress);
-          localStorage.setItem('${progressKey}', video.currentTime.toString());
-
-          if (progress >= 90) {
-            localStorage.setItem('${watchedKey}', 'true');
-          }
-        });
-      })();
-    </script>
   `;
+}
+
+// Initialize video players after content is rendered
+function initVideoPlayers() {
+  const videos = document.querySelectorAll('video[id$="-video"]');
+  videos.forEach(video => {
+    const videoEl = video as HTMLVideoElement;
+    const videoId = videoEl.id;
+    const watchedKey = `video-watched-${videoId}`;
+    const progressKey = `video-progress-${videoId}`;
+
+    const progressBar = document.getElementById(`${videoId}-progress-bar`);
+    const progressText = document.getElementById(`${videoId}-progress-text`);
+
+    // Restore saved time
+    const startTime = videoEl.getAttribute('data-start');
+    if (startTime) videoEl.currentTime = parseFloat(startTime);
+
+    // Remove any existing listeners by cloning (prevent duplicates)
+    const newVideo = videoEl.cloneNode(true) as HTMLVideoElement;
+    videoEl.parentNode?.replaceChild(newVideo, videoEl);
+
+    // Re-get elements after clone
+    const newProgressBar = document.getElementById(`${videoId}-progress-bar`);
+    const newProgressText = document.getElementById(`${videoId}-progress-text`);
+
+    newVideo.addEventListener('timeupdate', function() {
+      if (!newVideo.duration) return;
+      const progress = (newVideo.currentTime / newVideo.duration) * 100;
+      const progressPct = Math.round(progress);
+
+      // Update progress bar and text
+      if (newProgressBar) (newProgressBar as HTMLElement).style.width = progressPct + '%';
+      if (newProgressText) newProgressText.textContent = progressPct + '%';
+
+      localStorage.setItem(progressKey, newVideo.currentTime.toString());
+
+      if (progress >= 90 && localStorage.getItem(watchedKey) !== 'true') {
+        localStorage.setItem(watchedKey, 'true');
+
+        // Update progress bar to 100% and change color
+        if (newProgressBar) {
+          (newProgressBar as HTMLElement).style.width = '100%';
+          (newProgressBar as HTMLElement).style.background = 'linear-gradient(90deg, #4caf50 0%, #2e7d32 100%)';
+        }
+        if (newProgressText) {
+          newProgressText.textContent = '100%';
+          (newProgressText as HTMLElement).style.color = '#4caf50';
+        }
+
+        // Show video complete tip
+        if (typeof showTip === 'function') {
+          showTip({ icon: '✅', title: 'Video Complete!', message: 'Great job! Continue reading the content below.' });
+        }
+        // Add completion badge dynamically
+        const badge = document.createElement('div');
+        badge.className = 'completion-badge';
+        badge.style.cssText = 'position: absolute; top: 10px; right: 10px; background: #4caf50; color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px;';
+        badge.textContent = '✓ Completed';
+        newVideo.parentElement?.appendChild(badge);
+
+        // Mark video watched in engagement state for current module
+        if (currentModuleForEngagement) {
+          markVideoWatched(currentModuleForEngagement);
+        }
+      }
+    });
+
+    // Handle video loaded - restore saved progress display
+    newVideo.addEventListener('loadedmetadata', function() {
+      const savedTime = parseFloat(localStorage.getItem(progressKey) || '0');
+      if (savedTime > 0 && newVideo.duration) {
+        const savedPct = Math.round((savedTime / newVideo.duration) * 100);
+        if (newProgressBar) (newProgressBar as HTMLElement).style.width = savedPct + '%';
+        if (newProgressText) newProgressText.textContent = savedPct + '%';
+      }
+    });
+  });
 }
 
 // --- Speech Synthesis ---
 const synth = window.speechSynthesis;
 let currentUtterance: SpeechSynthesisUtterance | null = null;
 
+function updateSpeakButtonState(btn: HTMLElement, speaking: boolean) {
+    btn.textContent = speaking ? '⏸️' : '🔊';
+    btn.classList.toggle('speaking', speaking);
+}
+
 function handleSpeak(event: MouseEvent) {
-    const target = (event.target as HTMLElement).closest('.speak-btn');
+    const target = (event.target as HTMLElement).closest('.speak-btn') as HTMLElement;
     if (!target) return;
 
     const scriptContainer = target.closest('[data-text-source="true"]');
     if (!scriptContainer) return;
 
-    const textToSpeak = (scriptContainer as HTMLElement).innerText.trim();
+    // Get text excluding button content
+    const clonedContainer = scriptContainer.cloneNode(true) as HTMLElement;
+    clonedContainer.querySelectorAll('.speak-btn, .practice-btn').forEach(btn => btn.remove());
+    const textToSpeak = clonedContainer.innerText.trim();
 
     if (synth.speaking && currentUtterance) {
         synth.cancel();
         // If the same button is clicked again, just stop the speech.
         if (currentUtterance.text === textToSpeak) {
             currentUtterance = null;
+            updateSpeakButtonState(target, false);
             return;
         }
     }
 
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
+
+    // Select male voice
+    const voices = synth.getVoices();
+    const maleVoice = voices.find(v =>
+        v.name.includes('Daniel') ||
+        v.name.includes('Alex') ||
+        v.name.includes('Google US English') ||
+        v.name.includes('Male')
+    ) || voices[0];
+    if (maleVoice) utterance.voice = maleVoice;
+    utterance.rate = 0.95;  // Slightly slower for clarity
+    utterance.pitch = 0.9;  // Slightly lower pitch
+
     currentUtterance = utterance;
-    utterance.onerror = (e) => console.error("SpeechSynthesis Error", e);
+    updateSpeakButtonState(target, true);
+
+    utterance.onend = () => updateSpeakButtonState(target, false);
+    utterance.onerror = (e) => {
+        console.error("SpeechSynthesis Error", e);
+        updateSpeakButtonState(target, false);
+    };
+
     synth.speak(utterance);
 }
+
+// --- Module 5 Practice Mode ---
+const practicePrompts = [
+    "Introduce yourself by name and mention Roof-ER",
+    "Explain that you specialize in helping homeowners with insurance claims",
+    "Reference recent storms in the area",
+    "Mention that you're helping neighbors get approved",
+    "Explain what the free inspection includes",
+    "Handle the 'If you have damage' scenario",
+    "Handle the 'If you don't have damage' scenario",
+    "Ask for their name and insurance company",
+    "Hand off your card and explain next steps"
+];
+
+let currentPromptIndex = 0;
+const practicedScripts = new Set<string>();
+
+function togglePracticeMode() {
+    const practiceDiv = document.getElementById('practice-mode');
+    const introDiv = practiceDiv?.previousElementSibling as HTMLElement;
+    if (practiceDiv && introDiv) {
+        const isActive = practiceDiv.style.display !== 'none';
+        practiceDiv.style.display = isActive ? 'none' : 'block';
+        introDiv.style.display = isActive ? 'block' : 'none';
+        if (!isActive) {
+            currentPromptIndex = 0;
+            updatePrompt();
+        }
+    }
+}
+
+function showNextPrompt() {
+    currentPromptIndex = (currentPromptIndex + 1) % practicePrompts.length;
+    updatePrompt();
+}
+
+function updatePrompt() {
+    const promptEl = document.getElementById('practice-prompt-text');
+    if (promptEl) {
+        promptEl.textContent = practicePrompts[currentPromptIndex];
+    }
+}
+
+function markPracticed(scriptId: string) {
+    practicedScripts.add(scriptId);
+    updatePracticeProgress();
+
+    // Update button
+    const btn = document.querySelector(`[data-script-id="${scriptId}"] .practice-btn`);
+    if (btn) {
+        btn.textContent = '✓ Practiced!';
+        btn.classList.add('practiced');
+    }
+
+    // Update progress item
+    const progressItem = document.querySelector(`.progress-item[data-script="${scriptId}"]`);
+    if (progressItem) {
+        progressItem.classList.add('completed');
+        const icon = progressItem.querySelector('.progress-icon');
+        if (icon) icon.textContent = '✅';
+    }
+}
+
+function updatePracticeProgress() {
+    const count = practicedScripts.size;
+    const progressBar = document.getElementById('pitch-progress-bar');
+    const countEl = document.getElementById('practice-count');
+
+    if (progressBar) {
+        progressBar.style.width = `${(count / 4) * 100}%`;
+    }
+    if (countEl) {
+        countEl.textContent = String(count);
+    }
+
+    // Show completion if all practiced
+    if (count === 4) {
+        const completeSection = document.getElementById('module-complete-section');
+        if (completeSection) {
+            completeSection.style.display = 'block';
+        }
+    }
+}
+
+// Attach practice mode functions to window for onclick handlers
+(window as any).togglePracticeMode = togglePracticeMode;
+(window as any).showNextPrompt = showNextPrompt;
+(window as any).markPracticed = markPracticed;
 
 // --- Game Logic ---
 function initSalesCycleSorter() {
@@ -4416,6 +5264,160 @@ function resetInlinePractice(container) {
   container.querySelector('.mini-input-area').style.display = 'block';
   container.querySelector('.mini-feedback').style.display = 'none';
 }
+
+// --- Module 4: Shingle Type Challenge Game ---
+const shingleQuestions = [
+  { q: "This shingle type has a flat, uniform appearance with visible cutouts creating a tab pattern.", a: "3tab", explain: "3-Tab shingles have distinct cutouts that create 3 separate tabs per strip." },
+  { q: "These shingles have a dimensional, layered look that mimics natural wood shakes or slate.", a: "arch", explain: "Architectural shingles use multiple layers to create that textured, dimensional appearance." },
+  { q: "Wind rating: 60-70 mph. Lifespan: 15-25 years. Single-layer construction.", a: "3tab", explain: "3-Tab shingles have lower wind ratings and shorter lifespans due to single-layer design." },
+  { q: "Wind rating: 110-130 mph. Lifespan: 25-30 years. Multi-layer laminated construction.", a: "arch", explain: "Architectural shingles have superior wind resistance and longevity from their laminated layers." },
+  { q: "Commonly found on homes built before 2000. Often the builder-grade option for budget construction.", a: "3tab", explain: "3-Tab was the standard before architectural shingles became more affordable and popular." },
+  { q: "Features a thicker profile with shadow lines that add depth and curb appeal.", a: "arch", explain: "The dimensional design of architectural shingles creates natural shadow lines." },
+  { q: "GAF's HDZ and Timberline series are examples of this premium shingle type.", a: "arch", explain: "GAF Timberline HDZ is their flagship architectural shingle line." },
+  { q: "Weighs approximately 200-250 lbs per square. Thinner, lighter construction.", a: "3tab", explain: "3-Tab shingles are lighter due to their single-layer construction." },
+  { q: "This type often comes with enhanced warranty coverage of 30+ years.", a: "arch", explain: "Architectural shingles typically come with longer warranties due to better durability." },
+  { q: "Most common upgrade recommended by Roof-ER when replacing storm-damaged roofs.", a: "arch", explain: "We recommend architectural upgrades for their superior protection and appearance!" }
+];
+
+let shingleGameState = {
+  currentQuestion: 0,
+  score: 0,
+  gameQuestions: [] as typeof shingleQuestions,
+  answered: false
+};
+
+function initShingleGame() {
+  console.log('🎮 Initializing Shingle Type Challenge...');
+
+  // Shuffle and pick 5 questions
+  shingleGameState.gameQuestions = [...shingleQuestions].sort(() => Math.random() - 0.5).slice(0, 5);
+  shingleGameState.currentQuestion = 0;
+  shingleGameState.score = 0;
+  shingleGameState.answered = false;
+
+  const scoreEl = document.getElementById('game-score');
+  const progressEl = document.getElementById('game-progress');
+  const completeEl = document.getElementById('game-complete');
+  const questionAreaEl = document.getElementById('game-question-area');
+
+  if (scoreEl) scoreEl.textContent = '0';
+  if (progressEl) progressEl.style.width = '0%';
+  if (completeEl) completeEl.style.display = 'none';
+  if (questionAreaEl) questionAreaEl.style.display = 'block';
+
+  showShingleQuestion();
+}
+
+function showShingleQuestion() {
+  const { currentQuestion, gameQuestions } = shingleGameState;
+
+  if (currentQuestion >= gameQuestions.length) {
+    endShingleGame();
+    return;
+  }
+
+  shingleGameState.answered = false;
+  const q = gameQuestions[currentQuestion];
+
+  const qNumEl = document.getElementById('q-num');
+  const questionTextEl = document.getElementById('question-text');
+  const feedbackAreaEl = document.getElementById('feedback-area');
+
+  if (qNumEl) qNumEl.textContent = String(currentQuestion + 1);
+  if (questionTextEl) questionTextEl.textContent = q.q;
+  if (feedbackAreaEl) feedbackAreaEl.style.display = 'none';
+
+  // Reset button states
+  document.querySelectorAll('.answer-btn').forEach(btn => {
+    btn.classList.remove('correct', 'incorrect', 'disabled');
+    (btn as HTMLButtonElement).disabled = false;
+  });
+}
+
+(window as any).checkShingleAnswer = function(answer: string) {
+  if (shingleGameState.answered) return;
+  shingleGameState.answered = true;
+
+  const q = shingleGameState.gameQuestions[shingleGameState.currentQuestion];
+  const isCorrect = answer === q.a;
+  const feedbackArea = document.getElementById('feedback-area');
+  const feedbackIcon = document.getElementById('feedback-icon');
+  const feedbackText = document.getElementById('feedback-text');
+
+  // Disable buttons and show states
+  document.querySelectorAll('.answer-btn').forEach(btn => {
+    (btn as HTMLButtonElement).disabled = true;
+    btn.classList.add('disabled');
+    if ((btn as HTMLElement).dataset.answer === q.a) {
+      btn.classList.add('correct');
+    } else if ((btn as HTMLElement).dataset.answer === answer && !isCorrect) {
+      btn.classList.add('incorrect');
+    }
+  });
+
+  if (isCorrect) {
+    shingleGameState.score++;
+    const scoreEl = document.getElementById('game-score');
+    if (scoreEl) scoreEl.textContent = String(shingleGameState.score);
+    if (feedbackIcon) feedbackIcon.textContent = '✅';
+    if (feedbackText) feedbackText.innerHTML = '<strong>Correct!</strong> ' + q.explain;
+    if (feedbackArea) feedbackArea.className = 'feedback-area correct';
+  } else {
+    if (feedbackIcon) feedbackIcon.textContent = '❌';
+    if (feedbackText) feedbackText.innerHTML = '<strong>Not quite!</strong> ' + q.explain;
+    if (feedbackArea) feedbackArea.className = 'feedback-area incorrect';
+  }
+
+  if (feedbackArea) feedbackArea.style.display = 'flex';
+  const progressEl = document.getElementById('game-progress');
+  if (progressEl) progressEl.style.width = ((shingleGameState.currentQuestion + 1) / 5 * 100) + '%';
+
+  // Auto-advance after 2.5 seconds
+  setTimeout(() => {
+    shingleGameState.currentQuestion++;
+    showShingleQuestion();
+  }, 2500);
+};
+
+function endShingleGame() {
+  const questionAreaEl = document.getElementById('game-question-area');
+  const completeEl = document.getElementById('game-complete');
+  const finalScoreEl = document.getElementById('final-score');
+  const msgEl = document.getElementById('score-message');
+  const continueBtn = document.getElementById('shingle-continue-btn');
+  const passingNote = document.getElementById('passing-note');
+
+  if (questionAreaEl) questionAreaEl.style.display = 'none';
+  if (completeEl) completeEl.style.display = 'block';
+  if (finalScoreEl) finalScoreEl.textContent = String(shingleGameState.score);
+
+  // Determine if passed (3+ out of 5)
+  const passed = shingleGameState.score >= 3;
+
+  if (msgEl) {
+    if (shingleGameState.score === 5) {
+      msgEl.textContent = "🌟 Perfect! You're a shingle expert ready for the field!";
+    } else if (shingleGameState.score >= 4) {
+      msgEl.textContent = "Great job! You've got a solid grasp of shingle types.";
+    } else if (shingleGameState.score >= 3) {
+      msgEl.textContent = "Good work! You passed and can continue to the next module.";
+    } else {
+      msgEl.textContent = "Keep studying! Score at least 3/5 to continue.";
+    }
+  }
+
+  // Show/hide continue button based on passing
+  if (continueBtn) {
+    continueBtn.style.display = passed ? 'inline-block' : 'none';
+  }
+  if (passingNote) {
+    passingNote.style.display = passed ? 'none' : 'block';
+  }
+}
+
+(window as any).restartShingleGame = function() {
+  initShingleGame();
+};
 
 // --- Module 10: Damage Identification Hotspot Quiz ---
 function initDamageHotspotQuiz() {
@@ -4857,6 +5859,12 @@ function completeQuiz(quizState) {
 
   document.getElementById('quiz-complete-message').style.display = 'block';
   document.getElementById('quiz-complete-message').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // Mark quiz as passed in engagement state
+  markQuizPassed('damage-identification');
+
+  // Mark the damage identification module as complete
+  completeModule('damage-identification');
 }
 
 // Restart quiz
@@ -5290,13 +6298,44 @@ async function stopAgnesRecording(): Promise<Blob | null> {
 // Initialize Agnes Live Session
 async function initAgnesLiveSession() {
   try {
-    const apiKey = rawApiKey;
+    // Build system instruction first
+    const script = AGNES_TRAINING_SCRIPTS[agnesLiveState.selectedRole || 'door-knock'] || AGNES_TRAINING_SCRIPTS['door-knock'];
+    const systemInstruction = buildAgnesSystemInstruction(agnesLiveState.difficulty, script);
+
+    // Fetch ephemeral token from server (required for browser-based Live API)
+    console.log('Fetching ephemeral token from server...');
+    let tokenData: { token: string; expireTime: string } | null = null;
+    try {
+      const tokenResponse = await fetch('/api/ai/gemini-token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ systemInstruction })
+      });
+      if (tokenResponse.ok) {
+        tokenData = await tokenResponse.json();
+        console.log('Ephemeral token received, expires:', tokenData.expireTime);
+      } else {
+        const errorData = await tokenResponse.json();
+        console.warn('Token endpoint failed:', errorData);
+      }
+    } catch (tokenErr) {
+      console.warn('Could not fetch ephemeral token, falling back to API key:', tokenErr);
+    }
+
+    // Use ephemeral token if available, otherwise fall back to API key
+    const apiKey = tokenData?.token || rawApiKey;
     if (!apiKey) {
-      showAgnesError('API key not configured. Please add GEMINI_API_KEY to environment.');
+      showAgnesError('AI connection not available. Please check server configuration.');
       return;
     }
 
-    agnesAiClient = new GoogleGenAI({ apiKey });
+    // Create client with the token/key
+    // Ephemeral tokens require v1alpha API version
+    const clientConfig: any = { apiKey };
+    if (tokenData?.token) {
+      clientConfig.httpOptions = { apiVersion: 'v1alpha' };
+    }
+    agnesAiClient = new GoogleGenAI(clientConfig);
     agnesLiveState.sessionActive = true;
     agnesLiveState.sessionStartTime = Date.now();
     agnesLiveState.transcript = [];
@@ -5333,12 +6372,36 @@ async function initAgnesLiveSession() {
     agnesAnalyserNode.fftSize = 256;
     agnesAnalyserNode.connect(agnesOutputAudioContext.destination);
 
-    // Build system instruction
-    const script = AGNES_TRAINING_SCRIPTS[agnesLiveState.selectedRole || 'door-knock'] || AGNES_TRAINING_SCRIPTS['door-knock'];
-    const systemInstruction = buildAgnesSystemInstruction(agnesLiveState.difficulty, script);
-
-    // Connect to Gemini Live
-    agnesSessionPromise = agnesAiClient.live.connect({
+    // Connect to Gemini Live (config is baked into the token if using ephemeral token)
+    const connectConfig = tokenData ? {
+      // When using ephemeral token, config is already in the token
+      model: 'gemini-2.5-flash-native-audio-preview-09-2025',
+      callbacks: {
+        onopen: () => {
+          console.log('Agnes Live Session Connected');
+          agnesLiveState.isConnected = true;
+          updateAgnesLiveUI();
+          startAgnesAudioInput();
+          if (agnesLiveState.isVideoEnabled) {
+            startAgnesVideoInput();
+          }
+          startAgnesRecording();
+        },
+        onmessage: async (message: any) => {
+          await handleAgnesMessage(message);
+        },
+        onclose: () => {
+          console.log('Agnes Live Session Closed');
+          agnesLiveState.isConnected = false;
+          updateAgnesLiveUI();
+        },
+        onerror: (err: any) => {
+          console.error('Agnes Live Error:', err);
+          showAgnesError('Connection error. Please restart the session.');
+        }
+      }
+    } : {
+      // Fallback with full config when using API key directly
       model: 'gemini-2.5-flash-native-audio-preview-09-2025',
       callbacks: {
         onopen: () => {
@@ -5371,7 +6434,9 @@ async function initAgnesLiveSession() {
         },
         systemInstruction: systemInstruction,
       }
-    });
+    };
+
+    agnesSessionPromise = agnesAiClient.live.connect(connectConfig);
 
   } catch (err: any) {
     handleAgnesInitError(err);
@@ -5543,6 +6608,9 @@ async function endAgnesSession(saveSession: boolean = true) {
 function showAgnesSessionComplete(xpEarned: number, xpResult: any, streakResult: any) {
   const modal = document.getElementById('agnes-success-modal');
   if (!modal) return;
+
+  // Mark role-play module as complete when a session is finished
+  completeModule('role-play');
 
   const content = modal.querySelector('.modal-content');
   if (content) {
@@ -6914,6 +7982,10 @@ function renderQuiz(quizData: QuizQuestion[]) {
 
 function renderModule(moduleName: string) {
   if (!mainContent) return;
+
+  // Clean up tip observers from previous module
+  cleanupTipObservers();
+
   mainContent.innerHTML = trainingContent[moduleName] || '<div>Content not found.</div>';
 
   // Cancel any ongoing speech when changing modules
@@ -6925,6 +7997,17 @@ function renderModule(moduleName: string) {
   // Track module start and activity
   trackModuleStart(moduleName);
   startActivityTracking(moduleName);
+
+  // Setup contextual tip system for this module
+  setupScrollObserver(moduleName);
+
+  // Initialize video players (since inline scripts don't execute with innerHTML)
+  initVideoPlayers();
+
+  // Initialize engagement tracking for module completion gating
+  if (MODULE_REQUIREMENTS[moduleName]) {
+    initModuleEngagement(moduleName);
+  }
 
   // Initialize interactive elements for specific modules
   switch (moduleName) {
@@ -6973,6 +8056,9 @@ function renderModule(moduleName: string) {
           break;
       case 'admin-dashboard':
           initAdminDashboard();
+          break;
+      case 'shingle-types-materials':
+          initShingleGame();
           break;
   }
 }
@@ -7064,9 +8150,205 @@ function showManagerLogin() {
   }
 }
 
+// ============================================================================
+// CONTEXTUAL TIP POPUP SYSTEM
+// ============================================================================
+
+// Track shown tips to avoid repeats
+const shownTips = new Set<string>(JSON.parse(sessionStorage.getItem('roof-er.shownTips') || '[]'));
+
+// Active tip timeouts for cleanup
+let activeTipTimeout: number | null = null;
+let lingerTimeout: number | null = null;
+
+// Tip data for modules
+interface TipData {
+  id?: string;
+  icon: string;
+  title: string;
+  message: string;
+}
+
+interface ModuleTip extends TipData {
+  id: string;
+  trigger: 'scroll' | 'linger';
+  targetSelector?: string;
+  delay?: number;
+}
+
+const moduleTips: Record<string, ModuleTip[]> = {
+  'welcome': [
+    { id: 'tip-video', trigger: 'scroll', targetSelector: '.video-player-container', icon: '🎬', title: 'Watch the Video', message: 'This video contains important context. Watch it fully to progress!' },
+    { id: 'tip-leaders', trigger: 'scroll', targetSelector: '.leader-grid', icon: '👥', title: 'Meet the Team', message: 'Click "My Bio" on each leader to learn more about them.' },
+    { id: 'tip-values', trigger: 'scroll', targetSelector: '.core-values', icon: '💎', title: 'Core Values', message: 'Remember: Integrity, Quality, Simplicity - you\'ll be tested!' },
+    { id: 'tip-quiz', trigger: 'scroll', targetSelector: '.quiz-section', icon: '📝', title: 'Quick Quiz', message: 'Test your knowledge before completing the module.' },
+    { id: 'tip-linger', trigger: 'linger', delay: 45000, icon: '⏱️', title: 'Take Your Time', message: 'This module takes about 15-20 minutes. No rush!' },
+  ],
+  'commitment': [
+    { id: 'tip-commitment-video', trigger: 'scroll', targetSelector: '.video-player-container', icon: '🎬', title: 'Important Video', message: 'Watch this commitment video to understand expectations.' },
+    { id: 'tip-commitment-linger', trigger: 'linger', delay: 60000, icon: '💡', title: 'Still Here?', message: 'Take your time understanding the commitment expectations.' },
+  ],
+  'general-knowledge': [
+    { id: 'tip-gk-video', trigger: 'scroll', targetSelector: '.video-player-container', icon: '🎬', title: 'Educational Video', message: 'Learn the fundamentals of roofing in this video.' },
+    { id: 'tip-gk-linger', trigger: 'linger', delay: 60000, icon: '📚', title: 'Lots to Learn!', message: 'This module has important technical info. Take notes!' },
+  ],
+};
+
+// Show a tip popup
+function showTip(tip: TipData): void {
+  // Check if already shown (by id or by title if no id)
+  const tipId = tip.id || `tip-${tip.title.toLowerCase().replace(/\s+/g, '-')}`;
+  if (shownTips.has(tipId)) return;
+
+  // Mark as shown
+  shownTips.add(tipId);
+  sessionStorage.setItem('roof-er.shownTips', JSON.stringify([...shownTips]));
+
+  // Remove any existing tip
+  const existingTip = document.querySelector('.tip-popup');
+  if (existingTip) existingTip.remove();
+
+  // Clear existing timeout
+  if (activeTipTimeout) {
+    clearTimeout(activeTipTimeout);
+    activeTipTimeout = null;
+  }
+
+  // Create tip element
+  const tipEl = document.createElement('div');
+  tipEl.className = 'tip-popup';
+  tipEl.innerHTML = `
+    <span class="tip-icon">${tip.icon}</span>
+    <div class="tip-content">
+      <div class="tip-title">${tip.title}</div>
+      <div class="tip-message">${tip.message}</div>
+    </div>
+    <button class="tip-close" aria-label="Close tip">&times;</button>
+  `;
+
+  document.body.appendChild(tipEl);
+
+  // Animate in
+  requestAnimationFrame(() => {
+    tipEl.classList.add('show');
+  });
+
+  // Close button handler
+  const closeBtn = tipEl.querySelector('.tip-close');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      tipEl.classList.remove('show');
+      setTimeout(() => tipEl.remove(), 400);
+    });
+  }
+
+  // Auto-hide after 5 seconds
+  activeTipTimeout = window.setTimeout(() => {
+    if (tipEl.parentElement) {
+      tipEl.classList.remove('show');
+      setTimeout(() => tipEl.remove(), 400);
+    }
+  }, 5000);
+}
+
+// Scroll observer for contextual tips
+let scrollObserver: IntersectionObserver | null = null;
+
+function setupScrollObserver(moduleName: string): void {
+  // Clean up previous observer
+  if (scrollObserver) {
+    scrollObserver.disconnect();
+    scrollObserver = null;
+  }
+
+  // Clear linger timeout
+  if (lingerTimeout) {
+    clearTimeout(lingerTimeout);
+    lingerTimeout = null;
+  }
+
+  const tips = moduleTips[moduleName];
+  if (!tips) return;
+
+  // Setup scroll-based tips
+  const scrollTips = tips.filter(t => t.trigger === 'scroll' && t.targetSelector);
+
+  if (scrollTips.length > 0) {
+    scrollObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          // Find matching tip
+          const matchingTip = scrollTips.find(t =>
+            entry.target.matches(t.targetSelector!)
+          );
+          if (matchingTip && !shownTips.has(matchingTip.id)) {
+            // Small delay so it feels natural
+            setTimeout(() => showTip(matchingTip), 500);
+          }
+        }
+      });
+    }, { threshold: 0.3, rootMargin: '0px' });
+
+    // Observe target elements after a short delay (let DOM render)
+    setTimeout(() => {
+      scrollTips.forEach(tip => {
+        const el = document.querySelector(tip.targetSelector!);
+        if (el) scrollObserver?.observe(el);
+      });
+    }, 500);
+  }
+
+  // Setup linger-based tips
+  const lingerTips = tips.filter(t => t.trigger === 'linger' && t.delay);
+  lingerTips.forEach(tip => {
+    if (!shownTips.has(tip.id)) {
+      lingerTimeout = window.setTimeout(() => {
+        showTip(tip);
+      }, tip.delay);
+    }
+  });
+}
+
+// Clean up observers when leaving module
+function cleanupTipObservers(): void {
+  if (scrollObserver) {
+    scrollObserver.disconnect();
+    scrollObserver = null;
+  }
+  if (lingerTimeout) {
+    clearTimeout(lingerTimeout);
+    lingerTimeout = null;
+  }
+  if (activeTipTimeout) {
+    clearTimeout(activeTipTimeout);
+    activeTipTimeout = null;
+  }
+}
+
 // Mark module as complete and unlock next
 function completeModule(moduleName: string) {
   unlockNextModule(moduleName);
+
+  // Mark as completed in localStorage
+  const completedModules = JSON.parse(localStorage.getItem('roof-er.completedModules') || '[]');
+  if (!completedModules.includes(moduleName)) {
+    completedModules.push(moduleName);
+    localStorage.setItem('roof-er.completedModules', JSON.stringify(completedModules));
+
+    // Award XP for module completion (only if not already completed)
+    const currentXp = parseInt(localStorage.getItem('roof-er.totalXp') || '0', 10);
+    const newXp = currentXp + 100; // 100 XP per module
+    localStorage.setItem('roof-er.totalXp', newXp.toString());
+
+    // Update streak (only once per day)
+    const lastActivity = localStorage.getItem('roof-er.lastActivityDate');
+    const today = new Date().toDateString();
+    if (lastActivity !== today) {
+      const currentStreak = parseInt(localStorage.getItem('roof-er.streak') || '0', 10);
+      localStorage.setItem('roof-er.streak', (currentStreak + 1).toString());
+      localStorage.setItem('roof-er.lastActivityDate', today);
+    }
+  }
 
   // Track module completion via API (silent - don't spam console)
   apiCall('/progress/module', {
@@ -7084,14 +8366,123 @@ function completeModule(moduleName: string) {
   const currentIndex = MODULE_ORDER.indexOf(moduleName);
   if (currentIndex < MODULE_ORDER.length - 1) {
     const nextModule = MODULE_ORDER[currentIndex + 1];
-    // Show unlock notification
-    const notification = document.createElement('div');
-    notification.className = 'unlock-notification';
-    notification.innerHTML = `<strong>Next module unlocked!</strong> You can now access: Module ${currentIndex + 2}`;
-    document.body.appendChild(notification);
-    setTimeout(() => notification.remove(), 3000);
+    const nextModuleName = getModuleDisplayName(nextModule);
+
+    // Show success modal with countdown and auto-navigate
+    showModuleCompleteModal(moduleName, nextModule, nextModuleName);
+  } else {
+    // Last module - show training complete message
+    showTrainingCompleteModal();
   }
 }
+
+// Module display names
+function getModuleDisplayName(moduleId: string): string {
+  const names: Record<string, string> = {
+    'welcome': 'Welcome & Company Intro',
+    'commitment': 'Your Commitment',
+    'general-knowledge': 'General Roofing Knowledge',
+    'shingle-types-materials': 'Shingle Types & Materials',
+    'initial-pitch': 'Initial Pitch',
+    'handling-initial-pitch-objections': 'Handling Initial Pitch Objections',
+    'inspection-process': 'Inspection Process',
+    'post-inspection-pitch': 'Post-Inspection Pitch',
+    'post-inspection-objections': 'Post-Inspection Objections',
+    'damage-identification': 'Damage Identification',
+    'filing-claim-closing': 'Filing Claim & Closing',
+    'closing-objections': 'Closing Objections',
+    'discontinued-products': 'Discontinued Products',
+    'sales-cycle-job-flow': 'Sales Cycle & Job Flow',
+    'role-play': 'Role Play Practice',
+    'final-exam': 'Final Exam'
+  };
+  return names[moduleId] || moduleId;
+}
+
+// Show module complete modal with countdown
+function showModuleCompleteModal(currentModule: string, nextModule: string, nextModuleName: string) {
+  const modal = document.createElement('div');
+  modal.className = 'module-complete-modal';
+  modal.innerHTML = `
+    <div class="module-complete-content">
+      <div class="success-icon">🎉</div>
+      <h2>Module Complete!</h2>
+      <p>Great work finishing <strong>${getModuleDisplayName(currentModule)}</strong></p>
+      <p class="next-module-text">Continuing to <strong>${nextModuleName}</strong> in <span id="countdown">3</span>...</p>
+      <button class="skip-btn" id="go-now-btn">Go Now</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  // Add click handler for Go Now button
+  const goNowBtn = document.getElementById('go-now-btn');
+  let intervalCleared = false;
+
+  // Countdown and auto-navigate
+  let count = 3;
+  const interval = setInterval(() => {
+    count--;
+    const countdownEl = document.getElementById('countdown');
+    if (countdownEl) countdownEl.textContent = count.toString();
+    if (count <= 0) {
+      clearInterval(interval);
+      intervalCleared = true;
+      modal.remove();
+      navigateToModule(nextModule);
+    }
+  }, 1000);
+
+  if (goNowBtn) {
+    goNowBtn.onclick = () => {
+      if (!intervalCleared) {
+        clearInterval(interval);
+        intervalCleared = true;
+      }
+      modal.remove();
+      navigateToModule(nextModule);
+    };
+  }
+}
+
+// Show training complete modal
+function showTrainingCompleteModal() {
+  const modal = document.createElement('div');
+  modal.className = 'module-complete-modal';
+  modal.innerHTML = `
+    <div class="module-complete-content">
+      <div class="success-icon">🏆</div>
+      <h2>Training Complete!</h2>
+      <p>Congratulations! You've completed all training modules.</p>
+      <p class="next-module-text">You're now ready to hit the field!</p>
+      <button class="skip-btn" id="close-modal-btn">Close</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  const closeBtn = document.getElementById('close-modal-btn');
+  if (closeBtn) {
+    closeBtn.onclick = () => modal.remove();
+  }
+}
+
+// Navigate to a specific module
+function navigateToModule(moduleName: string) {
+  const sidebar = document.getElementById('sidebar');
+  const targetItem = sidebar?.querySelector(`[data-module="${moduleName}"]`) as HTMLElement;
+  if (targetItem) {
+    sidebar?.querySelectorAll('li').forEach(li => li.classList.remove('active'));
+    targetItem.classList.add('active');
+    renderModule(moduleName);
+    localStorage.setItem(STORAGE_KEYS.currentModule, moduleName);
+    // Scroll to top of content
+    const mainContent = document.getElementById('main-content');
+    if (mainContent) mainContent.scrollTop = 0;
+  }
+}
+
+// Make functions accessible from onclick handlers in HTML templates
+(window as any).navigateToModule = navigateToModule;
+(window as any).completeModule = completeModule;
 
 // Track module start
 function trackModuleStart(moduleName: string) {
@@ -8390,6 +9781,13 @@ const LEADER_BIOS: Record<string, {name: string; title: string; img: string; lin
     img: '/resources/images/ford-theroofdocs.jpg',
     link: 'https://www.theroofdocs.com/about/',
     summary: 'Oversees operations and execution, aligning teams and process from inspection to completion.'
+  },
+  ross: {
+    name: 'Ross Renzi',
+    title: 'Regional Sales Manager',
+    img: '',
+    link: 'https://www.theroofdocs.com/about/',
+    summary: 'Leads regional sales operations and team development, driving market expansion and sales excellence.'
   }
 };
 
@@ -8437,34 +9835,364 @@ function initWelcomeModals() {
     });
   });
 }
+// Commitment module state
+let commitmentVideoWatched = false;
+let commitmentInitialsCount = 0;
+
 function initCommitmentGate() {
   const container = document.getElementById('main-content');
   if (!container) return;
-  // Inject a simple signature form if not present
+
+  // Check if already completed
   const signed = localStorage.getItem(STORAGE_KEYS.commitmentSigned) === 'true';
-  if (signed) return;
-  const gate = document.createElement('div');
-  gate.innerHTML = `
-    <div class="commitment-gate">
-      <h3>Digital Signature</h3>
-      <p>You must acknowledge and sign before accessing the training.</p>
-      <label>Full Name: <input id="sigName" type="text" placeholder="Your full name"/></label>
-      <label><input id="sigAgree" type="checkbox"/> I agree to uphold Roof‑ER standards and ethics.</label>
-      <button id="sigSubmit">Sign & Continue</button>
-      <div id="sigMsg" class="sig-message"></div>
-    </div>`;
-  container.appendChild(gate);
-  const btn = gate.querySelector('#sigSubmit') as HTMLButtonElement | null;
-  btn?.addEventListener('click', () => {
-    const name = (gate.querySelector('#sigName') as HTMLInputElement)?.value?.trim();
-    const agree = (gate.querySelector('#sigAgree') as HTMLInputElement)?.checked;
-    const msg = gate.querySelector('#sigMsg') as HTMLElement | null;
-    if (!name || !agree) {
-      if (msg) msg.textContent = 'Please enter your name and agree to proceed.';
+  if (signed) {
+    // Show completed state
+    const signatureSection = document.getElementById('commitment-signature-section');
+    const reqNotice = document.getElementById('commitment-requirements-notice');
+    const videoNotice = document.getElementById('commitment-video-notice');
+    if (signatureSection) {
+      signatureSection.innerHTML = `
+        <div class="commitment-completed">
+          <span class="completed-icon">✓</span> You have already signed this commitment.
+          <button class="reset-commitment-btn" id="reset-commitment-btn" style="margin-left: 15px; padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Reset (Testing)</button>
+        </div>`;
+      // Add reset button handler
+      const resetBtn = document.getElementById('reset-commitment-btn');
+      if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+          if (confirm('Are you sure you want to reset this commitment? This will clear your signature and initials.')) {
+            localStorage.removeItem(STORAGE_KEYS.commitmentSigned);
+            for (let i = 1; i <= 8; i++) {
+              localStorage.removeItem('commitment-initial-' + i);
+            }
+            localStorage.removeItem('video-watched-commitment-video');
+            location.reload();
+          }
+        });
+      }
+    }
+    if (reqNotice) reqNotice.style.display = 'none';
+    if (videoNotice) videoNotice.style.display = 'none';
+    // Show all checks and restore saved initials
+    for (let i = 1; i <= 8; i++) {
+      const check = document.getElementById(`check-${i}`);
+      const item = document.querySelector(`.commitment-item[data-index="${i}"]`);
+      const inputBox = document.getElementById(`initial-${i}`) as HTMLInputElement;
+      if (check) check.classList.add('visible');
+      if (item) item.classList.add('completed');
+      // Restore saved initial and disable input
+      if (inputBox) {
+        const savedInitial = localStorage.getItem(`commitment-initial-${i}`);
+        if (savedInitial) {
+          inputBox.value = savedInitial;
+        }
+        inputBox.disabled = true;
+        inputBox.classList.add('completed');
+      }
+    }
+    return;
+  }
+
+  // Check if video was previously watched
+  const videoWatchedKey = 'video-watched-commitment-video';
+  commitmentVideoWatched = localStorage.getItem(videoWatchedKey) === 'true';
+
+  // Initialize state
+  commitmentInitialsCount = 0;
+
+  // Set up video progress tracking for commitment video
+  setupCommitmentVideoTracking();
+
+  // Set up initial box listeners
+  setupInitialBoxListeners();
+
+  // Set up signature form
+  setupSignatureForm();
+
+  // Set up navigation links within module content
+  setupModuleNavLinks();
+
+  // Initial state check
+  updateCommitmentRequirements();
+}
+
+// Handle navigation links within module content (e.g., reference links)
+function setupModuleNavLinks() {
+  const container = document.getElementById('main-content');
+  if (!container) return;
+
+  const navLinks = container.querySelectorAll('.nav-module-link');
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetModule = (link as HTMLElement).dataset.module;
+      const scrollToId = (link as HTMLElement).dataset.scrollTo;
+
+      if (targetModule) {
+        // Navigate to the module
+        const sidebar = document.getElementById('sidebar');
+        const navItem = sidebar?.querySelector(`[data-module="${targetModule}"]`);
+
+        if (navItem) {
+          // Simulate a click on the nav item to load the module
+          (navItem as HTMLElement).click();
+
+          // After module loads, scroll to the target element if specified
+          if (scrollToId) {
+            setTimeout(() => {
+              const scrollTarget = document.getElementById(scrollToId);
+              if (scrollTarget) {
+                scrollTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            }, 100);
+          }
+        }
+      }
+    });
+  });
+}
+
+function setupCommitmentVideoTracking() {
+  const videoContainer = document.querySelector('.video-player-container video') as HTMLVideoElement;
+  const progressText = document.getElementById('commitment-video-progress');
+
+  if (videoContainer) {
+    videoContainer.addEventListener('timeupdate', () => {
+      const percent = Math.round((videoContainer.currentTime / videoContainer.duration) * 100);
+      if (progressText) {
+        progressText.textContent = `Video progress: ${percent}%`;
+      }
+      if (percent >= 90 && !commitmentVideoWatched) {
+        commitmentVideoWatched = true;
+        localStorage.setItem('video-watched-commitment-video', 'true');
+        updateCommitmentRequirements();
+      }
+    });
+  }
+
+  // Check if already watched
+  if (commitmentVideoWatched) {
+    const videoNotice = document.getElementById('commitment-video-notice');
+    if (videoNotice) {
+      videoNotice.classList.add('completed');
+      const progressText = document.getElementById('commitment-video-progress');
+      if (progressText) progressText.textContent = 'Video completed ✓';
+    }
+  }
+}
+
+function setupInitialBoxListeners() {
+  // Use more specific selector within commitment-initials-section
+  const initialsSection = document.getElementById('commitment-initials-section');
+  if (!initialsSection) {
+    console.warn('Commitment initials section not found');
+    return;
+  }
+
+  // Select each initial box by ID for reliability
+  for (let i = 1; i <= 8; i++) {
+    const inputBox = document.getElementById(`initial-${i}`) as HTMLInputElement;
+    if (!inputBox) {
+      console.warn(`Initial box #${i} not found`);
+      continue;
+    }
+
+    const itemIndex = i;
+
+    // Check for saved initials and restore
+    const savedInitial = localStorage.getItem(`commitment-initial-${itemIndex}`);
+    if (savedInitial) {
+      inputBox.value = savedInitial;
+      markInitialComplete(itemIndex, true);
+    }
+
+    // Add input listener
+    inputBox.addEventListener('input', () => {
+      const value = inputBox.value.trim().toUpperCase();
+      // Update input to uppercase
+      inputBox.value = value;
+
+      if (value.length >= 2) {
+        // Valid initial (at least 2 characters)
+        localStorage.setItem(`commitment-initial-${itemIndex}`, value);
+        markInitialComplete(itemIndex, true);
+      } else {
+        localStorage.removeItem(`commitment-initial-${itemIndex}`);
+        markInitialComplete(itemIndex, false);
+      }
+
+      updateInitialsProgress();
+      updateCommitmentRequirements();
+    });
+
+    // Also listen for blur (when user leaves the field)
+    inputBox.addEventListener('blur', () => {
+      const value = inputBox.value.trim().toUpperCase();
+      inputBox.value = value;
+      if (value.length >= 2) {
+        localStorage.setItem(`commitment-initial-${itemIndex}`, value);
+        markInitialComplete(itemIndex, true);
+      }
+      updateInitialsProgress();
+      updateCommitmentRequirements();
+    });
+  }
+
+  // Initial progress update
+  updateInitialsProgress();
+}
+
+function markInitialComplete(itemIndex: number, isComplete: boolean) {
+  const check = document.getElementById(`check-${itemIndex}`);
+  const item = document.querySelector(`.commitment-item[data-index="${itemIndex}"]`);
+  const inputBox = document.getElementById(`initial-${itemIndex}`) as HTMLInputElement;
+
+  if (isComplete) {
+    if (check) check.classList.add('visible');
+    if (item) item.classList.add('completed');
+    if (inputBox) inputBox.classList.add('completed');
+  } else {
+    if (check) check.classList.remove('visible');
+    if (item) item.classList.remove('completed');
+    if (inputBox) inputBox.classList.remove('completed');
+  }
+}
+
+function updateInitialsProgress() {
+  let count = 0;
+  for (let i = 1; i <= 8; i++) {
+    const saved = localStorage.getItem(`commitment-initial-${i}`);
+    if (saved && saved.length >= 2) count++;
+  }
+  commitmentInitialsCount = count;
+
+  const progressFill = document.getElementById('initials-progress-fill');
+  const progressText = document.getElementById('initials-progress-text');
+
+  if (progressFill) {
+    progressFill.style.width = `${(count / 8) * 100}%`;
+    progressFill.style.backgroundColor = count === 8 ? '#28a745' : '#c62828';
+  }
+  if (progressText) {
+    progressText.textContent = count === 8 ? 'All commitments initialed ✓' : `${count} of 8 commitments initialed`;
+  }
+}
+
+function updateCommitmentRequirements() {
+  const reqVideo = document.getElementById('req-commitment-video');
+  const reqInitials = document.getElementById('req-commitment-initials');
+  const reqSignature = document.getElementById('req-commitment-signature');
+  const signatureSection = document.getElementById('commitment-signature-section');
+  const videoNotice = document.getElementById('commitment-video-notice');
+
+  // Update video requirement
+  if (reqVideo) {
+    if (commitmentVideoWatched) {
+      reqVideo.classList.remove('pending');
+      reqVideo.classList.add('complete');
+      reqVideo.innerHTML = '<span class="req-icon">✓</span> Watch the commitment video (90%+)';
+    } else {
+      reqVideo.classList.add('pending');
+      reqVideo.classList.remove('complete');
+      reqVideo.innerHTML = '<span class="req-icon">○</span> Watch the commitment video (90%+)';
+    }
+  }
+
+  // Update video notice
+  if (videoNotice) {
+    if (commitmentVideoWatched) {
+      videoNotice.classList.add('completed');
+    }
+  }
+
+  // Update initials requirement
+  if (reqInitials) {
+    if (commitmentInitialsCount === 8) {
+      reqInitials.classList.remove('pending');
+      reqInitials.classList.add('complete');
+      reqInitials.innerHTML = '<span class="req-icon">✓</span> Initial all 8 commitment statements';
+    } else {
+      reqInitials.classList.add('pending');
+      reqInitials.classList.remove('complete');
+      reqInitials.innerHTML = `<span class="req-icon">○</span> Initial all 8 commitment statements (${commitmentInitialsCount}/8)`;
+    }
+  }
+
+  // Show signature section only when video watched AND all initials done
+  if (signatureSection) {
+    if (commitmentVideoWatched && commitmentInitialsCount === 8) {
+      signatureSection.style.display = 'block';
+      signatureSection.classList.add('revealed');
+    } else {
+      signatureSection.style.display = 'none';
+    }
+  }
+}
+
+function setupSignatureForm() {
+  const submitBtn = document.getElementById('commitment-sig-submit');
+  const nameInput = document.getElementById('commitment-sig-name') as HTMLInputElement;
+  const agreeCheckbox = document.getElementById('commitment-sig-agree') as HTMLInputElement;
+  const errorDiv = document.getElementById('commitment-sig-error');
+  const reqSignature = document.getElementById('req-commitment-signature');
+
+  if (!submitBtn) return;
+
+  submitBtn.addEventListener('click', () => {
+    const name = nameInput?.value?.trim();
+    const agree = agreeCheckbox?.checked;
+
+    // Validate
+    if (!name || name.length < 3) {
+      if (errorDiv) {
+        errorDiv.textContent = 'Please enter your full legal name (at least 3 characters).';
+        errorDiv.classList.add('visible');
+      }
       return;
     }
+
+    if (!agree) {
+      if (errorDiv) {
+        errorDiv.textContent = 'You must agree to the commitment statement.';
+        errorDiv.classList.add('visible');
+      }
+      return;
+    }
+
+    // All validation passed - save and complete
     localStorage.setItem(STORAGE_KEYS.commitmentSigned, 'true');
-    if (msg) msg.textContent = 'Signed. You may continue to other sections.';
+    localStorage.setItem('commitment-signer-name', name);
+    localStorage.setItem('commitment-signed-date', new Date().toISOString());
+
+    // Update UI
+    if (errorDiv) {
+      errorDiv.classList.remove('visible');
+    }
+
+    // Update signature requirement
+    if (reqSignature) {
+      reqSignature.classList.remove('pending');
+      reqSignature.classList.add('complete');
+      reqSignature.innerHTML = '<span class="req-icon">✓</span> Provide your digital signature';
+    }
+
+    // Show success
+    const signatureSection = document.getElementById('commitment-signature-section');
+    if (signatureSection) {
+      signatureSection.innerHTML = `
+        <div class="commitment-completed">
+          <span class="completed-icon">✓</span>
+          <div class="completed-text">
+            <strong>Commitment Signed!</strong>
+            <p>Signed by: ${name}</p>
+            <p>Date: ${new Date().toLocaleDateString()}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    // Complete the module
+    completeModule('commitment');
   });
 }
 
@@ -8718,18 +10446,18 @@ function initFinalExam() {
 
 function showExamStartScreen(root: HTMLElement, state: ExamState) {
   const remaining = getRemainingAttempts();
-  const attemptsHtml = state.attempts.length > 0 ? `
-    <div class="exam-history">
-      <h4>Previous Attempts:</h4>
-      <ul>
-        ${state.attempts.map(a => `
-          <li class="${a.passed ? 'passed' : 'failed'}">
-            Attempt ${a.attemptNumber}: ${a.totalScore}% on ${formatExamDate(a.date)} - ${a.passed ? '✓ PASSED' : '✗ Failed'}
-          </li>
-        `).join('')}
-      </ul>
-    </div>
-  ` : '';
+
+  // Build attempts list separately to avoid nested template literal issues
+  let attemptsListHtml = '';
+  if (state.attempts.length > 0) {
+    const attemptItems = state.attempts.map(a => {
+      const statusClass = a.passed ? 'passed' : 'failed';
+      const statusText = a.passed ? '✓ PASSED' : '✗ Failed';
+      return '<li class="' + statusClass + '">Attempt ' + a.attemptNumber + ': ' + a.totalScore + '% on ' + formatExamDate(a.date) + ' - ' + statusText + '</li>';
+    }).join('');
+    attemptsListHtml = '<div class="exam-history"><h4>Previous Attempts:</h4><ul>' + attemptItems + '</ul></div>';
+  }
+  const attemptsHtml = attemptsListHtml;
 
   root.innerHTML = `
     <div class="exam-start-screen">
@@ -9483,6 +11211,12 @@ function showExamResults(root: HTMLElement, attempt: ExamAttempt, detailedResult
     });
 
     triggerConfetti();
+
+    // Mark quiz as passed in engagement state
+    markQuizPassed('final-exam');
+
+    // Mark the final exam module as complete
+    completeModule('final-exam');
   } else {
     // Show failure screen
     const locked = remaining === 0;
@@ -9665,44 +11399,97 @@ function initQuickQuiz1() {
   if (!startBtn || !area) return;
   startBtn.addEventListener('click', () => {
     area.innerHTML = `
-      <div class="quiz-item">
-        <p>1. Who is the Owner, Director of Sales, and General Manager of Roof-ER?</p>
-        <label><input type="radio" name="qa1" value="a"/> Oliver Brown (Owner), Reese Samala (Director of Sales), Ford Barsi (General Manager)</label>
-        <label><input type="radio" name="qa1" value="b"/> Ford Barsi (Owner), Oliver Brown (Director of Sales), Reese Samala (General Manager)</label>
-        <label><input type="radio" name="qa1" value="c"/> Reese Samala (Owner), Ford Barsi (Director of Sales), Oliver Brown (General Manager)</label>
+      <div class="quiz-container-enhanced">
+        <div class="quiz-question-card">
+          <p class="quiz-question-text">1. Who are the key leaders at Roof-ER?</p>
+          <div class="quiz-options">
+            <button class="quiz-option-btn" data-answer="a" data-question="qa1">
+              <span class="option-letter">A</span>
+              <span>Oliver Brown (Owner), Reese Samala (Director of Sales), Ford Barsi (GM), Ross Renzi (Regional Sales Manager)</span>
+            </button>
+            <button class="quiz-option-btn" data-answer="b" data-question="qa1">
+              <span class="option-letter">B</span>
+              <span>Ford Barsi (Owner), Oliver Brown (Director of Sales), Reese Samala (GM), Ross Renzi (Marketing)</span>
+            </button>
+            <button class="quiz-option-btn" data-answer="c" data-question="qa1">
+              <span class="option-letter">C</span>
+              <span>Reese Samala (Owner), Ford Barsi (Director of Sales), Oliver Brown (GM), Ross Renzi (Operations)</span>
+            </button>
+          </div>
+        </div>
+        <div class="quiz-question-card">
+          <p class="quiz-question-text">2. What are Roof-ER's core values?</p>
+          <div class="quiz-options">
+            <button class="quiz-option-btn" data-answer="a" data-question="qa2">
+              <span class="option-letter">A</span>
+              <span>Speed, Price, Volume</span>
+            </button>
+            <button class="quiz-option-btn" data-answer="b" data-question="qa2">
+              <span class="option-letter">B</span>
+              <span>Integrity, Quality, Simplicity</span>
+            </button>
+            <button class="quiz-option-btn" data-answer="c" data-question="qa2">
+              <span class="option-letter">C</span>
+              <span>Profit, Growth, Expansion</span>
+            </button>
+          </div>
+        </div>
+        <div class="quiz-question-card">
+          <p class="quiz-question-text">3. What year was Roof-ER founded?</p>
+          <div class="quiz-options">
+            <button class="quiz-option-btn" data-answer="a" data-question="qa3">
+              <span class="option-letter">A</span>
+              <span>2017</span>
+            </button>
+            <button class="quiz-option-btn" data-answer="b" data-question="qa3">
+              <span class="option-letter">B</span>
+              <span>2018</span>
+            </button>
+            <button class="quiz-option-btn" data-answer="c" data-question="qa3">
+              <span class="option-letter">C</span>
+              <span>2019</span>
+            </button>
+          </div>
+        </div>
+        <button id="quiz1Submit" class="quiz-submit-btn">Submit Answers</button>
+        <div id="quiz1Result" class="quiz-result-area"></div>
       </div>
-      <div class="quiz-item">
-        <p>2. What are Roof-ER's core values?</p>
-        <label><input type="radio" name="qa2" value="a"/> Speed, Price, Volume</label>
-        <label><input type="radio" name="qa2" value="b"/> Integrity, Quality, Simplicity</label>
-        <label><input type="radio" name="qa2" value="c"/> Profit, Growth, Expansion</label>
-      </div>
-      <div class="quiz-item">
-        <p>3. What year was Roof-ER founded?</p>
-        <label><input type="radio" name="qa3" value="a"/> 2017</label>
-        <label><input type="radio" name="qa3" value="b"/> 2018</label>
-        <label><input type="radio" name="qa3" value="c"/> 2019</label>
-      </div>
-      <button id="quiz1Submit">Submit</button>
-      <div id="quiz1Result"></div>
     `;
+
+    // Track selected answers
+    const selectedAnswers: Record<string, string> = {};
+
+    // Add click handlers for option buttons
+    area.querySelectorAll('.quiz-option-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const question = (btn as HTMLElement).dataset.question || '';
+        const answer = (btn as HTMLElement).dataset.answer || '';
+        selectedAnswers[question] = answer;
+
+        // Update visual selection
+        area.querySelectorAll(`.quiz-option-btn[data-question="${question}"]`).forEach(b => {
+          b.classList.remove('selected');
+        });
+        btn.classList.add('selected');
+      });
+    });
+
     (document.getElementById('quiz1Submit') as HTMLButtonElement)?.addEventListener('click', () => {
-      const q1 = (document.querySelector('input[name="qa1"]:checked') as HTMLInputElement)?.value;
-      const q2 = (document.querySelector('input[name="qa2"]:checked') as HTMLInputElement)?.value;
-      const q3 = (document.querySelector('input[name="qa3"]:checked') as HTMLInputElement)?.value;
+      const q1 = selectedAnswers['qa1'];
+      const q2 = selectedAnswers['qa2'];
+      const q3 = selectedAnswers['qa3'];
       const pass = q1 === 'a' && q2 === 'b' && q3 === 'c';
       const res = document.getElementById('quiz1Result');
       if (res) {
         if (pass) {
-          res.textContent = '✓ Perfect! You know the Roof-ER leadership team, core values, and founding year.';
-          res.className = 'quiz-feedback correct';
+          res.innerHTML = '<div class="quiz-success">&#10003; Perfect! You know the Roof-ER leadership team, core values, and founding year.</div>';
         } else {
-          let feedback = '✗ Not quite. ';
+          let feedback = '<div class="quiz-error">&#10007; Not quite. ';
           if (q1 !== 'a') feedback += 'Review the leadership team. ';
           if (q2 !== 'b') feedback += 'Check our core values. ';
           if (q3 !== 'c') feedback += 'Roof-ER was founded in 2019. ';
-          res.textContent = feedback;
-          res.className = 'quiz-feedback incorrect';
+          feedback += '</div>';
+          res.innerHTML = feedback;
         }
       }
     });

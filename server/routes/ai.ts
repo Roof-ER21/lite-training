@@ -1,12 +1,23 @@
 import { Router, Request, Response } from 'express';
 import OpenAI from 'openai';
+import { GoogleGenAI, Modality } from '@google/genai';
 
 const router = Router();
 
+// Initialize Google GenAI client for ephemeral tokens
+const geminiApiKey = process.env.GEMINI_API_KEY;
+let geminiClient: GoogleGenAI | null = null;
+if (geminiApiKey) {
+  geminiClient = new GoogleGenAI({ apiKey: geminiApiKey });
+}
+
 // Initialize OpenAI client (will use OPENAI_API_KEY from environment)
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+let openai: OpenAI | null = null;
+if (process.env.OPENAI_API_KEY) {
+  openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY
+  });
+}
 
 // Check if OpenAI is configured
 function isOpenAIConfigured(): boolean {
@@ -117,8 +128,8 @@ Return JSON only (no markdown):
   "improvements": ["<specific improvement 1>", "<specific improvement 2>"]
 }`;
 
-    // Call OpenAI API
-    const completion = await openai.chat.completions.create({
+    // Call OpenAI API (openai is guaranteed non-null here due to isOpenAIConfigured check)
+    const completion = await openai!.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
         { role: 'system', content: systemPrompt },
@@ -186,8 +197,75 @@ Return JSON only (no markdown):
 router.get('/status', (req: Request, res: Response) => {
   res.json({
     configured: isOpenAIConfigured(),
+    geminiConfigured: !!geminiApiKey,
     model: 'gpt-4o-mini'
   });
+});
+
+// POST /api/ai/gemini-token - Generate ephemeral token for Gemini Live API
+router.post('/gemini-token', async (req: Request, res: Response) => {
+  try {
+    if (!geminiClient || !geminiApiKey) {
+      return res.status(503).json({
+        error: 'Gemini API not configured',
+        message: 'GEMINI_API_KEY environment variable is not set'
+      });
+    }
+
+    const { systemInstruction } = req.body;
+
+    // Calculate expiration times
+    const now = new Date();
+    const expireTime = new Date(now.getTime() + 30 * 60 * 1000); // 30 minutes for session
+    const newSessionExpireTime = new Date(now.getTime() + 2 * 60 * 1000); // 2 minutes to start session
+
+    // Create ephemeral token using the SDK
+    console.log('Creating ephemeral token...');
+    const tokenResponse = await geminiClient.authTokens.create({
+      config: {
+        uses: 1, // Single use token
+        expireTime: expireTime.toISOString(),
+        newSessionExpireTime: newSessionExpireTime.toISOString(),
+        liveConnectConstraints: {
+          model: 'gemini-2.5-flash-native-audio-preview-09-2025',
+          config: {
+            responseModalities: [Modality.AUDIO],
+            speechConfig: {
+              voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } }
+            },
+            systemInstruction: systemInstruction || 'You are a helpful AI assistant.',
+          }
+        },
+        httpOptions: { apiVersion: 'v1alpha' }
+      }
+    });
+
+    console.log('Token response structure:', JSON.stringify(tokenResponse, null, 2));
+
+    // Extract the token - the SDK returns { name: "auth_tokens/..." }
+    // According to Google docs, token.name is the full token value to use as API key
+    const tokenValue = (tokenResponse as any).name;
+
+    if (!tokenValue) {
+      console.error('Failed to extract token from response');
+      return res.status(500).json({ error: 'Failed to extract token' });
+    }
+
+    console.log('Ephemeral token generated successfully');
+
+    res.json({
+      token: tokenValue,  // Full token.name value to use as API key
+      expireTime: expireTime.toISOString(),
+      model: 'gemini-2.5-flash-native-audio-preview-09-2025'
+    });
+
+  } catch (error: any) {
+    console.error('Gemini token generation error:', error);
+    res.status(500).json({
+      error: 'Failed to generate token',
+      details: error?.message || 'Unknown error'
+    });
+  }
 });
 
 export default router;
