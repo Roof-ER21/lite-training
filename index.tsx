@@ -2074,6 +2074,74 @@ const trainingContent = {
         </div>
       </div>
 
+      <!-- Pre-Pitch Preparation: Knockable Doors -->
+      <h2>Pre-Pitch Preparation: Identifying the Right Doors</h2>
+      <p class="section-intro">Before you deliver your pitch, know which doors to approach! Smart canvassing means better results.</p>
+
+      <div class="knockable-grid">
+        <div class="knockable-card do-knock">
+          <div class="knockable-header">
+            <span class="knockable-icon">✅</span>
+            <h3>DO Knock</h3>
+          </div>
+          <ul class="knockable-list">
+            <li><strong>Visible storm damage</strong> - Missing shingles, dented gutters, damaged siding</li>
+            <li><strong>Recent storm activity</strong> - Check storm maps and local weather reports</li>
+            <li><strong>Neighbors getting work done</strong> - Social proof creates opportunity</li>
+            <li><strong>Older roofs (15+ years)</strong> - Higher likelihood of qualifiable damage</li>
+            <li><strong>Collateral indicators</strong> - Dented screens, AC units, hail marks on cars</li>
+            <li><strong>Worn or weathered appearance</strong> - Signs of deferred maintenance</li>
+          </ul>
+        </div>
+        <div class="knockable-card dont-knock">
+          <div class="knockable-header">
+            <span class="knockable-icon">❌</span>
+            <h3>DON'T Knock</h3>
+          </div>
+          <ul class="knockable-list">
+            <li><strong>"No Soliciting" signs</strong> - Always respect posted wishes</li>
+            <li><strong>Aggressive dogs loose</strong> - Safety first, move on</li>
+            <li><strong>Late evening/early morning</strong> - Stick to 10am-7pm ideal window</li>
+            <li><strong>Brand new roofs (&lt;5 years)</strong> - Very low probability of claim</li>
+            <li><strong>Severe weather happening</strong> - Use judgment, stay safe</li>
+            <li><strong>Property clearly for sale</strong> - Homeowner priorities elsewhere</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="knockable-tip">
+        <span class="tip-icon">💡</span>
+        <div class="tip-content">
+          <strong>Pro Tip:</strong> A "No" door today might be a "Yes" door after the next storm. Keep notes on promising homes and revisit after weather events!
+        </div>
+      </div>
+
+      <div class="knockable-best-times">
+        <h4>Best Times to Knock</h4>
+        <div class="times-grid">
+          <div class="time-slot best">
+            <span class="time-period">Weekdays 4-7pm</span>
+            <span class="time-rating">Best</span>
+            <span class="time-reason">Homeowners arriving from work</span>
+          </div>
+          <div class="time-slot good">
+            <span class="time-period">Saturdays 10am-5pm</span>
+            <span class="time-rating">Good</span>
+            <span class="time-reason">People doing yard work, home projects</span>
+          </div>
+          <div class="time-slot okay">
+            <span class="time-period">Weekdays 10am-2pm</span>
+            <span class="time-rating">Okay</span>
+            <span class="time-reason">Retirees, work-from-home folks</span>
+          </div>
+          <div class="time-slot avoid">
+            <span class="time-period">Sundays/Before 10am</span>
+            <span class="time-rating">Avoid</span>
+            <span class="time-reason">Family time, sleeping in</span>
+          </div>
+        </div>
+      </div>
+
       <!-- Progress Tracker -->
       <div class="pitch-progress-tracker" id="pitch-progress">
         <h3>Your Practice Progress</h3>
@@ -3938,98 +4006,245 @@ const trainingContent = {
 };
 
 // Extend content with new tabs and remaps
-// 3. General Roofing Knowledge & Terminology (includes Identifying Knockable Doors)
+// 3. General Roofing Knowledge & Terminology (REDESIGNED with interactive elements)
 trainingContent['general-knowledge'] = `
-  <div class="content-card">
+  <div class="content-card module-3-redesign">
     <h1>General Roofing Knowledge & Terminology</h1>
     ${renderVideoPlayer('/assets/training/videos/module3-roofing101.mp4', 'roofing101-video', '📹 Roofing 101: Essential Knowledge')}
 
     <h2>Essential Roofing Terminology</h2>
-    <div class="terminology-grid">
-      <div class="term-card">
-        <h3>Ridge</h3>
-        <p>The horizontal line at the peak where two roof planes meet. Critical for ventilation and caps. The ridge is the highest point on the roof where opposing slopes connect.</p>
+    <p class="section-intro">Click on any card to flip and learn the definition!</p>
+
+    <div class="terminology-flip-grid">
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-card-inner">
+          <div class="flip-card-front">
+            <div class="flip-icon">🏔️</div>
+            <h3>Ridge</h3>
+            <span class="flip-hint">Click to learn more</span>
+          </div>
+          <div class="flip-card-back">
+            <h4>Ridge</h4>
+            <p>The horizontal line at the peak where two roof planes meet. Critical for ventilation and caps. The ridge is the highest point on the roof.</p>
+          </div>
+        </div>
       </div>
-      <div class="term-card">
-        <h3>Underlayment</h3>
-        <p>Water-resistant barrier installed beneath shingles. Protects against ice dams and leaks. Typically felt paper or synthetic material that provides secondary water protection.</p>
+
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-card-inner">
+          <div class="flip-card-front">
+            <div class="flip-icon">🛡️</div>
+            <h3>Underlayment</h3>
+            <span class="flip-hint">Click to learn more</span>
+          </div>
+          <div class="flip-card-back">
+            <h4>Underlayment</h4>
+            <p>Water-resistant barrier beneath shingles. Protects against ice dams and leaks. Typically felt paper or synthetic material.</p>
+          </div>
+        </div>
       </div>
-      <div class="term-card">
-        <h3>Flashing</h3>
-        <p>Metal strips around chimneys, vents, valleys to prevent water intrusion. Common damage point. Flashing directs water away from vulnerable areas where roof planes meet structures.</p>
+
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-card-inner">
+          <div class="flip-card-front">
+            <div class="flip-icon">⚡</div>
+            <h3>Flashing</h3>
+            <span class="flip-hint">Click to learn more</span>
+          </div>
+          <div class="flip-card-back">
+            <h4>Flashing</h4>
+            <p>Metal strips around chimneys, vents, valleys to prevent water intrusion. Common damage point - directs water away from vulnerable areas.</p>
+          </div>
+        </div>
       </div>
-      <div class="term-card">
-        <h3>Vents</h3>
-        <p>Roof penetrations for exhaust (bath, kitchen) and intake/exhaust ventilation systems. Proper ventilation extends roof life and prevents moisture buildup in the attic.</p>
+
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-card-inner">
+          <div class="flip-card-front">
+            <div class="flip-icon">💨</div>
+            <h3>Vents</h3>
+            <span class="flip-hint">Click to learn more</span>
+          </div>
+          <div class="flip-card-back">
+            <h4>Vents</h4>
+            <p>Roof penetrations for exhaust and intake/exhaust ventilation. Proper ventilation extends roof life and prevents moisture buildup.</p>
+          </div>
+        </div>
       </div>
-      <div class="term-card">
-        <h3>Valley</h3>
-        <p>Where two roof planes meet at an angle. High water flow area - check for debris and damage. Valleys are particularly susceptible to leaks and require special installation techniques.</p>
+
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-card-inner">
+          <div class="flip-card-front">
+            <div class="flip-icon">🌊</div>
+            <h3>Valley</h3>
+            <span class="flip-hint">Click to learn more</span>
+          </div>
+          <div class="flip-card-back">
+            <h4>Valley</h4>
+            <p>Where two roof planes meet at an angle. High water flow area - check for debris and damage. Susceptible to leaks.</p>
+          </div>
+        </div>
       </div>
-      <div class="term-card">
-        <h3>Drip Edge</h3>
-        <p>Metal edge along eaves and rakes. Directs water away from fascia and protects underlayment. Code-required in most jurisdictions to protect the roof deck edges.</p>
+
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-card-inner">
+          <div class="flip-card-front">
+            <div class="flip-icon">💧</div>
+            <h3>Drip Edge</h3>
+            <span class="flip-hint">Click to learn more</span>
+          </div>
+          <div class="flip-card-back">
+            <h4>Drip Edge</h4>
+            <p>Metal edge along eaves and rakes. Directs water away from fascia and protects underlayment. Code-required in most areas.</p>
+          </div>
+        </div>
       </div>
-      <div class="term-card">
-        <h3>Ice & Water Shield</h3>
-        <p>Self-adhering waterproof membrane installed in vulnerable areas like eaves, valleys, and around penetrations. Provides superior protection against ice dams and wind-driven rain.</p>
+
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-card-inner">
+          <div class="flip-card-front">
+            <div class="flip-icon">❄️</div>
+            <h3>Ice & Water Shield</h3>
+            <span class="flip-hint">Click to learn more</span>
+          </div>
+          <div class="flip-card-back">
+            <h4>Ice & Water Shield</h4>
+            <p>Self-adhering waterproof membrane in vulnerable areas like eaves and valleys. Superior protection against ice dams and wind-driven rain.</p>
+          </div>
+        </div>
       </div>
-      <div class="term-card">
-        <h3>Fascia</h3>
-        <p>Vertical board running along the roof edge. Provides mounting surface for gutters and protects roof deck from weather exposure.</p>
+
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-card-inner">
+          <div class="flip-card-front">
+            <div class="flip-icon">📐</div>
+            <h3>Fascia</h3>
+            <span class="flip-hint">Click to learn more</span>
+          </div>
+          <div class="flip-card-back">
+            <h4>Fascia</h4>
+            <p>Vertical board running along the roof edge. Provides mounting surface for gutters and protects roof deck from weather.</p>
+          </div>
+        </div>
       </div>
     </div>
 
-    <h3>Parts of a Roof</h3>
-    <div class="roof-visuals">
-      <figure>
-        <img src="/resources/3droof2.avif" alt="Roof system layers">
-        <figcaption>Example roof system layers and components.</figcaption>
-      </figure>
+    <h2>Parts of a Roof</h2>
+    <p class="section-intro">Study this labeled diagram - hover over the numbers to see what each part does!</p>
+
+    <div class="roof-diagram-interactive">
+      <div class="diagram-container">
+        <img src="/assets/training/parts-of-a-roof-diagram.jpg" alt="Parts of a Roof Diagram" class="roof-diagram-img">
+      </div>
+
+      <div class="roof-parts-legend">
+        <h4>Key Components to Know:</h4>
+        <div class="legend-grid">
+          <div class="legend-item">
+            <span class="legend-marker">1</span>
+            <div>
+              <strong>Ridge/Peak</strong>
+              <p>Highest point where slopes meet</p>
+            </div>
+          </div>
+          <div class="legend-item">
+            <span class="legend-marker">2</span>
+            <div>
+              <strong>Valley</strong>
+              <p>Where two slopes meet forming a channel</p>
+            </div>
+          </div>
+          <div class="legend-item">
+            <span class="legend-marker">3</span>
+            <div>
+              <strong>Fascia</strong>
+              <p>Board at roof edge, holds gutters</p>
+            </div>
+          </div>
+          <div class="legend-item">
+            <span class="legend-marker">4</span>
+            <div>
+              <strong>Drip Edge</strong>
+              <p>Metal strip directing water away</p>
+            </div>
+          </div>
+          <div class="legend-item">
+            <span class="legend-marker">5</span>
+            <div>
+              <strong>Gutter</strong>
+              <p>Channels water off the roof</p>
+            </div>
+          </div>
+          <div class="legend-item">
+            <span class="legend-marker">6</span>
+            <div>
+              <strong>Flashing</strong>
+              <p>Waterproofs joints and edges</p>
+            </div>
+          </div>
+          <div class="legend-item">
+            <span class="legend-marker">7</span>
+            <div>
+              <strong>Soffit</strong>
+              <p>Underside of roof overhang</p>
+            </div>
+          </div>
+          <div class="legend-item">
+            <span class="legend-marker">8</span>
+            <div>
+              <strong>Eave</strong>
+              <p>Lower edge of the roof</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <ul>
-      <li>Ridge, Ridge Vent, Hip & Ridge Shingles</li>
-      <li>Felt/Underlayment, Ice & Water Barrier</li>
-      <li>Flashing, Drip Edge, Starter Shingles</li>
-      <li>Intake/Exhaust Vents, Baffles, Insulation</li>
-    </ul>
+
+    <div class="roof-layers-summary">
+      <h4>Roof System Layers (Top to Bottom):</h4>
+      <ol>
+        <li><strong>Shingles</strong> - Weather barrier, what you see from outside</li>
+        <li><strong>Underlayment/Felt</strong> - Secondary water protection</li>
+        <li><strong>Ice & Water Shield</strong> - Extra protection at eaves/valleys</li>
+        <li><strong>Roof Deck (Sheathing)</strong> - Plywood or OSB base</li>
+        <li><strong>Rafters/Trusses</strong> - Structural support</li>
+      </ol>
+    </div>
 
     <hr>
-    <h2>Knockable Doors: Ethical Canvassing</h2>
-    <div class="knockable-section">
-      <h3>✅ DO Knock:</h3>
-      <ul>
-        <li><strong>Homes with visible storm damage</strong> - Missing shingles, dented gutters, damaged siding</li>
-        <li><strong>Neighborhoods with recent storm activity</strong> - Use storm maps and local intel; prioritize recent hail/wind corridors</li>
-        <li><strong>Properties with neighbors getting work done</strong> - Social proof makes homeowners more receptive</li>
-        <li><strong>Homes with older roofs (15+ years)</strong> - Higher likelihood of qualifying damage</li>
-        <li><strong>Look for collateral indicators</strong> - Dented downspouts, damaged screens, hail-marked gutters</li>
-      </ul>
 
-      <h3>❌ DON'T Knock:</h3>
-      <ul>
-        <li><strong>Homes with "No Soliciting" signs</strong> - Respect posted wishes</li>
-        <li><strong>Properties with aggressive dogs unleashed</strong> - Safety first</li>
-        <li><strong>Late evening or very early morning</strong> - Mind timing and etiquette (10am-7pm ideal)</li>
-        <li><strong>Homes with brand new roofs (< 5 years)</strong> - Low probability of qualifying damage</li>
-        <li><strong>During severe weather or family emergencies</strong> - Use professional judgment</li>
-      </ul>
+    <h2>Sample Photo Reports</h2>
+    <p class="section-intro">Review these real inspection reports to understand proper documentation techniques:</p>
+
+    <div class="photo-reports-grid">
+      <a href="/resources/Sample Photo Report 1.pdf" target="_blank" class="report-card">
+        <span class="report-icon">📋</span>
+        <span class="report-title">Sample Report 1</span>
+        <span class="report-desc">Hail damage documentation</span>
+      </a>
+      <a href="/resources/Sample Photo Report 2.pdf" target="_blank" class="report-card">
+        <span class="report-icon">📋</span>
+        <span class="report-title">Sample Report 2</span>
+        <span class="report-desc">Wind damage example</span>
+      </a>
+      <a href="/resources/Sample Photo Report 3.pdf" target="_blank" class="report-card">
+        <span class="report-icon">📋</span>
+        <span class="report-title">Sample Report 3</span>
+        <span class="report-desc">Mixed damage types</span>
+      </a>
+      <a href="/resources/Sample Photo Report 4.pdf" target="_blank" class="report-card">
+        <span class="report-icon">📋</span>
+        <span class="report-title">Sample Report 4</span>
+        <span class="report-desc">Comprehensive inspection</span>
+      </a>
     </div>
 
-    <div class="examples">
-      <p>See sample photo reports for good vs. bad examples:</p>
-      <ul>
-        <li><a href="/resources/Sample%20Photo%20Report%201.pdf" target="_blank">Sample Photo Report 1</a></li>
-        <li><a href="/resources/Sample%20Photo%20Report%204.pdf" target="_blank">Sample Photo Report 4</a></li>
-        <li><a href="/resources/Sample%20Ashpahlt%20Report%20NEW.pdf" target="_blank">Sample Asphalt Report</a></li>
-        <li><a href="/resources/Sample%20Cedar%20Report.pdf" target="_blank">Sample Cedar Report</a></li>
-      </ul>
-    </div>
     <hr>
-    <div id="quiz2">
-      <h3>Quick Quiz #2</h3>
-      <p>Pass/Fail mini‑quiz on general roofing concepts.</p>
-      <button id="startQuickQuiz2">Start Quiz</button>
+
+    <div id="quiz2" class="quiz-section">
+      <h3>Knowledge Check: Roofing Terminology</h3>
+      <p>Test your understanding of roof components and terminology.</p>
+      <button id="startQuickQuiz2" class="quiz-start-btn">Start Quiz</button>
       <div id="quiz2-area"></div>
     </div>
 
@@ -10219,33 +10434,146 @@ function initQuickQuiz2() {
   const startBtn = document.getElementById('startQuickQuiz2');
   const area = document.getElementById('quiz2-area');
   if (!startBtn || !area) return;
-  startBtn.addEventListener('click', () => {
+
+  const quiz2Questions = [
+    {
+      question: "Which component is installed at the eaves to prevent ice dam damage?",
+      options: ["Ridge vent", "Ice & Water Shield", "Hip cap shingles", "Starter strip"],
+      correct: 1
+    },
+    {
+      question: "What is the horizontal line at the peak of a roof where two planes meet?",
+      options: ["Valley", "Ridge", "Eave", "Hip"],
+      correct: 1
+    },
+    {
+      question: "Where is flashing typically installed?",
+      options: ["Under all shingles", "Around chimneys, vents, and valleys", "Only on flat roofs", "Along the gutter line"],
+      correct: 1
+    },
+    {
+      question: "What is a valley on a roof?",
+      options: ["The peak where planes meet", "A flat section of roof", "Where two roof planes meet at a downward angle", "The bottom edge of the roof"],
+      correct: 2
+    },
+    {
+      question: "What is the purpose of drip edge?",
+      options: ["Adds decoration to the roof", "Directs water away from fascia into gutters", "Holds shingles in place", "Provides ventilation"],
+      correct: 1
+    }
+  ];
+
+  let currentQuestion = 0;
+  let score = 0;
+  let answers: (number | null)[] = new Array(quiz2Questions.length).fill(null);
+
+  function renderQuestion() {
+    const q = quiz2Questions[currentQuestion];
     area.innerHTML = `
-      <div class="quiz-item">
-        <p>1. Which component helps prevent water intrusion at eaves?</p>
-        <label><input type="radio" name="q1" value="a"/> Ridge vent</label>
-        <label><input type="radio" name="q1" value="b"/> Ice & Water Barrier</label>
-        <label><input type="radio" name="q1" value="c"/> Hip shingles</label>
+      <div class="quiz2-container">
+        <div class="quiz2-progress">
+          <span class="quiz2-progress-text">Question ${currentQuestion + 1} of ${quiz2Questions.length}</span>
+          <div class="quiz2-progress-bar">
+            <div class="quiz2-progress-fill" style="width: ${((currentQuestion + 1) / quiz2Questions.length) * 100}%"></div>
+          </div>
+        </div>
+        <div class="quiz2-question">
+          <h4>${q.question}</h4>
+        </div>
+        <div class="quiz2-options">
+          ${q.options.map((opt, i) => `
+            <label class="quiz2-option ${answers[currentQuestion] === i ? 'selected' : ''}">
+              <input type="radio" name="quiz2q" value="${i}" ${answers[currentQuestion] === i ? 'checked' : ''}>
+              <span class="option-letter">${String.fromCharCode(65 + i)}</span>
+              <span class="option-text">${opt}</span>
+            </label>
+          `).join('')}
+        </div>
+        <div class="quiz2-nav">
+          ${currentQuestion > 0 ? '<button class="quiz2-btn quiz2-prev">Previous</button>' : '<span></span>'}
+          ${currentQuestion < quiz2Questions.length - 1
+            ? '<button class="quiz2-btn quiz2-next" ' + (answers[currentQuestion] === null ? 'disabled' : '') + '>Next</button>'
+            : '<button class="quiz2-btn quiz2-submit" ' + (answers[currentQuestion] === null ? 'disabled' : '') + '>Submit Quiz</button>'
+          }
+        </div>
       </div>
-      <div class="quiz-item">
-        <p>2. Knock timing should be…</p>
-        <label><input type="radio" name="q2" value="a"/> As late as possible</label>
-        <label><input type="radio" name="q2" value="b"/> Respectful of local norms and daylight</label>
-        <label><input type="radio" name="q2" value="c"/> Only during lunch</label>
-      </div>
-      <button id="quiz2Submit">Submit</button>
-      <div id="quiz2Result"></div>
     `;
-    (document.getElementById('quiz2Submit') as HTMLButtonElement)?.addEventListener('click', () => {
-      const q1 = (document.querySelector('input[name="q1"]:checked') as HTMLInputElement)?.value;
-      const q2 = (document.querySelector('input[name="q2"]:checked') as HTMLInputElement)?.value;
-      const pass = q1 === 'b' && q2 === 'b';
-      const res = document.getElementById('quiz2Result');
-      if (res) {
-        res.textContent = pass ? 'Pass' : 'Fail';
-        res.className = pass ? 'quiz-feedback correct' : 'quiz-feedback incorrect';
-      }
+
+    // Add event listeners
+    area.querySelectorAll('input[name="quiz2q"]').forEach((input) => {
+      input.addEventListener('change', (e) => {
+        answers[currentQuestion] = parseInt((e.target as HTMLInputElement).value);
+        renderQuestion();
+      });
     });
+
+    const prevBtn = area.querySelector('.quiz2-prev');
+    const nextBtn = area.querySelector('.quiz2-next');
+    const submitBtn = area.querySelector('.quiz2-submit');
+
+    prevBtn?.addEventListener('click', () => {
+      currentQuestion--;
+      renderQuestion();
+    });
+
+    nextBtn?.addEventListener('click', () => {
+      currentQuestion++;
+      renderQuestion();
+    });
+
+    submitBtn?.addEventListener('click', showResults);
+  }
+
+  function showResults() {
+    score = 0;
+    quiz2Questions.forEach((q, i) => {
+      if (answers[i] === q.correct) score++;
+    });
+
+    const percentage = Math.round((score / quiz2Questions.length) * 100);
+    const passed = percentage >= 80;
+
+    area.innerHTML = `
+      <div class="quiz2-results">
+        <div class="quiz2-result-header ${passed ? 'passed' : 'failed'}">
+          <span class="result-icon">${passed ? '🎉' : '📚'}</span>
+          <h3>${passed ? 'Great Job!' : 'Keep Learning!'}</h3>
+          <p class="result-score">${score}/${quiz2Questions.length} correct (${percentage}%)</p>
+        </div>
+        <div class="quiz2-result-details">
+          ${quiz2Questions.map((q, i) => `
+            <div class="result-item ${answers[i] === q.correct ? 'correct' : 'incorrect'}">
+              <span class="result-marker">${answers[i] === q.correct ? '✓' : '✗'}</span>
+              <div class="result-content">
+                <p class="result-question">${q.question}</p>
+                <p class="result-answer">
+                  ${answers[i] === q.correct
+                    ? `<span class="your-answer correct">Your answer: ${q.options[answers[i] ?? 0]}</span>`
+                    : `<span class="your-answer incorrect">Your answer: ${answers[i] !== null ? q.options[answers[i]] : 'No answer'}</span>
+                       <span class="correct-answer">Correct: ${q.options[q.correct]}</span>`
+                  }
+                </p>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="quiz2-result-actions">
+          <button class="quiz2-btn quiz2-retry">Try Again</button>
+        </div>
+      </div>
+    `;
+
+    area.querySelector('.quiz2-retry')?.addEventListener('click', () => {
+      currentQuestion = 0;
+      score = 0;
+      answers = new Array(quiz2Questions.length).fill(null);
+      renderQuestion();
+    });
+  }
+
+  startBtn.addEventListener('click', () => {
+    startBtn.style.display = 'none';
+    renderQuestion();
   });
 }
 
