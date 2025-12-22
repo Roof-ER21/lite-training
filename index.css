@@ -10517,8 +10517,8 @@ button:disabled {
 .flip-card {
   background: transparent;
   perspective: 1000px;
-  height: 180px;
-  min-height: 180px;
+  height: 220px;
+  min-height: 220px;
   cursor: pointer;
   position: relative;
 }
@@ -10631,7 +10631,7 @@ button:disabled {
   left: 50%;
   transform: translateX(-50%);
   width: 380px;
-  height: 100px;
+  height: 120px;
   background: #1a1a1a;
   border-radius: 4px;
   z-index: 10;
