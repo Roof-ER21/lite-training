@@ -10509,13 +10509,18 @@ button:disabled {
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 20px;
   margin: 25px 0;
+  overflow: visible;
+  position: relative;
+  z-index: 1;
 }
 
 .flip-card {
   background: transparent;
   perspective: 1000px;
-  height: 100px;
+  height: 80px;
+  min-height: 80px;
   cursor: pointer;
+  position: relative;
 }
 
 .flip-card-inner {
@@ -10536,12 +10541,12 @@ button:disabled {
   height: 100%;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  border-radius: 12px;
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: 10px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
   text-align: center;
 }
@@ -10557,18 +10562,12 @@ button:disabled {
 
 .flip-card-front h3 {
   margin: 0;
-  font-size: 1.3rem;
+  font-size: 1rem;
   font-weight: 600;
 }
 
 .flip-hint {
-  font-size: 0.7rem;
-  opacity: 0.9;
-  margin-top: 8px;
-  padding: 3px 10px;
-  background: rgba(255,255,255,0.15);
-  border-radius: 12px;
-  letter-spacing: 0.3px;
+  display: none;
 }
 
 .flip-card-back {
@@ -10621,11 +10620,11 @@ button:disabled {
 .diagram-container::after {
   content: '';
   position: absolute;
-  bottom: 8px;
+  bottom: 6px;
   left: 50%;
   transform: translateX(-50%);
-  width: 180px;
-  height: 50px;
+  width: 220px;
+  height: 55px;
   background: #1a1a1a;
   border-radius: 4px;
   z-index: 10;
