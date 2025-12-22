@@ -10547,7 +10547,7 @@ button:disabled {
 }
 
 .flip-card-front {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  background: linear-gradient(135deg, #d90429 0%, #343a40 100%);
   color: white;
 }
 
@@ -10562,17 +10562,18 @@ button:disabled {
 }
 
 .flip-hint {
-  font-size: 0.75rem;
-  opacity: 0.8;
-  margin-top: 12px;
-  padding: 4px 12px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 20px;
+  font-size: 0.7rem;
+  opacity: 0.9;
+  margin-top: 8px;
+  padding: 3px 10px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 12px;
+  letter-spacing: 0.3px;
 }
 
 .flip-card-back {
-  background: white;
-  color: #333;
+  background: #fff;
+  color: #212529;
   transform: rotateY(180deg);
   border: 2px solid #d90429;
 }
@@ -10587,7 +10588,7 @@ button:disabled {
   margin: 0;
   font-size: 0.9rem;
   line-height: 1.5;
-  color: #555;
+  color: #495057;
 }
 
 /* Interactive Roof Diagram */
@@ -10616,18 +10617,18 @@ button:disabled {
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
-/* Black bar to cover watermark at bottom */
+/* Black bar to cover watermark text at bottom of image */
 .diagram-container::after {
   content: '';
   position: absolute;
-  bottom: 4px;
+  bottom: 8px;
   left: 50%;
   transform: translateX(-50%);
-  width: calc(100% - 40px);
-  max-width: 600px;
-  height: 30px;
-  background: #000;
-  border-radius: 0 0 6px 6px;
+  width: 180px;
+  height: 50px;
+  background: #1a1a1a;
+  border-radius: 4px;
+  z-index: 10;
 }
 
 .roof-parts-legend {
