@@ -10517,11 +10517,10 @@ button:disabled {
 .flip-card {
   background: transparent;
   perspective: 1000px;
-  height: 120px;
-  min-height: 120px;
+  height: 180px;
+  min-height: 180px;
   cursor: pointer;
   position: relative;
-  overflow: hidden;
 }
 
 .flip-card-inner {
@@ -10632,7 +10631,7 @@ button:disabled {
   left: 50%;
   transform: translateX(-50%);
   width: 380px;
-  height: 55px;
+  height: 100px;
   background: #1a1a1a;
   border-radius: 4px;
   z-index: 10;
