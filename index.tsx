@@ -2074,74 +2074,6 @@ const trainingContent = {
         </div>
       </div>
 
-      <!-- Pre-Pitch Preparation: Knockable Doors -->
-      <h2>Pre-Pitch Preparation: Identifying the Right Doors</h2>
-      <p class="section-intro">Before you deliver your pitch, know which doors to approach! Smart canvassing means better results.</p>
-
-      <div class="knockable-grid">
-        <div class="knockable-card do-knock">
-          <div class="knockable-header">
-            <span class="knockable-icon">✅</span>
-            <h3>DO Knock</h3>
-          </div>
-          <ul class="knockable-list">
-            <li><strong>Visible storm damage</strong> - Missing shingles, dented gutters, damaged siding</li>
-            <li><strong>Recent storm activity</strong> - Check storm maps and local weather reports</li>
-            <li><strong>Neighbors getting work done</strong> - Social proof creates opportunity</li>
-            <li><strong>Older roofs (15+ years)</strong> - Higher likelihood of qualifiable damage</li>
-            <li><strong>Collateral indicators</strong> - Dented screens, AC units, hail marks on cars</li>
-            <li><strong>Worn or weathered appearance</strong> - Signs of deferred maintenance</li>
-          </ul>
-        </div>
-        <div class="knockable-card dont-knock">
-          <div class="knockable-header">
-            <span class="knockable-icon">❌</span>
-            <h3>DON'T Knock</h3>
-          </div>
-          <ul class="knockable-list">
-            <li><strong>"No Soliciting" signs</strong> - Always respect posted wishes</li>
-            <li><strong>Aggressive dogs loose</strong> - Safety first, move on</li>
-            <li><strong>Late evening/early morning</strong> - Stick to 10am-7pm ideal window</li>
-            <li><strong>Brand new roofs (&lt;5 years)</strong> - Very low probability of claim</li>
-            <li><strong>Severe weather happening</strong> - Use judgment, stay safe</li>
-            <li><strong>Property clearly for sale</strong> - Homeowner priorities elsewhere</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="knockable-tip">
-        <span class="tip-icon">💡</span>
-        <div class="tip-content">
-          <strong>Pro Tip:</strong> A "No" door today might be a "Yes" door after the next storm. Keep notes on promising homes and revisit after weather events!
-        </div>
-      </div>
-
-      <div class="knockable-best-times">
-        <h4>Best Times to Knock</h4>
-        <div class="times-grid">
-          <div class="time-slot best">
-            <span class="time-period">Weekdays 4-7pm</span>
-            <span class="time-rating">Best</span>
-            <span class="time-reason">Homeowners arriving from work</span>
-          </div>
-          <div class="time-slot good">
-            <span class="time-period">Saturdays 10am-5pm</span>
-            <span class="time-rating">Good</span>
-            <span class="time-reason">People doing yard work, home projects</span>
-          </div>
-          <div class="time-slot okay">
-            <span class="time-period">Weekdays 10am-2pm</span>
-            <span class="time-rating">Okay</span>
-            <span class="time-reason">Retirees, work-from-home folks</span>
-          </div>
-          <div class="time-slot avoid">
-            <span class="time-period">Sundays/Before 10am</span>
-            <span class="time-rating">Avoid</span>
-            <span class="time-reason">Family time, sleeping in</span>
-          </div>
-        </div>
-      </div>
-
       <!-- Progress Tracker -->
       <div class="pitch-progress-tracker" id="pitch-progress">
         <h3>Your Practice Progress</h3>
@@ -2413,7 +2345,6 @@ const trainingContent = {
             <li><strong>Circle Hail Hits & Slash Wind Damage:</strong> Close-up photos of each instance of damage.</li>
             <li><strong>Overview of Majority of Damage:</strong> Photos showing the chalked-up damage areas.</li>
             <li><strong>Granules in Gutters:</strong> Pictures of granules in gutters or at the bottom of downspouts.</li>
-            <li><strong>Flashlight:</strong> Use a flashlight to illuminate damage if needed.</li>
         </ol>
 
         <h2>Photo Documentation Strategy</h2>
@@ -2421,10 +2352,9 @@ const trainingContent = {
         <ul>
           <li><strong>Overall roof:</strong> 4 corners showing full house context</li>
           <li><strong>Each area of damage:</strong> Close-up + context shot (show location on roof)</li>
-          <li><strong>Serial numbers on equipment:</strong> HVAC units, water heaters visible from roof</li>
-          <li><strong>Test square with penny for size reference:</strong> Proves hail size to adjuster</li>
           <li><strong>Gutters showing granule loss:</strong> Evidence of recent shingle deterioration</li>
-          <li><strong>Any matching damage:</strong> Fence, AC unit, siding - builds collateral story</li>
+          <li><strong>Any matching damage:</strong> Fence, AC unit, siding - for collateral builds a convincing case</li>
+          <li><strong>Flashlight:</strong> Use a flashlight to illuminate damage if needed (will review in person)</li>
         </ul>
 
         <p><strong>Key takeaway:</strong> Getting enough clear photos to convince the homeowner is the most important part. Without their belief, you can't file a claim.</p>
@@ -3315,18 +3245,11 @@ const trainingContent = {
         <h2>The Complete Roof-ER Sales Cycle</h2>
         <div class="sales-cycle">
           <div class="cycle-phase">
-            <h3>Phase 1: Lead Generation (Days 1-2)</h3>
+            <h3>Phase 1: Lead Generation & Inspection (Days 1-3)</h3>
             <ul>
               <li>Storm tracking & mapping</li>
               <li>Door knocking targeted neighborhoods</li>
               <li>Initial pitch & permission</li>
-              <li><strong>Goal:</strong> Book inspection</li>
-            </ul>
-          </div>
-
-          <div class="cycle-phase">
-            <h3>Phase 2: Inspection & Sale (Day 2-3)</h3>
-            <ul>
               <li>Thorough roof inspection (15 min)</li>
               <li>Photo documentation (20-40 photos)</li>
               <li>Post-inspection pitch</li>
@@ -3336,7 +3259,7 @@ const trainingContent = {
           </div>
 
           <div class="cycle-phase">
-            <h3>Phase 3: Adjuster Meeting (Day 7-14)</h3>
+            <h3>Phase 2: Adjuster Meeting (Day 7-14)</h3>
             <ul>
               <li>Insurance assigns adjuster</li>
               <li>Meet adjuster on site</li>
@@ -3347,29 +3270,30 @@ const trainingContent = {
           </div>
 
           <div class="cycle-phase">
-            <h3>Phase 4: Materials & Scheduling (Day 15-21)</h3>
+            <h3>Phase 3: Project Meeting/Down Payment (Day 15-21)</h3>
             <ul>
               <li>Order materials</li>
               <li>Schedule production crew</li>
               <li>Confirm homeowner availability</li>
+              <li>Collect down payment</li>
               <li><strong>Goal:</strong> Install date set</li>
             </ul>
           </div>
 
           <div class="cycle-phase">
-            <h3>Phase 5: Installation (Day 22-23)</h3>
+            <h3>Phase 4: Installation (Day 22-23)</h3>
             <ul>
               <li>Crew arrives 7-8am</li>
               <li>Full tear-off and install (1-2 days)</li>
               <li>Final inspection</li>
-              <li>Collect payment</li>
               <li><strong>Goal:</strong> Happy customer</li>
             </ul>
           </div>
 
           <div class="cycle-phase">
-            <h3>Phase 6: Follow-Up (Day 30+)</h3>
+            <h3>Phase 5: Final Payment (Day 30+)</h3>
             <ul>
+              <li>Collect final payment</li>
               <li>Post-install call</li>
               <li>Request Google review</li>
               <li>Ask for referrals</li>
@@ -3383,10 +3307,9 @@ const trainingContent = {
 
         <h2>Key Milestones & Commissions</h2>
         <ul>
-          <li><strong>Contract Signed:</strong> Initial commission ($500-1,000 depending on job size)</li>
-          <li><strong>Adjuster Meeting:</strong> Track approval status</li>
-          <li><strong>Project Meeting:</strong> Collect ACV/downpayment ($1,000 commission)</li>
-          <li><strong>Install Complete:</strong> Final payment & residual commission</li>
+          <li><strong>Contracts:</strong> Initial draw for commission</li>
+          <li><strong>Project Coordinator:</strong> $500-$1,000 dep on job size</li>
+          <li><strong>Install Complete:</strong> Final payment & remaining commission</li>
         </ul>
 
         <h3>Sales Cycle Sorter Game</h3>
@@ -3396,11 +3319,11 @@ const trainingContent = {
                 <div class="game-column">
                     <h4>Stages</h4>
                     <div id="items-pool">
-                        <div class="draggable-item" draggable="true" data-order="3">Adjuster Meeting</div>
-                        <div class="draggable-item" draggable="true" data-order="1">Generating New Business</div>
-                        <div class="draggable-item" draggable="true" data-order="5">Install & Final Payment</div>
-                        <div class="draggable-item" draggable="true" data-order="2">Inspection & Pitch</div>
-                        <div class="draggable-item" draggable="true" data-order="4">Project Meeting & Downpayment</div>
+                        <div class="draggable-item" draggable="true" data-order="2">Adjuster Meeting</div>
+                        <div class="draggable-item" draggable="true" data-order="1">Lead Generation & Inspection</div>
+                        <div class="draggable-item" draggable="true" data-order="5">Final Payment</div>
+                        <div class="draggable-item" draggable="true" data-order="4">Installation</div>
+                        <div class="draggable-item" draggable="true" data-order="3">Project Meeting/Down Payment</div>
                     </div>
                 </div>
                 <div class="game-column">
@@ -4271,64 +4194,10 @@ trainingContent['post-inspection-objections'] = `
   <div class="content-card">
     <h1>Post‑Inspection Objections</h1>
 
-    <h2>9 Common Post-Inspection Objections</h2>
+    <h2>7 Common Post-Inspection Objections</h2>
     <div class="objections-grid">
       <div class="objection-card">
-        <h3>1. "I need to get other estimates"</h3>
-        <p><strong>Response:</strong> "That's smart! Here's what I recommend: Get those estimates, but know that insurance pays the same regardless of contractor. The difference is in service, speed, and warranty. We file the claim for you today - that starts your timeline. Other estimates can take weeks."</p>
-        <p><strong>Why it works:</strong> Validates their concern while emphasizing our value-add and urgency.</p>
-        <button class="practice-agnes-btn" data-scenario="m9-capstone-1">🎭 Practice with Agnes</button>
-
-        <!-- Inline Practice Container -->
-        <div class="inline-practice-container" style="display: none;" data-scenario="m9-capstone-1">
-          <div class="mini-conversation-thread"></div>
-          <div class="mini-input-area">
-            <textarea class="mini-response-input" rows="3" placeholder="Type your response here..."></textarea>
-            <div class="mini-actions">
-              <button class="submit-mini-response">Submit Response</button>
-              <button class="close-practice">Close Practice</button>
-            </div>
-          </div>
-          <div class="mini-feedback" style="display: none;">
-            <h4>📊 Key Points Checklist:</h4>
-            <ul class="key-points-checklist"></ul>
-            <div class="mini-actions">
-              <button class="try-again-btn">Try Again</button>
-              <button class="close-practice">Close</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="objection-card">
-        <h3>2. "This seems expensive"</h3>
-        <p><strong>Response:</strong> "I hear you! But remember - insurance covers this. Your only out-of-pocket is the deductible ($1,000-2,500 typically). A new $18,000 roof for $1,500? That's the best deal you'll ever get."</p>
-        <p><strong>Why it works:</strong> Reframes the cost through the insurance lens.</p>
-        <button class="practice-agnes-btn" data-scenario="m9-deductible-objection-close">🎭 Practice with Agnes</button>
-
-        <!-- Inline Practice Container -->
-        <div class="inline-practice-container" style="display: none;" data-scenario="m9-deductible-objection-close">
-          <div class="mini-conversation-thread"></div>
-          <div class="mini-input-area">
-            <textarea class="mini-response-input" rows="3" placeholder="Type your response here..."></textarea>
-            <div class="mini-actions">
-              <button class="submit-mini-response">Submit Response</button>
-              <button class="close-practice">Close Practice</button>
-            </div>
-          </div>
-          <div class="mini-feedback" style="display: none;">
-            <h4>📊 Key Points Checklist:</h4>
-            <ul class="key-points-checklist"></ul>
-            <div class="mini-actions">
-              <button class="try-again-btn">Try Again</button>
-              <button class="close-practice">Close</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="objection-card">
-        <h3>3. "I don't want to file a claim"</h3>
+        <h3>1. "I don't want to file a claim"</h3>
         <p><strong>Response:</strong> "I understand the concern about rates. But here's the reality: 1) This is what you pay insurance FOR. 2) Rates go up regardless - inflation, area risk. 3) Not filing means $20k out-of-pocket in 2 years when it leaks. Which would you rather pay?"</p>
         <p><strong>Why it works:</strong> Addresses fear directly with facts and reframes the alternative.</p>
         <button class="practice-agnes-btn" data-scenario="m9-claim-fear">🎭 Practice with Agnes</button>
@@ -4355,7 +4224,7 @@ trainingContent['post-inspection-objections'] = `
       </div>
 
       <div class="objection-card">
-        <h3>4. "My roof is fine"</h3>
+        <h3>2. "My roof is fine"</h3>
         <p><strong>Response:</strong> "It looks fine from the ground! That's what I thought too. But look at these photos - [show granule loss, exposed mat, bruising]. This is like a cavity in a tooth - small now, major problem soon. We fix it now while insurance pays."</p>
         <p><strong>Why it works:</strong> Visual evidence + medical analogy makes it tangible.</p>
         <button class="practice-agnes-btn" data-scenario="m9-adjuster-pushback">🎭 Practice with Agnes</button>
@@ -4382,7 +4251,7 @@ trainingContent['post-inspection-objections'] = `
       </div>
 
       <div class="objection-card">
-        <h3>5. "I need to talk to my spouse"</h3>
+        <h3>3. "I need to talk to my spouse"</h3>
         <p><strong>Response:</strong> "Absolutely! When can you both be available? I'm happy to come back tonight at 7pm to walk through the photos together. Or we can do a 3-way call right now - takes 5 minutes."</p>
         <p><strong>Why it works:</strong> Removes the delay while respecting the need for joint decision.</p>
         <button class="practice-agnes-btn" data-scenario="m9-spouse-decision">🎭 Practice with Agnes</button>
@@ -4409,7 +4278,7 @@ trainingContent['post-inspection-objections'] = `
       </div>
 
       <div class="objection-card">
-        <h3>6. "I'll just handle this myself"</h3>
+        <h3>4. "I'll just handle this myself"</h3>
         <p><strong>Response:</strong> "You absolutely can! But here's what most homeowners don't know: Insurance companies hire adjusters whose job is to minimize payouts. We're your advocate - we know what to look for, what codes require, and how to negotiate. Most DIY claims get 30-40% less coverage."</p>
         <p><strong>Why it works:</strong> Educates on the hidden challenge and value of professional representation.</p>
         <button class="practice-agnes-btn" data-scenario="m9-scope-walkthrough">🎭 Practice with Agnes</button>
@@ -4436,7 +4305,7 @@ trainingContent['post-inspection-objections'] = `
       </div>
 
       <div class="objection-card">
-        <h3>7. "I've never filed a claim before"</h3>
+        <h3>5. "I've never filed a claim before"</h3>
         <p><strong>Response:</strong> "Perfect - I'll walk you through every step. It's actually very simple: 1) We call together (3 minutes), 2) Adjuster comes out (I'll be here), 3) Approved, 4) We schedule install. I've done this 500+ times - you're in good hands."</p>
         <p><strong>Why it works:</strong> Simplifies the unknown and builds confidence.</p>
         <button class="practice-agnes-btn" data-scenario="m9-first-time-claim">🎭 Practice with Agnes</button>
@@ -4463,7 +4332,7 @@ trainingContent['post-inspection-objections'] = `
       </div>
 
       <div class="objection-card">
-        <h3>8. "What if my claim gets denied?"</h3>
+        <h3>6. "What if my claim gets denied?"</h3>
         <p><strong>Response:</strong> "Great question. That's why we have a contingency agreement - if we don't get you fully approved, you owe us NOTHING. The contract is null and void. Zero risk to you."</p>
         <p><strong>Why it works:</strong> Removes financial risk completely.</p>
         <button class="practice-agnes-btn" data-scenario="m9-denial-fear">🎭 Practice with Agnes</button>
@@ -4490,7 +4359,7 @@ trainingContent['post-inspection-objections'] = `
       </div>
 
       <div class="objection-card">
-        <h3>9. "I'm going to wait and see if it gets worse"</h3>
+        <h3>7. "I'm going to wait and see if it gets worse"</h3>
         <p><strong>Response:</strong> "I understand the hesitation, but here's the problem: Insurance only covers storm damage within your policy's statute of limitations - usually 1-2 years. Wait too long, and you lose coverage entirely. Plus, every day UV light and weather degrade the damaged shingles more. File now while you're protected."</p>
         <p><strong>Why it works:</strong> Creates urgency with real consequences.</p>
         <button class="practice-agnes-btn" data-scenario="m9-wait-and-see">🎭 Practice with Agnes</button>
