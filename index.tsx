@@ -1700,7 +1700,7 @@ const trainingScriptMap: Record<string, { scripts: string[]; keyPhrases: string[
   },
   objections: {
     scripts: [
-      "L.E.A.R.N. Framework: Listen, Empathize, Ask, Respond, Navigate",
+      "5 Steps: Pause & Listen, Acknowledge, Clarify, Respond with Value, Move Forward",
       "Always acknowledge their concern before responding",
       "Frame insurance as value and peace-of-mind, not cost",
       "Offer two specific times when scheduling"
@@ -1711,7 +1711,7 @@ const trainingScriptMap: Record<string, { scripts: string[]; keyPhrases: string[
       "Here's what most people don't know...",
       "Would 4pm today or 10am tomorrow work?"
     ],
-    framework: "L.E.A.R.N."
+    framework: "5-Step Objection Process"
   }
 };
 
@@ -2416,84 +2416,234 @@ const trainingContent = {
     </div>
   `,
   'objection-handling': `
-    <div class="content-card">
+    <div class="content-card objection-module-redesign">
         <h1>Handling Initial Pitch Objections</h1>
+        <p class="module-intro">Master the art of turning "No" into "Let's do it." Every objection is an opportunity to build trust and demonstrate value.</p>
 
-        <h2>The L.E.A.R.N. Framework for Objections</h2>
-        <div class="learn-framework">
-          <div class="learn-step">
-            <h3>L - Listen</h3>
-            <p>Let them finish. Don't interrupt. Show you care about their concern by giving them space to fully express it.</p>
-          </div>
-          <div class="learn-step">
-            <h3>E - Empathize</h3>
-            <p>"I completely understand..." Validate their feeling without agreeing with the objection. Make them feel heard.</p>
-          </div>
-          <div class="learn-step">
-            <h3>A - Ask</h3>
-            <p>Clarifying questions to understand the root concern. "What specifically worries you about that?" Dig deeper to find the real issue.</p>
-          </div>
-          <div class="learn-step">
-            <h3>R - Respond</h3>
-            <p>Address the actual concern with facts, benefits, or social proof. Don't just recite a script - tailor your response to their specific worry.</p>
-          </div>
-          <div class="learn-step">
-            <h3>N - Next Step</h3>
-            <p>Move forward with confidence. "So let's schedule that inspection for tomorrow at 2pm?" Always close with a clear next action.</p>
-          </div>
-        </div>
-
-        <h2>Common Initial Objections & Responses</h2>
-        <div class="objections-list">
-          <div class="objection">
-            <h3>"I'm busy right now"</h3>
-            <p><strong>Response:</strong> "I understand! This will only take 2 minutes from the ground. I can come back at [time] if that works better, or we can schedule a full inspection for [tomorrow]?"</p>
-            <p><strong>Why it works:</strong> Acknowledges their time constraint, offers flexibility, provides specific alternatives.</p>
-          </div>
-          <div class="objection">
-            <h3>"We already have a roofer"</h3>
-            <p><strong>Response:</strong> "That's great! When was your last inspection? Storm damage can happen without you knowing. A second opinion never hurts - it's free and takes 15 minutes."</p>
-            <p><strong>Why it works:</strong> Doesn't attack their existing relationship, positions as additional value, emphasizes no-cost benefit.</p>
-          </div>
-          <div class="objection">
-            <h3>"I don't think I have damage"</h3>
-            <p><strong>Response:</strong> "You might be right! But I've been on 10 roofs in this neighborhood today, and 8 had damage the owner didn't know about. Let me check - worst case, I give you peace of mind."</p>
-            <p><strong>Why it works:</strong> Uses social proof, creates urgency with neighborhood activity, emphasizes peace of mind.</p>
-          </div>
-          <div class="objection">
-            <h3>"Not interested"</h3>
-            <p><strong>Response:</strong> "I get it, a lot of your neighbors said the same thing at first. Then I showed them photos of hail damage they couldn't see from the ground. Can I at least take a quick look? If there's nothing, you lose 2 minutes. If there is damage, you save thousands."</p>
-            <p><strong>Why it works:</strong> Social proof, risk-reversal, emphasizes low time investment vs high potential gain.</p>
-          </div>
-          <div class="objection">
-            <h3>"I need to talk to my spouse"</h3>
-            <p><strong>Response:</strong> "That's great, the inspection is free and I can leave info for both of you. Or I can wait a few minutes if they'll be home soon. This way you have the facts when you talk."</p>
-            <p><strong>Why it works:</strong> Respects decision-making process, offers to wait or leave materials, positions inspection as information-gathering.</p>
-          </div>
-        </div>
-
-        <h3>Objection Matcher Game</h3>
-        <div class="game-container">
-            <p class="game-instructions">Drag the homeowner's objection to the correct sales strategy.</p>
-            <div id="objection-game-board" class="game-board">
-                <div class="game-column">
-                    <h4>Objections</h4>
-                    <div id="objections-list">
-                        <div class="draggable-item" draggable="true" data-match="1">"I don't have enough time."</div>
-                        <div class="draggable-item" draggable="true" data-match="2">"My roof is in good shape."</div>
-                        <div class="draggable-item" draggable="true" data-match="3">"Not interested."</div>
-                        <div class="draggable-item" draggable="true" data-match="4">"I need to talk to my spouse."</div>
-                    </div>
-                </div>
-                <div class="game-column">
-                    <h4>Responses</h4>
-                    <div class="drop-zone" data-match="3"><p class="response-text">"I get it, a lot of your neighbors said the same thing at first..."</p></div>
-                    <div class="drop-zone" data-match="4"><p class="response-text">"That's great, the inspection is free and I can leave info for both of you..."</p></div>
-                    <div class="drop-zone" data-match="1"><p class="response-text">"This will only take about 10-15 minutes, I'll be quick and efficient."</p></div>
-                    <div class="drop-zone" data-match="2"><p class="response-text">"I understand, we're experts and can spot things from the ground that others miss..."</p></div>
-                </div>
+        <!-- Steps to Overcoming Objections -->
+        <h2>Steps to Overcoming Objections</h2>
+        <div class="objection-steps-container">
+          <div class="objection-step" data-step="1">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h3>Pause & Listen</h3>
+              <p>Take a breath. Let them finish completely. Don't interrupt or jump to defend - silence shows respect and gives you time to think.</p>
+              <div class="step-example">
+                <span class="example-label">Example:</span> Nod, maintain eye contact, let them get it all out.
+              </div>
             </div>
-             <div id="objection-feedback" class="feedback-message" style="display: none;"></div>
+          </div>
+
+          <div class="objection-step" data-step="2">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h3>Acknowledge & Validate</h3>
+              <p>Show you heard them. Use phrases that validate without agreeing with the objection itself.</p>
+              <div class="step-example">
+                <span class="example-label">Say:</span> "I completely understand..." or "That's a fair concern..." or "I hear you..."
+              </div>
+            </div>
+          </div>
+
+          <div class="objection-step" data-step="3">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h3>Clarify the Real Concern</h3>
+              <p>Often the stated objection isn't the real issue. Ask questions to uncover what's really holding them back.</p>
+              <div class="step-example">
+                <span class="example-label">Ask:</span> "What specifically concerns you about that?" or "Is it the time, the cost, or something else?"
+              </div>
+            </div>
+          </div>
+
+          <div class="objection-step" data-step="4">
+            <div class="step-number">4</div>
+            <div class="step-content">
+              <h3>Respond with Value</h3>
+              <p>Address their specific concern with facts, social proof, or benefits. Tailor your response - don't just recite a script.</p>
+              <div class="step-example">
+                <span class="example-label">Use:</span> Neighbor stories, statistics, risk-reversal ("If there's no damage, I'll be out of your hair in 5 minutes")
+              </div>
+            </div>
+          </div>
+
+          <div class="objection-step" data-step="5">
+            <div class="step-number">5</div>
+            <div class="step-content">
+              <h3>Move Forward Confidently</h3>
+              <p>Don't wait for permission. Transition to the next step with an assumptive close.</p>
+              <div class="step-example">
+                <span class="example-label">Say:</span> "So let me take a quick look and we'll go from there. I'll start on this side..."
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Objection Cards -->
+        <h2>Common Objections & How to Handle Them</h2>
+        <p class="section-intro">Click any card to reveal the best response and why it works.</p>
+
+        <div class="interactive-objections-grid">
+          <div class="objection-flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">
+                <div class="objection-icon">⏰</div>
+                <h3>"I'm busy right now"</h3>
+                <p class="tap-hint">Tap to see response</p>
+              </div>
+              <div class="flip-card-back">
+                <div class="response-content">
+                  <p class="response-text">"I understand! This will only take 2 minutes from the ground. I can come back at [specific time] if that works better?"</p>
+                  <div class="why-works">
+                    <strong>Why it works:</strong> Acknowledges constraint, offers flexibility, gives specific alternatives.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="objection-flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">
+                <div class="objection-icon">🔧</div>
+                <h3>"We already have a roofer"</h3>
+                <p class="tap-hint">Tap to see response</p>
+              </div>
+              <div class="flip-card-back">
+                <div class="response-content">
+                  <p class="response-text">"That's great! When was your last inspection? Storm damage can happen without you knowing. A second opinion never hurts - it's free and takes 15 minutes."</p>
+                  <div class="why-works">
+                    <strong>Why it works:</strong> Doesn't attack their relationship, positions as additional value.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="objection-flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">
+                <div class="objection-icon">🏠</div>
+                <h3>"I don't think I have damage"</h3>
+                <p class="tap-hint">Tap to see response</p>
+              </div>
+              <div class="flip-card-back">
+                <div class="response-content">
+                  <p class="response-text">"You might be right! But I've been on 10 roofs in this neighborhood today, and 8 had damage the owner didn't know about. Let me check - worst case, I give you peace of mind."</p>
+                  <div class="why-works">
+                    <strong>Why it works:</strong> Social proof + peace of mind angle. Low risk proposition.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="objection-flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">
+                <div class="objection-icon">🚫</div>
+                <h3>"Not interested"</h3>
+                <p class="tap-hint">Tap to see response</p>
+              </div>
+              <div class="flip-card-back">
+                <div class="response-content">
+                  <p class="response-text">"I get it, a lot of your neighbors said the same thing at first. Then I showed them photos of hail damage they couldn't see from the ground. If there's nothing, you lose 2 minutes. If there is damage, you save thousands."</p>
+                  <div class="why-works">
+                    <strong>Why it works:</strong> Social proof, risk-reversal, high gain vs low investment.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="objection-flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">
+                <div class="objection-icon">💑</div>
+                <h3>"I need to talk to my spouse"</h3>
+                <p class="tap-hint">Tap to see response</p>
+              </div>
+              <div class="flip-card-back">
+                <div class="response-content">
+                  <p class="response-text">"That's great, the inspection is free and I can leave info for both of you. Or I can wait a few minutes if they'll be home soon. This way you have the facts when you talk."</p>
+                  <div class="why-works">
+                    <strong>Why it works:</strong> Respects their process, positions inspection as info-gathering.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="objection-flip-card" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">
+                <div class="objection-icon">🤔</div>
+                <h3>"Let me think about it"</h3>
+                <p class="tap-hint">Tap to see response</p>
+              </div>
+              <div class="flip-card-back">
+                <div class="response-content">
+                  <p class="response-text">"Of course! What specifically would you like to think over? I want to make sure I've answered all your questions before I go."</p>
+                  <div class="why-works">
+                    <strong>Why it works:</strong> Uncovers the real objection hidden behind "think about it."
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Objection Response Challenge Game -->
+        <h2>🎮 Objection Response Challenge</h2>
+        <p class="game-intro">Test your skills! Pick the best response for each scenario. Score 100% to master objection handling.</p>
+
+        <div class="objection-challenge-game" id="objection-challenge-container">
+          <div class="challenge-progress">
+            <div class="progress-bar-container">
+              <div class="challenge-progress-bar" id="challenge-progress-bar" style="width: 0%"></div>
+            </div>
+            <span class="progress-text" id="challenge-progress-text">Question 1 of 5</span>
+          </div>
+
+          <div class="challenge-score-display">
+            <span class="score-label">Score:</span>
+            <span class="score-value" id="challenge-score">0</span>
+            <span class="score-max">/ 500</span>
+          </div>
+
+          <div class="challenge-card" id="challenge-card">
+            <div class="scenario-header">
+              <span class="scenario-icon">🏠</span>
+              <span class="scenario-label">Homeowner says:</span>
+            </div>
+            <p class="scenario-text" id="scenario-text">"I'm really busy right now, maybe another time."</p>
+
+            <div class="response-options" id="response-options">
+              <button class="response-option" data-correct="false" onclick="selectChallengeResponse(this)">
+                "Okay, I'll come back later then."
+              </button>
+              <button class="response-option" data-correct="true" onclick="selectChallengeResponse(this)">
+                "I totally understand! This will only take 2 minutes from the ground. Would 4pm today or 10am tomorrow work better for a full look?"
+              </button>
+              <button class="response-option" data-correct="false" onclick="selectChallengeResponse(this)">
+                "But this is really important, you could have serious damage."
+              </button>
+            </div>
+
+            <div class="challenge-feedback" id="challenge-feedback" style="display: none;">
+              <div class="feedback-icon"></div>
+              <p class="feedback-text"></p>
+              <button class="next-question-btn" id="next-question-btn" onclick="nextChallengeQuestion()">Next Question →</button>
+            </div>
+          </div>
+
+          <div class="challenge-complete" id="challenge-complete" style="display: none;">
+            <div class="complete-icon">🏆</div>
+            <h3>Challenge Complete!</h3>
+            <p class="final-score">Your Score: <span id="final-score">0</span> / 500</p>
+            <p class="score-message" id="score-message"></p>
+            <button class="restart-challenge-btn" onclick="restartObjectionChallenge()">Try Again</button>
+          </div>
         </div>
 
         <div class="module-completion-section" id="module-complete-section" style="display: none;">
@@ -5052,63 +5202,178 @@ function initSalesCycleSorter() {
     }
 }
 
+// Objection Challenge Game Data & State
+const objectionChallengeQuestions = [
+  {
+    scenario: "I'm really busy right now, maybe another time.",
+    options: [
+      { text: "Okay, I'll come back later then.", correct: false, feedback: "This lets them off the hook too easily. Always offer specific alternatives!" },
+      { text: "I totally understand! This will only take 2 minutes from the ground. Would 4pm today or 10am tomorrow work better for a full look?", correct: true, feedback: "Perfect! You acknowledged their concern and offered specific alternatives." },
+      { text: "But this is really important, you could have serious damage.", correct: false, feedback: "This sounds pushy and doesn't respect their time. Lead with empathy first." }
+    ]
+  },
+  {
+    scenario: "We already have a roofer we use.",
+    options: [
+      { text: "Our company is better than whoever you're using.", correct: false, feedback: "Never attack their existing relationships. It makes you look unprofessional." },
+      { text: "That's great! When was your last inspection? Storm damage can happen without you knowing. A second opinion never hurts - it's free.", correct: true, feedback: "Excellent! You validated their choice while positioning yourself as additional value." },
+      { text: "Well, let me know if you change your mind.", correct: false, feedback: "Too passive. You're giving up without offering any value." }
+    ]
+  },
+  {
+    scenario: "I don't think we have any damage.",
+    options: [
+      { text: "Trust me, you definitely have damage. I can see it from here.", correct: false, feedback: "Making claims without proof comes off as dishonest. Show, don't tell." },
+      { text: "You might be right! But I've been on 10 roofs in this neighborhood today, and 8 had damage the owner didn't know about. Worst case, I give you peace of mind.", correct: true, feedback: "Great use of social proof and the peace of mind angle!" },
+      { text: "How would you know? You're not a professional.", correct: false, feedback: "Confrontational and rude. This will shut down the conversation immediately." }
+    ]
+  },
+  {
+    scenario: "Not interested.",
+    options: [
+      { text: "Okay, have a nice day.", correct: false, feedback: "You gave up at the first objection. 'Not interested' often just means 'convince me.'" },
+      { text: "I get it, a lot of your neighbors said the same thing at first. Then I showed them photos of damage they couldn't see from the ground. If there's nothing, you lose 2 minutes. If there is, you save thousands.", correct: true, feedback: "Perfect! Social proof + risk reversal + clear value proposition." },
+      { text: "You should be interested, your roof looks terrible.", correct: false, feedback: "Insulting their home is never the right approach." }
+    ]
+  },
+  {
+    scenario: "I need to talk to my spouse first.",
+    options: [
+      { text: "Can't you make this decision yourself?", correct: false, feedback: "This is disrespectful to their relationship and decision-making process." },
+      { text: "That's great! The inspection is free and I can leave info for both of you. Or I can wait if they'll be home soon. This way you have the facts when you talk.", correct: true, feedback: "Perfect! You respected their process while keeping momentum." },
+      { text: "Fine, call me when you've decided.", correct: false, feedback: "Too passive. You're putting all the follow-up on them." }
+    ]
+  }
+];
+
+let challengeState = {
+  currentQuestion: 0,
+  score: 0,
+  answered: false
+};
+
 function initObjectionMatcher() {
-    const draggables = document.querySelectorAll('#objections-list .draggable-item');
-    const dropZones = document.querySelectorAll('.drop-zone');
-    const feedbackEl = document.getElementById('objection-feedback');
-    let correctMatches = 0;
-    const totalMatches = draggables.length;
-    
-    let draggedItem: HTMLElement | null = null;
-
-    draggables.forEach(draggable => {
-        draggable.addEventListener('dragstart', (e) => {
-            draggedItem = e.target as HTMLElement;
-            setTimeout(() => {
-                if(draggedItem) draggedItem.classList.add('dragging');
-            }, 0)
-        });
-
-        draggable.addEventListener('dragend', () => {
-            if(draggedItem) draggedItem.classList.remove('dragging');
-        });
-    });
-
-    dropZones.forEach(zone => {
-        zone.addEventListener('dragover', e => {
-            e.preventDefault();
-            zone.classList.add('drag-over');
-        });
-        zone.addEventListener('dragleave', () => {
-            zone.classList.remove('drag-over');
-        });
-        zone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            zone.classList.remove('drag-over');
-            if (!draggedItem || zone.children.length > 1) return; // Allow one item (the <p>)
-
-            const zoneMatch = (zone as HTMLElement).dataset.match;
-            const itemMatch = draggedItem.dataset.match;
-
-            if (zoneMatch === itemMatch) {
-                // Hide the placeholder text and append the item
-                const placeholder = zone.querySelector('.response-text') as HTMLElement;
-                if(placeholder) placeholder.style.display = 'none';
-                
-                zone.appendChild(draggedItem);
-                (draggedItem as HTMLElement).setAttribute('draggable', 'false');
-                zone.classList.add('correctly-matched');
-                correctMatches++;
-                
-                if (correctMatches === totalMatches && feedbackEl) {
-                    feedbackEl.textContent = 'Great job! All objections matched correctly.';
-                    feedbackEl.className = 'feedback-message correct';
-                    feedbackEl.style.display = 'block';
-                }
-            }
-        });
-    });
+  // Initialize the new Objection Challenge game
+  initObjectionChallenge();
 }
+
+function initObjectionChallenge() {
+  challengeState = { currentQuestion: 0, score: 0, answered: false };
+  renderChallengeQuestion();
+}
+
+function renderChallengeQuestion() {
+  const question = objectionChallengeQuestions[challengeState.currentQuestion];
+  if (!question) return;
+
+  const scenarioText = document.getElementById('scenario-text');
+  const optionsContainer = document.getElementById('response-options');
+  const progressBar = document.getElementById('challenge-progress-bar');
+  const progressText = document.getElementById('challenge-progress-text');
+  const feedbackEl = document.getElementById('challenge-feedback');
+  const challengeCard = document.getElementById('challenge-card');
+  const challengeComplete = document.getElementById('challenge-complete');
+
+  if (!scenarioText || !optionsContainer || !progressBar || !progressText) return;
+
+  // Reset state
+  challengeState.answered = false;
+  if (feedbackEl) feedbackEl.style.display = 'none';
+  if (challengeCard) challengeCard.style.display = 'block';
+  if (challengeComplete) challengeComplete.style.display = 'none';
+
+  // Update progress
+  const progress = (challengeState.currentQuestion / objectionChallengeQuestions.length) * 100;
+  progressBar.style.width = `${progress}%`;
+  progressText.textContent = `Question ${challengeState.currentQuestion + 1} of ${objectionChallengeQuestions.length}`;
+
+  // Render scenario
+  scenarioText.textContent = `"${question.scenario}"`;
+
+  // Shuffle and render options
+  const shuffledOptions = [...question.options].sort(() => Math.random() - 0.5);
+  optionsContainer.innerHTML = shuffledOptions.map((opt, idx) => `
+    <button class="response-option" data-correct="${opt.correct}" data-feedback="${opt.feedback}" onclick="selectChallengeResponse(this)">
+      ${opt.text}
+    </button>
+  `).join('');
+}
+
+(window as any).selectChallengeResponse = function(button: HTMLElement) {
+  if (challengeState.answered) return;
+  challengeState.answered = true;
+
+  const isCorrect = button.dataset.correct === 'true';
+  const feedback = button.dataset.feedback || '';
+  const feedbackEl = document.getElementById('challenge-feedback');
+  const scoreEl = document.getElementById('challenge-score');
+
+  // Highlight selection
+  const allOptions = document.querySelectorAll('.response-option');
+  allOptions.forEach(opt => {
+    opt.classList.add('disabled');
+    if ((opt as HTMLElement).dataset.correct === 'true') {
+      opt.classList.add('correct-answer');
+    }
+  });
+  button.classList.add(isCorrect ? 'selected-correct' : 'selected-wrong');
+
+  // Update score
+  if (isCorrect) {
+    challengeState.score += 100;
+    if (scoreEl) scoreEl.textContent = challengeState.score.toString();
+  }
+
+  // Show feedback
+  if (feedbackEl) {
+    const feedbackIcon = feedbackEl.querySelector('.feedback-icon');
+    const feedbackText = feedbackEl.querySelector('.feedback-text');
+    if (feedbackIcon) feedbackIcon.textContent = isCorrect ? '✅' : '❌';
+    if (feedbackText) feedbackText.textContent = feedback;
+    feedbackEl.style.display = 'block';
+    feedbackEl.className = `challenge-feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+  }
+};
+
+(window as any).nextChallengeQuestion = function() {
+  challengeState.currentQuestion++;
+
+  if (challengeState.currentQuestion >= objectionChallengeQuestions.length) {
+    showChallengeComplete();
+  } else {
+    renderChallengeQuestion();
+  }
+};
+
+function showChallengeComplete() {
+  const challengeCard = document.getElementById('challenge-card');
+  const challengeComplete = document.getElementById('challenge-complete');
+  const finalScoreEl = document.getElementById('final-score');
+  const scoreMessageEl = document.getElementById('score-message');
+  const progressBar = document.getElementById('challenge-progress-bar');
+
+  if (challengeCard) challengeCard.style.display = 'none';
+  if (challengeComplete) challengeComplete.style.display = 'block';
+  if (progressBar) progressBar.style.width = '100%';
+  if (finalScoreEl) finalScoreEl.textContent = challengeState.score.toString();
+
+  let message = '';
+  const percentage = (challengeState.score / 500) * 100;
+  if (percentage === 100) {
+    message = "🌟 Perfect score! You're an objection handling master!";
+  } else if (percentage >= 80) {
+    message = "Great job! You've got solid objection handling skills.";
+  } else if (percentage >= 60) {
+    message = "Good effort! Review the responses and try again to improve.";
+  } else {
+    message = "Keep practicing! Review the flip cards above and try again.";
+  }
+  if (scoreMessageEl) scoreMessageEl.textContent = message;
+}
+
+(window as any).restartObjectionChallenge = function() {
+  initObjectionChallenge();
+};
 
 
 // --- Module 9: Practice with Agnes Buttons ---
@@ -7677,7 +7942,7 @@ Provide a JSON response with these exact fields:
       suggestedResponse: scenario.followUps?.[0] || 'Try addressing their main concern with empathy, then offer a clear next step.',
       keyPointsToInclude: missedPoints.slice(0, 3),
       toneGuidance: 'Be empathetic and professional',
-      scriptReference: trainingContent.keyPhrases?.[0] || 'Use the L.E.A.R.N. framework'
+      scriptReference: trainingContent.keyPhrases?.[0] || 'Use the 5-step objection process'
     };
   }
 
