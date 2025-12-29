@@ -6557,8 +6557,8 @@ async function initAgnesLiveSession() {
     agnesLiveState.currentScore = null;
     agnesLiveState.mistakeCount = 0;
 
-    // Track roleplay session in API (async, don't await to avoid blocking)
-    startRoleplaySessionAPI(
+    // Track roleplay session in API - await to ensure sessionId is set before session ends
+    await startRoleplaySessionAPI(
       agnesLiveState.selectedRole || 'default',
       agnesLiveState.difficulty,
       agnesLiveState.inputMode
@@ -6677,15 +6677,31 @@ async function handleAgnesMessage(message: any) {
   // Handle Text Output
   const textContent = serverContent?.modelTurn?.parts?.[0]?.text;
   if (textContent) {
-    // Parse score if present
-    const scoreMatch = textContent.match(/AGNES SCORE:?\s*(\d+)/i);
+    // Parse score if present - check multiple formats the AI might return
+    const scorePatterns = [
+      /AGNES SCORE:?\s*(\d+)/i,                    // "AGNES SCORE: 85" or "AGNES SCORE 85"
+      /(?:final\s+)?score:?\s*(\d+)\s*(?:\/\s*100)?/i,  // "Score: 85" or "Final Score: 85/100"
+      /(\d+)\s*(?:\/\s*100|\s*out\s+of\s+100|\s*points)/i,  // "85/100" or "85 out of 100" or "85 points"
+      /you(?:'ve)?\s+(?:scored|earned|got)\s+(\d+)/i  // "You scored 85" or "You've earned 85"
+    ];
+
+    let scoreMatch: RegExpMatchArray | null = null;
+    for (const pattern of scorePatterns) {
+      scoreMatch = textContent.match(pattern);
+      if (scoreMatch) break;
+    }
+
     if (scoreMatch) {
-      agnesLiveState.currentScore = parseInt(scoreMatch[1]);
-      // Show score UI
-      const scoreDisplay = document.getElementById('agnes-score-display');
-      if (scoreDisplay) {
-        scoreDisplay.innerHTML = `<div class="final-score">${agnesLiveState.currentScore}/100</div>`;
-        scoreDisplay.style.display = 'block';
+      const parsedScore = parseInt(scoreMatch[1]);
+      // Validate score is in reasonable range (0-100)
+      if (parsedScore >= 0 && parsedScore <= 100) {
+        agnesLiveState.currentScore = parsedScore;
+        // Show score UI
+        const scoreDisplay = document.getElementById('agnes-score-display');
+        if (scoreDisplay) {
+          scoreDisplay.innerHTML = `<div class="final-score">${agnesLiveState.currentScore}/100</div>`;
+          scoreDisplay.style.display = 'block';
+        }
       }
     }
 
@@ -6795,24 +6811,33 @@ async function endAgnesSession(saveSession: boolean = true) {
     );
     const xpResult = awardAgnesXP(xpEarned);
 
-    // Track session end in API
-    endRoleplaySessionAPI(
-      currentRoleplaySessionId,
-      agnesLiveState.currentScore || 0,
-      xpEarned,
-      false // Not a door slam if we're saving session
-    );
+    // Track session end in API (with error handling)
+    try {
+      await endRoleplaySessionAPI(
+        currentRoleplaySessionId,
+        agnesLiveState.currentScore || 0,
+        xpEarned,
+        false // Not a door slam if we're saving session
+      );
+    } catch (err) {
+      console.error('Failed to save session to API:', err);
+      // Continue anyway - local XP was already awarded
+    }
 
     // Show success modal
     showAgnesSessionComplete(xpEarned, xpResult, streakResult);
   } else if (!saveSession) {
-    // Track door slam or aborted session in API
-    endRoleplaySessionAPI(
-      currentRoleplaySessionId,
-      agnesLiveState.currentScore || 0,
-      0,
-      true // Door slammed or aborted
-    );
+    // Track door slam or aborted session in API (with error handling)
+    try {
+      await endRoleplaySessionAPI(
+        currentRoleplaySessionId,
+        agnesLiveState.currentScore || 0,
+        0,
+        true // Door slammed or aborted
+      );
+    } catch (err) {
+      console.error('Failed to save aborted session to API:', err);
+    }
   }
 
   // Cleanup resources
@@ -7124,8 +7149,35 @@ function initAgnesLiveRolePlay() {
               data: btoa('Score me now and end the simulation.')
             }
           });
-          // Wait for response then end session
-          setTimeout(() => endAgnesSession(true), 3000);
+
+          // Smart wait: poll for score to be received, with max timeout
+          const MAX_WAIT_MS = 15000; // 15 seconds max
+          const POLL_INTERVAL_MS = 500; // Check every 500ms
+          const startWait = Date.now();
+
+          const waitForScore = () => {
+            const elapsed = Date.now() - startWait;
+
+            // If we received a score, end the session
+            if (agnesLiveState.currentScore !== null) {
+              console.log('✅ Score received, ending session');
+              endAgnesSession(true);
+              return;
+            }
+
+            // If max timeout reached, end anyway (AI might not have responded)
+            if (elapsed >= MAX_WAIT_MS) {
+              console.warn('⚠️ Max wait time reached without score, ending session');
+              endAgnesSession(true);
+              return;
+            }
+
+            // Keep polling
+            setTimeout(waitForScore, POLL_INTERVAL_MS);
+          };
+
+          // Start polling after initial delay for AI to process
+          setTimeout(waitForScore, 1000);
         });
       } else {
         endAgnesSession(false);

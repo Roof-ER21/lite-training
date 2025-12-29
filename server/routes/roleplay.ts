@@ -75,13 +75,14 @@ router.post('/end', async (req: Request, res: Response) => {
       WHERE id = $1 AND user_id = $6
     `, [sessionId, finalScore || 0, xpEarned || 0, doorSlammed || false, conversationLog || null, userId]);
 
-    // Update user gamification if XP was earned
+    // Update user gamification if XP was earned (use UPSERT to handle missing rows)
     if (xpEarned && xpEarned > 0) {
       await query(`
-        UPDATE user_gamification
-        SET total_xp = total_xp + $2,
+        INSERT INTO user_gamification (user_id, total_xp, last_activity_date)
+        VALUES ($1, $2, NOW())
+        ON CONFLICT (user_id) DO UPDATE
+        SET total_xp = user_gamification.total_xp + $2,
             last_activity_date = NOW()
-        WHERE user_id = $1
       `, [userId, xpEarned]);
     }
 
