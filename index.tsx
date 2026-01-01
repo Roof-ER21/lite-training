@@ -2485,15 +2485,16 @@ const trainingContent = {
           </div>
         </div>
 
-        <!-- Agnes Role-Play Mini Game -->
+        <!-- Agnes Live Role-Play Practice -->
         <div class="agnes-practice-section" style="background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); border: 3px solid #8b5cf6; border-radius: 20px; padding: 30px; margin: 30px 0;">
           <div style="text-align: center; margin-bottom: 20px;">
             <span style="font-size: 3rem;">🎭</span>
-            <h2 style="margin: 10px 0 0 0; color: #6d28d9;">Practice with Agnes</h2>
-            <p style="color: #7c3aed; margin: 8px 0 0 0;">Walk through the script with an agreeable homeowner</p>
+            <h2 style="margin: 10px 0 0 0; color: #6d28d9;">Live Role-Play with Agnes</h2>
+            <p style="color: #7c3aed; margin: 8px 0 0 0;">Practice your post-inspection pitch with our AI homeowner</p>
           </div>
 
           <div id="agnes-pitch-practice" style="display: none;">
+            <!-- Phase Progress -->
             <div class="pitch-progress" style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
               <span class="pitch-step active" data-step="1" style="width: 30px; height: 30px; border-radius: 50%; background: #8b5cf6; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">1</span>
               <span class="pitch-step" data-step="2" style="width: 30px; height: 30px; border-radius: 50%; background: #e5e7eb; color: #6b7280; display: flex; align-items: center; justify-content: center; font-weight: bold;">2</span>
@@ -2501,28 +2502,52 @@ const trainingContent = {
               <span class="pitch-step" data-step="4" style="width: 30px; height: 30px; border-radius: 50%; background: #e5e7eb; color: #6b7280; display: flex; align-items: center; justify-content: center; font-weight: bold;">4</span>
             </div>
 
-            <div class="pitch-chat" style="background: white; border-radius: 16px; padding: 20px; min-height: 200px;">
-              <div id="pitch-chat-messages" style="max-height: 300px; overflow-y: auto;">
+            <!-- Current Phase Banner -->
+            <div id="current-phase-banner" style="background: #8b5cf6; color: white; padding: 10px 20px; border-radius: 10px; text-align: center; margin-bottom: 16px;">
+              <strong>Phase 1: INTEGRITY - Opening</strong>
+            </div>
+
+            <!-- Chat Interface -->
+            <div class="pitch-chat" style="background: white; border-radius: 16px; padding: 20px; min-height: 350px; display: flex; flex-direction: column;">
+              <div id="pitch-chat-messages" style="flex: 1; max-height: 250px; overflow-y: auto; margin-bottom: 16px;">
                 <!-- Messages will be added dynamically -->
               </div>
-              <div id="pitch-user-prompt" style="margin-top: 16px; text-align: center;">
-                <p style="color: #6b7280; font-style: italic; margin-bottom: 12px;">Your turn: Deliver the opening script</p>
-                <button onclick="advancePitchPractice()" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; border: none; padding: 12px 30px; border-radius: 25px; cursor: pointer; font-weight: bold; font-size: 1rem;">I've Delivered This Part ✓</button>
+
+              <!-- Input Area -->
+              <div id="pitch-input-area" style="border-top: 1px solid #e5e7eb; padding-top: 16px;">
+                <p id="pitch-prompt-text" style="color: #7c3aed; font-weight: 500; margin-bottom: 10px;">🎯 Deliver your opening - show the collateral damage photos and explain their importance:</p>
+                <div style="display: flex; gap: 10px;">
+                  <textarea id="pitch-user-input" placeholder="Type your pitch here... (e.g., 'Hey Mrs. Johnson, I have some photos to show you...')" style="flex: 1; padding: 14px; border: 2px solid #d8b4fe; border-radius: 12px; font-size: 1rem; resize: none; min-height: 80px; font-family: inherit;"></textarea>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 12px; justify-content: space-between;">
+                  <button onclick="skipPitchPhase()" style="background: #e5e7eb; color: #374151; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-size: 0.9rem;">Skip Phase →</button>
+                  <button onclick="submitPitchResponse()" id="submit-pitch-btn" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; border: none; padding: 12px 30px; border-radius: 25px; cursor: pointer; font-weight: bold; font-size: 1rem;">
+                    Send to Agnes 💬
+                  </button>
+                </div>
+              </div>
+
+              <!-- Loading indicator -->
+              <div id="agnes-loading" style="display: none; text-align: center; padding: 20px;">
+                <div style="display: inline-block; animation: spin 1s linear infinite; font-size: 2rem;">🔄</div>
+                <p style="color: #7c3aed; margin-top: 10px;">Agnes is responding...</p>
               </div>
             </div>
           </div>
 
           <div id="agnes-pitch-start" style="text-align: center;">
-            <button onclick="startPitchPractice()" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; border: none; padding: 16px 40px; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);">
-              🚀 Start Practice Session
+            <p style="color: #6b7280; margin-bottom: 16px;">Practice delivering your post-inspection pitch to Agnes, a friendly homeowner. She'll respond naturally and help you improve!</p>
+            <button onclick="startLivePitchPractice()" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; border: none; padding: 16px 40px; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);">
+              🚀 Start Live Role-Play
             </button>
           </div>
 
           <div id="agnes-pitch-complete" style="display: none; text-align: center;">
             <div style="font-size: 4rem;">🎉</div>
-            <h3 style="color: #15803d; margin: 10px 0;">Great Job!</h3>
-            <p style="color: #334155;">You've completed the post-inspection pitch practice!</p>
-            <button onclick="resetPitchPractice()" style="background: #e5e7eb; color: #374151; border: none; padding: 10px 24px; border-radius: 20px; cursor: pointer; margin-top: 10px;">Practice Again</button>
+            <h3 style="color: #15803d; margin: 10px 0;">Excellent Work!</h3>
+            <p style="color: #334155;">You've completed all 4 phases of the post-inspection pitch!</p>
+            <p style="color: #6b7280; font-size: 0.9rem; margin-top: 10px;">Agnes was impressed with your presentation skills.</p>
+            <button onclick="resetLivePitchPractice()" style="background: #e5e7eb; color: #374151; border: none; padding: 10px 24px; border-radius: 20px; cursor: pointer; margin-top: 10px;">Practice Again</button>
           </div>
         </div>
 
@@ -3295,22 +3320,26 @@ const trainingContent = {
 
         <h3>Shingle Types</h3>
         <p>Identifying the type of shingle is crucial for assessing damage and communicating with adjusters.</p>
-        <div class="shingle-comparison">
-            <div class="shingle-type">
-                <h4>3-Tab Shingles</h4>
-                <div style="padding: 40px; background: #f5f5f5; border: 2px solid #ddd; border-radius: 8px; text-align: center;">
-                  <p><strong>3-Tab Shingle Reference</strong></p>
-                  <p style="margin-top: 10px; color: #666;">Flat, single-layer appearance with distinct rectangular cutouts</p>
+        <div class="shingle-comparison" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 20px 0;">
+            <div class="shingle-type" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-radius: 16px; padding: 20px; border: 2px solid #94a3b8;">
+                <h4 style="color: #334155; margin: 0 0 16px 0; text-align: center;">📐 3-Tab Shingles</h4>
+                <img src="/assets/shingles/3-tab-shingles.webp"
+                     alt="3-Tab Shingles - flat, uniform appearance"
+                     style="width: 100%; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-bottom: 16px;">
+                <div style="background: #fef3c7; padding: 12px; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                  <p style="margin: 0; font-size: 0.9rem; color: #92400e;"><strong>Key Features:</strong> Flat, single-layer, distinct rectangular cutouts, "brick" pattern, lighter weight</p>
                 </div>
-                <p>Flat, single-layer appearance with distinct rectangular cutouts.</p>
+                <p style="margin: 12px 0 0 0; color: #475569; font-size: 0.9rem;">Common pre-2005. Most lines now <strong>discontinued</strong> - often triggers full replacement!</p>
             </div>
-            <div class="shingle-type">
-                <h4>Architectural Shingles</h4>
-                <div style="padding: 40px; background: #f5f5f5; border: 2px solid #ddd; border-radius: 8px; text-align: center;">
-                  <p><strong>Architectural Shingle Reference</strong></p>
-                  <p style="margin-top: 10px; color: #666;">Laminated, multi-layer design giving a dimensional, textured look</p>
+            <div class="shingle-type" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 16px; padding: 20px; border: 2px solid #86efac;">
+                <h4 style="color: #166534; margin: 0 0 16px 0; text-align: center;">🏔️ Architectural Shingles</h4>
+                <img src="/assets/shingles/architectural-shingles.jpg"
+                     alt="Architectural Shingles - dimensional, layered appearance"
+                     style="width: 100%; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-bottom: 16px;">
+                <div style="background: #d1fae5; padding: 12px; border-radius: 8px; border-left: 4px solid #22c55e;">
+                  <p style="margin: 0; font-size: 0.9rem; color: #065f46;"><strong>Key Features:</strong> Multi-layer laminated, dimensional texture, random pattern, 50% heavier</p>
                 </div>
-                <p>Laminated, multi-layer design giving a dimensional, textured look.</p>
+                <p style="margin: 12px 0 0 0; color: #166534; font-size: 0.9rem;">Industry standard post-2005. <strong>130 mph wind rating</strong>, 25-30 year warranty!</p>
             </div>
         </div>
         <hr>
@@ -3442,97 +3471,114 @@ const trainingContent = {
           </div>
         </div>
 
-        <!-- Interactive Hotspot Quiz - LAST before completion -->
+        <!-- Interactive Matching Game - LAST before completion -->
         <h2>🎮 Damage Identification Challenge</h2>
-        <p>Test your knowledge! Click on the damaged areas in the photos below. Find all the damage spots to complete each challenge.</p>
+        <p>Test your knowledge with these two interactive challenges!</p>
 
-        <div id="hotspot-quiz-container">
-          <!-- Quiz Question 1: Hail Damage -->
-          <div class="hotspot-quiz-question" data-question="1" data-damage-type="hail">
-            <h3>Challenge 1: Identify Clear Hail Impact Sites</h3>
-            <p class="quiz-instruction">Click on all areas showing obvious hail damage (3 spots)</p>
+        <div id="damage-matching-game" style="background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%); border-radius: 20px; padding: 24px; margin: 20px 0; border: 3px solid #a855f7;">
 
-            <div class="quiz-image-container">
-              <img src="/assets/damage/hail/hail-damage-1.jpg" alt="Roof with clear hail damage"
-                   class="clickable-quiz-image"
-                   data-hotspots="28.6,30.0,4;57.1,45.0,4;75.0,60.0,4"
-                   data-total-spots="3">
-              <div class="hotspot-markers"></div>
-              <div class="hotspot-guides"></div>
-            </div>
+          <!-- Challenge 1: Match Damage Type -->
+          <div id="match-damage-challenge" class="game-challenge">
+            <h3 style="color: #7c3aed; margin: 0 0 16px 0;">🎯 Challenge 1: Match the Damage Type</h3>
+            <p style="color: #6b7280; margin-bottom: 20px;">Click on a description, then click the matching damage type!</p>
 
-            <div class="quiz-feedback">
-              <p class="quiz-score">Found: <span class="found-count">0</span> / <span class="total-count">3</span></p>
-              <p class="quiz-hint" style="display: none;">💡 Hint: Look for circular impact craters with inspection markers</p>
-              <div class="quiz-actions">
-                <button class="btn-hint">Show Hint</button>
-                <button class="btn-toggle-guides" data-question="1">Show Hotspot Zones</button>
-                <button class="btn-reset">Try Again</button>
-                <button class="btn-next" style="display: none;">Next Challenge →</button>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+              <!-- Descriptions Column -->
+              <div>
+                <h4 style="color: #374151; margin-bottom: 12px;">Descriptions:</h4>
+                <div id="damage-descriptions" style="display: flex; flex-direction: column; gap: 10px;">
+                  <div class="match-item description" data-match="hail" onclick="selectMatchItem(this)" style="background: white; padding: 14px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; transition: all 0.2s;">
+                    🌨️ Circular "bruises" with concentrated granule loss, soft/spongy feel
+                  </div>
+                  <div class="match-item description" data-match="wind" onclick="selectMatchItem(this)" style="background: white; padding: 14px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; transition: all 0.2s;">
+                    💨 Lifted, creased, or completely missing shingles
+                  </div>
+                  <div class="match-item description" data-match="blistering" onclick="selectMatchItem(this)" style="background: white; padding: 14px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; transition: all 0.2s;">
+                    🫧 Bubbles on surface from manufacturing defect or trapped moisture
+                  </div>
+                  <div class="match-item description" data-match="cracking" onclick="selectMatchItem(this)" style="background: white; padding: 14px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; transition: all 0.2s;">
+                    💔 Straight-line splits from age, UV exposure, thermal cycling
+                  </div>
+                </div>
+              </div>
+
+              <!-- Damage Types Column -->
+              <div>
+                <h4 style="color: #374151; margin-bottom: 12px;">Damage Types:</h4>
+                <div id="damage-types" style="display: flex; flex-direction: column; gap: 10px;">
+                  <div class="match-item type" data-match="wind" onclick="matchDamageType(this)" style="background: #22c55e; color: white; padding: 14px; border-radius: 10px; cursor: pointer; font-weight: bold; text-align: center; transition: all 0.2s;">
+                    ✅ WIND DAMAGE (Qualifying)
+                  </div>
+                  <div class="match-item type" data-match="cracking" onclick="matchDamageType(this)" style="background: #ef4444; color: white; padding: 14px; border-radius: 10px; cursor: pointer; font-weight: bold; text-align: center; transition: all 0.2s;">
+                    ❌ CRACKING (Non-Qualifying)
+                  </div>
+                  <div class="match-item type" data-match="hail" onclick="matchDamageType(this)" style="background: #22c55e; color: white; padding: 14px; border-radius: 10px; cursor: pointer; font-weight: bold; text-align: center; transition: all 0.2s;">
+                    ✅ HAIL DAMAGE (Qualifying)
+                  </div>
+                  <div class="match-item type" data-match="blistering" onclick="matchDamageType(this)" style="background: #ef4444; color: white; padding: 14px; border-radius: 10px; cursor: pointer; font-weight: bold; text-align: center; transition: all 0.2s;">
+                    ❌ BLISTERING (Non-Qualifying)
+                  </div>
+                </div>
               </div>
             </div>
+
+            <div id="match-progress" style="margin-top: 16px; text-align: center;">
+              <p style="color: #7c3aed; font-weight: bold;">Matched: <span id="match-count">0</span> / 4</p>
+            </div>
+            <div id="match-feedback" style="display: none; margin-top: 12px; padding: 12px; border-radius: 8px; text-align: center;"></div>
           </div>
 
-          <!-- Quiz Question 2: Mixed Damage -->
-          <div class="hotspot-quiz-question" data-question="2" data-damage-type="mixed" style="display: none;">
-            <h3>Challenge 2: Distinguish Impact vs. Normal Wear</h3>
-            <p class="quiz-instruction">Click ONLY on actual hail impacts, not general weathering (3 spots)</p>
+          <hr style="margin: 30px 0; border: none; border-top: 2px dashed #d8b4fe;">
 
-            <div class="quiz-image-container">
-              <img src="/assets/damage/hail/hail-damage-2.jpg" alt="Roof with mixed damage and wear"
-                   class="clickable-quiz-image"
-                   data-hotspots="25.0,40.0,4;50.0,35.0,4;67.9,55.0,4"
-                   data-total-spots="3">
-              <div class="hotspot-markers"></div>
-              <div class="hotspot-guides"></div>
-            </div>
+          <!-- Challenge 2: Documentation Sequence -->
+          <div id="doc-sequence-challenge" class="game-challenge">
+            <h3 style="color: #7c3aed; margin: 0 0 16px 0;">📋 Challenge 2: Documentation Sequence</h3>
+            <p style="color: #6b7280; margin-bottom: 20px;">Put the documentation steps in the correct order! Click to select, then click where to place it.</p>
 
-            <div class="quiz-feedback">
-              <p class="quiz-score">Found: <span class="found-count">0</span> / <span class="total-count">3</span></p>
-              <p class="quiz-hint" style="display: none;">💡 Hint: Impact damage shows distinct circular patterns, not random wear marks</p>
-              <div class="quiz-actions">
-                <button class="btn-hint">Show Hint</button>
-                <button class="btn-toggle-guides" data-question="2">Show Hotspot Zones</button>
-                <button class="btn-reset">Try Again</button>
-                <button class="btn-next" style="display: none;">Next Challenge →</button>
+            <div id="doc-sequence-items" style="display: flex; flex-direction: column; gap: 8px;">
+              <div class="seq-item" data-order="5" onclick="selectSeqItem(this)" style="background: white; padding: 14px 20px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; display: flex; align-items: center; gap: 12px; transition: all 0.2s;">
+                <span class="seq-number" style="background: #e5e7eb; color: #6b7280; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">?</span>
+                <span>Damage Markup - Circle hail hits with chalk, slash wind damage</span>
+              </div>
+              <div class="seq-item" data-order="2" onclick="selectSeqItem(this)" style="background: white; padding: 14px 20px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; display: flex; align-items: center; gap: 12px; transition: all 0.2s;">
+                <span class="seq-number" style="background: #e5e7eb; color: #6b7280; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">?</span>
+                <span>Overview Shots - All four elevations of the home</span>
+              </div>
+              <div class="seq-item" data-order="7" onclick="selectSeqItem(this)" style="background: white; padding: 14px 20px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; display: flex; align-items: center; gap: 12px; transition: all 0.2s;">
+                <span class="seq-number" style="background: #e5e7eb; color: #6b7280; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">?</span>
+                <span>Granule Loss - Gutters and downspouts filled with granules</span>
+              </div>
+              <div class="seq-item" data-order="1" onclick="selectSeqItem(this)" style="background: white; padding: 14px 20px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; display: flex; align-items: center; gap: 12px; transition: all 0.2s;">
+                <span class="seq-number" style="background: #e5e7eb; color: #6b7280; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">?</span>
+                <span>Property ID - House number, full front view</span>
+              </div>
+              <div class="seq-item" data-order="4" onclick="selectSeqItem(this)" style="background: white; padding: 14px 20px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; display: flex; align-items: center; gap: 12px; transition: all 0.2s;">
+                <span class="seq-number" style="background: #e5e7eb; color: #6b7280; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">?</span>
+                <span>Roof Overview - Wide shots of each slope</span>
+              </div>
+              <div class="seq-item" data-order="3" onclick="selectSeqItem(this)" style="background: white; padding: 14px 20px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; display: flex; align-items: center; gap: 12px; transition: all 0.2s;">
+                <span class="seq-number" style="background: #e5e7eb; color: #6b7280; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">?</span>
+                <span>Elevation Collateral - Gutters, siding, windows from each side</span>
+              </div>
+              <div class="seq-item" data-order="6" onclick="selectSeqItem(this)" style="background: white; padding: 14px 20px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; display: flex; align-items: center; gap: 12px; transition: all 0.2s;">
+                <span class="seq-number" style="background: #e5e7eb; color: #6b7280; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">?</span>
+                <span>Close-ups - Individual damage photos with penny/quarter reference</span>
               </div>
             </div>
+
+            <div style="margin-top: 16px; display: flex; gap: 12px; justify-content: center;">
+              <button onclick="checkDocSequence()" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; border: none; padding: 12px 28px; border-radius: 25px; cursor: pointer; font-weight: bold; font-size: 1rem;">Check Order ✓</button>
+              <button onclick="resetDocSequence()" style="background: #e5e7eb; color: #374151; border: none; padding: 12px 28px; border-radius: 25px; cursor: pointer; font-weight: bold;">Reset</button>
+            </div>
+
+            <div id="seq-feedback" style="display: none; margin-top: 16px; padding: 16px; border-radius: 12px; text-align: center;"></div>
           </div>
 
-          <!-- Quiz Question 3: Qualifying vs Non-Qualifying -->
-          <div class="hotspot-quiz-question" data-question="3" data-damage-type="subtle" style="display: none;">
-            <h3>Challenge 3: Find Qualifying Damage Among Weathering</h3>
-            <p class="quiz-instruction">Advanced: Identify subtle hail impacts among heavy weathering (3 spots)</p>
-
-            <div class="quiz-image-container">
-              <img src="/assets/damage/hail/hail-damage-3.jpg" alt="Weathered roof with subtle damage"
-                   class="clickable-quiz-image"
-                   data-hotspots="39.3,45.0,4;60.7,55.0,4;32.1,65.0,4"
-                   data-total-spots="3">
-              <div class="hotspot-markers"></div>
-              <div class="hotspot-guides"></div>
-            </div>
-
-            <div class="quiz-feedback">
-              <p class="quiz-score">Found: <span class="found-count">0</span> / <span class="total-count">3</span></p>
-              <p class="quiz-hint" style="display: none;">💡 Hint: Look for the few inspection markers showing actual impacts vs. general aging</p>
-              <div class="quiz-actions">
-                <button class="btn-hint">Show Hint</button>
-                <button class="btn-toggle-guides" data-question="3">Show Hotspot Zones</button>
-                <button class="btn-reset">Try Again</button>
-                <button class="btn-complete" style="display: none;">Complete Quiz 🎉</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Quiz Complete Message -->
-          <div id="quiz-complete-message" style="display: none;">
-            <div class="success-banner">
-              <h3>🎉 Congratulations!</h3>
-              <p>You've completed the Damage Identification Challenge!</p>
-              <p class="final-score">Your Score: <span id="final-score">0</span> / <span id="total-possible">9</span></p>
-              <button class="btn-restart-quiz">Restart Quiz</button>
-            </div>
+          <!-- Game Complete -->
+          <div id="game-complete-section" style="display: none; text-align: center; padding: 30px; background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-radius: 16px; margin-top: 20px;">
+            <div style="font-size: 4rem;">🎉</div>
+            <h3 style="color: #059669; margin: 10px 0;">Excellent Work!</h3>
+            <p style="color: #047857;">You've mastered damage identification and documentation sequence!</p>
           </div>
         </div>
 
@@ -5335,25 +5381,36 @@ const pitchPracticeSteps = [
 let currentPitchStep = 0;
 
 function speakFullScript() {
-  const scriptContainer = document.querySelector('.pitch-script-content');
-  if (!scriptContainer) return;
+  const scriptContainer = document.querySelector('.full-script-section');
+  if (!scriptContainer) {
+    console.log('Script container not found');
+    return;
+  }
 
   const btn = document.querySelector('.speak-btn-enhanced') as HTMLElement;
 
   // Get all text from script phases
-  const phases = scriptContainer.querySelectorAll('.pitch-phase-card');
+  const phases = scriptContainer.querySelectorAll('.script-phase');
   let fullText = '';
   phases.forEach(phase => {
-    const clone = phase.cloneNode(true) as HTMLElement;
-    clone.querySelectorAll('button, .speak-section-btn').forEach(b => b.remove());
-    fullText += clone.innerText.trim() + ' ';
+    const scriptContent = phase.querySelector('.script-content p');
+    if (scriptContent) {
+      const clone = scriptContent.cloneNode(true) as HTMLElement;
+      // Remove stage directions in [brackets] and keep spoken text
+      let text = clone.innerText
+        .replace(/\[.*?\]/g, '') // Remove stage directions
+        .replace(/→.*$/gm, '') // Remove arrow points
+        .replace(/Gather:.*$/gm, '') // Remove gather list
+        .trim();
+      fullText += text + ' ';
+    }
   });
 
   if (synth.speaking) {
     synth.cancel();
     if (btn) {
-      btn.innerHTML = '<span class="speak-icon">🔊</span><span class="speak-label">Listen to Full Script</span>';
-      btn.classList.remove('playing');
+      btn.innerHTML = '<span style="font-size: 1.5rem;">🔊</span><span>Listen to Full Script</span>';
+      btn.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
     }
     return;
   }
@@ -5368,14 +5425,14 @@ function speakFullScript() {
   utterance.pitch = 0.95;
 
   if (btn) {
-    btn.innerHTML = '<span class="speak-icon">⏸️</span><span class="speak-label">Pause Playback</span>';
-    btn.classList.add('playing');
+    btn.innerHTML = '<span style="font-size: 1.5rem;">⏸️</span><span>Stop Playback</span>';
+    btn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
   }
 
   utterance.onend = () => {
     if (btn) {
-      btn.innerHTML = '<span class="speak-icon">🔊</span><span class="speak-label">Listen to Full Script</span>';
-      btn.classList.remove('playing');
+      btn.innerHTML = '<span style="font-size: 1.5rem;">🔊</span><span>Listen to Full Script</span>';
+      btn.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
     }
   };
 
@@ -5383,17 +5440,22 @@ function speakFullScript() {
 }
 
 function speakSection(btn: HTMLElement) {
-  const card = btn.closest('.pitch-phase-card');
-  if (!card) return;
+  const phase = btn.closest('.script-phase');
+  if (!phase) return;
 
-  const clone = card.cloneNode(true) as HTMLElement;
-  clone.querySelectorAll('button, .speak-section-btn, h3').forEach(b => b.remove());
-  const textToSpeak = clone.innerText.trim();
+  const scriptContent = phase.querySelector('.script-content p');
+  if (!scriptContent) return;
+
+  // Get text and clean it up
+  let textToSpeak = scriptContent.innerText
+    .replace(/\[.*?\]/g, '') // Remove stage directions
+    .replace(/→.*$/gm, '') // Remove arrow points
+    .replace(/Gather:.*$/gm, '') // Remove gather list
+    .trim();
 
   if (synth.speaking) {
     synth.cancel();
-    btn.textContent = '▶️';
-    btn.classList.remove('playing');
+    btn.innerHTML = '🔊 Play';
     return;
   }
 
@@ -5406,12 +5468,15 @@ function speakSection(btn: HTMLElement) {
   utterance.rate = 0.92;
   utterance.pitch = 0.95;
 
-  btn.textContent = '⏸️';
-  btn.classList.add('playing');
+  btn.innerHTML = '⏸️ Stop';
+  btn.style.background = '#ef4444';
+
+  const originalBg = btn.getAttribute('data-original-bg') || btn.style.background;
+  btn.setAttribute('data-original-bg', originalBg);
 
   utterance.onend = () => {
-    btn.textContent = '▶️';
-    btn.classList.remove('playing');
+    btn.innerHTML = '🔊 Play';
+    btn.style.background = originalBg;
   };
 
   synth.speak(utterance);
@@ -5519,12 +5584,479 @@ function resetPitchPractice() {
   if (completeEl) completeEl.style.display = 'none';
 }
 
+// --- Module 9: Live AI Role-Play with Agnes ---
+const pitchPhases = [
+  {
+    phase: 1,
+    name: "INTEGRITY - Opening",
+    prompt: "🎯 Deliver your opening - show the collateral damage photos and explain their importance:",
+    agnesOpening: "Hi! Come on in. So, you went up on my roof?",
+    keyPoints: ["collateral damage", "evidence", "build the case", "lawyers"]
+  },
+  {
+    phase: 2,
+    name: "QUALITY - Damage Explanation",
+    prompt: "🎯 Explain the hail damage and why it matters to the homeowner:",
+    agnesOpening: "Okay, show me what you found...",
+    keyPoints: ["circular", "divot", "freeze", "expand", "leaks", "insurance"]
+  },
+  {
+    phase: 3,
+    name: "SIMPLICITY - Summary",
+    prompt: "🎯 Summarize the damage and mention similar approvals in the area:",
+    agnesOpening: "I see those circles you're pointing at. What does that mean for my roof?",
+    keyPoints: ["granules", "gutters", "neighbors", "similar", "approvals", "area"]
+  },
+  {
+    phase: 4,
+    name: "INTEGRITY - Information Gathering",
+    prompt: "🎯 Transition to gathering their information for the claim:",
+    agnesOpening: "Wow, I had no idea there was this much damage. So what happens now?",
+    keyPoints: ["information", "system", "insurance", "deductible", "claim"]
+  }
+];
+
+let currentPitchPhase = 0;
+let pitchConversationHistory: {sender: string, message: string}[] = [];
+
+function startLivePitchPractice() {
+  currentPitchPhase = 0;
+  pitchConversationHistory = [];
+
+  const startEl = document.getElementById('agnes-pitch-start');
+  const practiceEl = document.getElementById('agnes-pitch-practice');
+  const completeEl = document.getElementById('agnes-pitch-complete');
+
+  if (startEl) startEl.style.display = 'none';
+  if (practiceEl) practiceEl.style.display = 'block';
+  if (completeEl) completeEl.style.display = 'none';
+
+  updatePitchPhaseUI();
+
+  // Add Agnes opening message
+  const phase = pitchPhases[currentPitchPhase];
+  addPitchMessage('agnes', phase.agnesOpening);
+}
+
+function updatePitchPhaseUI() {
+  const phase = pitchPhases[currentPitchPhase];
+  if (!phase) return;
+
+  // Update phase banner
+  const banner = document.getElementById('current-phase-banner');
+  if (banner) {
+    banner.innerHTML = `<strong>Phase ${phase.phase}: ${phase.name}</strong>`;
+  }
+
+  // Update prompt
+  const promptEl = document.getElementById('pitch-prompt-text');
+  if (promptEl) {
+    promptEl.textContent = phase.prompt;
+  }
+
+  // Update progress dots
+  const stepDots = document.querySelectorAll('.pitch-step');
+  stepDots.forEach((dot, index) => {
+    const el = dot as HTMLElement;
+    if (index < currentPitchPhase) {
+      el.style.background = '#22c55e';
+      el.style.color = 'white';
+    } else if (index === currentPitchPhase) {
+      el.style.background = '#8b5cf6';
+      el.style.color = 'white';
+    } else {
+      el.style.background = '#e5e7eb';
+      el.style.color = '#6b7280';
+    }
+  });
+
+  // Clear input
+  const input = document.getElementById('pitch-user-input') as HTMLTextAreaElement;
+  if (input) input.value = '';
+}
+
+function addPitchMessage(sender: 'user' | 'agnes', message: string) {
+  const container = document.getElementById('pitch-chat-messages');
+  if (!container) return;
+
+  const msgDiv = document.createElement('div');
+  msgDiv.style.cssText = sender === 'user'
+    ? 'background: #eff6ff; border-radius: 12px; padding: 12px 16px; margin-bottom: 10px; margin-left: 40px; border-left: 4px solid #3b82f6;'
+    : 'background: #fef3c7; border-radius: 12px; padding: 12px 16px; margin-bottom: 10px; margin-right: 40px; border-left: 4px solid #f59e0b; display: flex; align-items: flex-start; gap: 10px;';
+
+  if (sender === 'agnes') {
+    msgDiv.innerHTML = `<span style="font-size: 1.5rem;">🧓</span><div><strong style="color: #92400e;">Agnes:</strong><p style="margin: 6px 0 0 0; color: #78350f;">${message}</p></div>`;
+  } else {
+    msgDiv.innerHTML = `<strong style="color: #1e40af;">You:</strong><p style="margin: 6px 0 0 0; color: #334155;">${message}</p>`;
+  }
+
+  container.appendChild(msgDiv);
+  container.scrollTop = container.scrollHeight;
+
+  pitchConversationHistory.push({ sender, message });
+}
+
+async function submitPitchResponse() {
+  const input = document.getElementById('pitch-user-input') as HTMLTextAreaElement;
+  const userMessage = input?.value.trim();
+  if (!userMessage) return;
+
+  // Add user message to chat
+  addPitchMessage('user', userMessage);
+  input.value = '';
+
+  // Show loading
+  const loadingEl = document.getElementById('agnes-loading');
+  const inputArea = document.getElementById('pitch-input-area');
+  if (loadingEl) loadingEl.style.display = 'block';
+  if (inputArea) inputArea.style.display = 'none';
+
+  try {
+    // Generate Agnes response using AI
+    const agnesResponse = await generateAgnesPitchResponse(userMessage);
+    addPitchMessage('agnes', agnesResponse);
+
+    // Move to next phase after response
+    setTimeout(() => {
+      currentPitchPhase++;
+      if (currentPitchPhase >= pitchPhases.length) {
+        // Complete!
+        completeLivePitchPractice();
+      } else {
+        updatePitchPhaseUI();
+        const nextPhase = pitchPhases[currentPitchPhase];
+        setTimeout(() => addPitchMessage('agnes', nextPhase.agnesOpening), 500);
+      }
+    }, 1000);
+  } catch (error) {
+    console.error('Error generating Agnes response:', error);
+    addPitchMessage('agnes', "That sounds good! Tell me more about what you found.");
+  } finally {
+    if (loadingEl) loadingEl.style.display = 'none';
+    if (inputArea) inputArea.style.display = 'block';
+  }
+}
+
+async function generateAgnesPitchResponse(userMessage: string): Promise<string> {
+  const phase = pitchPhases[currentPitchPhase];
+
+  // Check if AI is available (uses the existing ai variable from the app)
+  if (typeof ai !== 'undefined' && ai) {
+    try {
+      const prompt = `You are Agnes, a friendly homeowner receiving a post-inspection sales pitch from a roofing company representative. The rep is at Phase ${phase.phase}: ${phase.name}.
+
+The sales rep just said: "${userMessage}"
+
+Respond naturally as Agnes would - be agreeable and interested, but ask clarifying questions. Keep response to 1-2 sentences. Be encouraging but realistic.
+
+Conversation so far:
+${pitchConversationHistory.map(m => `${m.sender === 'user' ? 'Sales Rep' : 'Agnes'}: ${m.message}`).join('\n')}
+
+Agnes's natural response:`;
+
+      const chat = await ai.chats.create({
+        model: 'gemini-2.0-flash-exp',
+        config: { temperature: 0.8, maxOutputTokens: 100 }
+      });
+
+      const response = await chat.sendMessage(prompt);
+      return response.text.trim();
+    } catch (e) {
+      console.warn('AI error, using fallback:', e);
+    }
+  }
+
+  // Fallback responses based on phase
+  const fallbacks = {
+    1: ["I see, so that damage on my gutters is from the same storm?", "That makes sense about building a case. What else did you find?", "Interesting approach. Show me what's on the roof itself."],
+    2: ["Oh wow, I had no idea those little marks could cause so much damage.", "So the insurance will cover fixing this?", "That's concerning about the leaks. What should I do?"],
+    3: ["A lot of my neighbors got approved? That's good to know.", "So this is pretty common in the area then?", "I'm glad you're here to help with the insurance company."],
+    4: ["Sure, what information do you need?", "I think my deductible is around $1000. Is that normal?", "Okay, let's get this process started."]
+  };
+
+  const phaseResponses = fallbacks[phase.phase as keyof typeof fallbacks] || fallbacks[1];
+  return phaseResponses[Math.floor(Math.random() * phaseResponses.length)];
+}
+
+function skipPitchPhase() {
+  currentPitchPhase++;
+  if (currentPitchPhase >= pitchPhases.length) {
+    completeLivePitchPractice();
+  } else {
+    updatePitchPhaseUI();
+    const nextPhase = pitchPhases[currentPitchPhase];
+    addPitchMessage('agnes', nextPhase.agnesOpening);
+  }
+}
+
+function completeLivePitchPractice() {
+  const practiceEl = document.getElementById('agnes-pitch-practice');
+  const completeEl = document.getElementById('agnes-pitch-complete');
+  const moduleComplete = document.getElementById('module-complete-section');
+
+  if (practiceEl) practiceEl.style.display = 'none';
+  if (completeEl) completeEl.style.display = 'block';
+  if (moduleComplete) moduleComplete.style.display = 'block';
+}
+
+function resetLivePitchPractice() {
+  currentPitchPhase = 0;
+  pitchConversationHistory = [];
+
+  const startEl = document.getElementById('agnes-pitch-start');
+  const practiceEl = document.getElementById('agnes-pitch-practice');
+  const completeEl = document.getElementById('agnes-pitch-complete');
+  const chatMessages = document.getElementById('pitch-chat-messages');
+
+  if (startEl) startEl.style.display = 'block';
+  if (practiceEl) practiceEl.style.display = 'none';
+  if (completeEl) completeEl.style.display = 'none';
+  if (chatMessages) chatMessages.innerHTML = '';
+}
+
 // Attach Module 9 practice functions to window
 (window as any).speakFullScript = speakFullScript;
 (window as any).speakSection = speakSection;
 (window as any).startPitchPractice = startPitchPractice;
 (window as any).advancePitchPractice = advancePitchPractice;
 (window as any).resetPitchPractice = resetPitchPractice;
+(window as any).startLivePitchPractice = startLivePitchPractice;
+(window as any).submitPitchResponse = submitPitchResponse;
+(window as any).skipPitchPhase = skipPitchPhase;
+(window as any).resetLivePitchPractice = resetLivePitchPractice;
+
+// --- Module 8: Damage Matching Game ---
+let selectedMatchItem: HTMLElement | null = null;
+let matchedCount = 0;
+let selectedSeqItem: HTMLElement | null = null;
+let assignedNumbers: number[] = [];
+let nextAssignNumber = 1;
+let challenge1Complete = false;
+let challenge2Complete = false;
+
+function selectMatchItem(element: HTMLElement) {
+  // Clear previous selection
+  document.querySelectorAll('.match-item.description').forEach(item => {
+    (item as HTMLElement).style.border = '2px solid #e5e7eb';
+    (item as HTMLElement).style.boxShadow = 'none';
+  });
+
+  // Select this item
+  element.style.border = '3px solid #8b5cf6';
+  element.style.boxShadow = '0 0 15px rgba(139, 92, 246, 0.4)';
+  selectedMatchItem = element;
+}
+
+function matchDamageType(element: HTMLElement) {
+  if (!selectedMatchItem) {
+    showMatchFeedback('First click a description on the left!', false);
+    return;
+  }
+
+  const selectedMatch = selectedMatchItem.getAttribute('data-match');
+  const targetMatch = element.getAttribute('data-match');
+
+  if (selectedMatch === targetMatch) {
+    // Correct match!
+    matchedCount++;
+    selectedMatchItem.style.background = '#d1fae5';
+    selectedMatchItem.style.border = '2px solid #22c55e';
+    selectedMatchItem.style.opacity = '0.7';
+    selectedMatchItem.style.pointerEvents = 'none';
+
+    element.style.opacity = '0.7';
+    element.style.pointerEvents = 'none';
+    element.style.transform = 'scale(0.95)';
+
+    // Update count
+    const countEl = document.getElementById('match-count');
+    if (countEl) countEl.textContent = String(matchedCount);
+
+    showMatchFeedback('Correct! Great job!', true);
+
+    if (matchedCount === 4) {
+      challenge1Complete = true;
+      checkGameComplete();
+    }
+  } else {
+    // Wrong match
+    showMatchFeedback('Not quite - try again!', false);
+    element.style.animation = 'shake 0.4s ease';
+    setTimeout(() => element.style.animation = '', 400);
+  }
+
+  selectedMatchItem = null;
+}
+
+function showMatchFeedback(message: string, success: boolean) {
+  const feedback = document.getElementById('match-feedback');
+  if (feedback) {
+    feedback.textContent = message;
+    feedback.style.display = 'block';
+    feedback.style.background = success ? '#d1fae5' : '#fee2e2';
+    feedback.style.color = success ? '#065f46' : '#991b1b';
+    setTimeout(() => feedback.style.display = 'none', 2000);
+  }
+}
+
+function selectSeqItem(element: HTMLElement) {
+  if (element.classList.contains('placed')) return;
+
+  // Clear previous selection
+  document.querySelectorAll('.seq-item').forEach(item => {
+    if (!item.classList.contains('placed')) {
+      (item as HTMLElement).style.border = '2px solid #e5e7eb';
+    }
+  });
+
+  // Select or assign number
+  if (selectedSeqItem === element) {
+    // Clicking same item - assign next number
+    const numEl = element.querySelector('.seq-number') as HTMLElement;
+    if (numEl && nextAssignNumber <= 7) {
+      numEl.textContent = String(nextAssignNumber);
+      numEl.style.background = '#8b5cf6';
+      numEl.style.color = 'white';
+      element.classList.add('placed');
+      element.style.border = '2px solid #8b5cf6';
+      assignedNumbers.push(parseInt(element.getAttribute('data-order') || '0'));
+      nextAssignNumber++;
+      selectedSeqItem = null;
+    }
+  } else {
+    // New selection
+    element.style.border = '3px solid #8b5cf6';
+    selectedSeqItem = element;
+  }
+}
+
+function checkDocSequence() {
+  const items = document.querySelectorAll('.seq-item');
+  const currentOrder: number[] = [];
+  let allAssigned = true;
+
+  items.forEach(item => {
+    const numEl = item.querySelector('.seq-number') as HTMLElement;
+    if (numEl && numEl.textContent !== '?') {
+      currentOrder.push(parseInt(numEl.textContent));
+    } else {
+      allAssigned = false;
+    }
+  });
+
+  if (!allAssigned || currentOrder.length < 7) {
+    showSeqFeedback('Assign all 7 steps first! Click each item to number it.', false);
+    return;
+  }
+
+  // Check if order matches position
+  let correct = true;
+  items.forEach((item, index) => {
+    const expectedOrder = parseInt(item.getAttribute('data-order') || '0');
+    const numEl = item.querySelector('.seq-number') as HTMLElement;
+    const assignedOrder = parseInt(numEl?.textContent || '0');
+
+    if (assignedOrder !== expectedOrder) {
+      correct = false;
+    }
+  });
+
+  // Actually check if the DOM order has items in 1-7 sequence top to bottom
+  const orderedItems = Array.from(items);
+  let isCorrectSequence = true;
+  orderedItems.forEach((item, index) => {
+    const numEl = item.querySelector('.seq-number') as HTMLElement;
+    const num = parseInt(numEl?.textContent || '0');
+    const correctOrder = parseInt(item.getAttribute('data-order') || '0');
+    if (num !== correctOrder) {
+      isCorrectSequence = false;
+    }
+  });
+
+  if (isCorrectSequence) {
+    showSeqFeedback('Perfect! You nailed the documentation sequence!', true);
+    challenge2Complete = true;
+
+    // Color all items green
+    items.forEach(item => {
+      (item as HTMLElement).style.background = '#d1fae5';
+      (item as HTMLElement).style.border = '2px solid #22c55e';
+    });
+
+    checkGameComplete();
+  } else {
+    showSeqFeedback('Not quite right. Review the sequence and try again!', false);
+  }
+}
+
+function resetDocSequence() {
+  nextAssignNumber = 1;
+  assignedNumbers = [];
+  selectedSeqItem = null;
+
+  document.querySelectorAll('.seq-item').forEach(item => {
+    item.classList.remove('placed');
+    (item as HTMLElement).style.border = '2px solid #e5e7eb';
+    (item as HTMLElement).style.background = 'white';
+    const numEl = item.querySelector('.seq-number') as HTMLElement;
+    if (numEl) {
+      numEl.textContent = '?';
+      numEl.style.background = '#e5e7eb';
+      numEl.style.color = '#6b7280';
+    }
+  });
+
+  const feedback = document.getElementById('seq-feedback');
+  if (feedback) feedback.style.display = 'none';
+}
+
+function showSeqFeedback(message: string, success: boolean) {
+  const feedback = document.getElementById('seq-feedback');
+  if (feedback) {
+    feedback.textContent = message;
+    feedback.style.display = 'block';
+    feedback.style.background = success ? '#d1fae5' : '#fee2e2';
+    feedback.style.color = success ? '#065f46' : '#991b1b';
+  }
+}
+
+function checkGameComplete() {
+  if (challenge1Complete && challenge2Complete) {
+    const completeSection = document.getElementById('game-complete-section');
+    const moduleComplete = document.getElementById('module-complete-section');
+    if (completeSection) completeSection.style.display = 'block';
+    if (moduleComplete) moduleComplete.style.display = 'block';
+
+    // Mark quiz as passed
+    markQuizPassed('damage-identification');
+  }
+}
+
+function initDamageMatchingGame() {
+  console.log('🎮 Initializing Damage Matching Game...');
+
+  // Reset game state
+  matchedCount = 0;
+  selectedMatchItem = null;
+  challenge1Complete = false;
+  challenge2Complete = false;
+  nextAssignNumber = 1;
+  assignedNumbers = [];
+  selectedSeqItem = null;
+
+  // Update match count display
+  const countEl = document.getElementById('match-count');
+  if (countEl) countEl.textContent = '0';
+
+  console.log('✅ Damage Matching Game initialized');
+}
+
+// Attach game functions to window
+(window as any).selectMatchItem = selectMatchItem;
+(window as any).matchDamageType = matchDamageType;
+(window as any).selectSeqItem = selectSeqItem;
+(window as any).checkDocSequence = checkDocSequence;
+(window as any).resetDocSequence = resetDocSequence;
 
 // --- Game Logic ---
 function initSalesCycleSorter() {
@@ -8814,7 +9346,7 @@ function renderModule(moduleName: string) {
           break;
       case 'damage-identification':
       case 'roofing-damage-id':
-          initDamageHotspotQuiz();
+          initDamageMatchingGame();
           break;
       // New module initializers
       case 'general-knowledge':
