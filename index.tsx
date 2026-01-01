@@ -5395,72 +5395,63 @@ let currentPitchStep = 0;
 // TTS - Using Gemini high-quality voices (Kore/Aoede) with browser fallback
 let currentAudio: HTMLAudioElement | null = null;
 let isPlayingTTS = false;
+let ttsCancelled = false;
 
-// Gemini TTS with Kore (male) or Aoede (female) voices
-async function speakWithGemini(text: string, voiceName: string = 'Kore'): Promise<boolean> {
-  if (typeof ai === 'undefined' || !ai) {
-    return false;
+// Stop all TTS immediately
+function stopAllTTS() {
+  ttsCancelled = true;
+  synth.cancel();
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.onended = null;
+    currentAudio.onerror = null;
+    try { URL.revokeObjectURL(currentAudio.src); } catch (e) {}
+    currentAudio = null;
+  }
+  isPlayingTTS = false;
+
+  // Reset all TTS buttons to their default state
+  const fullScriptBtn = document.getElementById('play-full-script-btn');
+  if (fullScriptBtn) {
+    fullScriptBtn.innerHTML = '<span style="font-size: 1.5rem;">🔊</span><span>Listen to Full Script</span>';
+    (fullScriptBtn as HTMLElement).style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
   }
 
-  try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-preview-tts',
-      contents: [{ parts: [{ text: text }] }],
-      config: {
-        responseModalities: ['AUDIO'],
-        speechConfig: {
-          voiceConfig: {
-            prebuiltVoiceConfig: {
-              voiceName: voiceName
-            }
-          }
-        }
-      }
-    });
-
-    // Extract audio from response
-    if (response.candidates && response.candidates[0]?.content?.parts) {
-      for (const part of response.candidates[0].content.parts) {
-        if (part.inlineData && part.inlineData.mimeType?.startsWith('audio/')) {
-          const audioData = part.inlineData.data;
-          const audioBlob = new Blob(
-            [Uint8Array.from(atob(audioData), c => c.charCodeAt(0))],
-            { type: part.inlineData.mimeType }
-          );
-          const audioUrl = URL.createObjectURL(audioBlob);
-
-          return new Promise((resolve) => {
-            if (currentAudio) {
-              currentAudio.pause();
-              URL.revokeObjectURL(currentAudio.src);
-            }
-            currentAudio = new Audio(audioUrl);
-            currentAudio.onended = () => {
-              URL.revokeObjectURL(audioUrl);
-              currentAudio = null;
-              resolve(true);
-            };
-            currentAudio.onerror = () => {
-              URL.revokeObjectURL(audioUrl);
-              currentAudio = null;
-              resolve(false);
-            };
-            currentAudio.play().catch(() => resolve(false));
-          });
-        }
-      }
+  // Reset section play buttons
+  document.querySelectorAll('.script-phase button').forEach(btn => {
+    const el = btn as HTMLElement;
+    if (el.innerHTML.includes('Stop')) {
+      el.innerHTML = '🔊 Play';
+      el.style.background = el.getAttribute('data-original-bg') || '#8b5cf6';
     }
-    return false;
-  } catch (error) {
-    console.warn('Gemini TTS error:', error);
-    return false;
-  }
+  });
 }
 
-// Browser TTS fallback
+// Cancel any playing TTS on page load
+synth.cancel();
+stopAllTTS();
+
+// Stop TTS when page is refreshed or closed
+window.addEventListener('beforeunload', () => {
+  stopAllTTS();
+});
+
+// Also stop when visibility changes (tab switch)
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    stopAllTTS();
+  }
+});
+
+// Browser TTS (simple and reliable)
 function speakWithBrowser(text: string, preferFemale: boolean = false): Promise<void> {
   return new Promise((resolve) => {
-    if (synth.speaking) synth.cancel();
+    if (ttsCancelled) {
+      resolve();
+      return;
+    }
+
+    synth.cancel(); // Clear any queue
 
     const utterance = new SpeechSynthesisUtterance(text);
     const voices = synth.getVoices();
@@ -5480,18 +5471,10 @@ function speakWithBrowser(text: string, preferFemale: boolean = false): Promise<
   });
 }
 
-// Main TTS function - tries Gemini first, falls back to browser
+// Main TTS function - uses browser TTS (Gemini TTS requires different API setup)
 async function speakText(text: string, preferFemale: boolean = false): Promise<void> {
-  const voiceName = preferFemale ? 'Aoede' : 'Kore'; // Aoede = warm female, Kore = clear male
-
-  // Try Gemini TTS first
-  const success = await speakWithGemini(text, voiceName);
-
-  // Fall back to browser TTS if Gemini fails
-  if (!success) {
-    console.log('Falling back to browser TTS');
-    await speakWithBrowser(text, preferFemale);
-  }
+  if (ttsCancelled) return;
+  await speakWithBrowser(text, preferFemale);
 }
 
 async function speakFullScript() {
@@ -5504,19 +5487,18 @@ async function speakFullScript() {
   const btn = document.querySelector('.speak-btn-enhanced') as HTMLElement;
 
   // Stop if already playing
-  if (isPlayingTTS || synth.speaking || currentAudio) {
-    synth.cancel();
-    if (currentAudio) {
-      currentAudio.pause();
-      currentAudio = null;
-    }
-    isPlayingTTS = false;
+  if (isPlayingTTS || synth.speaking) {
+    stopAllTTS();
     if (btn) {
       btn.innerHTML = '<span style="font-size: 1.5rem;">🔊</span><span>Listen to Full Script</span>';
       btn.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
     }
     return;
   }
+
+  // Reset cancel flag and start playing
+  ttsCancelled = false;
+  isPlayingTTS = true;
 
   // Get all text from script phases
   const phases = scriptContainer.querySelectorAll('.script-phase');
@@ -5538,13 +5520,11 @@ async function speakFullScript() {
     btn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
   }
 
-  isPlayingTTS = true;
-
   try {
     await speakText(fullText, false); // Use male voice for script
   } finally {
     isPlayingTTS = false;
-    if (btn) {
+    if (btn && !ttsCancelled) {
       btn.innerHTML = '<span style="font-size: 1.5rem;">🔊</span><span>Listen to Full Script</span>';
       btn.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
     }
@@ -5566,16 +5546,16 @@ async function speakSection(btn: HTMLElement) {
     .trim();
 
   // Toggle off if already playing
-  if (synth.speaking || currentAudio) {
-    synth.cancel();
-    if (currentAudio) {
-      currentAudio.pause();
-      currentAudio = null;
-    }
+  if (isPlayingTTS || synth.speaking || currentAudio) {
+    stopAllTTS();
     btn.innerHTML = '🔊 Play';
     btn.style.background = btn.getAttribute('data-original-bg') || '#8b5cf6';
     return;
   }
+
+  // Reset cancel flag and start playing
+  ttsCancelled = false;
+  isPlayingTTS = true;
 
   const originalBg = btn.style.background;
   btn.setAttribute('data-original-bg', originalBg);
@@ -5585,8 +5565,11 @@ async function speakSection(btn: HTMLElement) {
   try {
     await speakText(textToSpeak, false); // Use Kore (male) voice
   } finally {
-    btn.innerHTML = '🔊 Play';
-    btn.style.background = originalBg;
+    isPlayingTTS = false;
+    if (!ttsCancelled) {
+      btn.innerHTML = '🔊 Play';
+      btn.style.background = originalBg;
+    }
   }
 }
 
@@ -9573,11 +9556,9 @@ function renderModule(moduleName: string) {
 
   mainContent.innerHTML = trainingContent[moduleName] || '<div>Content not found.</div>';
 
-  // Cancel any ongoing speech when changing modules
-  if (synth.speaking) {
-      synth.cancel();
-      currentUtterance = null;
-  }
+  // Cancel any ongoing TTS when changing modules
+  stopAllTTS();
+  currentUtterance = null;
 
   // Track module start and activity
   trackModuleStart(moduleName);
