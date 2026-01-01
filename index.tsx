@@ -5392,40 +5392,83 @@ const pitchPracticeSteps = [
 
 let currentPitchStep = 0;
 
-// TTS - Using Browser Speech Synthesis with best available voices
+// TTS - Using Gemini high-quality voices (Kore/Aoede) with browser fallback
 let currentAudio: HTMLAudioElement | null = null;
 let isPlayingTTS = false;
 
-function getPreferredVoice(preferFemale: boolean = false): SpeechSynthesisVoice | null {
-  const voices = synth.getVoices();
-  if (voices.length === 0) return null;
+// Gemini TTS with Kore (male) or Aoede (female) voices
+async function speakWithGemini(text: string, voiceName: string = 'Kore'): Promise<boolean> {
+  if (typeof ai === 'undefined' || !ai) {
+    return false;
+  }
 
-  if (preferFemale) {
-    // Female voices for Agnes
-    return voices.find(v => v.name.includes('Samantha')) ||
-           voices.find(v => v.name.includes('Karen')) ||
-           voices.find(v => v.name.includes('Victoria')) ||
-           voices.find(v => v.name.includes('Google UK English Female')) ||
-           voices.find(v => v.name.toLowerCase().includes('female')) ||
-           voices[0];
-  } else {
-    // Male voices for script reading
-    return voices.find(v => v.name.includes('Daniel')) ||
-           voices.find(v => v.name.includes('Alex')) ||
-           voices.find(v => v.name.includes('Google US English')) ||
-           voices.find(v => v.name.toLowerCase().includes('male')) ||
-           voices[0];
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-preview-tts',
+      contents: [{ parts: [{ text: text }] }],
+      config: {
+        responseModalities: ['AUDIO'],
+        speechConfig: {
+          voiceConfig: {
+            prebuiltVoiceConfig: {
+              voiceName: voiceName
+            }
+          }
+        }
+      }
+    });
+
+    // Extract audio from response
+    if (response.candidates && response.candidates[0]?.content?.parts) {
+      for (const part of response.candidates[0].content.parts) {
+        if (part.inlineData && part.inlineData.mimeType?.startsWith('audio/')) {
+          const audioData = part.inlineData.data;
+          const audioBlob = new Blob(
+            [Uint8Array.from(atob(audioData), c => c.charCodeAt(0))],
+            { type: part.inlineData.mimeType }
+          );
+          const audioUrl = URL.createObjectURL(audioBlob);
+
+          return new Promise((resolve) => {
+            if (currentAudio) {
+              currentAudio.pause();
+              URL.revokeObjectURL(currentAudio.src);
+            }
+            currentAudio = new Audio(audioUrl);
+            currentAudio.onended = () => {
+              URL.revokeObjectURL(audioUrl);
+              currentAudio = null;
+              resolve(true);
+            };
+            currentAudio.onerror = () => {
+              URL.revokeObjectURL(audioUrl);
+              currentAudio = null;
+              resolve(false);
+            };
+            currentAudio.play().catch(() => resolve(false));
+          });
+        }
+      }
+    }
+    return false;
+  } catch (error) {
+    console.warn('Gemini TTS error:', error);
+    return false;
   }
 }
 
-function speakText(text: string, preferFemale: boolean = false): Promise<void> {
+// Browser TTS fallback
+function speakWithBrowser(text: string, preferFemale: boolean = false): Promise<void> {
   return new Promise((resolve) => {
-    if (synth.speaking) {
-      synth.cancel();
-    }
+    if (synth.speaking) synth.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
-    const voice = getPreferredVoice(preferFemale);
+    const voices = synth.getVoices();
+
+    const voice = preferFemale
+      ? voices.find(v => v.name.includes('Samantha') || v.name.includes('Karen')) || voices[0]
+      : voices.find(v => v.name.includes('Daniel') || v.name.includes('Alex')) || voices[0];
+
     if (voice) utterance.voice = voice;
     utterance.rate = 0.95;
     utterance.pitch = preferFemale ? 1.1 : 0.95;
@@ -5435,6 +5478,20 @@ function speakText(text: string, preferFemale: boolean = false): Promise<void> {
 
     synth.speak(utterance);
   });
+}
+
+// Main TTS function - tries Gemini first, falls back to browser
+async function speakText(text: string, preferFemale: boolean = false): Promise<void> {
+  const voiceName = preferFemale ? 'Aoede' : 'Kore'; // Aoede = warm female, Kore = clear male
+
+  // Try Gemini TTS first
+  const success = await speakWithGemini(text, voiceName);
+
+  // Fall back to browser TTS if Gemini fails
+  if (!success) {
+    console.log('Falling back to browser TTS');
+    await speakWithBrowser(text, preferFemale);
+  }
 }
 
 async function speakFullScript() {
@@ -5447,8 +5504,12 @@ async function speakFullScript() {
   const btn = document.querySelector('.speak-btn-enhanced') as HTMLElement;
 
   // Stop if already playing
-  if (isPlayingTTS || synth.speaking) {
+  if (isPlayingTTS || synth.speaking || currentAudio) {
     synth.cancel();
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio = null;
+    }
     isPlayingTTS = false;
     if (btn) {
       btn.innerHTML = '<span style="font-size: 1.5rem;">🔊</span><span>Listen to Full Script</span>';
@@ -5505,8 +5566,12 @@ async function speakSection(btn: HTMLElement) {
     .trim();
 
   // Toggle off if already playing
-  if (synth.speaking) {
+  if (synth.speaking || currentAudio) {
     synth.cancel();
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio = null;
+    }
     btn.innerHTML = '🔊 Play';
     btn.style.background = btn.getAttribute('data-original-bg') || '#8b5cf6';
     return;
@@ -5518,7 +5583,7 @@ async function speakSection(btn: HTMLElement) {
   btn.style.background = '#ef4444';
 
   try {
-    await speakText(textToSpeak, false); // Use male voice
+    await speakText(textToSpeak, false); // Use Kore (male) voice
   } finally {
     btn.innerHTML = '🔊 Play';
     btn.style.background = originalBg;
