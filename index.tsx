@@ -6154,7 +6154,6 @@ function resetLivePitchPractice() {
 (window as any).advancePitchPractice = advancePitchPractice;
 (window as any).resetPitchPractice = resetPitchPractice;
 (window as any).startLivePitchPractice = startLivePitchPractice;
-(window as any).submitPitchResponse = submitPitchResponse;
 (window as any).skipPitchPhase = skipPitchPhase;
 (window as any).resetLivePitchPractice = resetLivePitchPractice;
 (window as any).toggleVoiceRecording = toggleVoiceRecording;
