@@ -417,7 +417,7 @@ const MODULE_REQUIREMENTS: Record<string, ModuleRequirements> = {
   'shingle-types-materials': { needsTime: 60, needsScroll: true },
   'initial-pitch': { needsTime: 60, needsScroll: true },
   'handling-initial-pitch-objections': { needsTime: 60, needsScroll: true },
-  'inspection-process': { needsTime: 60, needsScroll: true },
+  'inspection-process': { needsQuiz: true, needsScroll: true },
   'post-inspection-pitch': { needsTime: 60, needsScroll: true },
   'post-inspection-objections': { needsTime: 60, needsScroll: true },
   'damage-identification': { needsQuiz: true, needsScroll: true },
@@ -2313,57 +2313,309 @@ const trainingContent = {
     </div>
   `,
    'inspection-process': `
-    <div class="content-card">
-        <h1>The Inspection Process</h1>
-        ${renderVideoPlayer('/assets/training/videos/module7-inspection-process.mp4', 'inspection-process-video', '📹 Complete Inspection Process Walkthrough')}
+    <div class="content-card inspection-module-redesign">
+      <!-- Module Header with Gradient -->
+      <div class="module-header-gradient" style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%); color: white; padding: 30px; margin: -20px -20px 30px -20px; border-radius: 12px 12px 0 0;">
+        <h1 style="margin: 0; color: white;">🔍 The Inspection Process</h1>
+        <p style="margin: 10px 0 0 0; opacity: 0.9; font-size: 1.1rem;">Master the 10-step process that separates professionals from amateurs</p>
+      </div>
 
-        <h2>The 10-Step Inspection Process</h2>
-        <div class="inspection-steps">
-          <ol>
-            <li><strong>Safety First:</strong> Check ladder stability, wear harness if needed, assess roof walkability. Never compromise safety for speed.</li>
-            <li><strong>360° Walk:</strong> Walk entire perimeter, check all slopes and facets. Document the whole structure before focusing on damage.</li>
-            <li><strong>Shingle Inspection:</strong> Look for missing granules, cracks, lifting, bruising. Use chalk or test square to mark hail strikes.</li>
-            <li><strong>Flashing Check:</strong> Inspect all flashing around chimneys, vents, valleys. Flashing failures are common leak sources.</li>
-            <li><strong>Vent Inspection:</strong> Check boot seals, housing damage, proper installation. Damaged vents mean water intrusion.</li>
-            <li><strong>Ridge/Hip Inspection:</strong> Look for lifted caps, damage to ridge venting. Critical for structural integrity.</li>
-            <li><strong>Valley Inspection:</strong> Check for debris, damage, proper water flow. Valleys handle high water volume - must be intact.</li>
-            <li><strong>Gutter Check:</strong> Look for hail dents, granule accumulation. Granules in gutters prove recent shingle damage.</li>
-            <li><strong>Photo Documentation:</strong> Take 20-40 photos covering all findings. Photos are your evidence - be thorough.</li>
-            <li><strong>Ground Cleanup:</strong> Pick up debris, leave property better than found. Professionalism builds trust.</li>
-          </ol>
+      <!-- Video Section -->
+      ${renderVideoPlayer('/assets/training/videos/module7-inspection-process.mp4', 'inspection-process-video', '📹 Complete Inspection Process Walkthrough')}
+
+      <!-- Introduction Card -->
+      <div class="intro-highlight-card" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-left: 5px solid #3b82f6; padding: 24px; border-radius: 0 16px 16px 0; margin: 30px 0;">
+        <h2 style="margin: 0 0 12px 0; color: #1e40af;">🎯 Why a Systematic Process Matters</h2>
+        <p style="margin: 0; color: #334155; line-height: 1.7;">A thorough, consistent inspection process ensures you never miss damage, builds trust with homeowners, and creates bulletproof documentation for insurance claims. Follow these 10 steps every time - no shortcuts.</p>
+      </div>
+
+      <!-- SECTION 1: Interactive 10-Step Cards -->
+      <h2 style="margin-bottom: 20px;">📋 The 10-Step Inspection Process</h2>
+      <p style="color: #4a5568; margin-bottom: 24px;">Click any step to learn more. Each step builds on the previous one for a complete inspection.</p>
+
+      <div class="inspection-steps-grid" id="inspection-steps-grid">
+        <!-- Step 1 -->
+        <div class="inspection-step-card" data-step="1" onclick="toggleStepCard(this)">
+          <div class="step-card-header">
+            <span class="step-badge" style="background: #ef4444;">1</span>
+            <span class="step-icon">🦺</span>
+            <h3>Safety First</h3>
+            <span class="expand-icon">+</span>
+          </div>
+          <div class="step-card-content">
+            <p>Check ladder stability, wear harness if needed, assess roof walkability. Never compromise safety for speed.</p>
+            <div class="step-checklist">
+              <label><input type="checkbox" /> Ladder secured at 4:1 angle</label>
+              <label><input type="checkbox" /> Harness worn if roof pitch > 6/12</label>
+              <label><input type="checkbox" /> Roof walkability assessed</label>
+            </div>
+          </div>
         </div>
 
-        <h3>Ideal Photo Progression</h3>
-        <p>A thorough inspection tells a story. Follow this order to capture all necessary evidence for the insurance claim. This process should take 15-20 minutes.</p>
-        <ol>
-            <li><strong>Mailbox/House Number/Overview of House:</strong> Set the scene.</li>
-            <li><strong>Front Elevation Collateral:</strong> Damage to screens, gutters, downspouts, siding.</li>
-            <li><strong>Right Elevation Collateral:</strong> Same as above.</li>
-            <li><strong>Rear Elevation Collateral:</strong> Same as above.</li>
-            <li><strong>Left Elevation Collateral:</strong> Same as above.</li>
-            <li><strong>Roof Overview Collateral:</strong> Damage to roof metals and other items on the roof.</li>
-            <li><strong>Circle Hail Hits & Slash Wind Damage:</strong> Close-up photos of each instance of damage.</li>
-            <li><strong>Overview of Majority of Damage:</strong> Photos showing the chalked-up damage areas.</li>
-            <li><strong>Granules in Gutters:</strong> Pictures of granules in gutters or at the bottom of downspouts.</li>
-        </ol>
+        <!-- Step 2 -->
+        <div class="inspection-step-card" data-step="2" onclick="toggleStepCard(this)">
+          <div class="step-card-header">
+            <span class="step-badge" style="background: #f97316;">2</span>
+            <span class="step-icon">🔄</span>
+            <h3>360° Walk</h3>
+            <span class="expand-icon">+</span>
+          </div>
+          <div class="step-card-content">
+            <p>Walk entire perimeter, check all slopes and facets. Document the whole structure before focusing on damage.</p>
+            <div class="step-pro-tip">
+              <strong>Pro Tip:</strong> Start at the front door and walk clockwise for consistency.
+            </div>
+          </div>
+        </div>
 
-        <h2>Photo Documentation Strategy</h2>
-        <p><strong>Take photos of:</strong></p>
-        <ul>
+        <!-- Step 3 -->
+        <div class="inspection-step-card" data-step="3" onclick="toggleStepCard(this)">
+          <div class="step-card-header">
+            <span class="step-badge" style="background: #eab308;">3</span>
+            <span class="step-icon">🔍</span>
+            <h3>Shingle Inspection</h3>
+            <span class="expand-icon">+</span>
+          </div>
+          <div class="step-card-content">
+            <p>Look for missing granules, cracks, lifting, bruising. Use chalk or test square to mark hail strikes.</p>
+            <div class="step-checklist">
+              <label><input type="checkbox" /> Check for granule loss</label>
+              <label><input type="checkbox" /> Look for cracks/lifting</label>
+              <label><input type="checkbox" /> Mark hail strikes with chalk</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="inspection-step-card" data-step="4" onclick="toggleStepCard(this)">
+          <div class="step-card-header">
+            <span class="step-badge" style="background: #84cc16;">4</span>
+            <span class="step-icon">⚡</span>
+            <h3>Flashing Check</h3>
+            <span class="expand-icon">+</span>
+          </div>
+          <div class="step-card-content">
+            <p>Inspect all flashing around chimneys, vents, valleys. Flashing failures are common leak sources.</p>
+            <div class="step-alert">
+              <strong>Critical:</strong> Flashing failures cause 90% of roof leaks!
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="inspection-step-card" data-step="5" onclick="toggleStepCard(this)">
+          <div class="step-card-header">
+            <span class="step-badge" style="background: #22c55e;">5</span>
+            <span class="step-icon">🌀</span>
+            <h3>Vent Inspection</h3>
+            <span class="expand-icon">+</span>
+          </div>
+          <div class="step-card-content">
+            <p>Check boot seals, housing damage, proper installation. Damaged vents mean water intrusion.</p>
+            <div class="step-checklist">
+              <label><input type="checkbox" /> Boot seals intact</label>
+              <label><input type="checkbox" /> No housing cracks</label>
+              <label><input type="checkbox" /> Proper flashing around base</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 6 -->
+        <div class="inspection-step-card" data-step="6" onclick="toggleStepCard(this)">
+          <div class="step-card-header">
+            <span class="step-badge" style="background: #14b8a6;">6</span>
+            <span class="step-icon">🏔️</span>
+            <h3>Ridge/Hip Inspection</h3>
+            <span class="expand-icon">+</span>
+          </div>
+          <div class="step-card-content">
+            <p>Look for lifted caps, damage to ridge venting. Critical for structural integrity.</p>
+            <div class="step-pro-tip">
+              <strong>Pro Tip:</strong> Ridge caps are often the first to show wind damage.
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 7 -->
+        <div class="inspection-step-card" data-step="7" onclick="toggleStepCard(this)">
+          <div class="step-card-header">
+            <span class="step-badge" style="background: #06b6d4;">7</span>
+            <span class="step-icon">🌊</span>
+            <h3>Valley Inspection</h3>
+            <span class="expand-icon">+</span>
+          </div>
+          <div class="step-card-content">
+            <p>Check for debris, damage, proper water flow. Valleys handle high water volume - must be intact.</p>
+            <div class="step-alert">
+              <strong>Critical:</strong> Valleys see 10x the water flow of flat sections!
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 8 -->
+        <div class="inspection-step-card" data-step="8" onclick="toggleStepCard(this)">
+          <div class="step-card-header">
+            <span class="step-badge" style="background: #3b82f6;">8</span>
+            <span class="step-icon">🪣</span>
+            <h3>Gutter Check</h3>
+            <span class="expand-icon">+</span>
+          </div>
+          <div class="step-card-content">
+            <p>Look for hail dents, granule accumulation. Granules in gutters prove recent shingle damage.</p>
+            <div class="step-pro-tip">
+              <strong>Pro Tip:</strong> Take close-up photos of granules - powerful insurance evidence.
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 9 -->
+        <div class="inspection-step-card" data-step="9" onclick="toggleStepCard(this)">
+          <div class="step-card-header">
+            <span class="step-badge" style="background: #8b5cf6;">9</span>
+            <span class="step-icon">📸</span>
+            <h3>Photo Documentation</h3>
+            <span class="expand-icon">+</span>
+          </div>
+          <div class="step-card-content">
+            <p>Take 20-40 photos covering all findings. Photos are your evidence - be thorough.</p>
+            <div class="step-checklist">
+              <label><input type="checkbox" /> 4 corner overview shots</label>
+              <label><input type="checkbox" /> Close-up of each damage area</label>
+              <label><input type="checkbox" /> Context shots showing location</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 10 -->
+        <div class="inspection-step-card" data-step="10" onclick="toggleStepCard(this)">
+          <div class="step-card-header">
+            <span class="step-badge" style="background: #ec4899;">10</span>
+            <span class="step-icon">🧹</span>
+            <h3>Ground Cleanup</h3>
+            <span class="expand-icon">+</span>
+          </div>
+          <div class="step-card-content">
+            <p>Pick up debris, leave property better than found. Professionalism builds trust.</p>
+            <div class="step-pro-tip">
+              <strong>Pro Tip:</strong> This simple step separates you from 90% of competitors.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2: Photo Documentation Strategy Cards -->
+      <h2 style="margin: 40px 0 20px 0;">📷 Photo Documentation Strategy</h2>
+      <p style="color: #4a5568; margin-bottom: 24px;">A thorough inspection tells a story. Follow this order to capture all necessary evidence. This process should take 15-20 minutes.</p>
+
+      <div class="photo-strategy-grid with-images">
+        <div class="photo-strategy-card has-image" onclick="openPhotoModal('/assets/photo-strategy/step1-overview.jpg', 'Step 1: Overview Shots', 'Mailbox, house number, full front view - set the scene for the entire inspection.')">
+          <div class="photo-card-number">1</div>
+          <img src="/assets/photo-strategy/step1-overview.jpg" alt="Overview shot example" class="strategy-photo" />
+          <h4>Overview Shots</h4>
+          <p>Mailbox, house number, full front view - set the scene.</p>
+        </div>
+        <div class="photo-strategy-card has-image" onclick="openPhotoModal('/assets/photo-strategy/step2-front-elevation.jpg', 'Step 2: Front Elevation', 'Document screens, gutters, downspouts, and any siding damage from the front.')">
+          <div class="photo-card-number">2</div>
+          <img src="/assets/photo-strategy/step2-front-elevation.jpg" alt="Front elevation example" class="strategy-photo" />
+          <h4>Front Elevation</h4>
+          <p>Screens, gutters, downspouts, siding damage.</p>
+        </div>
+        <div class="photo-strategy-card has-image" onclick="openPhotoModal('/assets/photo-strategy/step3-right-elevation.jpg', 'Step 3: Right Elevation', 'Same collateral damage check from the right side - be thorough.')">
+          <div class="photo-card-number">3</div>
+          <img src="/assets/photo-strategy/step3-right-elevation.jpg" alt="Right elevation example" class="strategy-photo" />
+          <h4>Right Elevation</h4>
+          <p>Same collateral damage check - be thorough.</p>
+        </div>
+        <div class="photo-strategy-card has-image" onclick="openPhotoModal('/assets/photo-strategy/step4-rear-elevation.jpg', 'Step 4: Rear Elevation', 'The rear often has the most damage - never skip this step!')">
+          <div class="photo-card-number">4</div>
+          <img src="/assets/photo-strategy/step4-rear-elevation.jpg" alt="Rear elevation example" class="strategy-photo" />
+          <h4>Rear Elevation</h4>
+          <p>Often has the most damage - don't skip.</p>
+        </div>
+        <div class="photo-strategy-card has-image" onclick="openPhotoModal('/assets/photo-strategy/step5-left-elevation.jpg', 'Step 5: Left Elevation', 'Complete the perimeter documentation from all sides.')">
+          <div class="photo-card-number">5</div>
+          <img src="/assets/photo-strategy/step5-left-elevation.jpg" alt="Left elevation example" class="strategy-photo" />
+          <h4>Left Elevation</h4>
+          <p>Complete the perimeter documentation.</p>
+        </div>
+        <div class="photo-strategy-card has-image" onclick="openPhotoModal('/assets/photo-strategy/step6-roof-overview.jpg', 'Step 6: Roof Overview', 'Document damage to roof metals, vents, and components from above.')">
+          <div class="photo-card-number">6</div>
+          <img src="/assets/photo-strategy/step6-roof-overview.jpg" alt="Roof overview example" class="strategy-photo" />
+          <h4>Roof Overview</h4>
+          <p>Damage to roof metals and components.</p>
+        </div>
+        <div class="photo-strategy-card has-image" onclick="openPhotoModal('/assets/photo-strategy/step7-mark-damage.jpg', 'Step 7: Mark Damage', 'Circle hail hits with chalk, slash marks for wind damage - get close-ups!')">
+          <div class="photo-card-number">7</div>
+          <img src="/assets/photo-strategy/step7-mark-damage.jpg" alt="Mark damage example" class="strategy-photo" />
+          <h4>Mark Damage</h4>
+          <p>Circle hail hits, slash wind damage - close-ups.</p>
+        </div>
+        <div class="photo-strategy-card has-image" onclick="openPhotoModal('/assets/photo-strategy/step8-damage-overview.jpg', 'Step 8: Damage Overview', 'Wide shots showing chalked-up damage areas with test square markings.')">
+          <div class="photo-card-number">8</div>
+          <img src="/assets/photo-strategy/step8-damage-overview.jpg" alt="Damage overview example" class="strategy-photo" />
+          <h4>Damage Overview</h4>
+          <p>Wide shots showing chalked-up damage areas.</p>
+        </div>
+        <div class="photo-strategy-card has-image" onclick="openPhotoModal('/assets/photo-strategy/step9-gutters.jpg', 'Step 9: Granules in Gutters', 'Critical evidence of shingle deterioration - check gutters and downspouts.')">
+          <div class="photo-card-number">9</div>
+          <img src="/assets/photo-strategy/step9-gutters.jpg" alt="Gutters example" class="strategy-photo" />
+          <h4>Granules in Gutters</h4>
+          <p>Critical evidence of shingle deterioration.</p>
+        </div>
+      </div>
+
+      <!-- Key Photo Tips -->
+      <div class="photo-tips-box" style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 12px; padding: 24px; margin: 30px 0;">
+        <h3 style="margin: 0 0 16px 0; color: #92400e;">📸 Key Photo Tips</h3>
+        <ul style="margin: 0; padding-left: 24px; color: #78350f;">
           <li><strong>Overall roof:</strong> 4 corners showing full house context</li>
-          <li><strong>Each area of damage:</strong> Close-up + context shot (show location on roof)</li>
-          <li><strong>Gutters showing granule loss:</strong> Evidence of recent shingle deterioration</li>
-          <li><strong>Any matching damage:</strong> Fence, AC unit, siding - for collateral builds a convincing case</li>
-          <li><strong>Flashlight:</strong> Use a flashlight to illuminate damage if needed (will review in person)</li>
+          <li><strong>Each damage area:</strong> Close-up + context shot (show location)</li>
+          <li><strong>Gutters:</strong> Evidence of recent granule loss</li>
+          <li><strong>Matching damage:</strong> Fence, AC unit, siding - builds convincing case</li>
+          <li><strong>Flashlight:</strong> Use to illuminate damage in shadows</li>
         </ul>
+        <p style="margin: 16px 0 0 0; font-weight: 600; color: #92400e;">💡 Key takeaway: Getting enough clear photos to convince the homeowner is the most important part. Without their belief, you can't file a claim.</p>
+      </div>
 
-        <p><strong>Key takeaway:</strong> Getting enough clear photos to convince the homeowner is the most important part. Without their belief, you can't file a claim.</p>
+      <!-- SECTION 3: Inspection Ordering Game -->
+      <h2 style="margin: 40px 0 20px 0;">🎮 Test Your Knowledge: Step Ordering Game</h2>
+      <p class="game-instructions">Drag and drop the inspection steps into the correct order from start to finish. Get them all right to unlock module completion!</p>
 
-        <div class="module-completion-section" id="module-complete-section" style="display: none;">
-          <button class="complete-module-btn" onclick="completeModule('inspection-process')">
-            Complete Module & Continue
-          </button>
+      <div id="inspection-order-game" class="game-board">
+        <div class="game-column">
+          <h4>🔀 Steps (Drag from here)</h4>
+          <div id="inspection-items-pool">
+            <div class="inspection-drag-item" draggable="true" data-order="5">🌀 Vent Inspection</div>
+            <div class="inspection-drag-item" draggable="true" data-order="2">🔄 360° Walk</div>
+            <div class="inspection-drag-item" draggable="true" data-order="8">🪣 Gutter Check</div>
+            <div class="inspection-drag-item" draggable="true" data-order="1">🦺 Safety First</div>
+            <div class="inspection-drag-item" draggable="true" data-order="10">🧹 Ground Cleanup</div>
+            <div class="inspection-drag-item" draggable="true" data-order="3">🔍 Shingle Inspection</div>
+            <div class="inspection-drag-item" draggable="true" data-order="7">🌊 Valley Inspection</div>
+            <div class="inspection-drag-item" draggable="true" data-order="4">⚡ Flashing Check</div>
+            <div class="inspection-drag-item" draggable="true" data-order="9">📸 Photo Documentation</div>
+            <div class="inspection-drag-item" draggable="true" data-order="6">🏔️ Ridge/Hip Inspection</div>
+          </div>
         </div>
+        <div class="game-column">
+          <h4>✅ Correct Order (Drop here)</h4>
+          <div id="inspection-sorted-list"></div>
+        </div>
+      </div>
+      <div id="inspection-order-feedback" style="display: none;"></div>
+      <button id="reset-inspection-game" class="reset-game-btn" onclick="resetInspectionGame()" style="display: none; margin-top: 16px;">🔄 Reset & Try Again</button>
+
+      <!-- Completion Section -->
+      <div class="module-completion-section" id="module-complete-section" style="display: none;">
+        <div class="completion-celebration" style="text-align: center; padding: 30px; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); border-radius: 16px; margin-top: 30px;">
+          <span style="font-size: 3rem;">🎉</span>
+          <h3 style="color: #166534; margin: 16px 0;">Excellent Work!</h3>
+          <p style="color: #15803d;">You've mastered the 10-step inspection process. Now you're ready to conduct professional roof inspections!</p>
+        </div>
+        <button class="complete-module-btn" onclick="completeModule('inspection-process')">
+          Complete Module & Continue →
+        </button>
+      </div>
     </div>
   `,
   'post-inspection-pitch': `
@@ -4499,29 +4751,33 @@ trainingContent['general-knowledge'] = `
 
     <hr>
 
-    <h2>Sample Photo Reports</h2>
-    <p class="section-intro">Review these real inspection reports to understand proper documentation techniques:</p>
+    <h2>📥 Download Full Sample Reports</h2>
+    <p class="section-intro">Download these complete inspection reports as PDFs to study the full documentation process:</p>
 
     <div class="photo-reports-grid">
-      <a href="/resources/Sample Photo Report 1.pdf" target="_blank" class="report-card">
+      <a href="/resources/Sample Photo Report 1.pdf" download class="report-card">
         <span class="report-icon">📋</span>
         <span class="report-title">Sample Report 1</span>
         <span class="report-desc">Hail damage documentation</span>
+        <span class="view-hint">Download PDF</span>
       </a>
-      <a href="/resources/Sample Photo Report 2.pdf" target="_blank" class="report-card">
+      <a href="/resources/Sample Photo Report 2.pdf" download class="report-card">
         <span class="report-icon">📋</span>
         <span class="report-title">Sample Report 2</span>
         <span class="report-desc">Wind damage example</span>
+        <span class="view-hint">Download PDF</span>
       </a>
-      <a href="/resources/Sample Photo Report 3.pdf" target="_blank" class="report-card">
+      <a href="/resources/Sample Photo Report 3.pdf" download class="report-card">
         <span class="report-icon">📋</span>
         <span class="report-title">Sample Report 3</span>
         <span class="report-desc">Mixed damage types</span>
+        <span class="view-hint">Download PDF</span>
       </a>
-      <a href="/resources/Sample Photo Report 4.pdf" target="_blank" class="report-card">
+      <a href="/resources/Sample Photo Report 4.pdf" download class="report-card">
         <span class="report-icon">📋</span>
         <span class="report-title">Sample Report 4</span>
         <span class="report-desc">Comprehensive inspection</span>
+        <span class="view-hint">Download PDF</span>
       </a>
     </div>
 
@@ -6431,6 +6687,214 @@ function initSalesCycleSorter() {
         feedbackEl.style.display = 'block';
     }
 }
+
+// --- Module 7: Inspection Step Card Toggle ---
+function toggleStepCard(cardElement: HTMLElement) {
+  const wasExpanded = cardElement.classList.contains('expanded');
+
+  // Close all other cards
+  document.querySelectorAll('.inspection-step-card.expanded').forEach(card => {
+    card.classList.remove('expanded');
+  });
+
+  // Toggle clicked card
+  if (!wasExpanded) {
+    cardElement.classList.add('expanded');
+  }
+}
+
+// Expose globally
+(window as any).toggleStepCard = toggleStepCard;
+
+// --- Module 7: Inspection Process Ordering Game ---
+function initInspectionOrderGame() {
+  const pool = document.getElementById('inspection-items-pool');
+  const dropZone = document.getElementById('inspection-sorted-list');
+  const feedbackEl = document.getElementById('inspection-order-feedback');
+  const resetBtn = document.getElementById('reset-inspection-game');
+
+  if (!pool || !dropZone || !feedbackEl) return;
+
+  let draggedItem: HTMLElement | null = null;
+  const correctOrder = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+
+  // Shuffle items on init for randomness
+  shufflePoolItems();
+
+  function shufflePoolItems() {
+    const items = Array.from(pool!.querySelectorAll('.inspection-drag-item'));
+    items.sort(() => Math.random() - 0.5);
+    items.forEach(item => pool!.appendChild(item));
+  }
+
+  pool.addEventListener('dragstart', (e) => {
+    draggedItem = e.target as HTMLElement;
+    setTimeout(() => {
+      if (draggedItem) draggedItem.style.opacity = '0.5';
+    }, 0);
+  });
+
+  pool.addEventListener('dragend', () => {
+    setTimeout(() => {
+      if (draggedItem) {
+        draggedItem.style.opacity = '1';
+        draggedItem = null;
+      }
+    }, 0);
+  });
+
+  // Also allow dragging from sorted list back to pool
+  dropZone.addEventListener('dragstart', (e) => {
+    draggedItem = e.target as HTMLElement;
+    setTimeout(() => {
+      if (draggedItem) draggedItem.style.opacity = '0.5';
+    }, 0);
+  });
+
+  dropZone.addEventListener('dragend', () => {
+    setTimeout(() => {
+      if (draggedItem) {
+        draggedItem.style.opacity = '1';
+        draggedItem = null;
+      }
+    }, 0);
+  });
+
+  // Drop zone handlers
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('drag-over');
+  });
+
+  dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('drag-over');
+  });
+
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    if (draggedItem) {
+      dropZone.appendChild(draggedItem);
+      checkOrder();
+    }
+  });
+
+  // Allow dropping back to pool
+  pool.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    pool.classList.add('drag-over');
+  });
+
+  pool.addEventListener('dragleave', () => {
+    pool.classList.remove('drag-over');
+  });
+
+  pool.addEventListener('drop', (e) => {
+    e.preventDefault();
+    pool.classList.remove('drag-over');
+    if (draggedItem && !pool.contains(draggedItem)) {
+      pool.appendChild(draggedItem);
+      feedbackEl.style.display = 'none';
+    }
+  });
+
+  function checkOrder() {
+    const items = dropZone!.querySelectorAll('.inspection-drag-item');
+    if (items.length !== correctOrder.length) {
+      feedbackEl!.textContent = `${items.length}/10 steps placed. Keep going!`;
+      feedbackEl!.className = '';
+      feedbackEl!.style.display = 'block';
+      feedbackEl!.style.background = '#fef3c7';
+      feedbackEl!.style.color = '#92400e';
+      feedbackEl!.style.padding = '16px 20px';
+      feedbackEl!.style.borderRadius = '12px';
+      feedbackEl!.style.fontWeight = '500';
+      feedbackEl!.style.textAlign = 'center';
+      feedbackEl!.style.marginTop = '16px';
+      return;
+    }
+
+    const currentOrder = Array.from(items).map(item => (item as HTMLElement).dataset.order);
+
+    if (JSON.stringify(currentOrder) === JSON.stringify(correctOrder)) {
+      // Success!
+      feedbackEl!.innerHTML = '🎉 <strong>Perfect!</strong> You\'ve mastered the inspection process order!';
+      feedbackEl!.className = 'correct';
+      feedbackEl!.style.display = 'block';
+      feedbackEl!.style.background = 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)';
+      feedbackEl!.style.border = '2px solid #22c55e';
+      feedbackEl!.style.color = '#166534';
+
+      // Mark all items as correct
+      items.forEach(item => {
+        (item as HTMLElement).classList.remove('incorrect');
+        (item as HTMLElement).style.background = 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)';
+      });
+
+      // Trigger confetti
+      triggerConfetti('module');
+
+      // Mark quiz as passed
+      markQuizPassed('inspection-process');
+
+      // Hide reset button on success
+      if (resetBtn) resetBtn.style.display = 'none';
+
+    } else {
+      // Show which are wrong
+      items.forEach((item, index) => {
+        const itemEl = item as HTMLElement;
+        if (itemEl.dataset.order === correctOrder[index]) {
+          itemEl.classList.remove('incorrect');
+          itemEl.style.background = 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)';
+        } else {
+          itemEl.classList.add('incorrect');
+          itemEl.style.background = 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)';
+        }
+      });
+
+      feedbackEl!.textContent = 'Not quite right. Items highlighted in red are in the wrong position. Try again!';
+      feedbackEl!.className = 'incorrect';
+      feedbackEl!.style.display = 'block';
+      feedbackEl!.style.background = 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)';
+      feedbackEl!.style.border = '2px solid #ef4444';
+      feedbackEl!.style.color = '#991b1b';
+
+      // Show reset button
+      if (resetBtn) resetBtn.style.display = 'inline-block';
+    }
+  }
+}
+
+// Reset game function
+function resetInspectionGame() {
+  const pool = document.getElementById('inspection-items-pool');
+  const dropZone = document.getElementById('inspection-sorted-list');
+  const feedbackEl = document.getElementById('inspection-order-feedback');
+  const resetBtn = document.getElementById('reset-inspection-game');
+
+  if (!pool || !dropZone) return;
+
+  // Move all items back to pool
+  const items = dropZone.querySelectorAll('.inspection-drag-item');
+  items.forEach(item => {
+    (item as HTMLElement).classList.remove('incorrect');
+    (item as HTMLElement).style.background = '';
+    pool.appendChild(item);
+  });
+
+  // Shuffle
+  const poolItems = Array.from(pool.querySelectorAll('.inspection-drag-item'));
+  poolItems.sort(() => Math.random() - 0.5);
+  poolItems.forEach(item => pool.appendChild(item));
+
+  // Hide feedback and reset button
+  if (feedbackEl) feedbackEl.style.display = 'none';
+  if (resetBtn) resetBtn.style.display = 'none';
+}
+
+// Expose globally
+(window as any).resetInspectionGame = resetInspectionGame;
 
 // Objection Challenge Game Data & State
 const objectionChallengeQuestions = [
@@ -9680,6 +10144,9 @@ function renderModule(moduleName: string) {
       case 'sales-cycle-job-flow':
           initSalesCycleSorter();
           break;
+      case 'inspection-process':
+          initInspectionOrderGame();
+          break;
       case 'commitment':
           initCommitmentGate();
           break;
@@ -10112,6 +10579,78 @@ function navigateToModule(moduleName: string) {
 // Make functions accessible from onclick handlers in HTML templates
 (window as any).navigateToModule = navigateToModule;
 (window as any).completeModule = completeModule;
+
+// ============================================================================
+// PHOTO MODAL - Simple lightbox for strategy photos
+// ============================================================================
+
+function ensurePhotoModal() {
+  if (document.getElementById('photo-modal')) return;
+
+  const modal = document.createElement('div');
+  modal.id = 'photo-modal';
+  modal.className = 'photo-modal-overlay';
+  modal.innerHTML = `
+    <div class="photo-modal">
+      <div class="photo-modal-header">
+        <h3 id="photo-modal-title">Photo</h3>
+        <button class="photo-modal-close" onclick="closePhotoModal()">×</button>
+      </div>
+      <div class="photo-modal-body">
+        <img id="photo-modal-image" src="" alt="Strategy photo" />
+      </div>
+      <div class="photo-modal-footer">
+        <p id="photo-modal-desc"></p>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  // Close on overlay click
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closePhotoModal();
+  });
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    const modalEl = document.getElementById('photo-modal');
+    if (!modalEl?.classList.contains('show')) return;
+    if (e.key === 'Escape') closePhotoModal();
+  });
+}
+
+function openPhotoModal(imageSrc: string, title: string, description: string) {
+  ensurePhotoModal();
+
+  const modal = document.getElementById('photo-modal');
+  const titleEl = document.getElementById('photo-modal-title');
+  const imageEl = document.getElementById('photo-modal-image') as HTMLImageElement;
+  const descEl = document.getElementById('photo-modal-desc');
+
+  if (!modal || !titleEl || !imageEl || !descEl) return;
+
+  modal.classList.add('show');
+  titleEl.textContent = title;
+  imageEl.src = imageSrc;
+  descEl.textContent = description;
+  document.body.style.overflow = 'hidden';
+}
+
+function closePhotoModal() {
+  const modal = document.getElementById('photo-modal');
+  if (modal) {
+    modal.classList.remove('show');
+    document.body.style.overflow = '';
+  }
+}
+
+// Make photo modal functions globally accessible
+(window as any).openPhotoModal = openPhotoModal;
+(window as any).closePhotoModal = closePhotoModal;
+
+// ============================================================================
+// END PHOTO MODAL
+// ============================================================================
 
 // Track module start
 function trackModuleStart(moduleName: string) {
