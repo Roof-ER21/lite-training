@@ -5392,78 +5392,49 @@ const pitchPracticeSteps = [
 
 let currentPitchStep = 0;
 
-// Gemini TTS - High Quality Voice
+// TTS - Using Browser Speech Synthesis with best available voices
 let currentAudio: HTMLAudioElement | null = null;
 let isPlayingTTS = false;
 
-async function speakWithGemini(text: string): Promise<void> {
-  if (typeof ai === 'undefined' || !ai) {
-    console.log('Gemini AI not available, falling back to browser TTS');
-    speakWithBrowserTTS(text);
-    return;
-  }
+function getPreferredVoice(preferFemale: boolean = false): SpeechSynthesisVoice | null {
+  const voices = synth.getVoices();
+  if (voices.length === 0) return null;
 
-  try {
-    // Use Gemini's TTS model for high-quality voice
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-preview-tts',
-      contents: text,
-      config: {
-        responseModalities: ['AUDIO'],
-        speechConfig: {
-          voiceConfig: {
-            prebuiltVoiceConfig: {
-              voiceName: 'Kore' // Clear male voice
-            }
-          }
-        }
-      }
-    });
-
-    // Get audio data from response
-    if (response.candidates && response.candidates[0]?.content?.parts) {
-      for (const part of response.candidates[0].content.parts) {
-        if (part.inlineData && part.inlineData.mimeType?.startsWith('audio/')) {
-          const audioData = part.inlineData.data;
-          const audioBlob = new Blob(
-            [Uint8Array.from(atob(audioData), c => c.charCodeAt(0))],
-            { type: part.inlineData.mimeType }
-          );
-          const audioUrl = URL.createObjectURL(audioBlob);
-
-          if (currentAudio) {
-            currentAudio.pause();
-            URL.revokeObjectURL(currentAudio.src);
-          }
-
-          currentAudio = new Audio(audioUrl);
-          currentAudio.play();
-          return;
-        }
-      }
-    }
-
-    // Fallback if no audio in response
-    console.log('No audio in Gemini response, falling back to browser TTS');
-    speakWithBrowserTTS(text);
-  } catch (error) {
-    console.error('Gemini TTS error:', error);
-    speakWithBrowserTTS(text);
+  if (preferFemale) {
+    // Female voices for Agnes
+    return voices.find(v => v.name.includes('Samantha')) ||
+           voices.find(v => v.name.includes('Karen')) ||
+           voices.find(v => v.name.includes('Victoria')) ||
+           voices.find(v => v.name.includes('Google UK English Female')) ||
+           voices.find(v => v.name.toLowerCase().includes('female')) ||
+           voices[0];
+  } else {
+    // Male voices for script reading
+    return voices.find(v => v.name.includes('Daniel')) ||
+           voices.find(v => v.name.includes('Alex')) ||
+           voices.find(v => v.name.includes('Google US English')) ||
+           voices.find(v => v.name.toLowerCase().includes('male')) ||
+           voices[0];
   }
 }
 
-function speakWithBrowserTTS(text: string) {
-  if (synth.speaking) {
-    synth.cancel();
-    return;
-  }
-  const utterance = new SpeechSynthesisUtterance(text);
-  const voices = synth.getVoices();
-  const voice = voices.find(v => v.name.includes('Samantha') || v.name.includes('Google US English')) || voices[0];
-  if (voice) utterance.voice = voice;
-  utterance.rate = 0.95;
-  utterance.pitch = 1.0;
-  synth.speak(utterance);
+function speakText(text: string, preferFemale: boolean = false): Promise<void> {
+  return new Promise((resolve) => {
+    if (synth.speaking) {
+      synth.cancel();
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    const voice = getPreferredVoice(preferFemale);
+    if (voice) utterance.voice = voice;
+    utterance.rate = 0.95;
+    utterance.pitch = preferFemale ? 1.1 : 0.95;
+
+    utterance.onend = () => resolve();
+    utterance.onerror = () => resolve();
+
+    synth.speak(utterance);
+  });
 }
 
 async function speakFullScript() {
@@ -5476,11 +5447,7 @@ async function speakFullScript() {
   const btn = document.querySelector('.speak-btn-enhanced') as HTMLElement;
 
   // Stop if already playing
-  if (isPlayingTTS) {
-    if (currentAudio) {
-      currentAudio.pause();
-      currentAudio = null;
-    }
+  if (isPlayingTTS || synth.speaking) {
     synth.cancel();
     isPlayingTTS = false;
     if (btn) {
@@ -5506,32 +5473,15 @@ async function speakFullScript() {
   });
 
   if (btn) {
-    btn.innerHTML = '<span style="font-size: 1.5rem;">⏳</span><span>Generating Audio...</span>';
-    btn.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
+    btn.innerHTML = '<span style="font-size: 1.5rem;">⏸️</span><span>Stop Playback</span>';
+    btn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
   }
 
   isPlayingTTS = true;
 
   try {
-    await speakWithGemini(fullText);
-
-    if (btn) {
-      btn.innerHTML = '<span style="font-size: 1.5rem;">⏸️</span><span>Stop Playback</span>';
-      btn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
-    }
-
-    // Handle audio end
-    if (currentAudio) {
-      currentAudio.onended = () => {
-        isPlayingTTS = false;
-        if (btn) {
-          btn.innerHTML = '<span style="font-size: 1.5rem;">🔊</span><span>Listen to Full Script</span>';
-          btn.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
-        }
-      };
-    }
-  } catch (error) {
-    console.error('TTS error:', error);
+    await speakText(fullText, false); // Use male voice for script
+  } finally {
     isPlayingTTS = false;
     if (btn) {
       btn.innerHTML = '<span style="font-size: 1.5rem;">🔊</span><span>Listen to Full Script</span>';
@@ -5555,11 +5505,7 @@ async function speakSection(btn: HTMLElement) {
     .trim();
 
   // Toggle off if already playing
-  if (currentAudio || synth.speaking) {
-    if (currentAudio) {
-      currentAudio.pause();
-      currentAudio = null;
-    }
+  if (synth.speaking) {
     synth.cancel();
     btn.innerHTML = '🔊 Play';
     btn.style.background = btn.getAttribute('data-original-bg') || '#8b5cf6';
@@ -5568,21 +5514,12 @@ async function speakSection(btn: HTMLElement) {
 
   const originalBg = btn.style.background;
   btn.setAttribute('data-original-bg', originalBg);
-  btn.innerHTML = '⏳ Loading...';
-  btn.style.background = '#f59e0b';
+  btn.innerHTML = '⏸️ Stop';
+  btn.style.background = '#ef4444';
 
   try {
-    await speakWithGemini(textToSpeak);
-    btn.innerHTML = '⏸️ Stop';
-    btn.style.background = '#ef4444';
-
-    if (currentAudio) {
-      currentAudio.onended = () => {
-        btn.innerHTML = '🔊 Play';
-        btn.style.background = originalBg;
-      };
-    }
-  } catch (error) {
+    await speakText(textToSpeak, false); // Use male voice
+  } finally {
     btn.innerHTML = '🔊 Play';
     btn.style.background = originalBg;
   }
@@ -5750,74 +5687,11 @@ function initSpeechRecognition() {
 // Speak Agnes's lines using Gemini TTS
 async function speakAsAgnes(text: string): Promise<void> {
   isAgnesSpeaking = true;
-
-  if (typeof ai !== 'undefined' && ai) {
-    try {
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash-preview-tts',
-        contents: text,
-        config: {
-          responseModalities: ['AUDIO'],
-          speechConfig: {
-            voiceConfig: {
-              prebuiltVoiceConfig: {
-                voiceName: 'Aoede' // Warm female voice for Agnes
-              }
-            }
-          }
-        }
-      });
-
-      if (response.candidates && response.candidates[0]?.content?.parts) {
-        for (const part of response.candidates[0].content.parts) {
-          if (part.inlineData && part.inlineData.mimeType?.startsWith('audio/')) {
-            const audioData = part.inlineData.data;
-            const audioBlob = new Blob(
-              [Uint8Array.from(atob(audioData), c => c.charCodeAt(0))],
-              { type: part.inlineData.mimeType }
-            );
-            const audioUrl = URL.createObjectURL(audioBlob);
-
-            return new Promise((resolve) => {
-              const audio = new Audio(audioUrl);
-              audio.onended = () => {
-                isAgnesSpeaking = false;
-                URL.revokeObjectURL(audioUrl);
-                resolve();
-              };
-              audio.onerror = () => {
-                isAgnesSpeaking = false;
-                resolve();
-              };
-              audio.play().catch(() => {
-                isAgnesSpeaking = false;
-                resolve();
-              });
-            });
-          }
-        }
-      }
-    } catch (error) {
-      console.warn('Gemini TTS for Agnes failed:', error);
-    }
+  try {
+    await speakText(text, true); // Use female voice for Agnes
+  } finally {
+    isAgnesSpeaking = false;
   }
-
-  // Fallback to browser TTS with female voice
-  return new Promise((resolve) => {
-    const utterance = new SpeechSynthesisUtterance(text);
-    const voices = synth.getVoices();
-    const femaleVoice = voices.find(v =>
-      v.name.includes('Samantha') || v.name.includes('Karen') || v.name.includes('Victoria') || v.name.includes('Google UK English Female')
-    ) || voices[0];
-    if (femaleVoice) utterance.voice = femaleVoice;
-    utterance.rate = 0.95;
-    utterance.pitch = 1.1;
-    utterance.onend = () => {
-      isAgnesSpeaking = false;
-      resolve();
-    };
-    synth.speak(utterance);
-  });
 }
 
 function toggleVoiceRecording() {
@@ -6075,28 +5949,31 @@ ${pitchConversationHistory.map(m => `${m.sender === 'user' ? 'Sales Rep' : 'Agne
 
 Agnes's natural response:`;
 
-      const chat = await ai.chats.create({
+      const response = await ai.models.generateContent({
         model: 'gemini-2.0-flash-exp',
+        contents: prompt,
         config: { temperature: 0.8, maxOutputTokens: 100 }
       });
 
-      const response = await chat.sendMessage(prompt);
-      return response.text.trim();
+      return response.text?.trim() || getFallbackResponse(phase.phase);
     } catch (e) {
       console.warn('AI error, using fallback:', e);
     }
   }
 
-  // Fallback responses based on phase
-  const fallbacks = {
+  return getFallbackResponse(phase.phase);
+}
+
+function getFallbackResponse(phaseNum: number): string {
+  const fallbacks: Record<number, string[]> = {
     1: ["I see, so that damage on my gutters is from the same storm?", "That makes sense about building a case. What else did you find?", "Interesting approach. Show me what's on the roof itself."],
     2: ["Oh wow, I had no idea those little marks could cause so much damage.", "So the insurance will cover fixing this?", "That's concerning about the leaks. What should I do?"],
     3: ["A lot of my neighbors got approved? That's good to know.", "So this is pretty common in the area then?", "I'm glad you're here to help with the insurance company."],
     4: ["Sure, what information do you need?", "I think my deductible is around $1000. Is that normal?", "Okay, let's get this process started."]
   };
 
-  const phaseResponses = fallbacks[phase.phase as keyof typeof fallbacks] || fallbacks[1];
-  return phaseResponses[Math.floor(Math.random() * phaseResponses.length)];
+  const responses = fallbacks[phaseNum] || fallbacks[1];
+  return responses[Math.floor(Math.random() * responses.length)];
 }
 
 function skipPitchPhase() {
