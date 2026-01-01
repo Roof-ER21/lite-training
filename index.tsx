@@ -2367,46 +2367,164 @@ const trainingContent = {
     </div>
   `,
   'post-inspection-pitch': `
-    <div class="content-card">
-        <h1>Post-Inspection Pitch</h1>
-        ${renderVideoPlayer('/assets/training/videos/module5-post-inspection.mp4', 'post-inspection-video', '📹 Post-Inspection Pitch Strategy')}
-
-        <h2>Building the Evidence Story</h2>
-        <div class="evidence-story">
-          <h3>Step 1: Set Expectations</h3>
-          <p>"I found some damage up there. Let me show you the photos on my tablet and explain what this means for your insurance claim..."</p>
-
-          <h3>Step 2: Walk Through Photos</h3>
-          <p>"Here's your south-facing slope - see these dark spots? That's where the protective granules are gone. This shingle is 18 years old, and these hail strikes have exposed the asphalt underneath..."</p>
-
-          <h3>Step 3: Explain Consequences</h3>
-          <p>"Without these granules, UV rays deteriorate the shingle rapidly. You'll get leaks within 2-3 years. That's $10,000+ in interior damage - water damage, mold, ceiling replacement..."</p>
-
-          <h3>Step 4: Present Solution</h3>
-          <p>"The good news? Your insurance will cover this. We file the claim, they send an adjuster, we handle everything. Your only cost is the deductible, which is typically around $1,000-$2,000 for a $20,000+ roof replacement..."</p>
+    <div class="content-card post-inspection-redesign">
+        <div class="module-header-gradient" style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%); color: white; padding: 30px; margin: -20px -20px 30px -20px; border-radius: 12px 12px 0 0;">
+          <h1 style="margin: 0; color: white;">🎯 Post-Inspection Pitch</h1>
+          <p style="margin: 10px 0 0 0; opacity: 0.9; font-size: 1.1rem;">Master the art of presenting damage and closing the deal</p>
         </div>
 
-        <h3>Build the Story</h3>
-        <div class="script" data-text-source="true">
-            <button class="speak-btn" aria-label="Listen to script">🔊</button>
-            <p>"Hey ____, so I have a bunch of photos to show you. First I walked around the perimeter of the house to look for collateral damage... While this damage functionally isn't a big deal, it really helps build a story. Think of us like lawyers and this collateral damage is the evidence that builds the case which helps us get the roof approved."</p>
+        ${renderVideoPlayer('/assets/training/videos/module9-post-inspection.mp4', 'post-inspection-video', '📹 Mastering the Post-Inspection Pitch')}
+
+        <!-- Full Script Section with Enhanced TTS -->
+        <div class="full-script-section" style="margin: 30px 0;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="margin: 0;">📜 The Complete Post-Inspection Script</h2>
+            <button class="speak-btn-enhanced" onclick="speakFullScript()" style="display: flex; align-items: center; gap: 10px; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: white; border: none; padding: 12px 24px; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 1rem; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4); transition: all 0.3s;">
+              <span style="font-size: 1.5rem;">🔊</span>
+              <span>Listen to Full Script</span>
+            </button>
+          </div>
+
+          <!-- INTEGRITY Phase -->
+          <div class="script-phase" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-left: 5px solid #3b82f6; border-radius: 0 16px 16px 0; padding: 24px; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+              <span style="background: #3b82f6; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold;">PHASE 1</span>
+              <h3 style="margin: 0; color: #1e40af;">🤝 INTEGRITY - Opening</h3>
+            </div>
+            <div class="script-content" style="background: white; padding: 20px; border-radius: 12px; position: relative;">
+              <button class="speak-section-btn" onclick="speakSection(this)" style="position: absolute; top: 10px; right: 10px; background: #3b82f6; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">🔊 Play</button>
+              <p style="color: #334155; line-height: 1.8; margin: 0;" data-script-text="true">
+                <em>[Knock on the door]</em><br><br>
+                <strong>"Hey _______, so I have a bunch of photos to show you. First I walked around the perimeter..."</strong><br><br>
+                <em>[Show pictures of damage to screens, gutters, downspouts, soft metals]</em><br><br>
+                "While this damage functionally isn't a big deal, it really helps build a story. <strong>Think of us like lawyers</strong> and this collateral damage is the evidence that builds the case which helps us get the roof (and siding) approved."
+              </p>
+            </div>
+          </div>
+
+          <!-- QUALITY Phase -->
+          <div class="script-phase" style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 5px solid #eab308; border-radius: 0 16px 16px 0; padding: 24px; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+              <span style="background: #eab308; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold;">PHASE 2</span>
+              <h3 style="margin: 0; color: #a16207;">⭐ QUALITY - Damage Explanation</h3>
+            </div>
+            <div class="script-content" style="background: white; padding: 20px; border-radius: 12px; position: relative;">
+              <button class="speak-section-btn" onclick="speakSection(this)" style="position: absolute; top: 10px; right: 10px; background: #eab308; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">🔊 Play</button>
+              <p style="color: #334155; line-height: 1.8; margin: 0;" data-script-text="true">
+                "Here are the photos of the damage to your shingles. <strong>Anything I have circled means it's hail damage</strong> [IF wind damage: and anything I have slashed means it's wind damage]."<br><br>
+                <em>[Remain on a photo of hail damage]</em><br><br>
+                "This is exactly what we look for when we're looking for hail damage. If you notice, the divot is <strong>circular in nature</strong>. Even if this damage doesn't look like a big deal, what happens over time, these hail divots fill with water, freeze... when water freezes it <strong>expands and breaks apart the shingle</strong> which will eventually lead to leaks. That is why your insurance company is responsible and your policy covers this type of damage."<br><br>
+                <em>[Slowly swipe through all the pictures of hail]</em>
+              </p>
+            </div>
+          </div>
+
+          <!-- SIMPLICITY Phase -->
+          <div class="script-phase" style="background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); border-left: 5px solid #22c55e; border-radius: 0 16px 16px 0; padding: 24px; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+              <span style="background: #22c55e; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold;">PHASE 3</span>
+              <h3 style="margin: 0; color: #15803d;">✨ SIMPLICITY - Summary & Close</h3>
+            </div>
+            <div class="script-content" style="background: white; padding: 20px; border-radius: 12px; position: relative;">
+              <button class="speak-section-btn" onclick="speakSection(this)" style="position: absolute; top: 10px; right: 10px; background: #22c55e; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">🔊 Play</button>
+              <p style="color: #334155; line-height: 1.8; margin: 0;" data-script-text="true">
+                "As you can see there is quite a bit of damage."<br><br>
+                <em>[If wind damage: "Now here are the wind damaged shingles. You have both shingles that are creased from the wind lifting them up and shingles that have completely been blown off."]</em><br><br>
+                <em>[Show granules in gutters/downspouts]</em><br><br>
+                "As you can see here, <strong>granules have filled up your gutters</strong>. These granules are supposed to be what's protecting your home. When wind and hail hits your roof, it knocks out these granules which reduces the lifespan of your roof."<br><br>
+                "This is very similar to damage to ________'s home and/or the rest of the approvals we've gotten in the area."<br><br>
+                "With that being said, insurance companies are always looking for ways to mitigate their losses. It's unfortunate but that's how they make money. <strong>The most important part of this process is that when your insurance company comes out to run their inspection, we are here as storm experts</strong> to make sure you as a homeowner get a fair shake. If they are missing anything we make sure they see all the damage that I just showed you."<br><br>
+                "What I'm going to do now is run to my car, grab my iPad and we can get this process started..."
+              </p>
+            </div>
+          </div>
+
+          <!-- Info Gathering Phase -->
+          <div class="script-phase" style="background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); border-left: 5px solid #ec4899; border-radius: 0 16px 16px 0; padding: 24px; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+              <span style="background: #ec4899; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold;">PHASE 4</span>
+              <h3 style="margin: 0; color: #be185d;">📋 INTEGRITY - Information Gathering</h3>
+            </div>
+            <div class="script-content" style="background: white; padding: 20px; border-radius: 12px; position: relative;">
+              <button class="speak-section-btn" onclick="speakSection(this)" style="position: absolute; top: 10px; right: 10px; background: #ec4899; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">🔊 Play</button>
+              <p style="color: #334155; line-height: 1.8; margin: 0;" data-script-text="true">
+                <em>[Approach house]</em> "Is there a place we could sit down for 5-10 Minutes?"<br><br>
+                <em>[Build rapport as you get settled]</em><br><br>
+                "Okay, so first I am going to grab some of your basic information for our system."<br><br>
+                <strong>Gather:</strong> Full name, Address, Phone Number, E-mail, Insurance Company<br><br>
+                "Do you happen to know your deductible? If not, no big deal at all!"<br><br>
+                <em>[After collecting info: Set up claim filing with homeowner's phone]</em><br>
+                <strong>→ Move on to Contingency & Claim Authorization</strong>
+              </p>
+            </div>
+          </div>
         </div>
 
-        <h3>Explain the Critical Damage</h3>
-        <div class="script" data-text-source="true">
-            <button class="speak-btn" aria-label="Listen to script">🔊</button>
-            <p>"Here are the photos of the damage to your shingles. Anything I have circled means it's hail damage. This is exactly what we look for... Even if this damage doesn't look like a big deal, what happens over time, these hail divots fill with water, freeze, expand, and break apart the shingle which will eventually lead to leaks. That is why your insurance company is responsible and your policy covers this type of damage."</p>
+        <!-- Key Points Cards -->
+        <h2>💡 Critical Points to Remember</h2>
+        <div class="key-points-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin: 20px 0;">
+          <div class="key-point-card" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 2px solid #22c55e; border-radius: 12px; padding: 20px;">
+            <div style="font-size: 2rem; margin-bottom: 10px;">⚖️</div>
+            <h4 style="margin: 0 0 8px 0; color: #15803d;">Matching Law</h4>
+            <p style="margin: 0; color: #334155; font-size: 0.9rem;">Insurance must replace entire roof if >25% damaged (varies by state)</p>
+          </div>
+          <div class="key-point-card" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border: 2px solid #ef4444; border-radius: 12px; padding: 20px;">
+            <div style="font-size: 2rem; margin-bottom: 10px;">⏰</div>
+            <h4 style="margin: 0 0 8px 0; color: #b91c1c;">Urgency</h4>
+            <p style="margin: 0; color: #334155; font-size: 0.9rem;">Statute of limitations is 1-2 years in most states</p>
+          </div>
+          <div class="key-point-card" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 2px solid #3b82f6; border-radius: 12px; padding: 20px;">
+            <div style="font-size: 2rem; margin-bottom: 10px;">💰</div>
+            <h4 style="margin: 0 0 8px 0; color: #1d4ed8;">No Cost</h4>
+            <p style="margin: 0; color: #334155; font-size: 0.9rem;">Free inspection, only pay deductible if approved</p>
+          </div>
+          <div class="key-point-card" style="background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 20px;">
+            <div style="font-size: 2rem; margin-bottom: 10px;">🏠</div>
+            <h4 style="margin: 0 0 8px 0; color: #b45309;">Home Value</h4>
+            <p style="margin: 0; color: #334155; font-size: 0.9rem;">New roof adds $15-20k to property value</p>
+          </div>
         </div>
 
-        <h2>Critical Damage Points to Emphasize</h2>
-        <ul>
-          <li><strong>Matching Law:</strong> Insurance must replace entire roof if >25% damaged (varies by state). This protects homeowners from patchwork roofs that look mismatched.</li>
-          <li><strong>Urgency:</strong> Statute of limitations (1-2 years in most states). File claims promptly after storm damage or lose coverage.</li>
-          <li><strong>No Cost:</strong> Free inspection, we work with insurance, you only pay deductible. No out-of-pocket expense beyond deductible.</li>
-          <li><strong>Warranty:</strong> New roof comes with 30-50 year warranty vs. current aging roof with no remaining warranty coverage.</li>
-          <li><strong>Home Value:</strong> New roof adds $15-20k to property value. Increases curb appeal and marketability if selling.</li>
-          <li><strong>Energy Efficiency:</strong> Modern shingles reflect more heat, reducing cooling costs by 10-15% in summer.</li>
-        </ul>
+        <!-- Agnes Role-Play Mini Game -->
+        <div class="agnes-practice-section" style="background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); border: 3px solid #8b5cf6; border-radius: 20px; padding: 30px; margin: 30px 0;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <span style="font-size: 3rem;">🎭</span>
+            <h2 style="margin: 10px 0 0 0; color: #6d28d9;">Practice with Agnes</h2>
+            <p style="color: #7c3aed; margin: 8px 0 0 0;">Walk through the script with an agreeable homeowner</p>
+          </div>
+
+          <div id="agnes-pitch-practice" style="display: none;">
+            <div class="pitch-progress" style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
+              <span class="pitch-step active" data-step="1" style="width: 30px; height: 30px; border-radius: 50%; background: #8b5cf6; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">1</span>
+              <span class="pitch-step" data-step="2" style="width: 30px; height: 30px; border-radius: 50%; background: #e5e7eb; color: #6b7280; display: flex; align-items: center; justify-content: center; font-weight: bold;">2</span>
+              <span class="pitch-step" data-step="3" style="width: 30px; height: 30px; border-radius: 50%; background: #e5e7eb; color: #6b7280; display: flex; align-items: center; justify-content: center; font-weight: bold;">3</span>
+              <span class="pitch-step" data-step="4" style="width: 30px; height: 30px; border-radius: 50%; background: #e5e7eb; color: #6b7280; display: flex; align-items: center; justify-content: center; font-weight: bold;">4</span>
+            </div>
+
+            <div class="pitch-chat" style="background: white; border-radius: 16px; padding: 20px; min-height: 200px;">
+              <div id="pitch-chat-messages" style="max-height: 300px; overflow-y: auto;">
+                <!-- Messages will be added dynamically -->
+              </div>
+              <div id="pitch-user-prompt" style="margin-top: 16px; text-align: center;">
+                <p style="color: #6b7280; font-style: italic; margin-bottom: 12px;">Your turn: Deliver the opening script</p>
+                <button onclick="advancePitchPractice()" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; border: none; padding: 12px 30px; border-radius: 25px; cursor: pointer; font-weight: bold; font-size: 1rem;">I've Delivered This Part ✓</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="agnes-pitch-start" style="text-align: center;">
+            <button onclick="startPitchPractice()" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; border: none; padding: 16px 40px; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);">
+              🚀 Start Practice Session
+            </button>
+          </div>
+
+          <div id="agnes-pitch-complete" style="display: none; text-align: center;">
+            <div style="font-size: 4rem;">🎉</div>
+            <h3 style="color: #15803d; margin: 10px 0;">Great Job!</h3>
+            <p style="color: #334155;">You've completed the post-inspection pitch practice!</p>
+            <button onclick="resetPitchPractice()" style="background: #e5e7eb; color: #374151; border: none; padding: 10px 24px; border-radius: 20px; cursor: pointer; margin-top: 10px;">Practice Again</button>
+          </div>
+        </div>
 
         <div class="module-completion-section" id="module-complete-section" style="display: none;">
           <button class="complete-module-btn" onclick="completeModule('post-inspection-pitch')">
@@ -3070,7 +3188,7 @@ const trainingContent = {
   'roofing-damage-id': `
    <div class="content-card">
         <h1>Roofing & Damage Identification</h1>
-        ${renderVideoPlayer('/assets/training/videos/module10-damage-id.mp4', 'damage-id-video', '📹 Identifying Storm Damage')}
+        ${renderVideoPlayer('/assets/training/videos/module8-damage-id.mp4', 'damage-id-video', '📹 Identifying Storm Damage')}
 
         <h2>Understanding Storm Damage Types</h2>
 
@@ -3078,19 +3196,19 @@ const trainingContent = {
           <div class="damage-type">
             <h3>🌨️ Hail Damage</h3>
 
-            <!-- Image Gallery -->
+            <!-- Hail Damage Image Gallery -->
             <div class="damage-gallery">
               <div class="damage-image-item">
-                <img src="/assets/damage/wind/Wind.jpg" alt="Example roof damage">
-                <p class="image-caption">Example roof damage - impact patterns</p>
+                <img src="/assets/damage/hail/hail-damage-1.jpg" alt="Hail damage on shingles showing circular impact patterns">
+                <p class="image-caption">Circular hail impacts - note the bruising pattern</p>
               </div>
               <div class="damage-image-item">
-                <img src="/assets/damage/wind/wind1.jpg" alt="Example roof damage">
-                <p class="image-caption">Example roof damage - shingle surface</p>
+                <img src="/assets/damage/hail/hail-damage-2.jpg" alt="Hail damage showing granule loss">
+                <p class="image-caption">Granule loss from hail - exposed asphalt mat</p>
               </div>
               <div class="damage-image-item">
-                <img src="/assets/damage/wind/wind2.jpg" alt="Example roof damage">
-                <p class="image-caption">Example roof damage - close-up detail</p>
+                <img src="/assets/damage/hail/hail-damage-3.jpg" alt="Close-up of hail damage divots">
+                <p class="image-caption">Close-up of hail divots and soft spots</p>
               </div>
             </div>
 
@@ -3147,62 +3265,32 @@ const trainingContent = {
             </ul>
           </div>
 
-          <!-- NEW: Collateral Damage Card -->
+          <!-- Collateral Damage Card -->
           <div class="damage-type">
             <h3>🎯 Collateral Damage</h3>
 
-            <div class="damage-gallery">
-              <div class="damage-image-item">
-                <img src="/assets/damage/wind/Wind.jpg" alt="Example collateral damage">
-                <p class="image-caption">Example collateral damage on exterior surfaces</p>
+            <div class="collateral-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 20px 0;">
+              <div class="collateral-item" style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); padding: 20px; border-radius: 12px; text-align: center; border: 2px solid #0ea5e9;">
+                <div style="font-size: 2.5rem; margin-bottom: 10px;">🔧</div>
+                <h4 style="margin: 0 0 8px 0; color: #0369a1;">Metal Items</h4>
+                <p style="margin: 0; font-size: 0.9rem; color: #334155;">Dented gutters, downspouts, vents, flashing, AC units</p>
               </div>
-              <div class="damage-image-item">
-                <img src="/assets/damage/wind/wind1.jpg" alt="Example collateral damage">
-                <p class="image-caption">Example impact damage on property</p>
+              <div class="collateral-item" style="background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%); padding: 20px; border-radius: 12px; text-align: center; border: 2px solid #f59e0b;">
+                <div style="font-size: 2.5rem; margin-bottom: 10px;">🪟</div>
+                <h4 style="margin: 0 0 8px 0; color: #b45309;">Soft Items</h4>
+                <p style="margin: 0; font-size: 0.9rem; color: #334155;">Window screens with pitting, vinyl siding impacts</p>
               </div>
-              <div class="damage-image-item">
-                <img src="/assets/damage/wind/wind2.jpg" alt="Example collateral damage">
-                <p class="image-caption">Example secondary storm damage</p>
+              <div class="collateral-item" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 20px; border-radius: 12px; text-align: center; border: 2px solid #22c55e;">
+                <div style="font-size: 2.5rem; margin-bottom: 10px;">🏡</div>
+                <h4 style="margin: 0 0 8px 0; color: #15803d;">Ground Items</h4>
+                <p style="margin: 0; font-size: 0.9rem; color: #334155;">Deck railings, mailboxes, outdoor furniture</p>
               </div>
             </div>
 
-            <h4>Why Collateral Damage Matters:</h4>
-            <p>Collateral damage strengthens your claim by proving storm impact across multiple surfaces.</p>
-            <ul>
-              <li><strong>Metal Items:</strong> Dented gutters, downspouts, vents, flashing, AC units</li>
-              <li><strong>Soft Items:</strong> Window screens with pitting, vinyl siding damage</li>
-              <li><strong>Ground Items:</strong> Damaged deck railings, mailboxes, outdoor furniture</li>
-              <li><strong>Key Point:</strong> Insurance can't argue "normal wear" when brand-new items show obvious impact damage</li>
-            </ul>
-          </div>
-        </div>
-
-        <h2>📐 The "Test Square" Method</h2>
-        <div class="test-square">
-          <p>Insurance companies require a <strong>test square</strong> - a 10x10 ft area with minimum damage counts:</p>
-
-          <!-- Test Square Visual Examples -->
-          <div class="damage-gallery" style="margin: 20px 0;">
-            <div class="damage-image-item">
-              <img src="/assets/damage/wind/Wind.jpg" alt="Example test square documentation">
-              <p class="image-caption">Example damage documentation method</p>
-            </div>
-            <div class="damage-image-item">
-              <img src="/assets/damage/wind/wind1.jpg" alt="Example test square area">
-              <p class="image-caption">Example test square area measurement</p>
-            </div>
-            <div class="damage-image-item">
-              <img src="/assets/damage/wind/wind2.jpg" alt="Example damage reference">
-              <p class="image-caption">Example damage reference documentation</p>
+            <div class="key-point-callout" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-left: 4px solid #ef4444; padding: 16px 20px; border-radius: 0 8px 8px 0; margin-top: 16px;">
+              <p style="margin: 0; color: #991b1b;"><strong>💡 Key Point:</strong> Collateral damage strengthens your claim! Insurance can't argue "normal wear" when multiple surfaces show obvious impact damage from the same storm.</p>
             </div>
           </div>
-
-          <ul>
-            <li><strong>Hail:</strong> Minimum 8-10 hits per 100 sq ft (varies by carrier)</li>
-            <li><strong>Location:</strong> Choose south or west-facing slope (most sun exposure = most damage)</li>
-            <li><strong>Documentation:</strong> Circle damage with chalk, photograph from multiple angles</li>
-            <li><strong>Why it matters:</strong> This determines if they'll approve full replacement vs. repair</li>
-          </ul>
         </div>
 
         <h3>Shingle Types</h3>
@@ -3229,54 +3317,133 @@ const trainingContent = {
         <h2>⚠️ Storm Damage vs. Non-Storm Damage</h2>
         <p>It's vital to differentiate between actual storm damage and other roof issues.</p>
 
-        <!-- NEW: Non-Qualifying Damage Card with Images -->
-        <div class="damage-types" style="margin-top: 20px;">
-          <div class="damage-type" style="border-color: #28a745;">
-            <h3 style="color: #28a745;">✅ Storm Damage (Qualifying)</h3>
-            <div class="damage-gallery">
-              <div class="damage-image-item">
-                <img src="/assets/damage/wind/Wind.jpg" alt="Example storm damage">
-                <p class="image-caption">Example storm damage - qualifying impacts</p>
+        <!-- Storm vs Non-Storm Comparison -->
+        <div class="damage-comparison-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 20px;">
+
+          <!-- Qualifying Damage -->
+          <div class="qualifying-damage-card" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 3px solid #22c55e; border-radius: 16px; padding: 24px; position: relative;">
+            <div style="position: absolute; top: -14px; left: 20px; background: #22c55e; color: white; padding: 6px 16px; border-radius: 20px; font-weight: bold; font-size: 0.9rem;">
+              ✅ QUALIFYING
+            </div>
+            <h3 style="color: #15803d; margin-top: 10px;">Storm Damage</h3>
+            <p style="color: #166534; font-style: italic; margin-bottom: 16px;">Covered by insurance - file a claim!</p>
+
+            <div class="qualifying-items" style="display: flex; flex-direction: column; gap: 12px;">
+              <div style="display: flex; align-items: flex-start; gap: 12px; background: white; padding: 12px; border-radius: 8px;">
+                <span style="font-size: 1.5rem;">🌨️</span>
+                <div>
+                  <strong style="color: #15803d;">Hail Damage</strong>
+                  <p style="margin: 4px 0 0 0; font-size: 0.9rem; color: #374151;">Circular "bruises" or divots, soft/spongy feel, concentrated granule loss</p>
+                </div>
               </div>
-              <div class="damage-image-item">
-                <img src="/assets/damage/wind/wind1.jpg" alt="Wind lifted shingles">
-                <p class="image-caption">Wind: Lifted/creased shingles</p>
+              <div style="display: flex; align-items: flex-start; gap: 12px; background: white; padding: 12px; border-radius: 8px;">
+                <span style="font-size: 1.5rem;">💨</span>
+                <div>
+                  <strong style="color: #15803d;">Wind Damage</strong>
+                  <p style="margin: 4px 0 0 0; font-size: 0.9rem; color: #374151;">Lifted, creased, or missing shingles from strong winds</p>
+                </div>
               </div>
             </div>
-            <ul>
-              <li><strong>Hail Damage:</strong> Circular "bruises" or divots where granules are knocked off, often with a soft or spongy feel</li>
-              <li><strong>Wind Damage:</strong> Lifted, creased, or missing shingles from strong winds</li>
-              <li><strong>Why Qualifying:</strong> These are direct results of weather events covered by insurance</li>
-            </ul>
           </div>
 
-          <div class="damage-type" style="border-color: #dc3545;">
-            <h3 style="color: #dc3545;">❌ Non-Storm Damage (Non-Qualifying)</h3>
-            <div class="damage-gallery">
-              <div class="damage-image-item">
-                <img src="/assets/damage/wind/wind2.jpg" alt="Example non-qualifying damage">
-                <p class="image-caption">Example non-qualifying damage reference</p>
+          <!-- Non-Qualifying Damage -->
+          <div class="non-qualifying-damage-card" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border: 3px solid #ef4444; border-radius: 16px; padding: 24px; position: relative;">
+            <div style="position: absolute; top: -14px; left: 20px; background: #ef4444; color: white; padding: 6px 16px; border-radius: 20px; font-weight: bold; font-size: 0.9rem;">
+              ❌ NON-QUALIFYING
+            </div>
+            <h3 style="color: #b91c1c; margin-top: 10px;">Wear & Tear</h3>
+            <p style="color: #991b1b; font-style: italic; margin-bottom: 16px;">Not covered - normal aging issues</p>
+
+            <div class="non-qualifying-items" style="display: flex; flex-direction: column; gap: 12px;">
+              <div style="display: flex; align-items: flex-start; gap: 12px; background: white; padding: 12px; border-radius: 8px;">
+                <span style="font-size: 1.5rem;">🫧</span>
+                <div>
+                  <strong style="color: #b91c1c;">Blistering</strong>
+                  <p style="margin: 4px 0 0 0; font-size: 0.9rem; color: #374151;">Bubbles on surface - manufacturing defect, not storm damage</p>
+                </div>
               </div>
-              <div class="damage-image-item">
-                <img src="/assets/damage/wind/Wind.jpg" alt="Example age-related wear">
-                <p class="image-caption">Example wear pattern reference</p>
+              <div style="display: flex; align-items: flex-start; gap: 12px; background: white; padding: 12px; border-radius: 8px;">
+                <span style="font-size: 1.5rem;">💔</span>
+                <div>
+                  <strong style="color: #b91c1c;">Cracking</strong>
+                  <p style="margin: 4px 0 0 0; font-size: 0.9rem; color: #374151;">Straight-line splits from age, UV exposure, thermal cycling</p>
+                </div>
               </div>
-              <div class="damage-image-item">
-                <img src="/assets/damage/wind/wind1.jpg" alt="Example general deterioration">
-                <p class="image-caption">Example deterioration reference</p>
+              <div style="display: flex; align-items: flex-start; gap: 12px; background: white; padding: 12px; border-radius: 8px;">
+                <span style="font-size: 1.5rem;">⏳</span>
+                <div>
+                  <strong style="color: #b91c1c;">General Granule Loss</strong>
+                  <p style="margin: 4px 0 0 0; font-size: 0.9rem; color: #374151;">Even, widespread loss due to age - not concentrated like hail</p>
+                </div>
               </div>
             </div>
-            <ul>
-              <li><strong>Blistering:</strong> Looks like bubbles on shingle surface - a manufacturing defect, not storm damage</li>
-              <li><strong>Cracking:</strong> Age-related deterioration appearing as splintering or straight lines</li>
-              <li><strong>Granule Loss:</strong> General, even loss of granules due to age, not concentrated spots like hail hits</li>
-              <li><strong>Why Non-Qualifying:</strong> These are wear-and-tear issues, not covered by storm damage insurance</li>
-            </ul>
           </div>
         </div>
 
-        <!-- NEW: Interactive Hotspot Quiz -->
-        <h2>📸 Damage Identification Challenge</h2>
+        <div class="pro-tip-box" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 2px solid #3b82f6; border-radius: 12px; padding: 20px; margin-top: 24px; display: flex; align-items: flex-start; gap: 16px;">
+          <span style="font-size: 2rem;">💡</span>
+          <div>
+            <strong style="color: #1d4ed8; font-size: 1.1rem;">Pro Tip: How to Tell the Difference</strong>
+            <p style="margin: 8px 0 0 0; color: #1e40af;">Hail damage creates <em>random, circular patterns</em> across the roof. Age-related wear appears <em>uniformly</em> across all shingles. When in doubt, check for matching damage on metal components - insurance can't argue that gutters and vents aged the same day!</p>
+          </div>
+        </div>
+
+        <h2>📋 Documentation Strategy Sequence</h2>
+        <p>Follow this exact order for professional, adjuster-ready documentation:</p>
+        <div class="doc-sequence" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 20px 0;">
+          <div class="doc-step" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-left: 4px solid #3b82f6; padding: 16px; border-radius: 0 8px 8px 0;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+              <span style="background: #3b82f6; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem;">1</span>
+              <strong>Property ID</strong>
+            </div>
+            <p style="margin: 0; color: #475569; font-size: 0.9rem;">House number, full front view</p>
+          </div>
+          <div class="doc-step" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-left: 4px solid #3b82f6; padding: 16px; border-radius: 0 8px 8px 0;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+              <span style="background: #3b82f6; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem;">2</span>
+              <strong>Overview Shots</strong>
+            </div>
+            <p style="margin: 0; color: #475569; font-size: 0.9rem;">All four elevations of the home</p>
+          </div>
+          <div class="doc-step" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-left: 4px solid #3b82f6; padding: 16px; border-radius: 0 8px 8px 0;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+              <span style="background: #3b82f6; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem;">3</span>
+              <strong>Elevation Collateral</strong>
+            </div>
+            <p style="margin: 0; color: #475569; font-size: 0.9rem;">Gutters, siding, windows from each side</p>
+          </div>
+          <div class="doc-step" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-left: 4px solid #3b82f6; padding: 16px; border-radius: 0 8px 8px 0;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+              <span style="background: #3b82f6; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem;">4</span>
+              <strong>Roof Overview</strong>
+            </div>
+            <p style="margin: 0; color: #475569; font-size: 0.9rem;">Wide shots of each slope</p>
+          </div>
+          <div class="doc-step" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-left: 4px solid #3b82f6; padding: 16px; border-radius: 0 8px 8px 0;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+              <span style="background: #3b82f6; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem;">5</span>
+              <strong>Damage Markup</strong>
+            </div>
+            <p style="margin: 0; color: #475569; font-size: 0.9rem;">Circle hail hits with chalk, slash wind damage</p>
+          </div>
+          <div class="doc-step" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-left: 4px solid #3b82f6; padding: 16px; border-radius: 0 8px 8px 0;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+              <span style="background: #3b82f6; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem;">6</span>
+              <strong>Close-ups</strong>
+            </div>
+            <p style="margin: 0; color: #475569; font-size: 0.9rem;">Individual damage photos with penny/quarter reference</p>
+          </div>
+          <div class="doc-step" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-left: 4px solid #3b82f6; padding: 16px; border-radius: 0 8px 8px 0;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+              <span style="background: #3b82f6; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem;">7</span>
+              <strong>Granule Loss</strong>
+            </div>
+            <p style="margin: 0; color: #475569; font-size: 0.9rem;">Gutters and downspouts filled with granules</p>
+          </div>
+        </div>
+
+        <!-- Interactive Hotspot Quiz - LAST before completion -->
+        <h2>🎮 Damage Identification Challenge</h2>
         <p>Test your knowledge! Click on the damaged areas in the photos below. Find all the damage spots to complete each challenge.</p>
 
         <div id="hotspot-quiz-container">
@@ -3368,18 +3535,6 @@ const trainingContent = {
             </div>
           </div>
         </div>
-
-        <h2>Documentation Strategy Sequence</h2>
-        <p>Follow this exact order for professional, adjuster-ready documentation:</p>
-        <ol>
-          <li><strong>Property ID:</strong> House number, full front view</li>
-          <li><strong>Overview Shots:</strong> All four elevations of the home</li>
-          <li><strong>Elevation Collateral:</strong> Gutters, siding, windows from each side</li>
-          <li><strong>Roof Overview:</strong> Wide shots of each slope</li>
-          <li><strong>Damage Markup:</strong> Circle hail hits with chalk, slash wind damage</li>
-          <li><strong>Close-ups:</strong> Individual damage photos with size reference (penny/quarter)</li>
-          <li><strong>Granule Loss:</strong> Gutters and downspouts filled with granules</li>
-        </ol>
 
         <div class="module-completion-section" id="module-complete-section" style="display: none;">
           <button class="complete-module-btn" onclick="completeModule('damage-identification')">
@@ -5148,6 +5303,228 @@ function updatePracticeProgress() {
 (window as any).togglePracticeMode = togglePracticeMode;
 (window as any).showNextPrompt = showNextPrompt;
 (window as any).markPracticed = markPracticed;
+
+// --- Module 9: Post-Inspection Pitch Practice ---
+const pitchPracticeSteps = [
+  {
+    phase: "INTEGRITY",
+    userPrompt: "Show the homeowner collateral damage photos and explain their importance...",
+    agnesResponse: "Okay, show me what you found on my roof...",
+    tip: "Build credibility by showing collateral damage first - it establishes trust!"
+  },
+  {
+    phase: "QUALITY",
+    userPrompt: "Point out the hail damage and explain why it matters...",
+    agnesResponse: "I see those circles you're pointing at... what exactly does that mean for my roof?",
+    tip: "Explain the freeze-thaw cycle - it helps homeowners understand WHY this damage is serious."
+  },
+  {
+    phase: "SIMPLICITY",
+    userPrompt: "Summarize the damage and mention similar approvals in the area...",
+    agnesResponse: "Wow, I had no idea there was this much damage. So what happens now?",
+    tip: "Social proof is powerful - mentioning neighbor approvals builds confidence."
+  },
+  {
+    phase: "INFO GATHERING",
+    userPrompt: "Transition to gathering their information for the claim...",
+    agnesResponse: "That sounds reasonable. What information do you need from me?",
+    tip: "Keep the momentum! Smoothly transition from showing damage to starting the claim."
+  }
+];
+
+let currentPitchStep = 0;
+
+function speakFullScript() {
+  const scriptContainer = document.querySelector('.pitch-script-content');
+  if (!scriptContainer) return;
+
+  const btn = document.querySelector('.speak-btn-enhanced') as HTMLElement;
+
+  // Get all text from script phases
+  const phases = scriptContainer.querySelectorAll('.pitch-phase-card');
+  let fullText = '';
+  phases.forEach(phase => {
+    const clone = phase.cloneNode(true) as HTMLElement;
+    clone.querySelectorAll('button, .speak-section-btn').forEach(b => b.remove());
+    fullText += clone.innerText.trim() + ' ';
+  });
+
+  if (synth.speaking) {
+    synth.cancel();
+    if (btn) {
+      btn.innerHTML = '<span class="speak-icon">🔊</span><span class="speak-label">Listen to Full Script</span>';
+      btn.classList.remove('playing');
+    }
+    return;
+  }
+
+  const utterance = new SpeechSynthesisUtterance(fullText);
+  const voices = synth.getVoices();
+  const maleVoice = voices.find(v =>
+    v.name.includes('Daniel') || v.name.includes('Alex') || v.name.includes('Google US English')
+  ) || voices[0];
+  if (maleVoice) utterance.voice = maleVoice;
+  utterance.rate = 0.92;
+  utterance.pitch = 0.95;
+
+  if (btn) {
+    btn.innerHTML = '<span class="speak-icon">⏸️</span><span class="speak-label">Pause Playback</span>';
+    btn.classList.add('playing');
+  }
+
+  utterance.onend = () => {
+    if (btn) {
+      btn.innerHTML = '<span class="speak-icon">🔊</span><span class="speak-label">Listen to Full Script</span>';
+      btn.classList.remove('playing');
+    }
+  };
+
+  synth.speak(utterance);
+}
+
+function speakSection(btn: HTMLElement) {
+  const card = btn.closest('.pitch-phase-card');
+  if (!card) return;
+
+  const clone = card.cloneNode(true) as HTMLElement;
+  clone.querySelectorAll('button, .speak-section-btn, h3').forEach(b => b.remove());
+  const textToSpeak = clone.innerText.trim();
+
+  if (synth.speaking) {
+    synth.cancel();
+    btn.textContent = '▶️';
+    btn.classList.remove('playing');
+    return;
+  }
+
+  const utterance = new SpeechSynthesisUtterance(textToSpeak);
+  const voices = synth.getVoices();
+  const maleVoice = voices.find(v =>
+    v.name.includes('Daniel') || v.name.includes('Alex') || v.name.includes('Google US English')
+  ) || voices[0];
+  if (maleVoice) utterance.voice = maleVoice;
+  utterance.rate = 0.92;
+  utterance.pitch = 0.95;
+
+  btn.textContent = '⏸️';
+  btn.classList.add('playing');
+
+  utterance.onend = () => {
+    btn.textContent = '▶️';
+    btn.classList.remove('playing');
+  };
+
+  synth.speak(utterance);
+}
+
+function startPitchPractice() {
+  currentPitchStep = 0;
+
+  // Hide start button, show practice area
+  const startEl = document.getElementById('agnes-pitch-start');
+  const practiceEl = document.getElementById('agnes-pitch-practice');
+  const completeEl = document.getElementById('agnes-pitch-complete');
+
+  if (startEl) startEl.style.display = 'none';
+  if (practiceEl) practiceEl.style.display = 'block';
+  if (completeEl) completeEl.style.display = 'none';
+
+  updatePitchPracticeStep();
+}
+
+function updatePitchPracticeStep() {
+  const step = pitchPracticeSteps[currentPitchStep];
+  if (!step) return;
+
+  // Update progress dots
+  const stepDots = document.querySelectorAll('.pitch-step');
+  stepDots.forEach((dot, index) => {
+    const el = dot as HTMLElement;
+    if (index < currentPitchStep) {
+      el.style.background = '#22c55e';
+      el.style.color = 'white';
+    } else if (index === currentPitchStep) {
+      el.style.background = '#8b5cf6';
+      el.style.color = 'white';
+    } else {
+      el.style.background = '#e5e7eb';
+      el.style.color = '#6b7280';
+    }
+  });
+
+  // Update chat messages
+  const chatMessages = document.getElementById('pitch-chat-messages');
+  if (chatMessages) {
+    const phaseLabel = step.phase;
+    chatMessages.innerHTML = `
+      <div style="background: #f5f3ff; border-radius: 12px; padding: 16px; margin-bottom: 12px; border-left: 4px solid #8b5cf6;">
+        <span style="background: #8b5cf6; color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: bold;">${phaseLabel}</span>
+        <p style="margin: 12px 0 0 0; color: #374151; font-style: italic;">${step.userPrompt}</p>
+      </div>
+      <div style="background: #fef3c7; border-radius: 12px; padding: 16px; margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px;">
+        <span style="font-size: 1.5rem;">🧓</span>
+        <div>
+          <span style="font-weight: bold; color: #92400e;">Agnes:</span>
+          <p style="margin: 8px 0 0 0; color: #78350f;">"${step.agnesResponse}"</p>
+        </div>
+      </div>
+      <div style="background: #d1fae5; border-radius: 10px; padding: 12px; color: #065f46; font-size: 0.9rem;">
+        💡 <strong>Tip:</strong> ${step.tip}
+      </div>
+    `;
+  }
+
+  // Update prompt
+  const promptEl = document.getElementById('pitch-user-prompt');
+  if (promptEl) {
+    const isLast = currentPitchStep === pitchPracticeSteps.length - 1;
+    promptEl.innerHTML = `
+      <p style="color: #6b7280; font-style: italic; margin-bottom: 12px;">Your turn: ${step.userPrompt}</p>
+      <button onclick="advancePitchPractice()" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; border: none; padding: 12px 30px; border-radius: 25px; cursor: pointer; font-weight: bold; font-size: 1rem;">
+        ${isLast ? "Complete Practice 🎉" : "I've Delivered This Part ✓"}
+      </button>
+    `;
+  }
+}
+
+function advancePitchPractice() {
+  currentPitchStep++;
+
+  if (currentPitchStep >= pitchPracticeSteps.length) {
+    // Complete! Show completion screen
+    const practiceEl = document.getElementById('agnes-pitch-practice');
+    const completeEl = document.getElementById('agnes-pitch-complete');
+
+    if (practiceEl) practiceEl.style.display = 'none';
+    if (completeEl) completeEl.style.display = 'block';
+
+    // Also show the module completion button
+    const moduleComplete = document.getElementById('module-complete-section');
+    if (moduleComplete) moduleComplete.style.display = 'block';
+    return;
+  }
+
+  updatePitchPracticeStep();
+}
+
+function resetPitchPractice() {
+  currentPitchStep = 0;
+
+  const startEl = document.getElementById('agnes-pitch-start');
+  const practiceEl = document.getElementById('agnes-pitch-practice');
+  const completeEl = document.getElementById('agnes-pitch-complete');
+
+  if (startEl) startEl.style.display = 'block';
+  if (practiceEl) practiceEl.style.display = 'none';
+  if (completeEl) completeEl.style.display = 'none';
+}
+
+// Attach Module 9 practice functions to window
+(window as any).speakFullScript = speakFullScript;
+(window as any).speakSection = speakSection;
+(window as any).startPitchPractice = startPitchPractice;
+(window as any).advancePitchPractice = advancePitchPractice;
+(window as any).resetPitchPractice = resetPitchPractice;
 
 // --- Game Logic ---
 function initSalesCycleSorter() {
