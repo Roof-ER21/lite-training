@@ -202,50 +202,64 @@ router.get('/status', (req: Request, res: Response) => {
   });
 });
 
-// POST /api/ai/tts - Text-to-Speech using OpenAI's high-quality voices
+// POST /api/ai/tts - Text-to-Speech using Gemini's high-quality voices (Kore, Aoede, etc.)
 router.post('/tts', async (req: Request, res: Response) => {
   try {
-    const { text, voice = 'onyx' } = req.body;
+    const { text, voice = 'Kore' } = req.body;
 
     if (!text) {
       return res.status(400).json({ error: 'text is required' });
     }
 
-    if (!openai) {
+    if (!geminiClient) {
       return res.status(503).json({
-        error: 'OpenAI not configured',
-        message: 'OPENAI_API_KEY environment variable is not set'
+        error: 'Gemini not configured',
+        message: 'GEMINI_API_KEY environment variable is not set'
       });
     }
 
-    // Valid voices: alloy, echo, fable, onyx, nova, shimmer
-    // onyx = deep male, nova = female, alloy = neutral
-    const validVoices = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
-    const selectedVoice = validVoices.includes(voice) ? voice : 'onyx';
+    // Valid Gemini voices: Kore (male), Aoede (female), Charon, Fenrir, Puck
+    const validVoices = ['Kore', 'Aoede', 'Charon', 'Fenrir', 'Puck'];
+    const selectedVoice = validVoices.includes(voice) ? voice : 'Kore';
 
-    console.log(`Generating TTS with voice: ${selectedVoice}, text length: ${text.length}`);
+    console.log(`Generating Gemini TTS with voice: ${selectedVoice}, text length: ${text.length}`);
 
-    const mp3Response = await openai.audio.speech.create({
-      model: 'tts-1-hd', // High-definition model for better quality
-      voice: selectedVoice as any,
-      input: text,
-      speed: 1.0,
+    // Use Gemini TTS model
+    const response = await geminiClient.models.generateContent({
+      model: 'gemini-2.5-flash-preview-tts',
+      contents: [{ parts: [{ text }] }],
+      config: {
+        responseModalities: [Modality.AUDIO],
+        speechConfig: {
+          voiceConfig: { prebuiltVoiceConfig: { voiceName: selectedVoice } }
+        }
+      }
     });
 
-    // Get the audio as a buffer
-    const buffer = Buffer.from(await mp3Response.arrayBuffer());
+    // Extract audio data from response
+    const audioData = (response as any).candidates?.[0]?.content?.parts?.[0]?.inlineData;
+
+    if (!audioData?.data) {
+      console.error('No audio data in Gemini response:', JSON.stringify(response, null, 2));
+      throw new Error('No audio generated from Gemini');
+    }
+
+    // Convert base64 audio to buffer
+    const audioBuffer = Buffer.from(audioData.data, 'base64');
+
+    console.log(`Gemini TTS generated: ${audioBuffer.length} bytes, mime: ${audioData.mimeType}`);
 
     // Set headers for audio response
     res.set({
-      'Content-Type': 'audio/mpeg',
-      'Content-Length': buffer.length.toString(),
-      'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
+      'Content-Type': audioData.mimeType || 'audio/wav',
+      'Content-Length': audioBuffer.length.toString(),
+      'Cache-Control': 'public, max-age=3600',
     });
 
-    res.send(buffer);
+    res.send(audioBuffer);
 
   } catch (error: any) {
-    console.error('TTS error:', error);
+    console.error('Gemini TTS error:', error);
     res.status(500).json({
       error: 'TTS generation failed',
       details: error?.message || 'Unknown error'

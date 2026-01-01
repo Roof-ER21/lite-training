@@ -5471,13 +5471,13 @@ function speakWithBrowser(text: string, preferFemale: boolean = false): Promise<
   });
 }
 
-// High-quality TTS using OpenAI voices via server API
-async function speakWithOpenAI(text: string, preferFemale: boolean = false): Promise<void> {
+// High-quality TTS using Gemini voices via server API (Kore = male, Aoede = female)
+async function speakWithGemini(text: string, preferFemale: boolean = false): Promise<void> {
   if (ttsCancelled) return;
 
   try {
-    // Use onyx (deep male) or nova (female) voice
-    const voice = preferFemale ? 'nova' : 'onyx';
+    // Use Kore (deep male) or Aoede (female) voice - same as Module 15's realistic voice
+    const voice = preferFemale ? 'Aoede' : 'Kore';
 
     const response = await fetch('/api/ai/tts', {
       method: 'POST',
@@ -5485,8 +5485,11 @@ async function speakWithOpenAI(text: string, preferFemale: boolean = false): Pro
       body: JSON.stringify({ text, voice })
     });
 
-    if (!response.ok) {
-      throw new Error(`TTS API error: ${response.status}`);
+    // Check if response is actually audio (not JSON error)
+    const contentType = response.headers.get('content-type');
+    if (!response.ok || contentType?.includes('application/json')) {
+      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+      throw new Error(errorData.details || errorData.error || `TTS API error: ${response.status}`);
     }
 
     const audioBlob = await response.blob();
@@ -5508,21 +5511,33 @@ async function speakWithOpenAI(text: string, preferFemale: boolean = false): Pro
       currentAudio.onerror = (e) => {
         URL.revokeObjectURL(audioUrl);
         currentAudio = null;
-        reject(e);
+        console.error('Audio playback error:', e);
+        reject(new Error('Audio playback failed'));
       };
       currentAudio.play().catch(reject);
     });
   } catch (error) {
-    console.log('OpenAI TTS failed, using browser fallback:', error);
-    // Fall back to browser TTS
+    console.error('Gemini TTS failed:', error);
+    // Show user feedback instead of silent failure
+    const btn = document.querySelector('.speak-btn-enhanced') as HTMLElement;
+    if (btn) {
+      const originalContent = btn.innerHTML;
+      btn.innerHTML = '<span style="font-size: 1.5rem;">⚠️</span><span>Voice Unavailable - Trying Backup...</span>';
+      btn.style.background = '#ef4444';
+      setTimeout(() => {
+        btn.innerHTML = originalContent;
+        btn.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
+      }, 3000);
+    }
+    // Fall back to browser TTS as last resort
     await speakWithBrowser(text, preferFemale);
   }
 }
 
-// Main TTS function - uses OpenAI high-quality voices with browser fallback
+// Main TTS function - uses Gemini high-quality voices (Kore/Aoede) with browser fallback
 async function speakText(text: string, preferFemale: boolean = false): Promise<void> {
   if (ttsCancelled) return;
-  await speakWithOpenAI(text, preferFemale);
+  await speakWithGemini(text, preferFemale);
 }
 
 async function speakFullScript() {
