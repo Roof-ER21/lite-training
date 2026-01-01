@@ -2513,17 +2513,23 @@ const trainingContent = {
                 <!-- Messages will be added dynamically -->
               </div>
 
-              <!-- Input Area -->
+              <!-- Voice Input Area -->
               <div id="pitch-input-area" style="border-top: 1px solid #e5e7eb; padding-top: 16px;">
-                <p id="pitch-prompt-text" style="color: #7c3aed; font-weight: 500; margin-bottom: 10px;">🎯 Deliver your opening - show the collateral damage photos and explain their importance:</p>
-                <div style="display: flex; gap: 10px;">
-                  <textarea id="pitch-user-input" placeholder="Type your pitch here... (e.g., 'Hey Mrs. Johnson, I have some photos to show you...')" style="flex: 1; padding: 14px; border: 2px solid #d8b4fe; border-radius: 12px; font-size: 1rem; resize: none; min-height: 80px; font-family: inherit;"></textarea>
-                </div>
-                <div style="display: flex; gap: 10px; margin-top: 12px; justify-content: space-between;">
-                  <button onclick="skipPitchPhase()" style="background: #e5e7eb; color: #374151; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-size: 0.9rem;">Skip Phase →</button>
-                  <button onclick="submitPitchResponse()" id="submit-pitch-btn" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; border: none; padding: 12px 30px; border-radius: 25px; cursor: pointer; font-weight: bold; font-size: 1rem;">
-                    Send to Agnes 💬
+                <p id="pitch-prompt-text" style="color: #7c3aed; font-weight: 500; margin-bottom: 16px; text-align: center;">🎯 Deliver your opening - show the collateral damage photos and explain their importance</p>
+
+                <!-- Voice Recording UI -->
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+                  <div id="voice-status" style="color: #6b7280; font-size: 0.95rem; min-height: 24px;">Press the microphone to speak</div>
+
+                  <button id="voice-record-btn" onclick="toggleVoiceRecording()" style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); border: none; cursor: pointer; box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4); transition: all 0.3s; display: flex; align-items: center; justify-content: center;">
+                    <span style="font-size: 2.5rem;">🎤</span>
                   </button>
+
+                  <p id="voice-transcript" style="color: #374151; font-style: italic; text-align: center; min-height: 50px; padding: 10px; background: #f9fafb; border-radius: 10px; width: 100%; display: none;"></p>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 20px; justify-content: center;">
+                  <button onclick="skipPitchPhase()" style="background: #e5e7eb; color: #374151; border: none; padding: 10px 24px; border-radius: 20px; cursor: pointer; font-size: 0.9rem;">Skip Phase →</button>
                 </div>
               </div>
 
@@ -3533,7 +3539,13 @@ const trainingContent = {
           <!-- Challenge 2: Documentation Sequence -->
           <div id="doc-sequence-challenge" class="game-challenge">
             <h3 style="color: #7c3aed; margin: 0 0 16px 0;">📋 Challenge 2: Documentation Sequence</h3>
-            <p style="color: #6b7280; margin-bottom: 20px;">Put the documentation steps in the correct order! Click to select, then click where to place it.</p>
+            <p style="color: #6b7280; margin-bottom: 12px;">Put the documentation steps in the correct order!</p>
+            <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 12px; padding: 14px 18px; margin-bottom: 20px;">
+              <p style="color: #92400e; margin: 0; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 1.3rem;">👆</span>
+                <span>HOW TO PLAY: Tap a step once to select it (it will glow purple). Then tap it again to assign the next number. Start with step #1!</span>
+              </p>
+            </div>
 
             <div id="doc-sequence-items" style="display: flex; flex-direction: column; gap: 8px;">
               <div class="seq-item" data-order="5" onclick="selectSeqItem(this)" style="background: white; padding: 14px 20px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; display: flex; align-items: center; gap: 12px; transition: all 0.2s;">
@@ -5380,7 +5392,81 @@ const pitchPracticeSteps = [
 
 let currentPitchStep = 0;
 
-function speakFullScript() {
+// Gemini TTS - High Quality Voice
+let currentAudio: HTMLAudioElement | null = null;
+let isPlayingTTS = false;
+
+async function speakWithGemini(text: string): Promise<void> {
+  if (typeof ai === 'undefined' || !ai) {
+    console.log('Gemini AI not available, falling back to browser TTS');
+    speakWithBrowserTTS(text);
+    return;
+  }
+
+  try {
+    // Use Gemini's TTS model for high-quality voice
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-preview-tts',
+      contents: text,
+      config: {
+        responseModalities: ['AUDIO'],
+        speechConfig: {
+          voiceConfig: {
+            prebuiltVoiceConfig: {
+              voiceName: 'Kore' // Clear male voice
+            }
+          }
+        }
+      }
+    });
+
+    // Get audio data from response
+    if (response.candidates && response.candidates[0]?.content?.parts) {
+      for (const part of response.candidates[0].content.parts) {
+        if (part.inlineData && part.inlineData.mimeType?.startsWith('audio/')) {
+          const audioData = part.inlineData.data;
+          const audioBlob = new Blob(
+            [Uint8Array.from(atob(audioData), c => c.charCodeAt(0))],
+            { type: part.inlineData.mimeType }
+          );
+          const audioUrl = URL.createObjectURL(audioBlob);
+
+          if (currentAudio) {
+            currentAudio.pause();
+            URL.revokeObjectURL(currentAudio.src);
+          }
+
+          currentAudio = new Audio(audioUrl);
+          currentAudio.play();
+          return;
+        }
+      }
+    }
+
+    // Fallback if no audio in response
+    console.log('No audio in Gemini response, falling back to browser TTS');
+    speakWithBrowserTTS(text);
+  } catch (error) {
+    console.error('Gemini TTS error:', error);
+    speakWithBrowserTTS(text);
+  }
+}
+
+function speakWithBrowserTTS(text: string) {
+  if (synth.speaking) {
+    synth.cancel();
+    return;
+  }
+  const utterance = new SpeechSynthesisUtterance(text);
+  const voices = synth.getVoices();
+  const voice = voices.find(v => v.name.includes('Samantha') || v.name.includes('Google US English')) || voices[0];
+  if (voice) utterance.voice = voice;
+  utterance.rate = 0.95;
+  utterance.pitch = 1.0;
+  synth.speak(utterance);
+}
+
+async function speakFullScript() {
   const scriptContainer = document.querySelector('.full-script-section');
   if (!scriptContainer) {
     console.log('Script container not found');
@@ -5389,15 +5475,28 @@ function speakFullScript() {
 
   const btn = document.querySelector('.speak-btn-enhanced') as HTMLElement;
 
+  // Stop if already playing
+  if (isPlayingTTS) {
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio = null;
+    }
+    synth.cancel();
+    isPlayingTTS = false;
+    if (btn) {
+      btn.innerHTML = '<span style="font-size: 1.5rem;">🔊</span><span>Listen to Full Script</span>';
+      btn.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
+    }
+    return;
+  }
+
   // Get all text from script phases
   const phases = scriptContainer.querySelectorAll('.script-phase');
   let fullText = '';
   phases.forEach(phase => {
     const scriptContent = phase.querySelector('.script-content p');
     if (scriptContent) {
-      const clone = scriptContent.cloneNode(true) as HTMLElement;
-      // Remove stage directions in [brackets] and keep spoken text
-      let text = clone.innerText
+      let text = scriptContent.innerText
         .replace(/\[.*?\]/g, '') // Remove stage directions
         .replace(/→.*$/gm, '') // Remove arrow points
         .replace(/Gather:.*$/gm, '') // Remove gather list
@@ -5406,40 +5505,42 @@ function speakFullScript() {
     }
   });
 
-  if (synth.speaking) {
-    synth.cancel();
-    if (btn) {
-      btn.innerHTML = '<span style="font-size: 1.5rem;">🔊</span><span>Listen to Full Script</span>';
-      btn.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
-    }
-    return;
-  }
-
-  const utterance = new SpeechSynthesisUtterance(fullText);
-  const voices = synth.getVoices();
-  const maleVoice = voices.find(v =>
-    v.name.includes('Daniel') || v.name.includes('Alex') || v.name.includes('Google US English')
-  ) || voices[0];
-  if (maleVoice) utterance.voice = maleVoice;
-  utterance.rate = 0.92;
-  utterance.pitch = 0.95;
-
   if (btn) {
-    btn.innerHTML = '<span style="font-size: 1.5rem;">⏸️</span><span>Stop Playback</span>';
-    btn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+    btn.innerHTML = '<span style="font-size: 1.5rem;">⏳</span><span>Generating Audio...</span>';
+    btn.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
   }
 
-  utterance.onend = () => {
+  isPlayingTTS = true;
+
+  try {
+    await speakWithGemini(fullText);
+
+    if (btn) {
+      btn.innerHTML = '<span style="font-size: 1.5rem;">⏸️</span><span>Stop Playback</span>';
+      btn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+    }
+
+    // Handle audio end
+    if (currentAudio) {
+      currentAudio.onended = () => {
+        isPlayingTTS = false;
+        if (btn) {
+          btn.innerHTML = '<span style="font-size: 1.5rem;">🔊</span><span>Listen to Full Script</span>';
+          btn.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
+        }
+      };
+    }
+  } catch (error) {
+    console.error('TTS error:', error);
+    isPlayingTTS = false;
     if (btn) {
       btn.innerHTML = '<span style="font-size: 1.5rem;">🔊</span><span>Listen to Full Script</span>';
       btn.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
     }
-  };
-
-  synth.speak(utterance);
+  }
 }
 
-function speakSection(btn: HTMLElement) {
+async function speakSection(btn: HTMLElement) {
   const phase = btn.closest('.script-phase');
   if (!phase) return;
 
@@ -5453,33 +5554,38 @@ function speakSection(btn: HTMLElement) {
     .replace(/Gather:.*$/gm, '') // Remove gather list
     .trim();
 
-  if (synth.speaking) {
+  // Toggle off if already playing
+  if (currentAudio || synth.speaking) {
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio = null;
+    }
     synth.cancel();
     btn.innerHTML = '🔊 Play';
+    btn.style.background = btn.getAttribute('data-original-bg') || '#8b5cf6';
     return;
   }
 
-  const utterance = new SpeechSynthesisUtterance(textToSpeak);
-  const voices = synth.getVoices();
-  const maleVoice = voices.find(v =>
-    v.name.includes('Daniel') || v.name.includes('Alex') || v.name.includes('Google US English')
-  ) || voices[0];
-  if (maleVoice) utterance.voice = maleVoice;
-  utterance.rate = 0.92;
-  utterance.pitch = 0.95;
-
-  btn.innerHTML = '⏸️ Stop';
-  btn.style.background = '#ef4444';
-
-  const originalBg = btn.getAttribute('data-original-bg') || btn.style.background;
+  const originalBg = btn.style.background;
   btn.setAttribute('data-original-bg', originalBg);
+  btn.innerHTML = '⏳ Loading...';
+  btn.style.background = '#f59e0b';
 
-  utterance.onend = () => {
+  try {
+    await speakWithGemini(textToSpeak);
+    btn.innerHTML = '⏸️ Stop';
+    btn.style.background = '#ef4444';
+
+    if (currentAudio) {
+      currentAudio.onended = () => {
+        btn.innerHTML = '🔊 Play';
+        btn.style.background = originalBg;
+      };
+    }
+  } catch (error) {
     btn.innerHTML = '🔊 Play';
     btn.style.background = originalBg;
-  };
-
-  synth.speak(utterance);
+  }
 }
 
 function startPitchPractice() {
@@ -5619,6 +5725,255 @@ const pitchPhases = [
 let currentPitchPhase = 0;
 let pitchConversationHistory: {sender: string, message: string}[] = [];
 
+// Voice-Based Role-Play with Agnes
+let isRecording = false;
+let speechRecognition: any = null;
+let agnesAudioQueue: string[] = [];
+let isAgnesSpeaking = false;
+
+// Initialize Speech Recognition
+function initSpeechRecognition() {
+  const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    console.warn('Speech Recognition not supported');
+    return null;
+  }
+
+  const recognition = new SpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+
+  return recognition;
+}
+
+// Speak Agnes's lines using Gemini TTS
+async function speakAsAgnes(text: string): Promise<void> {
+  isAgnesSpeaking = true;
+
+  if (typeof ai !== 'undefined' && ai) {
+    try {
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash-preview-tts',
+        contents: text,
+        config: {
+          responseModalities: ['AUDIO'],
+          speechConfig: {
+            voiceConfig: {
+              prebuiltVoiceConfig: {
+                voiceName: 'Aoede' // Warm female voice for Agnes
+              }
+            }
+          }
+        }
+      });
+
+      if (response.candidates && response.candidates[0]?.content?.parts) {
+        for (const part of response.candidates[0].content.parts) {
+          if (part.inlineData && part.inlineData.mimeType?.startsWith('audio/')) {
+            const audioData = part.inlineData.data;
+            const audioBlob = new Blob(
+              [Uint8Array.from(atob(audioData), c => c.charCodeAt(0))],
+              { type: part.inlineData.mimeType }
+            );
+            const audioUrl = URL.createObjectURL(audioBlob);
+
+            return new Promise((resolve) => {
+              const audio = new Audio(audioUrl);
+              audio.onended = () => {
+                isAgnesSpeaking = false;
+                URL.revokeObjectURL(audioUrl);
+                resolve();
+              };
+              audio.onerror = () => {
+                isAgnesSpeaking = false;
+                resolve();
+              };
+              audio.play().catch(() => {
+                isAgnesSpeaking = false;
+                resolve();
+              });
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('Gemini TTS for Agnes failed:', error);
+    }
+  }
+
+  // Fallback to browser TTS with female voice
+  return new Promise((resolve) => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    const voices = synth.getVoices();
+    const femaleVoice = voices.find(v =>
+      v.name.includes('Samantha') || v.name.includes('Karen') || v.name.includes('Victoria') || v.name.includes('Google UK English Female')
+    ) || voices[0];
+    if (femaleVoice) utterance.voice = femaleVoice;
+    utterance.rate = 0.95;
+    utterance.pitch = 1.1;
+    utterance.onend = () => {
+      isAgnesSpeaking = false;
+      resolve();
+    };
+    synth.speak(utterance);
+  });
+}
+
+function toggleVoiceRecording() {
+  if (isRecording) {
+    stopVoiceRecording();
+  } else {
+    startVoiceRecording();
+  }
+}
+
+function startVoiceRecording() {
+  if (isAgnesSpeaking) {
+    updateVoiceStatus('Wait for Agnes to finish speaking...');
+    return;
+  }
+
+  speechRecognition = initSpeechRecognition();
+  if (!speechRecognition) {
+    updateVoiceStatus('Voice not supported in this browser. Try Chrome.');
+    return;
+  }
+
+  isRecording = true;
+  const btn = document.getElementById('voice-record-btn') as HTMLElement;
+  const transcript = document.getElementById('voice-transcript') as HTMLElement;
+
+  if (btn) {
+    btn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+    btn.style.animation = 'pulse 1s infinite';
+    btn.innerHTML = '<span style="font-size: 2.5rem;">🔴</span>';
+  }
+
+  updateVoiceStatus('🎙️ Listening... Speak now!');
+  if (transcript) {
+    transcript.style.display = 'block';
+    transcript.textContent = '';
+  }
+
+  let finalTranscript = '';
+
+  speechRecognition.onresult = (event: any) => {
+    let interimTranscript = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const result = event.results[i];
+      if (result.isFinal) {
+        finalTranscript += result[0].transcript + ' ';
+      } else {
+        interimTranscript += result[0].transcript;
+      }
+    }
+    if (transcript) {
+      transcript.textContent = finalTranscript + interimTranscript;
+    }
+  };
+
+  speechRecognition.onend = async () => {
+    isRecording = false;
+    resetRecordButton();
+
+    if (finalTranscript.trim()) {
+      updateVoiceStatus('Processing your pitch...');
+      await processVoiceInput(finalTranscript.trim());
+    } else {
+      updateVoiceStatus('No speech detected. Try again!');
+    }
+  };
+
+  speechRecognition.onerror = (event: any) => {
+    console.error('Speech recognition error:', event.error);
+    isRecording = false;
+    resetRecordButton();
+
+    if (event.error === 'no-speech') {
+      updateVoiceStatus('No speech detected. Tap the mic and speak!');
+    } else if (event.error === 'not-allowed') {
+      updateVoiceStatus('Microphone access denied. Please allow microphone access.');
+    } else {
+      updateVoiceStatus('Error: ' + event.error + '. Try again!');
+    }
+  };
+
+  speechRecognition.start();
+}
+
+function stopVoiceRecording() {
+  if (speechRecognition) {
+    speechRecognition.stop();
+  }
+  isRecording = false;
+  resetRecordButton();
+}
+
+function resetRecordButton() {
+  const btn = document.getElementById('voice-record-btn') as HTMLElement;
+  if (btn) {
+    btn.style.background = 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)';
+    btn.style.animation = 'none';
+    btn.innerHTML = '<span style="font-size: 2.5rem;">🎤</span>';
+  }
+}
+
+function updateVoiceStatus(message: string) {
+  const status = document.getElementById('voice-status');
+  if (status) status.textContent = message;
+}
+
+async function processVoiceInput(userMessage: string) {
+  // Add user message to chat
+  addPitchMessage('user', userMessage);
+
+  // Show loading
+  const loadingEl = document.getElementById('agnes-loading');
+  const inputArea = document.getElementById('pitch-input-area');
+  if (loadingEl) loadingEl.style.display = 'block';
+  if (inputArea) inputArea.style.display = 'none';
+
+  try {
+    // Generate Agnes response
+    const agnesResponse = await generateAgnesPitchResponse(userMessage);
+
+    // Add Agnes message to chat
+    addPitchMessage('agnes', agnesResponse);
+
+    // Hide loading, show input
+    if (loadingEl) loadingEl.style.display = 'none';
+    if (inputArea) inputArea.style.display = 'block';
+
+    // Speak Agnes's response
+    updateVoiceStatus('🧓 Agnes is speaking...');
+    await speakAsAgnes(agnesResponse);
+
+    // Move to next phase
+    currentPitchPhase++;
+    if (currentPitchPhase >= pitchPhases.length) {
+      completeLivePitchPractice();
+    } else {
+      updatePitchPhaseUI();
+      const nextPhase = pitchPhases[currentPitchPhase];
+
+      // Show and speak next opening
+      setTimeout(async () => {
+        addPitchMessage('agnes', nextPhase.agnesOpening);
+        updateVoiceStatus('🧓 Agnes is speaking...');
+        await speakAsAgnes(nextPhase.agnesOpening);
+        updateVoiceStatus('Your turn! Tap the mic to respond.');
+      }, 800);
+    }
+  } catch (error) {
+    console.error('Error processing voice input:', error);
+    addPitchMessage('agnes', "That sounds good! Tell me more about what you found.");
+
+    if (loadingEl) loadingEl.style.display = 'none';
+    if (inputArea) inputArea.style.display = 'block';
+  }
+}
+
 function startLivePitchPractice() {
   currentPitchPhase = 0;
   pitchConversationHistory = [];
@@ -5633,9 +5988,14 @@ function startLivePitchPractice() {
 
   updatePitchPhaseUI();
 
-  // Add Agnes opening message
+  // Add and speak Agnes opening message
   const phase = pitchPhases[currentPitchPhase];
   addPitchMessage('agnes', phase.agnesOpening);
+
+  updateVoiceStatus('🧓 Agnes is speaking...');
+  speakAsAgnes(phase.agnesOpening).then(() => {
+    updateVoiceStatus('Your turn! Tap the mic to respond.');
+  });
 }
 
 function updatePitchPhaseUI() {
@@ -5670,9 +6030,12 @@ function updatePitchPhaseUI() {
     }
   });
 
-  // Clear input
-  const input = document.getElementById('pitch-user-input') as HTMLTextAreaElement;
-  if (input) input.value = '';
+  // Reset voice UI
+  const transcript = document.getElementById('voice-transcript') as HTMLElement;
+  if (transcript) {
+    transcript.textContent = '';
+    transcript.style.display = 'none';
+  }
 }
 
 function addPitchMessage(sender: 'user' | 'agnes', message: string) {
@@ -5696,51 +6059,9 @@ function addPitchMessage(sender: 'user' | 'agnes', message: string) {
   pitchConversationHistory.push({ sender, message });
 }
 
-async function submitPitchResponse() {
-  const input = document.getElementById('pitch-user-input') as HTMLTextAreaElement;
-  const userMessage = input?.value.trim();
-  if (!userMessage) return;
-
-  // Add user message to chat
-  addPitchMessage('user', userMessage);
-  input.value = '';
-
-  // Show loading
-  const loadingEl = document.getElementById('agnes-loading');
-  const inputArea = document.getElementById('pitch-input-area');
-  if (loadingEl) loadingEl.style.display = 'block';
-  if (inputArea) inputArea.style.display = 'none';
-
-  try {
-    // Generate Agnes response using AI
-    const agnesResponse = await generateAgnesPitchResponse(userMessage);
-    addPitchMessage('agnes', agnesResponse);
-
-    // Move to next phase after response
-    setTimeout(() => {
-      currentPitchPhase++;
-      if (currentPitchPhase >= pitchPhases.length) {
-        // Complete!
-        completeLivePitchPractice();
-      } else {
-        updatePitchPhaseUI();
-        const nextPhase = pitchPhases[currentPitchPhase];
-        setTimeout(() => addPitchMessage('agnes', nextPhase.agnesOpening), 500);
-      }
-    }, 1000);
-  } catch (error) {
-    console.error('Error generating Agnes response:', error);
-    addPitchMessage('agnes', "That sounds good! Tell me more about what you found.");
-  } finally {
-    if (loadingEl) loadingEl.style.display = 'none';
-    if (inputArea) inputArea.style.display = 'block';
-  }
-}
-
 async function generateAgnesPitchResponse(userMessage: string): Promise<string> {
   const phase = pitchPhases[currentPitchPhase];
 
-  // Check if AI is available (uses the existing ai variable from the app)
   if (typeof ai !== 'undefined' && ai) {
     try {
       const prompt = `You are Agnes, a friendly homeowner receiving a post-inspection sales pitch from a roofing company representative. The rep is at Phase ${phase.phase}: ${phase.name}.
@@ -5786,6 +6107,10 @@ function skipPitchPhase() {
     updatePitchPhaseUI();
     const nextPhase = pitchPhases[currentPitchPhase];
     addPitchMessage('agnes', nextPhase.agnesOpening);
+    updateVoiceStatus('🧓 Agnes is speaking...');
+    speakAsAgnes(nextPhase.agnesOpening).then(() => {
+      updateVoiceStatus('Your turn! Tap the mic to respond.');
+    });
   }
 }
 
@@ -5797,6 +6122,10 @@ function completeLivePitchPractice() {
   if (practiceEl) practiceEl.style.display = 'none';
   if (completeEl) completeEl.style.display = 'block';
   if (moduleComplete) moduleComplete.style.display = 'block';
+
+  // Stop any ongoing speech
+  if (speechRecognition) speechRecognition.stop();
+  synth.cancel();
 }
 
 function resetLivePitchPractice() {
@@ -5812,6 +6141,10 @@ function resetLivePitchPractice() {
   if (practiceEl) practiceEl.style.display = 'none';
   if (completeEl) completeEl.style.display = 'none';
   if (chatMessages) chatMessages.innerHTML = '';
+
+  // Stop any ongoing speech
+  if (speechRecognition) speechRecognition.stop();
+  synth.cancel();
 }
 
 // Attach Module 9 practice functions to window
@@ -5824,6 +6157,7 @@ function resetLivePitchPractice() {
 (window as any).submitPitchResponse = submitPitchResponse;
 (window as any).skipPitchPhase = skipPitchPhase;
 (window as any).resetLivePitchPractice = resetLivePitchPractice;
+(window as any).toggleVoiceRecording = toggleVoiceRecording;
 
 // --- Module 8: Damage Matching Game ---
 let selectedMatchItem: HTMLElement | null = null;

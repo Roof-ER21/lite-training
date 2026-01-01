@@ -11215,6 +11215,12 @@ button:disabled {
   80% { transform: translateX(8px); }
 }
 
+/* Pulse animation for voice recording button */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4); }
+  50% { transform: scale(1.05); box-shadow: 0 8px 30px rgba(239, 68, 68, 0.6); }
+}
+
 /* Section Intro */
 .section-intro {
   color: #6c757d;
