@@ -202,6 +202,57 @@ router.get('/status', (req: Request, res: Response) => {
   });
 });
 
+// POST /api/ai/tts - Text-to-Speech using OpenAI's high-quality voices
+router.post('/tts', async (req: Request, res: Response) => {
+  try {
+    const { text, voice = 'onyx' } = req.body;
+
+    if (!text) {
+      return res.status(400).json({ error: 'text is required' });
+    }
+
+    if (!openai) {
+      return res.status(503).json({
+        error: 'OpenAI not configured',
+        message: 'OPENAI_API_KEY environment variable is not set'
+      });
+    }
+
+    // Valid voices: alloy, echo, fable, onyx, nova, shimmer
+    // onyx = deep male, nova = female, alloy = neutral
+    const validVoices = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
+    const selectedVoice = validVoices.includes(voice) ? voice : 'onyx';
+
+    console.log(`Generating TTS with voice: ${selectedVoice}, text length: ${text.length}`);
+
+    const mp3Response = await openai.audio.speech.create({
+      model: 'tts-1-hd', // High-definition model for better quality
+      voice: selectedVoice as any,
+      input: text,
+      speed: 1.0,
+    });
+
+    // Get the audio as a buffer
+    const buffer = Buffer.from(await mp3Response.arrayBuffer());
+
+    // Set headers for audio response
+    res.set({
+      'Content-Type': 'audio/mpeg',
+      'Content-Length': buffer.length.toString(),
+      'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
+    });
+
+    res.send(buffer);
+
+  } catch (error: any) {
+    console.error('TTS error:', error);
+    res.status(500).json({
+      error: 'TTS generation failed',
+      details: error?.message || 'Unknown error'
+    });
+  }
+});
+
 // POST /api/ai/gemini-token - Generate ephemeral token for Gemini Live API
 router.post('/gemini-token', async (req: Request, res: Response) => {
   try {

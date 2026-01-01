@@ -5443,7 +5443,7 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
-// Browser TTS (simple and reliable)
+// Browser TTS fallback (used when OpenAI TTS is not available)
 function speakWithBrowser(text: string, preferFemale: boolean = false): Promise<void> {
   return new Promise((resolve) => {
     if (ttsCancelled) {
@@ -5471,10 +5471,58 @@ function speakWithBrowser(text: string, preferFemale: boolean = false): Promise<
   });
 }
 
-// Main TTS function - uses browser TTS (Gemini TTS requires different API setup)
+// High-quality TTS using OpenAI voices via server API
+async function speakWithOpenAI(text: string, preferFemale: boolean = false): Promise<void> {
+  if (ttsCancelled) return;
+
+  try {
+    // Use onyx (deep male) or nova (female) voice
+    const voice = preferFemale ? 'nova' : 'onyx';
+
+    const response = await fetch('/api/ai/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, voice })
+    });
+
+    if (!response.ok) {
+      throw new Error(`TTS API error: ${response.status}`);
+    }
+
+    const audioBlob = await response.blob();
+    const audioUrl = URL.createObjectURL(audioBlob);
+
+    return new Promise((resolve, reject) => {
+      if (ttsCancelled) {
+        URL.revokeObjectURL(audioUrl);
+        resolve();
+        return;
+      }
+
+      currentAudio = new Audio(audioUrl);
+      currentAudio.onended = () => {
+        URL.revokeObjectURL(audioUrl);
+        currentAudio = null;
+        resolve();
+      };
+      currentAudio.onerror = (e) => {
+        URL.revokeObjectURL(audioUrl);
+        currentAudio = null;
+        reject(e);
+      };
+      currentAudio.play().catch(reject);
+    });
+  } catch (error) {
+    console.log('OpenAI TTS failed, using browser fallback:', error);
+    // Fall back to browser TTS
+    await speakWithBrowser(text, preferFemale);
+  }
+}
+
+// Main TTS function - uses OpenAI high-quality voices with browser fallback
 async function speakText(text: string, preferFemale: boolean = false): Promise<void> {
   if (ttsCancelled) return;
-  await speakWithBrowser(text, preferFemale);
+  await speakWithOpenAI(text, preferFemale);
 }
 
 async function speakFullScript() {
