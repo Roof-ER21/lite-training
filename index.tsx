@@ -4183,14 +4183,16 @@ const trainingContent = {
                 <button id="agnes-module-back-btn" class="btn-secondary" style="margin-top: 10px;">← Back</button>
             </div>
 
-        <!-- Step 4: Personality/Difficulty Selector -->
+        <!-- Step 4: Quick Start (Skip old difficulty selector) -->
         <div id="agnes-difficulty-selector" style="display: none;">
-            <h2>Choose Your Agnes</h2>
-            <p>Each personality has different difficulty. Higher difficulty = more XP!</p>
-            <div id="agnes-difficulty-grid" class="agnes-difficulty-grid">
-                <!-- Dynamically populated -->
+            <h2 style="text-align: center; color: #1f2937; margin-bottom: 10px;">Ready to Practice!</h2>
+            <p style="text-align: center; color: #6b7280; margin-bottom: 25px;">You can adjust difficulty during the session</p>
+            <div style="text-align: center;">
+                <button id="agnes-start-session-btn" style="padding: 18px 50px; font-size: 18px; font-weight: 700; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; border-radius: 12px; cursor: pointer; transition: all 0.3s;">
+                    🚀 Start Role-Play
+                </button>
             </div>
-            <button onclick="showAgnesScreen('agnes-module-selector')" class="btn-secondary">← Back to Module Selection</button>
+            <button onclick="showAgnesScreen('agnes-module-selector')" class="btn-secondary" style="margin-top: 20px;">← Back to Module Selection</button>
         </div>
 
         <!-- Voice UI Screen -->
@@ -4204,6 +4206,20 @@ const trainingContent = {
                     <div id="agnes-recording-indicator" class="recording-indicator" style="display: none;">
                         <span class="rec-dot"></span> REC
                     </div>
+                </div>
+
+                <!-- In-Session Difficulty Selector -->
+                <div id="agnes-difficulty-buttons" style="display: flex; gap: 8px; justify-content: center; padding: 12px 0; background: #f8fafc; border-radius: 10px; margin: 10px 0;">
+                    <span style="font-size: 13px; color: #64748b; align-self: center; margin-right: 8px;">Difficulty:</span>
+                    <button class="difficulty-btn active" data-difficulty="easy" style="padding: 8px 20px; border: 2px solid #10b981; background: #10b981; color: white; border-radius: 20px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s;">
+                        😊 Easy
+                    </button>
+                    <button class="difficulty-btn" data-difficulty="medium" style="padding: 8px 20px; border: 2px solid #f59e0b; background: white; color: #f59e0b; border-radius: 20px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s;">
+                        🤔 Medium
+                    </button>
+                    <button class="difficulty-btn" data-difficulty="hard" style="padding: 8px 20px; border: 2px solid #ef4444; background: white; color: #ef4444; border-radius: 20px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s;">
+                        😤 Hard
+                    </button>
                 </div>
 
                 <div class="agnes-controls">
@@ -4410,9 +4426,23 @@ const trainingContent = {
 
             <!-- Screen 2: Scenario Display -->
             <div id="scenario-display" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <div id="scenario-progress" style="font-weight: 500; color: #8b4fbe;"></div>
                     <div id="turn-counter" style="font-weight: 600; color: #8b4fbe; background: #f8f4fc; padding: 8px 16px; border-radius: 20px; border: 2px solid #8b4fbe;">Turn 1 of 5</div>
+                </div>
+
+                <!-- In-Session Difficulty Selector (Text Mode) -->
+                <div id="text-difficulty-buttons" style="display: flex; gap: 8px; justify-content: center; padding: 12px 0; background: #f8fafc; border-radius: 10px; margin-bottom: 20px;">
+                    <span style="font-size: 13px; color: #64748b; align-self: center; margin-right: 8px;">Difficulty:</span>
+                    <button class="difficulty-btn active" data-difficulty="easy" style="padding: 8px 20px; border: 2px solid #10b981; background: #10b981; color: white; border-radius: 20px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s;">
+                        😊 Easy
+                    </button>
+                    <button class="difficulty-btn" data-difficulty="medium" style="padding: 8px 20px; border: 2px solid #f59e0b; background: white; color: #f59e0b; border-radius: 20px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s;">
+                        🤔 Medium
+                    </button>
+                    <button class="difficulty-btn" data-difficulty="hard" style="padding: 8px 20px; border: 2px solid #ef4444; background: white; color: #ef4444; border-radius: 20px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s;">
+                        😤 Hard
+                    </button>
                 </div>
                 <div class="roleplay-container-with-feedback">
                     <div class="roleplay-main-content">
@@ -5037,81 +5067,131 @@ trainingContent['filing-claim-closing'] = trainingContent['claim-closing'] || `
 
 // 12. Closing Objections (new) — ties into Filing the Claim & Closing
 trainingContent['closing-objections'] = `
-  <div class="content-card">
-    <h1>Closing Objections</h1>
-
-    <h2>12 Final Closing Objections & Responses</h2>
-    <div class="closing-objections">
-      <div class="closing-objection">
-        <h3>"I want to wait for more bids"</h3>
-        <p><strong>Response:</strong> "I respect that. But here's what happens: We file TODAY, start your timeline. Other contractors will bid the same - insurance sets the price. Difference is, we're the fastest in the area. Every week you wait is a week later you get your new roof. File now, get other bids while we wait for the adjuster?"</p>
-      </div>
-
-      <div class="closing-objection">
-        <h3>"I need to think about it"</h3>
-        <p><strong>Response:</strong> "Absolutely. What specifically do you need to think about? [Listen] ... Most people say that when they're unsure about [objection]. Let me address that: [handle objection]. Does that help?"</p>
-      </div>
-
-      <div class="closing-objection">
-        <h3>"Call me next week"</h3>
-        <p><strong>Response:</strong> "I can do that. But can I ask - what changes between now and next week? [Listen] ... Here's my concern: your statute of limitations is ticking, weather window is closing. Can we at least file the claim today? That reserves your rights. You can still decide on the contractor later."</p>
-      </div>
-
-      <div class="closing-objection">
-        <h3>"I'm not sure about the deductible"</h3>
-        <p><strong>Response:</strong> "I get it - deductibles can sting. But let's look at the math: Your deductible is probably $1,000-2,500. A new roof costs $15,000-25,000. You're paying 5-10% for a brand new roof. Where else can you get that return? Plus, not fixing it means leaks in 6 months - then you pay the full $20k yourself."</p>
-      </div>
-
-      <div class="closing-objection">
-        <h3>"My spouse handles this stuff"</h3>
-        <p><strong>Response:</strong> "Perfect! Are they home? I can wait. Or we can do a quick 3-way call - takes 5 minutes to walk through the photos. I'm here now, roof's already documented, let's get them on the same page so you can make the best decision together."</p>
-      </div>
-
-      <div class="closing-objection">
-        <h3>"I don't trust contractors"</h3>
-        <p><strong>Response:</strong> "I totally understand - this industry has a bad reputation. That's exactly why we do things differently. Contingency agreement means you only pay if we deliver. No money upfront, no risk to you. We're the only company in the area that offers this protection. Give me a shot to prove we're different."</p>
-      </div>
+  <div class="content-card" style="background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%); padding: 0; overflow: hidden;">
+    <!-- Hero Header -->
+    <div style="background: linear-gradient(135deg, #dc2626 0%, #ef4444 50%, #f87171 100%); padding: 40px 30px; text-align: center; color: white;">
+      <div style="font-size: 48px; margin-bottom: 15px;">🎯</div>
+      <h1 style="margin: 0 0 10px 0; font-size: 28px; font-weight: 700;">Closing Objections</h1>
+      <p style="margin: 0; opacity: 0.9; font-size: 16px;">Master the final hurdles to seal the deal</p>
     </div>
 
-    <h2>The Assumptive Close</h2>
-    <p>After handling objections, assume the sale:</p>
-    <ul>
-      <li>"Let me text you that contract now - what's your cell?"</li>
-      <li>"I'll mark you down for [color]. Any preference on shingle style?"</li>
-      <li>"Perfect! I'll get with my scheduling team and text you a date this week."</li>
-      <li>"Great! Let me pull up the contract - I'll walk you through it real quick."</li>
-    </ul>
+    <div style="padding: 30px;">
+      <!-- Quick Stats -->
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;">
+        <div style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); padding: 20px; border-radius: 12px; text-align: center;">
+          <div style="font-size: 28px; font-weight: 700; color: #dc2626;">6</div>
+          <div style="font-size: 13px; color: #991b1b;">Key Objections</div>
+        </div>
+        <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 20px; border-radius: 12px; text-align: center;">
+          <div style="font-size: 28px; font-weight: 700; color: #16a34a;">4</div>
+          <div style="font-size: 13px; color: #166534;">Closing Phrases</div>
+        </div>
+        <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 20px; border-radius: 12px; text-align: center;">
+          <div style="font-size: 28px; font-weight: 700; color: #2563eb;">5</div>
+          <div style="font-size: 13px; color: #1e40af;">Steps to Close</div>
+        </div>
+      </div>
 
-    <p>Common pushbacks when moving from claim filing to the close, with concise responses and next‑step prompts.</p>
-    <div class="script" data-text-source="true">
-      <button class="speak-btn" aria-label="Listen to script">🔊</button>
-      <p><strong>"I need to think about it."</strong><br>
-      Absolutely—totally fair. Would it help if I summarize where we are and what happens next? It's a simple step: we'll handle the carrier communication and keep you updated. The only cost to you is the deductible if fully approved.</p>
-    </div>
-    <div class="script" data-text-source="true">
-      <button class="speak-btn" aria-label="Listen to script">🔊</button>
-      <p><strong>"I'll just call my insurance myself."</strong><br>
-      That works too. The benefit of authorizing us is we do the legwork—photos, documentation, and follow‑ups—while keeping you in the loop, so you're not the middle‑person.</p>
-    </div>
-    <div class="script" data-text-source="true">
-      <button class="speak-btn" aria-label="Listen to script">🔊</button>
-      <p><strong>"I'm worried about costs."</strong><br>
-      Understandable. If approved, your only out‑of‑pocket is the deductible. No surprises—everything is documented and reviewed with you before work begins.</p>
-    </div>
-    <h3>Flow to Close</h3>
-    <ol>
-      <li>Recap inspection results and insurance path</li>
-      <li>Clarify deductible and timeline</li>
-      <li>Present authorization/contingency forms</li>
-      <li>Set expectations for adjuster meeting</li>
-      <li>Schedule next touchpoint</li>
-    </ol>
-    <p>Review the prior section <em>Filing the Claim & Closing</em> for scripts and carrier variations.</p>
+      <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+        <span style="background: #fef2f2; padding: 8px 12px; border-radius: 8px;">🛑</span>
+        Top 6 Closing Objections & Responses
+      </h2>
 
-    <div class="module-completion-section" id="module-complete-section" style="display: none;">
-      <button class="complete-module-btn" onclick="completeModule('closing-objections')">
-        Complete Module & Continue
-      </button>
+      <div style="display: grid; gap: 15px; margin-bottom: 35px;">
+        <div style="background: white; border: 2px solid #fee2e2; border-radius: 12px; padding: 20px; border-left: 4px solid #dc2626;">
+          <h3 style="color: #dc2626; font-size: 16px; margin: 0 0 12px 0;">"I want to wait for more bids"</h3>
+          <p style="color: #374151; font-size: 14px; line-height: 1.6; margin: 0;"><strong style="color: #059669;">Response:</strong> "I respect that. But here's what happens: We file TODAY, start your timeline. Other contractors will bid the same - insurance sets the price. Difference is, we're the fastest in the area. Every week you wait is a week later you get your new roof. File now, get other bids while we wait for the adjuster?"</p>
+        </div>
+
+        <div style="background: white; border: 2px solid #fee2e2; border-radius: 12px; padding: 20px; border-left: 4px solid #dc2626;">
+          <h3 style="color: #dc2626; font-size: 16px; margin: 0 0 12px 0;">"I need to think about it"</h3>
+          <p style="color: #374151; font-size: 14px; line-height: 1.6; margin: 0;"><strong style="color: #059669;">Response:</strong> "Absolutely. What specifically do you need to think about? [Listen] ... Most people say that when they're unsure about [objection]. Let me address that: [handle objection]. Does that help?"</p>
+        </div>
+
+        <div style="background: white; border: 2px solid #fee2e2; border-radius: 12px; padding: 20px; border-left: 4px solid #dc2626;">
+          <h3 style="color: #dc2626; font-size: 16px; margin: 0 0 12px 0;">"Call me next week"</h3>
+          <p style="color: #374151; font-size: 14px; line-height: 1.6; margin: 0;"><strong style="color: #059669;">Response:</strong> "I can do that. But can I ask - what changes between now and next week? [Listen] ... Here's my concern: your statute of limitations is ticking, weather window is closing. Can we at least file the claim today? That reserves your rights."</p>
+        </div>
+
+        <div style="background: white; border: 2px solid #fee2e2; border-radius: 12px; padding: 20px; border-left: 4px solid #dc2626;">
+          <h3 style="color: #dc2626; font-size: 16px; margin: 0 0 12px 0;">"I'm not sure about the deductible"</h3>
+          <p style="color: #374151; font-size: 14px; line-height: 1.6; margin: 0;"><strong style="color: #059669;">Response:</strong> "I get it - deductibles can sting. But let's look at the math: Your deductible is probably $1,000-2,500. A new roof costs $15,000-25,000. You're paying 5-10% for a brand new roof. Where else can you get that return?"</p>
+        </div>
+
+        <div style="background: white; border: 2px solid #fee2e2; border-radius: 12px; padding: 20px; border-left: 4px solid #dc2626;">
+          <h3 style="color: #dc2626; font-size: 16px; margin: 0 0 12px 0;">"My spouse handles this stuff"</h3>
+          <p style="color: #374151; font-size: 14px; line-height: 1.6; margin: 0;"><strong style="color: #059669;">Response:</strong> "Perfect! Are they home? I can wait. Or we can do a quick 3-way call - takes 5 minutes to walk through the photos. I'm here now, roof's already documented, let's get them on the same page."</p>
+        </div>
+
+        <div style="background: white; border: 2px solid #fee2e2; border-radius: 12px; padding: 20px; border-left: 4px solid #dc2626;">
+          <h3 style="color: #dc2626; font-size: 16px; margin: 0 0 12px 0;">"I don't trust contractors"</h3>
+          <p style="color: #374151; font-size: 14px; line-height: 1.6; margin: 0;"><strong style="color: #059669;">Response:</strong> "I totally understand - this industry has a bad reputation. That's exactly why we do things differently. Contingency agreement means you only pay if we deliver. No money upfront, no risk to you."</p>
+        </div>
+      </div>
+
+      <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+        <span style="background: #f0fdf4; padding: 8px 12px; border-radius: 8px;">✅</span>
+        The Assumptive Close
+      </h2>
+
+      <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 16px; padding: 25px; margin-bottom: 35px;">
+        <p style="color: #166534; font-size: 15px; margin: 0 0 20px 0; font-weight: 500;">After handling objections, assume the sale with these phrases:</p>
+        <div style="display: grid; gap: 12px;">
+          <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 12px;">
+            <span style="background: #16a34a; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">1</span>
+            <span style="color: #374151; font-size: 14px;">"Let me text you that contract now - what's your cell?"</span>
+          </div>
+          <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 12px;">
+            <span style="background: #16a34a; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">2</span>
+            <span style="color: #374151; font-size: 14px;">"I'll mark you down for [color]. Any preference on shingle style?"</span>
+          </div>
+          <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 12px;">
+            <span style="background: #16a34a; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">3</span>
+            <span style="color: #374151; font-size: 14px;">"Perfect! I'll get with my scheduling team and text you a date this week."</span>
+          </div>
+          <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 12px;">
+            <span style="background: #16a34a; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">4</span>
+            <span style="color: #374151; font-size: 14px;">"Great! Let me pull up the contract - I'll walk you through it real quick."</span>
+          </div>
+        </div>
+      </div>
+
+      <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+        <span style="background: #eff6ff; padding: 8px 12px; border-radius: 8px;">📋</span>
+        5-Step Flow to Close
+      </h2>
+
+      <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-radius: 16px; padding: 25px; margin-bottom: 30px;">
+        <div style="display: grid; gap: 12px;">
+          <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
+            <span style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700;">1</span>
+            <span style="color: #1e40af; font-size: 15px; font-weight: 500;">Recap inspection results and insurance path</span>
+          </div>
+          <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
+            <span style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700;">2</span>
+            <span style="color: #1e40af; font-size: 15px; font-weight: 500;">Clarify deductible and timeline</span>
+          </div>
+          <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
+            <span style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700;">3</span>
+            <span style="color: #1e40af; font-size: 15px; font-weight: 500;">Present authorization/contingency forms</span>
+          </div>
+          <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
+            <span style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700;">4</span>
+            <span style="color: #1e40af; font-size: 15px; font-weight: 500;">Set expectations for adjuster meeting</span>
+          </div>
+          <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
+            <span style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700;">5</span>
+            <span style="color: #1e40af; font-size: 15px; font-weight: 500;">Schedule next touchpoint</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="module-completion-section" id="module-complete-section" style="display: none; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 30px; border-radius: 16px; text-align: center; margin-top: 30px;">
+        <p style="color: #166534; font-size: 16px; margin: 0 0 20px 0; font-weight: 500;">🎉 Ready to continue?</p>
+        <button class="complete-module-btn" onclick="completeModule('closing-objections')" style="padding: 16px 40px; font-size: 16px; font-weight: 600; background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: white; border: none; border-radius: 12px; cursor: pointer; transition: all 0.3s;">
+          Complete Module & Continue →
+        </button>
+      </div>
     </div>
   </div>
 `;
@@ -8923,6 +9003,84 @@ function initAgnesLiveRolePlay() {
     document.getElementById('agnes-door-slam-modal')!.style.display = 'none';
     showAgnesScreen('agnes-mode-selector');
   });
+
+  // NEW: Start Session button (simplified flow - skip old difficulty selector)
+  const startSessionBtn = document.getElementById('agnes-start-session-btn');
+  startSessionBtn?.addEventListener('click', () => {
+    // Default to EASY difficulty
+    agnesLiveState.difficulty = 'BEGINNER';
+
+    // Pick a random scenario from the selected module
+    if (agnesSessionConfig.selectedScenarios.length > 0) {
+      const randomIndex = Math.floor(Math.random() * agnesSessionConfig.selectedScenarios.length);
+      agnesSessionConfig.currentScenarioIndex = randomIndex;
+    }
+
+    console.log(`🎯 Starting ${agnesSessionConfig.trainingType} mode (${agnesSessionConfig.inputMode}) with EASY difficulty`);
+
+    // Start the appropriate mode
+    if (agnesSessionConfig.inputMode === 'voice') {
+      showAgnesScreen('agnes-voice-ui');
+      initAgnesLiveSession();
+    } else {
+      showAgnesScreen('agnes-text-ui');
+      initRolePlayWithScenarios(agnesSessionConfig.selectedScenarios, agnesSessionConfig.trainingType);
+    }
+  });
+
+  // NEW: In-session difficulty buttons handler
+  function setupDifficultyButtons() {
+    const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+    difficultyBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const difficulty = (btn as HTMLElement).dataset.difficulty;
+        if (!difficulty) return;
+
+        // Update visual state for all difficulty button groups
+        document.querySelectorAll('.difficulty-btn').forEach(b => {
+          const d = (b as HTMLElement).dataset.difficulty;
+          if (d === difficulty) {
+            // Make active
+            if (d === 'easy') {
+              (b as HTMLElement).style.background = '#10b981';
+              (b as HTMLElement).style.color = 'white';
+            } else if (d === 'medium') {
+              (b as HTMLElement).style.background = '#f59e0b';
+              (b as HTMLElement).style.color = 'white';
+            } else if (d === 'hard') {
+              (b as HTMLElement).style.background = '#ef4444';
+              (b as HTMLElement).style.color = 'white';
+            }
+            b.classList.add('active');
+          } else {
+            // Make inactive
+            const dOther = (b as HTMLElement).dataset.difficulty;
+            if (dOther === 'easy') {
+              (b as HTMLElement).style.background = 'white';
+              (b as HTMLElement).style.color = '#10b981';
+            } else if (dOther === 'medium') {
+              (b as HTMLElement).style.background = 'white';
+              (b as HTMLElement).style.color = '#f59e0b';
+            } else if (dOther === 'hard') {
+              (b as HTMLElement).style.background = 'white';
+              (b as HTMLElement).style.color = '#ef4444';
+            }
+            b.classList.remove('active');
+          }
+        });
+
+        // Map simple difficulty to internal difficulty levels
+        const difficultyMap: Record<string, string> = {
+          'easy': 'BEGINNER',
+          'medium': 'PRO',
+          'hard': 'ELITE'
+        };
+        agnesLiveState.difficulty = difficultyMap[difficulty] || 'BEGINNER';
+        console.log(`🎚️ Difficulty changed to: ${difficulty} (${agnesLiveState.difficulty})`);
+      });
+    });
+  }
+  setupDifficultyButtons();
 
   // Show mode selector
   showAgnesScreen('agnes-mode-selector');
