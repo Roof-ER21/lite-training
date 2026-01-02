@@ -5165,7 +5165,7 @@ trainingContent['closing-objections'] = `
         <div style="display: grid; gap: 12px;">
           <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
             <span style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700;">1</span>
-            <span style="color: #1e40af; font-size: 15px; font-weight: 500;">Recap inspection results and insurance path</span>
+            <span style="color: #1e40af; font-size: 15px; font-weight: 500;">Secure and conduct the inspection</span>
           </div>
           <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
             <span style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700;">2</span>
@@ -5173,7 +5173,7 @@ trainingContent['closing-objections'] = `
           </div>
           <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
             <span style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700;">3</span>
-            <span style="color: #1e40af; font-size: 15px; font-weight: 500;">Present authorization/contingency forms</span>
+            <span style="color: #1e40af; font-size: 15px; font-weight: 500;">Present contingency/agreement forms</span>
           </div>
           <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
             <span style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700;">4</span>
@@ -5181,7 +5181,7 @@ trainingContent['closing-objections'] = `
           </div>
           <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
             <span style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700;">5</span>
-            <span style="color: #1e40af; font-size: 15px; font-weight: 500;">Schedule next touchpoint</span>
+            <span style="color: #1e40af; font-size: 15px; font-weight: 500;">Stay in regular contact with the Home Owner</span>
           </div>
         </div>
       </div>
