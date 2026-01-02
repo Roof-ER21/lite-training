@@ -7090,9 +7090,12 @@ function showQuizResultsM11() {
         <div style="font-size: 64px; margin-bottom: 15px;">🎉</div>
         <h3 style="color: #166534; font-size: 24px; margin: 0 0 10px 0;">Great job!</h3>
         <p style="color: #374151; font-size: 18px; margin: 0 0 20px 0;">You got <strong>${quizStateM11.correct}/${quizStateM11.total}</strong> correct (${score}%)</p>
-        <div style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); padding: 15px; border-radius: 10px;">
+        <div style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
           <p style="color: #166534; margin: 0; font-weight: 500;">You're ready to move on!</p>
         </div>
+        <button onclick="resetQuizM11()" style="background: linear-gradient(135deg, #64748b 0%, #94a3b8 100%); color: white; border: none; padding: 12px 24px; border-radius: 25px; font-weight: 600; font-size: 14px; cursor: pointer;">
+          🔄 Retake Quiz
+        </button>
       `;
       // Show module completion
       const completeSection = document.getElementById('module-complete-section');
@@ -7105,8 +7108,8 @@ function showQuizResultsM11() {
         <div style="background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
           <p style="color: #991b1b; margin: 0; font-weight: 500;">You need 80% to pass. Review the material and try again!</p>
         </div>
-        <button onclick="resetQuizM11()" style="background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); color: white; border: none; padding: 14px 28px; border-radius: 25px; font-weight: 600; font-size: 16px; cursor: pointer;">
-          Try Again
+        <button onclick="resetQuizM11()" style="background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); color: white; border: none; padding: 14px 28px; border-radius: 25px; font-weight: 600; font-size: 16px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+          🔄 Try Again
         </button>
       `;
     }
@@ -7155,10 +7158,13 @@ function initSalesCycleSorter() {
     if (!pool || !dropZone || !feedbackEl) return;
 
     let draggedItem: HTMLElement | null = null;
+    let dragSource: 'pool' | 'dropzone' | null = null;
     const correctOrder = ['1', '2', '3', '4', '5'];
 
+    // Handle drag from pool
     pool.addEventListener('dragstart', (e) => {
         draggedItem = e.target as HTMLElement;
+        dragSource = 'pool';
         setTimeout(() => {
             if (draggedItem) draggedItem.style.opacity = '0.5';
         }, 0);
@@ -7169,17 +7175,49 @@ function initSalesCycleSorter() {
             if (draggedItem) {
                 draggedItem.style.opacity = '1';
                 draggedItem = null;
+                dragSource = null;
             }
         }, 0);
     });
 
+    // Handle drag from drop zone (to move back to pool)
+    dropZone.addEventListener('dragstart', (e) => {
+        draggedItem = e.target as HTMLElement;
+        dragSource = 'dropzone';
+        setTimeout(() => {
+            if (draggedItem) draggedItem.style.opacity = '0.5';
+        }, 0);
+    });
+
+    dropZone.addEventListener('dragend', () => {
+        setTimeout(() => {
+            if (draggedItem) {
+                draggedItem.style.opacity = '1';
+                draggedItem = null;
+                dragSource = null;
+            }
+        }, 0);
+    });
+
+    // Drop zone accepts items
     dropZone.addEventListener('dragover', e => e.preventDefault());
 
     dropZone.addEventListener('drop', (e) => {
         e.preventDefault();
-        if (draggedItem) {
+        if (draggedItem && dragSource === 'pool') {
             dropZone.appendChild(draggedItem);
             checkOrder();
+        }
+    });
+
+    // Pool accepts items back from drop zone
+    pool.addEventListener('dragover', e => e.preventDefault());
+
+    pool.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (draggedItem && dragSource === 'dropzone') {
+            pool.appendChild(draggedItem);
+            feedbackEl.style.display = 'none'; // Hide feedback when moving items back
         }
     });
 
@@ -7188,7 +7226,7 @@ function initSalesCycleSorter() {
         if (items.length !== correctOrder.length) return;
 
         const currentOrder = Array.from(items).map(item => (item as HTMLElement).dataset.order);
-        
+
         if (JSON.stringify(currentOrder) === JSON.stringify(correctOrder)) {
             feedbackEl.textContent = 'Correct! That is the right order.';
             feedbackEl.className = 'feedback-message correct';
