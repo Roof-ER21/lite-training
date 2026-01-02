@@ -307,8 +307,8 @@ const FINAL_EXAM_MCQ: MCQQuestion[] = [
   { id: 'mcq-33', module: 12, question: 'The homeowner says "I want to get other quotes." Best response?', options: ['Fine, get 10 quotes', 'Explain you\'re a claims specialist, not just a roofer, and what sets you apart', 'Lower your price immediately', 'Criticize other companies'], correctAnswer: 1, explanation: 'Differentiate by explaining you\'re a claims specialist who handles insurance, not just a roofer.' },
   { id: 'mcq-34', module: 12, question: 'What should you do immediately after getting a signature?', options: ['Leave quickly', 'Set clear next-step expectations and timeline', 'Ask for referrals only', 'Nothing - job is done'], correctAnswer: 1, explanation: 'Set clear expectations: what happens next, when they\'ll hear from you, timeline for process.' },
 
-  // Module 13-14: Products & Sales Cycle (1 MCQ)
-  { id: 'mcq-35', module: 14, question: 'What are the main stages of the Roof E.R. sales cycle?', options: ['Call, Sell, Install', 'Knock, Inspect, File claim, Meet adjuster, Install, Collect', 'Email, Quote, Invoice', 'Advertise, Estimate, Build'], correctAnswer: 1, explanation: 'Full cycle: Door knock → Inspection → File claim → Adjuster meeting → Installation → Collection.' }
+  // Module 13: Sales Cycle (1 MCQ)
+  { id: 'mcq-35', module: 13, question: 'What are the main stages of the Roof E.R. sales cycle?', options: ['Call, Sell, Install', 'Knock, Inspect, File claim, Meet adjuster, Install, Collect', 'Email, Quote, Invoice', 'Advertise, Estimate, Build'], correctAnswer: 1, explanation: 'Full cycle: Door knock → Inspection → File claim → Adjuster meeting → Installation → Collection.' }
 ];
 
 const FINAL_EXAM_FIB: FIBQuestion[] = [
@@ -392,7 +392,6 @@ const MODULE_ORDER = [
   'damage-identification',
   'filing-claim-closing',
   'closing-objections',
-  'discontinued-products',
   'sales-cycle-job-flow',
   'role-play',
   'final-exam'
@@ -423,7 +422,6 @@ const MODULE_REQUIREMENTS: Record<string, ModuleRequirements> = {
   'damage-identification': { needsQuiz: true, needsScroll: true },
   'filing-claim-closing': { needsTime: 60, needsScroll: true },
   'closing-objections': { needsTime: 60, needsScroll: true },
-  'discontinued-products': { needsTime: 60, needsScroll: true },
   'sales-cycle-job-flow': { needsTime: 60, needsScroll: true },
   'role-play': { needsScroll: true }, // Special: unlock when role-play starts
   'final-exam': { needsQuiz: true, needsScroll: true },
@@ -1264,7 +1262,6 @@ function getNextTrainingModule(): { module: string; displayName: string } {
     'damage-identification': 'Damage Identification',
     'filing-claim-closing': 'Filing the Claim & Closing',
     'closing-objections': 'Closing Objections',
-    'discontinued-products': 'Discontinued Products',
     'sales-cycle-job-flow': 'The Sales Cycle & Job Flow',
     'role-play': 'AI Role-Play',
     'final-exam': 'Final Exam'
@@ -1393,8 +1390,8 @@ async function initMyPage() {
   // Determine next milestone
   const milestoneEl = document.getElementById('stat-milestone');
   if (milestoneEl) {
-    if (completedModulesCount < 16) {
-      const remaining = 16 - completedModulesCount;
+    if (completedModulesCount < 15) {
+      const remaining = 15 - completedModulesCount;
       milestoneEl.textContent = `${remaining} modules`;
     } else {
       milestoneEl.textContent = 'Complete!';
@@ -4057,117 +4054,134 @@ const trainingContent = {
     </div>
   `,
   'role-play': `
-    <div class="content-card agnes-roleplay-container">
-        <h1>🎙️ Agnes 21 AI Role-Play Training</h1>
-        <p class="agnes-subtitle">Practice your sales pitch with real-time AI feedback. Choose your training mode below.</p>
-
-        <!-- Error Display -->
-        <div id="agnes-error" class="agnes-error" style="display: none;"></div>
-
-        <!-- Step 1: Training Type Selector -->
-        <div id="agnes-mode-selector" style="display: block;">
-            <div id="agnes-xp-bar" class="agnes-xp-bar"></div>
-
-            <h2>How Do You Want to Train?</h2>
-            <div class="agnes-mode-grid">
-                <button id="agnes-roleplay-btn" class="agnes-mode-card voice-mode">
-                    <div class="mode-icon">🎭</div>
-                    <div class="mode-title">Role Play</div>
-                    <div class="mode-subtitle">Free Practice</div>
-                    <div class="mode-desc">
-                        <ul>
-                            <li>🗣️ Jump right into conversation</li>
-                            <li>🎯 Real-time AI feedback</li>
-                            <li>📊 Scoring after each response</li>
-                            <li>💪 Build confidence fast</li>
-                        </ul>
-                    </div>
-                    <div class="mode-badge">RECOMMENDED</div>
-                </button>
-
-                <button id="agnes-walkthrough-btn" class="agnes-mode-card text-mode">
-                    <div class="mode-icon">📚</div>
-                    <div class="mode-title">Walk Through</div>
-                    <div class="mode-subtitle">Guided Practice</div>
-                    <div class="mode-desc">
-                        <ul>
-                            <li>📝 See example responses first</li>
-                            <li>🎓 Learn the ideal approach</li>
-                            <li>🔄 Then practice yourself</li>
-                            <li>✅ Compare your response</li>
-                        </ul>
-                    </div>
-                </button>
-            </div>
+    <div class="content-card agnes-roleplay-container" style="background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%); padding: 0; overflow: hidden;">
+        <!-- Hero Header -->
+        <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%); padding: 40px 30px; text-align: center; color: white;">
+            <div style="font-size: 48px; margin-bottom: 15px;">🎭</div>
+            <h1 style="margin: 0 0 10px 0; font-size: 28px; font-weight: 700;">AI Role-Play Training</h1>
+            <p style="margin: 0; opacity: 0.9; font-size: 16px;">Master your pitch with real-time AI feedback</p>
         </div>
 
-        <!-- Step 2: Input Mode Selector (Role Play only) -->
-        <div id="agnes-input-mode-selector" style="display: none;">
-            <h2>Choose Your Input Method</h2>
-            <p>How would you like to practice?</p>
-            <div class="agnes-mode-grid">
-                <button id="agnes-voice-mode-btn" class="agnes-mode-card voice-mode">
-                    <div class="mode-icon">🎤</div>
-                    <div class="mode-title">Voice Mode</div>
-                    <div class="mode-subtitle">Speak with Agnes</div>
-                    <div class="mode-desc">
-                        <ul>
-                            <li>🗣️ Real conversation practice</li>
-                            <li>📹 Optional video recording</li>
+        <div style="padding: 30px;">
+            <!-- Error Display -->
+            <div id="agnes-error" class="agnes-error" style="display: none;"></div>
+
+            <!-- XP Progress Bar -->
+            <div id="agnes-xp-bar" class="agnes-xp-bar" style="margin-bottom: 30px;"></div>
+
+            <!-- Step 1: Training Type Selector -->
+            <div id="agnes-mode-selector" style="display: block;">
+                <h2 style="text-align: center; color: #1f2937; margin-bottom: 10px;">Choose Your Training Mode</h2>
+                <p style="text-align: center; color: #6b7280; margin-bottom: 30px;">Two focused modules to perfect your pitch and inspection skills</p>
+
+                <div class="agnes-mode-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                    <button id="agnes-roleplay-btn" class="agnes-mode-card voice-mode" style="padding: 30px; border: 2px solid #e5e7eb; border-radius: 16px; background: white; cursor: pointer; text-align: left; transition: all 0.3s; position: relative;">
+                        <div style="position: absolute; top: -12px; right: 20px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 600;">RECOMMENDED</div>
+                        <div style="font-size: 42px; margin-bottom: 15px;">🎯</div>
+                        <div style="font-weight: 700; font-size: 20px; color: #1f2937; margin-bottom: 5px;">Free Practice</div>
+                        <div style="font-size: 14px; color: #6b7280; margin-bottom: 15px;">Jump into real scenarios</div>
+                        <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; color: #374151;">
+                            <li style="margin-bottom: 8px;">✓ Real-time AI conversation</li>
+                            <li style="margin-bottom: 8px;">✓ Instant scoring & feedback</li>
+                            <li style="margin-bottom: 8px;">✓ Voice or text input</li>
+                            <li>✓ Build confidence fast</li>
+                        </ul>
+                    </button>
+
+                    <button id="agnes-walkthrough-btn" class="agnes-mode-card text-mode" style="padding: 30px; border: 2px solid #e5e7eb; border-radius: 16px; background: white; cursor: pointer; text-align: left; transition: all 0.3s;">
+                        <div style="font-size: 42px; margin-bottom: 15px;">📖</div>
+                        <div style="font-weight: 700; font-size: 20px; color: #1f2937; margin-bottom: 5px;">Guided Practice</div>
+                        <div style="font-size: 14px; color: #6b7280; margin-bottom: 15px;">Learn the ideal responses first</div>
+                        <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; color: #374151;">
+                            <li style="margin-bottom: 8px;">✓ See example responses</li>
+                            <li style="margin-bottom: 8px;">✓ Learn the best approach</li>
+                            <li style="margin-bottom: 8px;">✓ Then practice yourself</li>
+                            <li>✓ Compare side-by-side</li>
+                        </ul>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Input Mode Selector -->
+            <div id="agnes-input-mode-selector" style="display: none;">
+                <h2 style="text-align: center; color: #1f2937; margin-bottom: 10px;">How Do You Want to Practice?</h2>
+                <p style="text-align: center; color: #6b7280; margin-bottom: 30px;">Choose your preferred input method</p>
+
+                <div class="agnes-mode-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                    <button id="agnes-voice-mode-btn" class="agnes-mode-card voice-mode" style="padding: 30px; border: 2px solid #3b82f6; border-radius: 16px; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); cursor: pointer; text-align: left; transition: all 0.3s; position: relative;">
+                        <div style="position: absolute; top: -12px; right: 20px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 600;">MOST REALISTIC</div>
+                        <div style="font-size: 42px; margin-bottom: 15px;">🎤</div>
+                        <div style="font-weight: 700; font-size: 20px; color: #1e40af; margin-bottom: 5px;">Voice Mode</div>
+                        <div style="font-size: 14px; color: #3b82f6; margin-bottom: 15px;">Speak naturally with Agnes</div>
+                        <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; color: #1e40af;">
+                            <li style="margin-bottom: 8px;">🗣️ Real conversation feel</li>
+                            <li style="margin-bottom: 8px;">📹 Optional video recording</li>
                             <li>⚡ Instant audio feedback</li>
                         </ul>
-                    </div>
-                    <div class="mode-badge">BEST FOR REALISM</div>
-                </button>
+                    </button>
 
-                <button id="agnes-text-mode-btn" class="agnes-mode-card text-mode">
-                    <div class="mode-icon">⌨️</div>
-                    <div class="mode-title">Text Mode</div>
-                    <div class="mode-subtitle">Type Your Responses</div>
-                    <div class="mode-desc">
-                        <ul>
-                            <li>✍️ Think at your own pace</li>
-                            <li>📝 Review before submitting</li>
+                    <button id="agnes-text-mode-btn" class="agnes-mode-card text-mode" style="padding: 30px; border: 2px solid #e5e7eb; border-radius: 16px; background: white; cursor: pointer; text-align: left; transition: all 0.3s;">
+                        <div style="font-size: 42px; margin-bottom: 15px;">⌨️</div>
+                        <div style="font-weight: 700; font-size: 20px; color: #1f2937; margin-bottom: 5px;">Text Mode</div>
+                        <div style="font-size: 14px; color: #6b7280; margin-bottom: 15px;">Type your responses</div>
+                        <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; color: #374151;">
+                            <li style="margin-bottom: 8px;">✍️ Think at your own pace</li>
+                            <li style="margin-bottom: 8px;">📝 Review before sending</li>
                             <li>📊 Detailed scoring</li>
                         </ul>
-                    </div>
-                </button>
+                    </button>
+                </div>
+                <button onclick="showAgnesScreen('agnes-mode-selector')" class="btn-secondary" style="margin-top: 10px;">← Back</button>
             </div>
-            <button onclick="showAgnesScreen('agnes-mode-selector')" class="btn-secondary" style="margin-top: 20px;">← Back</button>
-        </div>
 
-        <!-- Step 3: Module Selector -->
-        <div id="agnes-module-selector" style="display: none;">
-            <h2>What Do You Want to Practice?</h2>
-            <p>Agnes will auto-select scenarios from your chosen module.</p>
-            <div class="agnes-module-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 25px 0;">
-                <button class="agnes-module-card" data-module="7" style="padding: 25px; border: 2px solid #e5e7eb; border-radius: 12px; background: white; cursor: pointer; text-align: left; transition: all 0.3s;">
-                    <div style="font-size: 36px; margin-bottom: 10px;">🚪</div>
-                    <div style="font-weight: 700; font-size: 16px; color: #1f2937;">Module 7</div>
-                    <div style="font-size: 14px; color: #6b7280; margin-top: 5px;">Door Knock & Inspection</div>
-                    <div style="font-size: 12px; color: #8b4fbe; margin-top: 8px;">9 scenarios</div>
-                </button>
-                <button class="agnes-module-card" data-module="8" style="padding: 25px; border: 2px solid #e5e7eb; border-radius: 12px; background: white; cursor: pointer; text-align: left; transition: all 0.3s;">
-                    <div style="font-size: 36px; margin-bottom: 10px;">📋</div>
-                    <div style="font-weight: 700; font-size: 16px; color: #1f2937;">Module 8</div>
-                    <div style="font-size: 14px; color: #6b7280; margin-top: 5px;">Post-Inspection Pitch</div>
-                    <div style="font-size: 12px; color: #8b4fbe; margin-top: 8px;">3 scenarios</div>
-                </button>
-                <button class="agnes-module-card" data-module="9" style="padding: 25px; border: 2px solid #e5e7eb; border-radius: 12px; background: white; cursor: pointer; text-align: left; transition: all 0.3s;">
-                    <div style="font-size: 36px; margin-bottom: 10px;">🛑</div>
-                    <div style="font-weight: 700; font-size: 16px; color: #1f2937;">Module 9</div>
-                    <div style="font-size: 14px; color: #6b7280; margin-top: 5px;">Objection Handling</div>
-                    <div style="font-size: 12px; color: #8b4fbe; margin-top: 8px;">14 scenarios</div>
-                </button>
-                <button class="agnes-module-card" data-module="12" style="padding: 25px; border: 2px solid #e5e7eb; border-radius: 12px; background: white; cursor: pointer; text-align: left; transition: all 0.3s;">
-                    <div style="font-size: 36px; margin-bottom: 10px;">✍️</div>
-                    <div style="font-weight: 700; font-size: 16px; color: #1f2937;">Module 12</div>
-                    <div style="font-size: 14px; color: #6b7280; margin-top: 5px;">Closing the Deal</div>
-                    <div style="font-size: 12px; color: #8b4fbe; margin-top: 8px;">12 scenarios</div>
-                </button>
+            <!-- Step 3: Module Selector (Focused on Module 5 & 7) -->
+            <div id="agnes-module-selector" style="display: none;">
+                <h2 style="text-align: center; color: #1f2937; margin-bottom: 10px;">Select Your Focus Area</h2>
+                <p style="text-align: center; color: #6b7280; margin-bottom: 30px;">Master these two critical skills</p>
+
+                <div class="agnes-module-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 25px 0;">
+                    <button class="agnes-module-card" data-module="5" style="padding: 30px; border: 3px solid #8b5cf6; border-radius: 16px; background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); cursor: pointer; text-align: left; transition: all 0.3s; position: relative;">
+                        <div style="position: absolute; top: 15px; right: 15px; background: #8b5cf6; color: white; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 600;">MODULE 5</div>
+                        <div style="font-size: 48px; margin-bottom: 15px;">🚪</div>
+                        <div style="font-weight: 700; font-size: 20px; color: #5b21b6; margin-bottom: 8px;">The Initial Pitch</div>
+                        <div style="font-size: 14px; color: #7c3aed; margin-bottom: 15px;">Master your door approach</div>
+                        <div style="background: white; border-radius: 10px; padding: 15px; margin-top: 10px;">
+                            <div style="font-size: 13px; color: #6b7280; margin-bottom: 8px;">You'll practice:</div>
+                            <ul style="list-style: none; padding: 0; margin: 0; font-size: 13px; color: #374151;">
+                                <li style="margin-bottom: 6px;">• The 5 Non-Negotiables</li>
+                                <li style="margin-bottom: 6px;">• Opening statements</li>
+                                <li style="margin-bottom: 6px;">• Building rapport</li>
+                                <li>• Getting permission to inspect</li>
+                            </ul>
+                        </div>
+                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd6fe; display: flex; align-items: center; justify-content: space-between;">
+                            <span style="font-size: 13px; color: #8b5cf6; font-weight: 600;">9 scenarios</span>
+                            <span style="font-size: 20px;">→</span>
+                        </div>
+                    </button>
+
+                    <button class="agnes-module-card" data-module="7" style="padding: 30px; border: 3px solid #0ea5e9; border-radius: 16px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); cursor: pointer; text-align: left; transition: all 0.3s; position: relative;">
+                        <div style="position: absolute; top: 15px; right: 15px; background: #0ea5e9; color: white; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 600;">MODULE 7</div>
+                        <div style="font-size: 48px; margin-bottom: 15px;">🔍</div>
+                        <div style="font-weight: 700; font-size: 20px; color: #0369a1; margin-bottom: 8px;">The Inspection Process</div>
+                        <div style="font-size: 14px; color: #0284c7; margin-bottom: 15px;">Nail the inspection conversation</div>
+                        <div style="background: white; border-radius: 10px; padding: 15px; margin-top: 10px;">
+                            <div style="font-size: 13px; color: #6b7280; margin-bottom: 8px;">You'll practice:</div>
+                            <ul style="list-style: none; padding: 0; margin: 0; font-size: 13px; color: #374151;">
+                                <li style="margin-bottom: 6px;">• Explaining the process</li>
+                                <li style="margin-bottom: 6px;">• Handling hesitation</li>
+                                <li style="margin-bottom: 6px;">• The inspection order</li>
+                                <li>• Post-inspection handoff</li>
+                            </ul>
+                        </div>
+                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #bae6fd; display: flex; align-items: center; justify-content: space-between;">
+                            <span style="font-size: 13px; color: #0ea5e9; font-weight: 600;">9 scenarios</span>
+                            <span style="font-size: 20px;">→</span>
+                        </div>
+                    </button>
+                </div>
+                <button id="agnes-module-back-btn" class="btn-secondary" style="margin-top: 10px;">← Back</button>
             </div>
-            <button id="agnes-module-back-btn" class="btn-secondary">← Back</button>
-        </div>
 
         <!-- Step 4: Personality/Difficulty Selector -->
         <div id="agnes-difficulty-selector" style="display: none;">
@@ -4264,51 +4278,32 @@ const trainingContent = {
         <div id="agnes-text-ui" style="display: none;">
             <div id="roleplay-live-region" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
-            <!-- Screen 1: Category Selection -->
+            <!-- Screen 1: Category Selection (Module 5 & 7 focused) -->
             <div id="category-selector" style="display: block;">
-                <h2>Choose Your Training Focus</h2>
-                <p>Select a scenario category to practice. Each has AI-powered feedback and multiple difficulty levels.</p>
-                <div class="category-grid">
-                    <button class="category-card" data-category="inspection">
-                        <div class="category-icon">🔍</div>
-                        <div class="category-title">Inspection Process</div>
-                        <div class="category-source">From Module 7</div>
-                        <div class="category-count">5 scenarios</div>
+                <h2 style="text-align: center; color: #1f2937; margin-bottom: 10px;">Choose Your Scenario Type</h2>
+                <p style="text-align: center; color: #6b7280; margin-bottom: 25px;">Practice specific skills from Module 5 & 7</p>
+                <div class="category-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px;">
+                    <button class="category-card" data-category="initialPitch" style="padding: 25px; border: 2px solid #8b5cf6; border-radius: 14px; background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); cursor: pointer; text-align: left; transition: all 0.3s;">
+                        <div style="font-size: 36px; margin-bottom: 12px;">🚪</div>
+                        <div style="font-weight: 700; font-size: 16px; color: #5b21b6;">Door Knock & Pitch</div>
+                        <div style="font-size: 13px; color: #7c3aed; margin-top: 5px;">From Module 5</div>
+                        <div style="font-size: 12px; color: #8b5cf6; margin-top: 8px; font-weight: 600;">4 scenarios</div>
                     </button>
-                    <button class="category-card" data-category="initialPitch">
-                        <div class="category-icon">🚪</div>
-                        <div class="category-title">Door Knock & Pitch</div>
-                        <div class="category-source">From Module 7</div>
-                        <div class="category-count">4 scenarios</div>
+                    <button class="category-card" data-category="initialObjections" style="padding: 25px; border: 2px solid #8b5cf6; border-radius: 14px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); cursor: pointer; text-align: left; transition: all 0.3s;">
+                        <div style="font-size: 36px; margin-bottom: 12px;">🛑</div>
+                        <div style="font-weight: 700; font-size: 16px; color: #92400e;">Initial Objections</div>
+                        <div style="font-size: 13px; color: #b45309; margin-top: 5px;">From Module 5</div>
+                        <div style="font-size: 12px; color: #d97706; margin-top: 8px; font-weight: 600;">5 scenarios</div>
                     </button>
-                    <button class="category-card" data-category="postInspection">
-                        <div class="category-icon">📋</div>
-                        <div class="category-title">Post-Inspection Pitch</div>
-                        <div class="category-source">From Module 8</div>
-                        <div class="category-count">3 scenarios</div>
-                    </button>
-                    <button class="category-card" data-category="initialObjections">
-                        <div class="category-icon">🛑</div>
-                        <div class="category-title">Initial Objections</div>
-                        <div class="category-source">From Module 9</div>
-                        <div class="category-count">5 scenarios</div>
-                    </button>
-                    <button class="category-card" data-category="postInspectionObjections">
-                        <div class="category-icon">💬</div>
-                        <div class="category-title">Post-Inspection Objections</div>
-                        <div class="category-source">From Module 9</div>
-                        <div class="category-count">9 scenarios</div>
-                    </button>
-                    <button class="category-card" data-category="closingObjections">
-                        <div class="category-icon">✍️</div>
-                        <div class="category-title">Closing Objections</div>
-                        <div class="category-source">From Module 12</div>
-                        <div class="category-count">12 scenarios</div>
+                    <button class="category-card" data-category="inspection" style="padding: 25px; border: 2px solid #0ea5e9; border-radius: 14px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); cursor: pointer; text-align: left; transition: all 0.3s;">
+                        <div style="font-size: 36px; margin-bottom: 12px;">🔍</div>
+                        <div style="font-weight: 700; font-size: 16px; color: #0369a1;">Inspection Process</div>
+                        <div style="font-size: 13px; color: #0284c7; margin-top: 5px;">From Module 7</div>
+                        <div style="font-size: 12px; color: #0ea5e9; margin-top: 8px; font-weight: 600;">5 scenarios</div>
                     </button>
                 </div>
                 <div class="quick-actions" style="margin-top: 25px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                    <button id="random-scenario-btn" class="btn-secondary">🎲 Random Scenario</button>
-                    <button id="legacy-role-btn" class="btn-secondary">👥 Browse by Role</button>
+                    <button id="random-scenario-btn" class="btn-secondary" style="padding: 12px 24px; border-radius: 10px;">🎲 Random Scenario</button>
                 </div>
                 <button onclick="showAgnesScreen('agnes-mode-selector')" class="btn-secondary" style="margin-top: 20px;">← Back to Mode Selection</button>
             </div>
@@ -5121,101 +5116,12 @@ trainingContent['closing-objections'] = `
   </div>
 `;
 
-// 13. Discontinued Products & Special Scenarios (new)
-trainingContent['discontinued-products'] = `
-  <div class="content-card">
-    <h1>Discontinued Products & Special Scenarios</h1>
-
-    <h2>Why Discontinued Products Matter</h2>
-    <div class="discontinued-explainer">
-      <p><strong>Insurance "Matching Law":</strong> In many states, if your shingle is discontinued and they can't match it, insurance MUST replace the entire roof (not just damaged sections).</p>
-
-      <h3>How to Use This:</h3>
-      <ol>
-        <li><strong>Check the shingle:</strong> Look for brand/model on packaging or check attic</li>
-        <li><strong>Google "[brand] [model] discontinued"</strong></li>
-        <li><strong>If discontinued:</strong> "Great news! Your shingle is discontinued. State law says insurance must replace the whole roof since they can't match. You're getting a full new roof!"</li>
-      </ol>
-    </div>
-
-    <h2>Common Discontinued Shingles (2020-2024)</h2>
-    <ul>
-      <li><strong>GAF Timberline HD</strong> (replaced by HDZ in 2019)</li>
-      <li><strong>Owens Corning Duration</strong> (older versions discontinued)</li>
-      <li><strong>CertainTeed Landmark</strong> (certain colors discontinued)</li>
-      <li><strong>IKO Cambridge</strong> (many colors discontinued)</li>
-      <li><strong>GAF Royal Sovereign</strong> (3-tab, fully discontinued)</li>
-      <li><strong>CertainTeed XT 25</strong> (3-tab, fully discontinued)</li>
-    </ul>
-
-    <h2>English vs. Metric Dimensions</h2>
-    <div class="dimensions-explainer">
-      <p>Older shingles used <strong>English dimensions</strong> (different exposure measurements). Newer shingles use <strong>Metric dimensions</strong>. They CANNOT be mixed because:</p>
-      <ul>
-        <li>Different exposure sizes don't align properly</li>
-        <li>Sealant strips won't line up correctly</li>
-        <li>Creates visible mismatch and sealing failures</li>
-        <li><strong>Result:</strong> Must replace entire slope or roof to maintain integrity</li>
-      </ul>
-    </div>
-
-    <h2>Using iTel Reports</h2>
-    <p><strong>iTel</strong> is a third-party service that verifies product discontinuation. Use it to:</p>
-    <ol>
-      <li>Identify the exact shingle brand and model</li>
-      <li>Research manufacturer databases</li>
-      <li>Generate official discontinuation report</li>
-      <li>Attach report to insurance estimate</li>
-      <li>Prove to adjuster that matching is impossible</li>
-    </ol>
-
-    <h2>Matching Law Arguments</h2>
-    <p>Key legal and policy language to reference:</p>
-    <ul>
-      <li><strong>"Like kind and quality":</strong> Policy language requiring matching materials</li>
-      <li><strong>Maryland Bulletin 18-23:</strong> State guidance on matching requirements</li>
-      <li><strong>Aesthetic mismatch:</strong> When no true match exists, full replacement required to avoid visible differences</li>
-    </ul>
-
-    <h2>Code Compliance Scenarios</h2>
-    <div class="code-scenarios">
-      <h3>Virginia R905.2.2 - Low Slope Restriction</h3>
-      <p>Asphalt shingles are NOT allowed on slopes below 2:12 pitch. If existing roof violates code, full replacement with proper materials required.</p>
-
-      <h3>Maryland IRC R703.2 - Water-Resistive Barrier</h3>
-      <p>Code requires water-resistive barrier (WRB) behind all exterior siding. If missing, must be installed during repairs - often requires full siding replacement.</p>
-    </div>
-
-    <h2>Failed Repair Attempts</h2>
-    <p>If adjuster initially approves only partial repairs, document why repairs won't work:</p>
-    <ul>
-      <li><strong>Brittle Test:</strong> Video of old shingles breaking/cracking when you try to lift them</li>
-      <li><strong>Non-Bonding:</strong> Photos showing adhesive strips no longer functional</li>
-      <li><strong>Color Fade:</strong> Side-by-side showing severe mismatch between old and new</li>
-      <li><strong>Result:</strong> Send documentation proving repairs are impossible, request full replacement</li>
-    </ul>
-
-    <h2>Reference Resources</h2>
-    <p>Handling discontinued shingles and product mismatches. Reference manufacturer resources and real‑world examples.</p>
-    <ul>
-      <li><a href="/resources/Training%20Manual.docx" target="_blank">Training Manual</a></li>
-      <li><a href="/resources/Sales%20Operations%20and%20Tasks.docx" target="_blank">Sales Operations & Tasks</a></li>
-    </ul>
-
-    <div class="module-completion-section" id="module-complete-section" style="display: none;">
-      <button class="complete-module-btn" onclick="completeModule('discontinued-products')">
-        Complete Module & Continue
-      </button>
-    </div>
-  </div>
-`;
-
 // 13. Sales Cycle & Job Flow (remap existing)
 trainingContent['sales-cycle-job-flow'] = trainingContent['sales-cycle'] || `
   <div class="content-card"><h1>Sales Cycle & Job Flow</h1><p>Content coming soon.</p></div>
 `;
 
-// 16. Final Exam (new)
+// 15. Final Exam (new)
 trainingContent['final-exam'] = `
   <div class="content-card" id="final-exam">
     <h1>🎯 Final Certification Exam</h1>
@@ -8835,12 +8741,10 @@ function renderAgnesXPBar() {
   `;
 }
 
-// Module to categories mapping
+// Module to categories mapping (focused on Module 5 & 7 only)
 const moduleToCategories: Record<string, string[]> = {
-  '7': ['inspection', 'initialPitch'],
-  '8': ['postInspection'],
-  '9': ['initialObjections', 'postInspectionObjections'],
-  '12': ['closingObjections']
+  '5': ['initialPitch', 'initialObjections'],
+  '7': ['inspection', 'initialPitch']
 };
 
 // Session state for the new simplified flow
@@ -10487,7 +10391,6 @@ function getModuleDisplayName(moduleId: string): string {
     'damage-identification': 'Damage Identification',
     'filing-claim-closing': 'Filing Claim & Closing',
     'closing-objections': 'Closing Objections',
-    'discontinued-products': 'Discontinued Products',
     'sales-cycle-job-flow': 'Sales Cycle & Job Flow',
     'role-play': 'Role Play Practice',
     'final-exam': 'Final Exam'
@@ -11054,7 +10957,7 @@ function renderUsersTable(users: AdminUser[]): void {
             <td>${user.isManager ? '<span class="role-badge manager">Manager</span>' : '<span class="role-badge user">User</span>'}</td>
             <td>
               <div class="progress-cell">
-                <span class="modules-count">${user.modulesCompleted}/16 modules</span>
+                <span class="modules-count">${user.modulesCompleted}/15 modules</span>
                 <span class="exam-count">${user.examAttempts}/3 attempts</span>
               </div>
             </td>
