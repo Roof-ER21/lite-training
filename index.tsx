@@ -3851,205 +3851,469 @@ const trainingContent = {
     </div>
   `,
   'sales-cycle': `
-    <div class="content-card">
-        <h1>The Sales Cycle</h1>
+    <div class="content-card" style="background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%); padding: 0; overflow: hidden;">
+        <!-- Hero Header -->
+        <div style="background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #c084fc 100%); padding: 40px 30px; text-align: center; color: white;">
+          <div style="font-size: 48px; margin-bottom: 15px;">🔄</div>
+          <h1 style="margin: 0 0 10px 0; font-size: 28px; font-weight: 700;">The Sales Cycle & Job Flow</h1>
+          <p style="margin: 0; opacity: 0.9; font-size: 16px;">From first knock to final payment - master the complete process</p>
+        </div>
 
-        <h2>The Complete Roof-ER Sales Cycle</h2>
-        <div class="sales-cycle">
-          <div class="cycle-phase">
-            <h3>Phase 1: Lead Generation & Inspection (Days 1-3)</h3>
-            <ul>
-              <li>Storm tracking & mapping</li>
-              <li>Door knocking targeted neighborhoods</li>
-              <li>Initial pitch & permission</li>
-              <li>Thorough roof inspection (15 min)</li>
-              <li>Photo documentation (20-40 photos)</li>
-              <li>Post-inspection pitch</li>
-              <li>File insurance claim</li>
-              <li><strong>Goal:</strong> Signed contract</li>
-            </ul>
+        <div style="padding: 30px;">
+          <!-- Quick Stats -->
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;">
+            <div style="background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%); padding: 20px; border-radius: 12px; text-align: center;">
+              <div style="font-size: 28px; font-weight: 700; color: #7c3aed;">5</div>
+              <div style="font-size: 13px; color: #6b21a8;">Key Phases</div>
+            </div>
+            <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 20px; border-radius: 12px; text-align: center;">
+              <div style="font-size: 28px; font-weight: 700; color: #16a34a;">9-16</div>
+              <div style="font-size: 13px; color: #166534;">Weeks Avg</div>
+            </div>
+            <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 20px; border-radius: 12px; text-align: center;">
+              <div style="font-size: 28px; font-weight: 700; color: #2563eb;">16%</div>
+              <div style="font-size: 13px; color: #1e40af;">Max Commission</div>
+            </div>
           </div>
 
-          <div class="cycle-phase">
-            <h3>Phase 2: Adjuster Meeting (Day 7-14)</h3>
-            <ul>
-              <li>Insurance assigns adjuster</li>
-              <li>Meet adjuster on site</li>
-              <li>Walk through all damage</li>
-              <li>Negotiate scope if needed</li>
-              <li><strong>Goal:</strong> Full approval</li>
-            </ul>
+          <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+            <span style="background: #f3e8ff; padding: 8px 12px; border-radius: 8px;">📋</span>
+            The 5 Phases of the Sales Cycle
+          </h2>
+
+          <div style="display: grid; gap: 15px; margin-bottom: 35px;">
+            <!-- Phase 1 -->
+            <div style="background: white; border: 2px solid #e9d5ff; border-radius: 16px; padding: 20px; border-left: 4px solid #7c3aed;">
+              <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                <div style="background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">1</div>
+                <div>
+                  <h3 style="color: #7c3aed; font-size: 18px; margin: 0;">Generating New Business</h3>
+                  <span style="color: #6b7280; font-size: 13px;">Days 1-3</span>
+                </div>
+              </div>
+              <ul style="color: #374151; margin: 0; padding-left: 60px; font-size: 14px; line-height: 1.8;">
+                <li>Knock 70+ doors minimum per day</li>
+                <li>Pin houses & take quick notes</li>
+                <li>Deliver initial pitch & get inspection permission</li>
+                <li>Conduct thorough 15-20 minute inspection</li>
+                <li>Document 20-40 photos of damage</li>
+                <li>File insurance claim with homeowner</li>
+                <li style="color: #16a34a; font-weight: 600;">Goal: Signed contract</li>
+              </ul>
+            </div>
+
+            <!-- Phase 2 -->
+            <div style="background: white; border: 2px solid #e9d5ff; border-radius: 16px; padding: 20px; border-left: 4px solid #7c3aed;">
+              <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                <div style="background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">2</div>
+                <div>
+                  <h3 style="color: #7c3aed; font-size: 18px; margin: 0;">Adjuster Meeting</h3>
+                  <span style="color: #6b7280; font-size: 13px;">2-7 days after claim filed</span>
+                </div>
+              </div>
+              <ul style="color: #374151; margin: 0; padding-left: 60px; font-size: 14px; line-height: 1.8;">
+                <li>Insurance assigns adjuster (typically 2-7 days)</li>
+                <li>Meet adjuster on site - <strong>CRITICAL: Be present!</strong></li>
+                <li>Walk through all damage documented</li>
+                <li>Create formal photo report</li>
+                <li>Decision usually within 1-10 business days</li>
+                <li style="color: #16a34a; font-weight: 600;">Goal: Full approval</li>
+              </ul>
+            </div>
+
+            <!-- Phase 3 -->
+            <div style="background: white; border: 2px solid #e9d5ff; border-radius: 16px; padding: 20px; border-left: 4px solid #7c3aed;">
+              <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                <div style="background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">3</div>
+                <div>
+                  <h3 style="color: #7c3aed; font-size: 18px; margin: 0;">Project Meeting</h3>
+                  <span style="color: #6b7280; font-size: 13px;">Within 1 week of estimate</span>
+                </div>
+              </div>
+              <ul style="color: #374151; margin: 0; padding-left: 60px; font-size: 14px; line-height: 1.8;">
+                <li>Send estimate to office for Project Review</li>
+                <li>Project Coordinator schedules meeting with homeowner</li>
+                <li>Homeowner signs Project Documents</li>
+                <li>Collect Downpayment (ACV payment from insurance)</li>
+                <li style="color: #16a34a; font-weight: 600;">💰 You receive $1,000 at Downpayment</li>
+              </ul>
+            </div>
+
+            <!-- Phase 4 -->
+            <div style="background: white; border: 2px solid #e9d5ff; border-radius: 16px; padding: 20px; border-left: 4px solid #7c3aed;">
+              <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                <div style="background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">4</div>
+                <div>
+                  <h3 style="color: #7c3aed; font-size: 18px; margin: 0;">Installation</h3>
+                  <span style="color: #6b7280; font-size: 13px;">4-6 weeks from Downpayment</span>
+                </div>
+              </div>
+              <ul style="color: #374151; margin: 0; padding-left: 60px; font-size: 14px; line-height: 1.8;">
+                <li>Crew arrives 7-8am</li>
+                <li>Full tear-off and installation (1-2 days)</li>
+                <li>Quality Check and Wrap Up with homeowner</li>
+                <li>Sign Certificate of Completion</li>
+                <li style="color: #16a34a; font-weight: 600;">Goal: Happy customer & quality install</li>
+              </ul>
+            </div>
+
+            <!-- Phase 5 -->
+            <div style="background: white; border: 2px solid #e9d5ff; border-radius: 16px; padding: 20px; border-left: 4px solid #7c3aed;">
+              <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                <div style="background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">5</div>
+                <div>
+                  <h3 style="color: #7c3aed; font-size: 18px; margin: 0;">Final Payment</h3>
+                  <span style="color: #6b7280; font-size: 13px;">After Certificate of Completion</span>
+                </div>
+              </div>
+              <ul style="color: #374151; margin: 0; padding-left: 60px; font-size: 14px; line-height: 1.8;">
+                <li>Submit Certificate of Completion to insurance</li>
+                <li>Insurance releases Depreciation funds</li>
+                <li>Homeowner pays Final Payment (Depreciation + Deductible)</li>
+                <li>Request Google review & referrals</li>
+                <li style="color: #16a34a; font-weight: 600;">💰 You receive remaining 16% of job</li>
+              </ul>
+            </div>
           </div>
 
-          <div class="cycle-phase">
-            <h3>Phase 3: Project Meeting/Down Payment (Day 15-21)</h3>
-            <ul>
-              <li>Order materials</li>
-              <li>Schedule production crew</li>
-              <li>Confirm homeowner availability</li>
-              <li>Collect down payment</li>
-              <li><strong>Goal:</strong> Install date set</li>
-            </ul>
+          <!-- Timeline Summary -->
+          <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-radius: 16px; padding: 25px; margin-bottom: 30px; text-align: center;">
+            <h3 style="color: #1e40af; margin: 0 0 10px 0; font-size: 20px;">⏱️ Total Sales Cycle: 9-16 Weeks</h3>
+            <p style="color: #3b82f6; margin: 0; font-size: 15px;">From initial knock to final payment - stay in regular contact throughout!</p>
           </div>
 
-          <div class="cycle-phase">
-            <h3>Phase 4: Installation (Day 22-23)</h3>
-            <ul>
-              <li>Crew arrives 7-8am</li>
-              <li>Full tear-off and install (1-2 days)</li>
-              <li>Final inspection</li>
-              <li><strong>Goal:</strong> Happy customer</li>
-            </ul>
+        <h2 style="color: #1f2937; font-size: 22px; margin: 35px 0 20px 0; display: flex; align-items: center; gap: 10px;">
+          <span style="background: #f0fdf4; padding: 8px 12px; border-radius: 8px;">💰</span>
+          Key Milestones & Commissions
+        </h2>
+
+        <div style="display: grid; gap: 20px; margin-bottom: 30px;">
+          <!-- Payment Milestones -->
+          <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-radius: 16px; padding: 25px;">
+            <h3 style="color: #1e40af; margin: 0 0 15px 0; font-size: 18px;">📋 Payment Milestones</h3>
+            <div style="display: grid; gap: 12px;">
+              <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px; border-left: 4px solid #3b82f6;">
+                <div style="background: #3b82f6; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">1</div>
+                <div>
+                  <div style="font-weight: 600; color: #1f2937;">Downpayment</div>
+                  <div style="color: #16a34a; font-weight: 700; font-size: 18px;">$1,000</div>
+                  <div style="color: #6b7280; font-size: 13px;">Paid when homeowner submits ACV (Actual Cash Value)</div>
+                </div>
+              </div>
+              <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px; border-left: 4px solid #3b82f6;">
+                <div style="background: #3b82f6; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">2</div>
+                <div>
+                  <div style="font-weight: 600; color: #1f2937;">Final Payment</div>
+                  <div style="color: #16a34a; font-weight: 700; font-size: 18px;">Remaining 16% of job</div>
+                  <div style="color: #6b7280; font-size: 13px;">After depreciation release + homeowner pays deductible</div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div class="cycle-phase">
-            <h3>Phase 5: Final Payment (Day 30+)</h3>
-            <ul>
-              <li>Collect final payment</li>
-              <li>Post-install call</li>
-              <li>Request Google review</li>
-              <li>Ask for referrals</li>
-              <li><strong>Goal:</strong> Repeat business</li>
+          <!-- Commission Scale -->
+          <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 16px; padding: 25px;">
+            <h3 style="color: #166534; margin: 0 0 15px 0; font-size: 18px;">📊 Commission Percentage Scale</h3>
+            <p style="color: #374151; font-size: 14px; margin: 0 0 15px 0;"><em>First 6 weeks: Automatic 16% on all completed jobs. After that, qualify based on monthly sign-ups:</em></p>
+
+            <div style="display: grid; gap: 15px;">
+              <!-- March - October -->
+              <div style="background: white; padding: 15px 20px; border-radius: 10px;">
+                <div style="font-weight: 600; color: #1f2937; margin-bottom: 10px;">🌞 March - October (Peak Season)</div>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center;">
+                  <div style="background: #dcfce7; padding: 12px; border-radius: 8px;">
+                    <div style="font-size: 20px; font-weight: 700; color: #16a34a;">16%</div>
+                    <div style="font-size: 12px; color: #166534;">10+ Sign-ups</div>
+                  </div>
+                  <div style="background: #fef3c7; padding: 12px; border-radius: 8px;">
+                    <div style="font-size: 20px; font-weight: 700; color: #d97706;">10%</div>
+                    <div style="font-size: 12px; color: #92400e;">8-9 Sign-ups</div>
+                  </div>
+                  <div style="background: #fee2e2; padding: 12px; border-radius: 8px;">
+                    <div style="font-size: 20px; font-weight: 700; color: #dc2626;">6%</div>
+                    <div style="font-size: 12px; color: #991b1b;">&lt;8 Sign-ups</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- November & February -->
+              <div style="background: white; padding: 15px 20px; border-radius: 10px;">
+                <div style="font-weight: 600; color: #1f2937; margin-bottom: 10px;">🍂 November & February</div>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; text-align: center;">
+                  <div style="background: #dcfce7; padding: 12px; border-radius: 8px;">
+                    <div style="font-size: 20px; font-weight: 700; color: #16a34a;">16%</div>
+                    <div style="font-size: 12px; color: #166534;">8+ Sign-ups</div>
+                  </div>
+                  <div style="background: #fee2e2; padding: 12px; border-radius: 8px;">
+                    <div style="font-size: 20px; font-weight: 700; color: #dc2626;">6%</div>
+                    <div style="font-size: 12px; color: #991b1b;">&lt;8 Sign-ups</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- December & January -->
+              <div style="background: white; padding: 15px 20px; border-radius: 10px;">
+                <div style="font-weight: 600; color: #1f2937; margin-bottom: 10px;">❄️ December & January (Off-Season)</div>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; text-align: center;">
+                  <div style="background: #dcfce7; padding: 12px; border-radius: 8px;">
+                    <div style="font-size: 20px; font-weight: 700; color: #16a34a;">16%</div>
+                    <div style="font-size: 12px; color: #166534;">4+ Sign-ups</div>
+                  </div>
+                  <div style="background: #fee2e2; padding: 12px; border-radius: 8px;">
+                    <div style="font-size: 20px; font-weight: 700; color: #dc2626;">6%</div>
+                    <div style="font-size: 12px; color: #991b1b;">&lt;4 Sign-ups</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Important Notes -->
+          <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 16px; padding: 20px; border-left: 4px solid #f59e0b;">
+            <h4 style="color: #92400e; margin: 0 0 10px 0; font-size: 16px;">⚠️ Important Notes</h4>
+            <ul style="color: #78350f; margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.8;">
+              <li><strong>Townhomes</strong> do not count as a sign-up unless: Has aluminum siding OR minimum 15 squares</li>
+              <li><strong>Retail jobs</strong> (non-insurance): Nothing at Downpayment, 2% commission</li>
+              <li><strong>Solar referrals:</strong> 2% commission</li>
             </ul>
           </div>
         </div>
 
-        <h2>Average Timeline: 21-28 Days</h2>
-        <p>From initial knock to completed roof, expect 3-4 weeks for a smooth job.</p>
+          <h2 style="color: #1f2937; font-size: 22px; margin: 35px 0 20px 0; display: flex; align-items: center; gap: 10px;">
+            <span style="background: #f3e8ff; padding: 8px 12px; border-radius: 8px;">🎮</span>
+            Sales Cycle Sorter Game
+          </h2>
 
-        <h2>Key Milestones & Commissions</h2>
-        <ul>
-          <li><strong>Contracts:</strong> Initial draw for commission</li>
-          <li><strong>Project Coordinator:</strong> $500-$1,000 dep on job size</li>
-          <li><strong>Install Complete:</strong> Final payment & remaining commission</li>
-        </ul>
-
-        <h3>Sales Cycle Sorter Game</h3>
-        <div class="game-container">
-            <p class="game-instructions">Drag and drop the sales cycle stages into the correct order from start to finish.</p>
-            <div id="sales-cycle-game" class="game-board">
-                <div class="game-column">
-                    <h4>Stages</h4>
-                    <div id="items-pool">
-                        <div class="draggable-item" draggable="true" data-order="2">Adjuster Meeting</div>
-                        <div class="draggable-item" draggable="true" data-order="1">Lead Generation & Inspection</div>
-                        <div class="draggable-item" draggable="true" data-order="5">Final Payment</div>
-                        <div class="draggable-item" draggable="true" data-order="4">Installation</div>
-                        <div class="draggable-item" draggable="true" data-order="3">Project Meeting/Down Payment</div>
+          <div style="background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%); border-radius: 16px; padding: 25px; margin-bottom: 30px;">
+            <p style="color: #6b21a8; font-size: 15px; margin: 0 0 20px 0; text-align: center;">
+              <strong>Test your knowledge!</strong> Drag and drop the 5 sales cycle phases into the correct order.
+            </p>
+            <div id="sales-cycle-game" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div style="background: white; border-radius: 12px; padding: 20px;">
+                    <h4 style="color: #7c3aed; margin: 0 0 15px 0; font-size: 16px; text-align: center;">📦 Phases (Drag from here)</h4>
+                    <div id="items-pool" style="min-height: 200px; background: #faf5ff; border-radius: 8px; padding: 10px; border: 2px dashed #c4b5fd;">
+                        <div class="draggable-item" draggable="true" data-order="2" style="background: white; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; cursor: grab; border: 2px solid #e9d5ff; font-size: 14px; font-weight: 500; color: #1f2937; transition: all 0.2s;">2️⃣ Adjuster Meeting</div>
+                        <div class="draggable-item" draggable="true" data-order="1" style="background: white; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; cursor: grab; border: 2px solid #e9d5ff; font-size: 14px; font-weight: 500; color: #1f2937; transition: all 0.2s;">1️⃣ Generating New Business</div>
+                        <div class="draggable-item" draggable="true" data-order="5" style="background: white; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; cursor: grab; border: 2px solid #e9d5ff; font-size: 14px; font-weight: 500; color: #1f2937; transition: all 0.2s;">5️⃣ Final Payment</div>
+                        <div class="draggable-item" draggable="true" data-order="4" style="background: white; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; cursor: grab; border: 2px solid #e9d5ff; font-size: 14px; font-weight: 500; color: #1f2937; transition: all 0.2s;">4️⃣ Installation</div>
+                        <div class="draggable-item" draggable="true" data-order="3" style="background: white; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; cursor: grab; border: 2px solid #e9d5ff; font-size: 14px; font-weight: 500; color: #1f2937; transition: all 0.2s;">3️⃣ Project Meeting</div>
                     </div>
                 </div>
-                <div class="game-column">
-                    <h4>Correct Order</h4>
-                    <div id="sorted-list" class="drop-zone-sort"></div>
+                <div style="background: white; border-radius: 12px; padding: 20px;">
+                    <h4 style="color: #16a34a; margin: 0 0 15px 0; font-size: 16px; text-align: center;">✅ Correct Order (Drop here)</h4>
+                    <div id="sorted-list" class="drop-zone-sort" style="min-height: 200px; background: #f0fdf4; border-radius: 8px; padding: 10px; border: 2px dashed #86efac;"></div>
                 </div>
             </div>
-            <div id="sales-cycle-feedback" class="feedback-message" style="display: none;"></div>
-        </div>
+            <div id="sales-cycle-feedback" class="feedback-message" style="display: none; margin-top: 15px; padding: 15px; border-radius: 10px; text-align: center; font-weight: 500;"></div>
+          </div>
 
-        <div class="module-completion-section" id="module-complete-section" style="display: none;">
-          <button class="complete-module-btn" onclick="completeModule('sales-cycle-job-flow')">
-            Complete Module & Continue
-          </button>
+          <div class="module-completion-section" id="module-complete-section" style="display: none; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 30px; border-radius: 16px; text-align: center; margin-top: 30px;">
+            <p style="color: #166534; font-size: 16px; margin: 0 0 20px 0; font-weight: 500;">🎉 Ready to continue?</p>
+            <button class="complete-module-btn" onclick="completeModule('sales-cycle-job-flow')" style="padding: 16px 40px; font-size: 16px; font-weight: 600; background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: white; border: none; border-radius: 12px; cursor: pointer; transition: all 0.3s;">
+              Complete Module & Continue →
+            </button>
+          </div>
         </div>
     </div>
   `,
   'claim-closing': `
-     <div class="content-card">
-        <h1>Filing a Claim & Closing</h1>
+    <div class="content-card" style="background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%); padding: 0; overflow: hidden;">
+        <!-- Hero Header -->
+        <div style="background: linear-gradient(135deg, #0891b2 0%, #06b6d4 50%, #22d3ee 100%); padding: 40px 30px; text-align: center; color: white;">
+          <div style="font-size: 48px; margin-bottom: 15px;">📋</div>
+          <h1 style="margin: 0 0 10px 0; font-size: 28px; font-weight: 700;">Filing the Claim & Closing</h1>
+          <p style="margin: 0; opacity: 0.9; font-size: 16px;">From inspection to signed contract - lock in the deal</p>
+        </div>
 
-        <h2>When to File the Claim</h2>
-        <div class="filing-timeline">
-          <div class="timeline-step">
-            <h3>✓ Immediately (Same Day):</h3>
-            <p>If homeowner is ready, file the claim before you leave. Strike while the iron is hot. You'll need:</p>
-            <ul>
-              <li>Policy number (on insurance card)</li>
-              <li>Date of loss (storm date - check weather reports)</li>
-              <li>Contact information</li>
-              <li>Brief description: "Hail/wind damage to roof"</li>
-            </ul>
+        <div style="padding: 30px;">
+          <!-- Quick Stats -->
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;">
+            <div style="background: linear-gradient(135deg, #ecfeff 0%, #cffafe 100%); padding: 20px; border-radius: 12px; text-align: center;">
+              <div style="font-size: 28px; font-weight: 700; color: #0891b2;">📞</div>
+              <div style="font-size: 13px; color: #0e7490;">File Same Day</div>
+            </div>
+            <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 20px; border-radius: 12px; text-align: center;">
+              <div style="font-size: 28px; font-weight: 700; color: #16a34a;">2</div>
+              <div style="font-size: 13px; color: #166534;">Key Forms</div>
+            </div>
+            <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 20px; border-radius: 12px; text-align: center;">
+              <div style="font-size: 28px; font-weight: 700; color: #d97706;">48hr</div>
+              <div style="font-size: 13px; color: #92400e;">Max Wait Time</div>
+            </div>
           </div>
 
-          <div class="timeline-step">
-            <h3>⏰ Within 24 Hours:</h3>
-            <p>If they need to "think about it," follow up next morning. Send them:</p>
-            <ul>
-              <li>Photo gallery link</li>
-              <li>Written summary of damage</li>
-              <li>Text: "Hi [Name]! Following up on your roof. Ready to file that claim? I can do it over the phone in 2 minutes."</li>
-            </ul>
+          <!-- When to File -->
+          <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+            <span style="background: #ecfeff; padding: 8px 12px; border-radius: 8px;">⏰</span>
+            When to File the Claim
+          </h2>
+
+          <div style="display: grid; gap: 15px; margin-bottom: 35px;">
+            <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 16px; padding: 20px; border-left: 4px solid #16a34a;">
+              <h3 style="color: #16a34a; font-size: 18px; margin: 0 0 12px 0;">✅ Immediately (Same Day) - BEST</h3>
+              <p style="color: #374151; font-size: 14px; line-height: 1.6; margin: 0 0 12px 0;">If homeowner is ready, file before you leave. Strike while the iron is hot!</p>
+              <div style="background: white; padding: 15px; border-radius: 10px;">
+                <p style="color: #374151; font-size: 13px; margin: 0; font-weight: 600;">You'll need:</p>
+                <ul style="color: #374151; font-size: 13px; margin: 8px 0 0 0; padding-left: 20px;">
+                  <li>Policy number (on insurance card)</li>
+                  <li>Date of loss (storm date - check weather reports)</li>
+                  <li>Contact information</li>
+                  <li>Brief description: "Hail/wind damage to roof"</li>
+                </ul>
+              </div>
+            </div>
+
+            <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 16px; padding: 20px; border-left: 4px solid #f59e0b;">
+              <h3 style="color: #d97706; font-size: 18px; margin: 0 0 12px 0;">⏰ Within 24 Hours - OK</h3>
+              <p style="color: #374151; font-size: 14px; line-height: 1.6; margin: 0 0 12px 0;">If they need to "think about it," follow up next morning:</p>
+              <div style="background: white; padding: 15px; border-radius: 10px;">
+                <ul style="color: #374151; font-size: 13px; margin: 0; padding-left: 20px;">
+                  <li>Send photo gallery link</li>
+                  <li>Text: "Hi [Name]! Following up on your roof. Ready to file that claim? I can do it over the phone in 2 minutes."</li>
+                </ul>
+              </div>
+            </div>
+
+            <div style="background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border-radius: 16px; padding: 20px; border-left: 4px solid #dc2626;">
+              <h3 style="color: #dc2626; font-size: 18px; margin: 0 0 12px 0;">🚫 Never Wait More Than 48 Hours</h3>
+              <p style="color: #374151; font-size: 14px; line-height: 1.6; margin: 0;">After 48 hours, they'll cool off, get other opinions, forget urgency. <strong>File ASAP or risk losing the deal.</strong></p>
+            </div>
           </div>
 
-          <div class="timeline-step">
-            <h3>🚫 Never Wait More Than 48 Hours:</h3>
-            <p>After 48 hours, they'll cool off, get other opinions, forget urgency. File ASAP or risk losing the deal.</p>
+          <!-- Prepping the Homeowner -->
+          <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+            <span style="background: #ecfeff; padding: 8px 12px; border-radius: 8px;">📝</span>
+            Prepping the Homeowner for the Call
+          </h2>
+
+          <div style="background: linear-gradient(135deg, #ecfeff 0%, #cffafe 100%); border-radius: 16px; padding: 25px; margin-bottom: 35px;">
+            <p style="color: #0e7490; font-size: 15px; margin: 0 0 20px 0; font-weight: 500;">Use a blank note on your iPad to go over these key points so they know what to say:</p>
+            <div style="display: grid; gap: 12px;">
+              <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
+                <span style="background: #0891b2; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">1</span>
+                <div>
+                  <span style="color: #0e7490; font-weight: 600;">Reason for claim:</span>
+                  <span style="color: #374151; font-size: 14px;"> "I'd like to file a claim for hail and wind damage." (Never only one type)</span>
+                </div>
+              </div>
+              <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
+                <span style="background: #0891b2; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">2</span>
+                <div>
+                  <span style="color: #0e7490; font-weight: 600;">Damaged items:</span>
+                  <span style="color: #374151; font-size: 14px;"> Roof, Downspouts, Gutters, Siding, etc.</span>
+                </div>
+              </div>
+              <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
+                <span style="background: #0891b2; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">3</span>
+                <div>
+                  <span style="color: #0e7490; font-weight: 600;">Selected Contractor:</span>
+                  <span style="color: #374151; font-size: 14px;"> "Yes, we have selected Roof-ER."</span>
+                </div>
+              </div>
+              <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
+                <span style="background: #0891b2; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">4</span>
+                <div>
+                  <span style="color: #0e7490; font-weight: 600;">Have an estimate:</span>
+                  <span style="color: #374151; font-size: 14px;"> "No."</span>
+                </div>
+              </div>
+            </div>
+            <p style="color: #0e7490; font-size: 13px; margin: 15px 0 0 0; font-style: italic;">💡 Tip: Ask if they have the app or website login to file the claim first. Use the homeowner's phone when possible.</p>
           </div>
-        </div>
 
-        <h2>The Filing Call Script</h2>
-        <div class="filing-script">
-          <p><strong>"I'm calling to file a claim for storm damage to the roof at [address]."</strong></p>
+          <!-- After Filing: The Close -->
+          <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+            <span style="background: #f0fdf4; padding: 8px 12px; border-radius: 8px;">✅</span>
+            After Filing: Setting Expectations
+          </h2>
 
-          <p><strong>Carrier will ask:</strong></p>
-          <ol>
-            <li>Policy number → [Read from card]</li>
-            <li>Date of loss → "[Storm date] - we had [hail/wind] in the area"</li>
-            <li>Description → "Inspector found damage to roof shingles from recent storm"</li>
-            <li>Anyone injured? → "No"</li>
-            <li>Is the property secured? → "Yes, no immediate leaks"</li>
-            <li>Have repairs been made? → "No, waiting for adjuster"</li>
-          </ol>
+          <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 16px; padding: 25px; margin-bottom: 35px;">
+            <p style="color: #166534; font-size: 16px; font-weight: 600; margin: 0 0 20px 0; text-align: center;">"Great! Claim #[number] is filed. Here's what happens next:"</p>
+            <div style="display: grid; gap: 12px;">
+              <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
+                <span style="background: #16a34a; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">1</span>
+                <span style="color: #374151; font-size: 14px;"><strong>Adjuster Contact:</strong> "They'll call you in 3-5 days to schedule their inspection."</span>
+              </div>
+              <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
+                <span style="background: #16a34a; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">2</span>
+                <span style="color: #374151; font-size: 14px;"><strong>Our Role:</strong> "I'll meet the adjuster here to make sure they see ALL the damage."</span>
+              </div>
+              <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
+                <span style="background: #16a34a; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">3</span>
+                <span style="color: #374151; font-size: 14px;"><strong>Authorization:</strong> "I'll text you a contract now. E-sign so I'm authorized to work with the adjuster."</span>
+              </div>
+              <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
+                <span style="background: #16a34a; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">4</span>
+                <span style="color: #374151; font-size: 14px;"><strong>Timeline:</strong> "Once approved, 3-4 weeks to completion. I'll update you every step."</span>
+              </div>
+              <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
+                <span style="background: #16a34a; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">5</span>
+                <span style="color: #374151; font-size: 14px;"><strong>Reassurance:</strong> "You did the right thing. This protects your biggest investment."</span>
+              </div>
+            </div>
+          </div>
 
-          <p><strong>You'll get:</strong></p>
-          <ul>
-            <li>Claim number (write it down!)</li>
-            <li>Adjuster assignment (usually 3-5 business days)</li>
-            <li>Next steps explanation</li>
-          </ul>
-        </div>
+          <!-- The Contingency & Claim Authorization -->
+          <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+            <span style="background: #eff6ff; padding: 8px 12px; border-radius: 8px;">📄</span>
+            The Contingency & Claim Authorization
+          </h2>
 
-        <h3>Prepping the Homeowner</h3>
-        <p>Before the call to the insurance company, you must prep the homeowner. Use a blank note on your iPad to go over these key points so they know what to say.</p>
-        <ul>
-            <li><strong>Reason for claim:</strong> "I'd like to file a claim for hail and wind damage." (Never only one type).</li>
-            <li><strong>Damaged items:</strong> Roof, Downspouts, Gutters, Siding, etc.</li>
-            <li><strong>Selected Contractor:</strong> "Yes, we have selected Roof-ER."</li>
-            <li><strong>Have an estimate:</strong> "No."</li>
-        </ul>
+          <div style="display: grid; gap: 15px; margin-bottom: 35px;">
+            <div style="background: white; border: 2px solid #dbeafe; border-radius: 16px; padding: 20px; border-left: 4px solid #3b82f6;">
+              <h3 style="color: #1e40af; font-size: 16px; margin: 0 0 12px 0;">📝 Contingency Agreement</h3>
+              <p style="color: #374151; font-size: 14px; line-height: 1.7; margin: 0; background: #f8fafc; padding: 15px; border-radius: 8px; font-style: italic;">"This basic agreement backs you as the homeowner by guaranteeing your only cost will be your deductible if we get you fully approved. If it is a partial approval or denial, we will fight for you. But if we are not able to get you fully approved, this contract is null and void and you do not owe us a penny."</p>
+            </div>
 
-        <h2>After Filing: The Close</h2>
-        <div class="closing-steps">
-          <p><strong>"Great! Claim #[number] is filed. Here's what happens next:"</strong></p>
+            <div style="background: white; border: 2px solid #dbeafe; border-radius: 16px; padding: 20px; border-left: 4px solid #3b82f6;">
+              <h3 style="color: #1e40af; font-size: 16px; margin: 0 0 12px 0;">📋 Claim Authorization</h3>
+              <p style="color: #374151; font-size: 14px; line-height: 1.7; margin: 0; background: #f8fafc; padding: 15px; border-radius: 8px; font-style: italic;">"This next form is our Claim Authorization. Very simple, it allows us to communicate with your insurance company on your behalf. I'll be here for the inspection and will communicate with them, so you don't have to be the middle-man. Of course, I'll always keep you looped in."</p>
+            </div>
+          </div>
 
-          <ol>
-            <li><strong>Adjuster Contact:</strong> "They'll call you in 3-5 days to schedule inspection."</li>
-            <li><strong>Our Role:</strong> "I'll meet the adjuster here, show them everything, make sure they see all damage."</li>
-            <li><strong>Authorization:</strong> "I'll text you a contract now. E-sign it so I'm authorized to work with the adjuster."</li>
-            <li><strong>Timeline:</strong> "Once approved, 3-4 weeks to completion. I'll update you every step."</li>
-            <li><strong>Reassurance:</strong> "You did the right thing. This protects your biggest investment."</li>
-          </ol>
-        </div>
+          <!-- Common Mistakes -->
+          <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+            <span style="background: #fef2f2; padding: 8px 12px; border-radius: 8px;">⚠️</span>
+            Common Filing Mistakes to Avoid
+          </h2>
 
-        <h3>The Contingency & Claim Authorization</h3>
-        <p>After the claim is filed, you will present the agreements. This is the close.</p>
-        <div class="script" data-text-source="true">
-            <button class="speak-btn" aria-label="Listen to script">🔊</button>
-            <p><strong>Contingency Agreement:</strong> "This basic agreement backs you as the homeowner by guaranteeing your only cost will be your deductible if we get you fully approved. If it is a partial approval or denial, we will fight for you. But if we are not able to get you fully approved, this contract is null and void and you do not owe us a penny."</p>
-            <p><strong>Claim Authorization:</strong> "This next form is our Claim Authorization. Very simple, it allows us to communicate with your insurance company on your behalf. I'll be here for the inspection and will communicate with them, so you don't have to be the middle-man. Of course, I'll always keep you looped in."</p>
-        </div>
+          <div style="display: grid; gap: 12px; margin-bottom: 30px;">
+            <div style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); padding: 15px 20px; border-radius: 10px; display: flex; align-items: flex-start; gap: 12px;">
+              <span style="font-size: 20px;">❌</span>
+              <div>
+                <strong style="color: #dc2626;">Filing without homeowner present:</strong>
+                <span style="color: #374151; font-size: 14px;"> Always file WITH them on speakerphone</span>
+              </div>
+            </div>
+            <div style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); padding: 15px 20px; border-radius: 10px; display: flex; align-items: flex-start; gap: 12px;">
+              <span style="font-size: 20px;">❌</span>
+              <div>
+                <strong style="color: #dc2626;">Saying "full roof replacement":</strong>
+                <span style="color: #374151; font-size: 14px;"> Say "damage to roof" - let adjuster determine scope</span>
+              </div>
+            </div>
+            <div style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); padding: 15px 20px; border-radius: 10px; display: flex; align-items: flex-start; gap: 12px;">
+              <span style="font-size: 20px;">❌</span>
+              <div>
+                <strong style="color: #dc2626;">Not getting claim number:</strong>
+                <span style="color: #374151; font-size: 14px;"> Write it down immediately, text it to homeowner</span>
+              </div>
+            </div>
+            <div style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); padding: 15px 20px; border-radius: 10px; display: flex; align-items: flex-start; gap: 12px;">
+              <span style="font-size: 20px;">❌</span>
+              <div>
+                <strong style="color: #dc2626;">Forgetting to ask about inspection timeline:</strong>
+                <span style="color: #374151; font-size: 14px;"> Ask when adjuster will contact them</span>
+              </div>
+            </div>
+          </div>
 
-        <h2>Common Filing Mistakes to Avoid</h2>
-        <ul>
-          <li><strong>❌ Filing without homeowner present:</strong> Always file WITH them on speakerphone</li>
-          <li><strong>❌ Saying "full roof replacement":</strong> Say "damage to roof" - let adjuster determine scope</li>
-          <li><strong>❌ Not getting claim number:</strong> Write it down immediately, text it to homeowner</li>
-          <li><strong>❌ Forgetting to ask about inspection timeline:</strong> Ask when adjuster will contact them</li>
-        </ul>
-
-        <div class="module-completion-section" id="module-complete-section" style="display: none;">
-          <button class="complete-module-btn" onclick="completeModule('filing-claim-closing')">
-            Complete Module & Continue
-          </button>
+          <div class="module-completion-section" id="module-complete-section" style="display: none; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 30px; border-radius: 16px; text-align: center; margin-top: 30px;">
+            <p style="color: #166534; font-size: 16px; margin: 0 0 20px 0; font-weight: 500;">🎉 Ready to continue?</p>
+            <button class="complete-module-btn" onclick="completeModule('filing-claim-closing')" style="padding: 16px 40px; font-size: 16px; font-weight: 600; background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: white; border: none; border-radius: 12px; cursor: pointer; transition: all 0.3s;">
+              Complete Module & Continue →
+            </button>
+          </div>
         </div>
     </div>
   `,
