@@ -3871,8 +3871,8 @@ const trainingContent = {
               <div style="font-size: 13px; color: #166534;">Weeks Avg</div>
             </div>
             <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 20px; border-radius: 12px; text-align: center;">
-              <div style="font-size: 28px; font-weight: 700; color: #2563eb;">16%</div>
-              <div style="font-size: 13px; color: #1e40af;">Max Commission</div>
+              <div style="font-size: 28px; font-weight: 700; color: #2563eb;">12%+</div>
+              <div style="font-size: 13px; color: #1e40af;">Top Commission</div>
             </div>
           </div>
 
@@ -3971,7 +3971,7 @@ const trainingContent = {
                 <li>Insurance releases Depreciation funds</li>
                 <li>Homeowner pays Final Payment (Depreciation + Deductible)</li>
                 <li>Request Google review & referrals</li>
-                <li style="color: #16a34a; font-weight: 600;">💰 You receive remaining 16% of job</li>
+                <li style="color: #16a34a; font-weight: 600;">💰 You receive remaining commission (12%+)</li>
               </ul>
             </div>
           </div>
@@ -4004,7 +4004,7 @@ const trainingContent = {
                 <div style="background: #3b82f6; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">2</div>
                 <div>
                   <div style="font-weight: 600; color: #1f2937;">Final Payment</div>
-                  <div style="color: #16a34a; font-weight: 700; font-size: 18px;">Remaining 16% of job</div>
+                  <div style="color: #16a34a; font-weight: 700; font-size: 18px;">Remaining 12%+ of job</div>
                   <div style="color: #6b7280; font-size: 13px;">After depreciation release + homeowner pays deductible</div>
                 </div>
               </div>
@@ -4014,7 +4014,7 @@ const trainingContent = {
           <!-- Commission Scale -->
           <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 16px; padding: 25px;">
             <h3 style="color: #166534; margin: 0 0 15px 0; font-size: 18px;">📊 Commission Percentage Scale</h3>
-            <p style="color: #374151; font-size: 14px; margin: 0 0 15px 0;"><em>First 6 weeks: Automatic 16% on all completed jobs. After that, qualify based on monthly sign-ups:</em></p>
+            <p style="color: #374151; font-size: 14px; margin: 0 0 15px 0;"><em>First 6 weeks: Automatic top tier on all completed jobs. After that, qualify based on monthly sign-ups:</em></p>
 
             <div style="display: grid; gap: 15px;">
               <!-- March - October -->
@@ -4022,7 +4022,7 @@ const trainingContent = {
                 <div style="font-weight: 600; color: #1f2937; margin-bottom: 10px;">🌞 March - October (Peak Season)</div>
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center;">
                   <div style="background: #dcfce7; padding: 12px; border-radius: 8px;">
-                    <div style="font-size: 20px; font-weight: 700; color: #16a34a;">16%</div>
+                    <div style="font-size: 20px; font-weight: 700; color: #16a34a;">12%+</div>
                     <div style="font-size: 12px; color: #166534;">10+ Sign-ups</div>
                   </div>
                   <div style="background: #fef3c7; padding: 12px; border-radius: 8px;">
@@ -4041,7 +4041,7 @@ const trainingContent = {
                 <div style="font-weight: 600; color: #1f2937; margin-bottom: 10px;">🍂 November & February</div>
                 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; text-align: center;">
                   <div style="background: #dcfce7; padding: 12px; border-radius: 8px;">
-                    <div style="font-size: 20px; font-weight: 700; color: #16a34a;">16%</div>
+                    <div style="font-size: 20px; font-weight: 700; color: #16a34a;">12%+</div>
                     <div style="font-size: 12px; color: #166534;">8+ Sign-ups</div>
                   </div>
                   <div style="background: #fee2e2; padding: 12px; border-radius: 8px;">
@@ -4056,7 +4056,7 @@ const trainingContent = {
                 <div style="font-weight: 600; color: #1f2937; margin-bottom: 10px;">❄️ December & January (Off-Season)</div>
                 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; text-align: center;">
                   <div style="background: #dcfce7; padding: 12px; border-radius: 8px;">
-                    <div style="font-size: 20px; font-weight: 700; color: #16a34a;">16%</div>
+                    <div style="font-size: 20px; font-weight: 700; color: #16a34a;">12%+</div>
                     <div style="font-size: 12px; color: #166534;">4+ Sign-ups</div>
                   </div>
                   <div style="background: #fee2e2; padding: 12px; border-radius: 8px;">
@@ -4271,6 +4271,40 @@ const trainingContent = {
             </div>
           </div>
 
+          <!-- Key Documents Section -->
+          <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+            <span style="background: #f3e8ff; padding: 8px 12px; border-radius: 8px;">📎</span>
+            View Key Documents
+          </h2>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 35px;">
+            <!-- Claim Authorization PDF -->
+            <div style="background: white; border: 2px solid #e9d5ff; border-radius: 16px; padding: 25px; text-align: center;">
+              <div style="font-size: 48px; margin-bottom: 15px;">📄</div>
+              <h3 style="color: #7c3aed; font-size: 18px; margin: 0 0 10px 0;">Claim Authorization Form</h3>
+              <p style="color: #6b7280; font-size: 14px; margin: 0 0 15px 0; line-height: 1.5;">Authorizes ROOF-ER to communicate with the homeowner's insurance company on their behalf.</p>
+              <div style="background: #f3e8ff; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+                <p style="color: #6b21a8; font-size: 13px; margin: 0;"><strong>When to use:</strong> After filing the claim</p>
+              </div>
+              <a href="/resources/Claim Authorization Form.pdf" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; padding: 12px 24px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: all 0.3s;">
+                📥 View PDF
+              </a>
+            </div>
+
+            <!-- Insurance Claim Agreement (Contingency) PDF -->
+            <div style="background: white; border: 2px solid #e9d5ff; border-radius: 16px; padding: 25px; text-align: center;">
+              <div style="font-size: 48px; margin-bottom: 15px;">📋</div>
+              <h3 style="color: #7c3aed; font-size: 18px; margin: 0 0 10px 0;">Insurance Claim Agreement</h3>
+              <p style="color: #6b7280; font-size: 14px; margin: 0 0 15px 0; line-height: 1.5;">The contingency contract - only cost to homeowner is their deductible if fully approved.</p>
+              <div style="background: #f3e8ff; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+                <p style="color: #6b21a8; font-size: 13px; margin: 0;"><strong>Key term:</strong> Null & void if claim denied</p>
+              </div>
+              <a href="/resources/DMV Blank Contingency.pdf" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; padding: 12px 24px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: all 0.3s;">
+                📥 View PDF
+              </a>
+            </div>
+          </div>
+
           <!-- Common Mistakes -->
           <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
             <span style="background: #fef2f2; padding: 8px 12px; border-radius: 8px;">⚠️</span>
@@ -4306,6 +4340,146 @@ const trainingContent = {
                 <span style="color: #374151; font-size: 14px;"> Ask when adjuster will contact them</span>
               </div>
             </div>
+          </div>
+
+          <!-- Mini Quiz -->
+          <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+            <span style="background: #ecfeff; padding: 8px 12px; border-radius: 8px;">✅</span>
+            Quick Knowledge Check
+          </h2>
+
+          <div id="module11-quiz" style="background: linear-gradient(135deg, #ecfeff 0%, #cffafe 100%); border-radius: 16px; padding: 25px; margin-bottom: 30px;">
+            <p style="color: #0e7490; font-size: 15px; margin: 0 0 20px 0; text-align: center;">
+              <strong>Test your knowledge!</strong> Answer these 5 questions about filing claims and closing.
+            </p>
+
+            <!-- Quiz Questions Container -->
+            <div id="quiz-questions-m11" style="display: grid; gap: 20px;">
+              <!-- Q1 -->
+              <div class="quiz-question-m11" data-correct="1" style="background: white; border-radius: 12px; padding: 20px;">
+                <p style="font-weight: 600; color: #1f2937; margin: 0 0 15px 0;">1. When is the BEST time to file a claim?</p>
+                <div style="display: grid; gap: 8px;">
+                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                    <input type="radio" name="q1-m11" value="0" style="width: 18px; height: 18px;">
+                    <span style="color: #374151; font-size: 14px;">Within a week</span>
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                    <input type="radio" name="q1-m11" value="1" style="width: 18px; height: 18px;">
+                    <span style="color: #374151; font-size: 14px;">Same day - immediately</span>
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                    <input type="radio" name="q1-m11" value="2" style="width: 18px; height: 18px;">
+                    <span style="color: #374151; font-size: 14px;">After getting other estimates</span>
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                    <input type="radio" name="q1-m11" value="3" style="width: 18px; height: 18px;">
+                    <span style="color: #374151; font-size: 14px;">After the adjuster visits</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Q2 -->
+              <div class="quiz-question-m11" data-correct="1" style="background: white; border-radius: 12px; padding: 20px;">
+                <p style="font-weight: 600; color: #1f2937; margin: 0 0 15px 0;">2. What should the homeowner tell insurance about having an estimate?</p>
+                <div style="display: grid; gap: 8px;">
+                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                    <input type="radio" name="q2-m11" value="0" style="width: 18px; height: 18px;">
+                    <span style="color: #374151; font-size: 14px;">Yes, we have one</span>
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                    <input type="radio" name="q2-m11" value="1" style="width: 18px; height: 18px;">
+                    <span style="color: #374151; font-size: 14px;">No</span>
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                    <input type="radio" name="q2-m11" value="2" style="width: 18px; height: 18px;">
+                    <span style="color: #374151; font-size: 14px;">We're getting one soon</span>
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                    <input type="radio" name="q2-m11" value="3" style="width: 18px; height: 18px;">
+                    <span style="color: #374151; font-size: 14px;">Just the approximate cost</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Q3 -->
+              <div class="quiz-question-m11" data-correct="1" style="background: white; border-radius: 12px; padding: 20px;">
+                <p style="font-weight: 600; color: #1f2937; margin: 0 0 15px 0;">3. What does the Claim Authorization Form allow ROOF-ER to do?</p>
+                <div style="display: grid; gap: 8px;">
+                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                    <input type="radio" name="q3-m11" value="0" style="width: 18px; height: 18px;">
+                    <span style="color: #374151; font-size: 14px;">Start the roof work immediately</span>
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                    <input type="radio" name="q3-m11" value="1" style="width: 18px; height: 18px;">
+                    <span style="color: #374151; font-size: 14px;">Communicate with insurance on homeowner's behalf</span>
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                    <input type="radio" name="q3-m11" value="2" style="width: 18px; height: 18px;">
+                    <span style="color: #374151; font-size: 14px;">Collect payment from insurance</span>
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                    <input type="radio" name="q3-m11" value="3" style="width: 18px; height: 18px;">
+                    <span style="color: #374151; font-size: 14px;">Schedule the installation</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Q4 -->
+              <div class="quiz-question-m11" data-correct="2" style="background: white; border-radius: 12px; padding: 20px;">
+                <p style="font-weight: 600; color: #1f2937; margin: 0 0 15px 0;">4. What happens if insurance denies the claim?</p>
+                <div style="display: grid; gap: 8px;">
+                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                    <input type="radio" name="q4-m11" value="0" style="width: 18px; height: 18px;">
+                    <span style="color: #374151; font-size: 14px;">Homeowner pays full cost</span>
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                    <input type="radio" name="q4-m11" value="1" style="width: 18px; height: 18px;">
+                    <span style="color: #374151; font-size: 14px;">15% cancellation fee applies</span>
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                    <input type="radio" name="q4-m11" value="2" style="width: 18px; height: 18px;">
+                    <span style="color: #374151; font-size: 14px;">The contract is null and void</span>
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                    <input type="radio" name="q4-m11" value="3" style="width: 18px; height: 18px;">
+                    <span style="color: #374151; font-size: 14px;">ROOF-ER appeals automatically</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Q5 -->
+              <div class="quiz-question-m11" data-correct="1" style="background: white; border-radius: 12px; padding: 20px;">
+                <p style="font-weight: 600; color: #1f2937; margin: 0 0 15px 0;">5. What is the rescission period for the Insurance Claim Agreement?</p>
+                <div style="display: grid; gap: 8px;">
+                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                    <input type="radio" name="q5-m11" value="0" style="width: 18px; height: 18px;">
+                    <span style="color: #374151; font-size: 14px;">24 hours</span>
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                    <input type="radio" name="q5-m11" value="1" style="width: 18px; height: 18px;">
+                    <span style="color: #374151; font-size: 14px;">3 business days</span>
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                    <input type="radio" name="q5-m11" value="2" style="width: 18px; height: 18px;">
+                    <span style="color: #374151; font-size: 14px;">7 days</span>
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                    <input type="radio" name="q5-m11" value="3" style="width: 18px; height: 18px;">
+                    <span style="color: #374151; font-size: 14px;">30 days</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quiz Submit Button -->
+            <div style="text-align: center; margin-top: 20px;">
+              <button onclick="checkModule11Quiz()" style="background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); color: white; border: none; padding: 14px 32px; border-radius: 25px; font-weight: 600; font-size: 16px; cursor: pointer; transition: all 0.3s;">
+                Check Answers ✓
+              </button>
+            </div>
+
+            <!-- Quiz Feedback -->
+            <div id="quiz-feedback-m11" style="display: none; margin-top: 20px; padding: 20px; border-radius: 12px; text-align: center;"></div>
           </div>
 
           <div class="module-completion-section" id="module-complete-section" style="display: none; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 30px; border-radius: 16px; text-align: center; margin-top: 30px;">
@@ -6885,6 +7059,77 @@ function initDamageMatchingGame() {
 (window as any).checkDocSequence = checkDocSequence;
 (window as any).resetDocSequence = resetDocSequence;
 
+// --- Module 11 Mini Quiz ---
+function checkModule11Quiz() {
+  const questions = document.querySelectorAll('.quiz-question-m11');
+  const feedbackEl = document.getElementById('quiz-feedback-m11');
+  if (!feedbackEl) return;
+
+  let correct = 0;
+  let total = questions.length;
+  let allAnswered = true;
+
+  questions.forEach((q, index) => {
+    const correctAnswer = (q as HTMLElement).dataset.correct;
+    const selected = (q as HTMLElement).querySelector(`input[name="q${index + 1}-m11"]:checked`) as HTMLInputElement;
+
+    // Reset styles
+    q.querySelectorAll('label').forEach(label => {
+      (label as HTMLElement).style.background = '#f8fafc';
+      (label as HTMLElement).style.border = 'none';
+    });
+
+    if (!selected) {
+      allAnswered = false;
+      return;
+    }
+
+    const selectedLabel = selected.closest('label') as HTMLElement;
+
+    if (selected.value === correctAnswer) {
+      correct++;
+      selectedLabel.style.background = 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)';
+      selectedLabel.style.border = '2px solid #16a34a';
+    } else {
+      selectedLabel.style.background = 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)';
+      selectedLabel.style.border = '2px solid #dc2626';
+      // Highlight correct answer
+      const correctLabel = (q as HTMLElement).querySelector(`input[value="${correctAnswer}"]`)?.closest('label') as HTMLElement;
+      if (correctLabel) {
+        correctLabel.style.background = 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)';
+        correctLabel.style.border = '2px solid #16a34a';
+      }
+    }
+  });
+
+  if (!allAnswered) {
+    feedbackEl.textContent = 'Please answer all questions before checking!';
+    feedbackEl.style.background = 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)';
+    feedbackEl.style.color = '#92400e';
+    feedbackEl.style.display = 'block';
+    return;
+  }
+
+  const score = Math.round((correct / total) * 100);
+
+  if (score >= 80) {
+    feedbackEl.innerHTML = `<div style="font-size: 32px; margin-bottom: 10px;">🎉</div><strong>Great job!</strong> You got ${correct}/${total} correct (${score}%)`;
+    feedbackEl.style.background = 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)';
+    feedbackEl.style.color = '#166534';
+    // Show module completion
+    const completeSection = document.getElementById('module-complete-section');
+    if (completeSection) completeSection.style.display = 'block';
+  } else {
+    feedbackEl.innerHTML = `<div style="font-size: 32px; margin-bottom: 10px;">📚</div><strong>Keep studying!</strong> You got ${correct}/${total} correct (${score}%). Review the material and try again!`;
+    feedbackEl.style.background = 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)';
+    feedbackEl.style.color = '#991b1b';
+  }
+
+  feedbackEl.style.display = 'block';
+}
+
+(window as any).checkModule11Quiz = checkModule11Quiz;
+
 // --- Game Logic ---
 function initSalesCycleSorter() {
     const pool = document.getElementById('items-pool');
@@ -6898,14 +7143,14 @@ function initSalesCycleSorter() {
     pool.addEventListener('dragstart', (e) => {
         draggedItem = e.target as HTMLElement;
         setTimeout(() => {
-            if (draggedItem) draggedItem.style.display = 'none';
+            if (draggedItem) draggedItem.style.opacity = '0.5';
         }, 0);
     });
 
     pool.addEventListener('dragend', () => {
         setTimeout(() => {
             if (draggedItem) {
-                draggedItem.style.display = 'block';
+                draggedItem.style.opacity = '1';
                 draggedItem = null;
             }
         }, 0);
