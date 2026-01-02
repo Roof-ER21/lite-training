@@ -5408,22 +5408,115 @@ trainingContent['post-inspection-objections'] = `
       </div>
     </div>
 
-    <h2>Creating Urgency (Without Being Pushy)</h2>
-    <ul>
-      <li><strong>Weather Window:</strong> "We're 3 weeks out on scheduling. If we file today, we can get you on the schedule before winter."</li>
-      <li><strong>Statute of Limitations:</strong> "Storm was [date]. You have [X] months to file. After that, insurance won't cover it."</li>
-      <li><strong>Deterioration:</strong> "Every day without protection, UV damages the shingles more. In 6 months, this could be a leak."</li>
-      <li><strong>Matching Availability:</strong> "We can only guarantee color match if we order within 30 days. After that, discontinued colors become a problem."</li>
-    </ul>
+    <!-- Enhanced Urgency Section -->
+    <div style="margin-top: 40px;">
+      <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+        <span style="background: #fef3c7; padding: 8px 12px; border-radius: 8px;">⚡</span>
+        Creating Urgency (Without Being Pushy)
+      </h2>
 
-    <h2>The Empathy Framework</h2>
-    <p>For every objection, use this 4-step framework:</p>
-    <ol>
-      <li><strong>Acknowledge:</strong> "I completely understand..."</li>
-      <li><strong>Educate:</strong> "Here's what most people don't know..."</li>
-      <li><strong>Evidence:</strong> "Let me show you the photos/data..."</li>
-      <li><strong>Ask:</strong> "Does that make sense? Should we move forward?"</li>
-    </ol>
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 35px;">
+        <!-- Weather Reality Card -->
+        <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-radius: 16px; padding: 20px; border-left: 4px solid #3b82f6;">
+          <div style="font-size: 32px; margin-bottom: 10px;">🌧️</div>
+          <h4 style="color: #1e40af; margin: 0 0 10px 0; font-size: 16px; font-weight: 600;">Weather Reality</h4>
+          <p style="color: #374151; font-size: 14px; margin: 0; font-style: italic;">"We're 3 weeks out on scheduling. If we file today, we can get you on the schedule before winter."</p>
+        </div>
+
+        <!-- Schedule Reality Card -->
+        <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 16px; padding: 20px; border-left: 4px solid #16a34a;">
+          <div style="font-size: 32px; margin-bottom: 10px;">📋</div>
+          <h4 style="color: #166534; margin: 0 0 10px 0; font-size: 16px; font-weight: 600;">Statute of Limitations</h4>
+          <p style="color: #374151; font-size: 14px; margin: 0; font-style: italic;">"Storm was [date]. You have [X] months to file. After that, insurance won't cover it."</p>
+        </div>
+
+        <!-- Cost Reality Card -->
+        <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 16px; padding: 20px; border-left: 4px solid #f59e0b;">
+          <div style="font-size: 32px; margin-bottom: 10px;">💰</div>
+          <h4 style="color: #92400e; margin: 0 0 10px 0; font-size: 16px; font-weight: 600;">Deterioration</h4>
+          <p style="color: #374151; font-size: 14px; margin: 0; font-style: italic;">"Every day without protection, UV damages the shingles more. In 6 months, this could be a leak."</p>
+        </div>
+
+        <!-- Home Protection Card -->
+        <div style="background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); border-radius: 16px; padding: 20px; border-left: 4px solid #db2777;">
+          <div style="font-size: 32px; margin-bottom: 10px;">🏠</div>
+          <h4 style="color: #9d174d; margin: 0 0 10px 0; font-size: 16px; font-weight: 600;">Matching Availability</h4>
+          <p style="color: #374151; font-size: 14px; margin: 0; font-style: italic;">"We can only guarantee color match if we order within 30 days. After that, discontinued colors become a problem."</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Enhanced Empathy Framework -->
+    <div style="margin-top: 40px;">
+      <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+        <span style="background: #f0fdf4; padding: 8px 12px; border-radius: 8px;">🤝</span>
+        The Empathy Framework
+      </h2>
+      <p style="color: #6b7280; margin-bottom: 20px;">For every objection, use this 4-step framework:</p>
+
+      <!-- Visual Flow -->
+      <div style="display: flex; align-items: stretch; gap: 0; margin-bottom: 35px; flex-wrap: wrap;">
+        <!-- Step 1 -->
+        <div style="flex: 1; min-width: 150px; background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); padding: 20px; border-radius: 16px 0 0 16px; text-align: center; position: relative;">
+          <div style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; margin: 0 auto 12px auto;">1</div>
+          <h4 style="color: #1e40af; margin: 0 0 8px 0; font-size: 15px; font-weight: 600;">Acknowledge</h4>
+          <p style="color: #374151; font-size: 13px; margin: 0; font-style: italic;">"I completely understand..."</p>
+          <div style="position: absolute; right: -15px; top: 50%; transform: translateY(-50%); font-size: 24px; color: #3b82f6; z-index: 10;">→</div>
+        </div>
+
+        <!-- Step 2 -->
+        <div style="flex: 1; min-width: 150px; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); padding: 20px; text-align: center; position: relative;">
+          <div style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; margin: 0 auto 12px auto;">2</div>
+          <h4 style="color: #166534; margin: 0 0 8px 0; font-size: 15px; font-weight: 600;">Educate</h4>
+          <p style="color: #374151; font-size: 13px; margin: 0; font-style: italic;">"Here's what most people don't know..."</p>
+          <div style="position: absolute; right: -15px; top: 50%; transform: translateY(-50%); font-size: 24px; color: #16a34a; z-index: 10;">→</div>
+        </div>
+
+        <!-- Step 3 -->
+        <div style="flex: 1; min-width: 150px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 20px; text-align: center; position: relative;">
+          <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; margin: 0 auto 12px auto;">3</div>
+          <h4 style="color: #92400e; margin: 0 0 8px 0; font-size: 15px; font-weight: 600;">Evidence</h4>
+          <p style="color: #374151; font-size: 13px; margin: 0; font-style: italic;">"Let me show you the photos/data..."</p>
+          <div style="position: absolute; right: -15px; top: 50%; transform: translateY(-50%); font-size: 24px; color: #f59e0b; z-index: 10;">→</div>
+        </div>
+
+        <!-- Step 4 -->
+        <div style="flex: 1; min-width: 150px; background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); padding: 20px; border-radius: 0 16px 16px 0; text-align: center;">
+          <div style="background: linear-gradient(135deg, #db2777 0%, #be185d 100%); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; margin: 0 auto 12px auto;">4</div>
+          <h4 style="color: #9d174d; margin: 0 0 8px 0; font-size: 15px; font-weight: 600;">Ask</h4>
+          <p style="color: #374151; font-size: 13px; margin: 0; font-style: italic;">"Does that make sense? Should we move forward?"</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Module 10 Mini Quiz -->
+    <div style="margin-top: 40px;" id="m10-quiz-section">
+      <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+        <span style="background: #fef2f2; padding: 8px 12px; border-radius: 8px;">📝</span>
+        Knowledge Check
+      </h2>
+
+      <div id="m10-quiz-container" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-radius: 16px; padding: 30px; border: 2px solid #e2e8f0;">
+        <!-- Quiz will be populated by JS -->
+        <div id="m10-quiz-question" style="margin-bottom: 25px;">
+          <div style="font-size: 14px; color: #6b7280; margin-bottom: 8px;">Question <span id="m10-q-num">1</span> of 5</div>
+          <div id="m10-q-text" style="font-size: 18px; color: #1f2937; font-weight: 600;">Loading...</div>
+        </div>
+        <div id="m10-quiz-answers" style="display: grid; gap: 12px;">
+          <!-- Answers populated by JS -->
+        </div>
+        <div id="m10-quiz-feedback" style="display: none; margin-top: 20px; padding: 15px; border-radius: 10px;"></div>
+      </div>
+
+      <div id="m10-quiz-results" style="display: none; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 16px; padding: 40px; text-align: center; margin-top: 20px;">
+        <div id="m10-results-icon" style="font-size: 64px; margin-bottom: 15px;">🎉</div>
+        <h3 id="m10-results-title" style="color: #166534; font-size: 24px; margin: 0 0 10px 0;">Great job!</h3>
+        <p id="m10-results-text" style="color: #374151; font-size: 18px; margin: 0 0 20px 0;">You got <strong><span id="m10-score">0</span>/5</strong> correct</p>
+        <button id="m10-retry-quiz" style="background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); color: white; border: none; padding: 12px 24px; border-radius: 25px; font-weight: 600; font-size: 14px; cursor: pointer;">
+          🔄 Retake Quiz
+        </button>
+      </div>
+    </div>
 
     <div class="module-completion-section" id="module-complete-section" style="display: none;">
       <button class="complete-module-btn" onclick="completeModule('post-inspection-objections')">
@@ -5561,6 +5654,92 @@ trainingContent['closing-objections'] = `
             <span style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700;">5</span>
             <span style="color: #1e40af; font-size: 15px; font-weight: 500;">Stay in regular contact with the Home Owner</span>
           </div>
+        </div>
+      </div>
+
+      <!-- Quick-Fire Closing Quiz -->
+      <div id="closing-quiz-section" style="margin-top: 40px;">
+        <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+          <span style="background: #fef3c7; padding: 8px 12px; border-radius: 8px;">⚡</span>
+          Quick-Fire Closing Quiz
+        </h2>
+
+        <!-- Start Screen -->
+        <div id="closing-quiz-start" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 16px; padding: 40px; text-align: center;">
+          <div style="font-size: 64px; margin-bottom: 20px;">🎯</div>
+          <h3 style="color: #92400e; font-size: 24px; margin: 0 0 15px 0;">Test Your Closing Skills!</h3>
+          <p style="color: #a16207; font-size: 16px; margin: 0 0 25px 0;">6 objections. 15 seconds each. Pick the BEST response.</p>
+          <div style="display: flex; gap: 20px; justify-content: center; margin-bottom: 25px;">
+            <div style="background: white; padding: 15px 25px; border-radius: 10px;">
+              <div style="font-size: 20px; font-weight: 700; color: #dc2626;">+10</div>
+              <div style="font-size: 12px; color: #6b7280;">Correct Answer</div>
+            </div>
+            <div style="background: white; padding: 15px 25px; border-radius: 10px;">
+              <div style="font-size: 20px; font-weight: 700; color: #16a34a;">+5</div>
+              <div style="font-size: 12px; color: #6b7280;">Speed Bonus (&lt;5s)</div>
+            </div>
+          </div>
+          <button id="start-closing-quiz" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border: none; padding: 16px 40px; border-radius: 30px; font-size: 18px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);">
+            Start Quiz ⚡
+          </button>
+        </div>
+
+        <!-- Quiz Game Area (hidden initially) -->
+        <div id="closing-quiz-game" style="display: none;">
+          <!-- Progress Bar -->
+          <div style="background: #e5e7eb; border-radius: 10px; height: 8px; margin-bottom: 20px; overflow: hidden;">
+            <div id="closing-quiz-progress" style="background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%); height: 100%; width: 0%; transition: width 0.3s;"></div>
+          </div>
+
+          <!-- Header with Question # and Timer -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div style="font-size: 16px; color: #6b7280;">
+              Question <span id="closing-q-num">1</span> of 6
+            </div>
+            <div style="display: flex; align-items: center; gap: 20px;">
+              <div style="font-size: 16px; color: #6b7280;">
+                Score: <span id="closing-score" style="font-weight: 700; color: #f59e0b;">0</span>
+              </div>
+              <div id="closing-timer" style="background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); color: white; padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 18px; min-width: 50px; text-align: center;">
+                15
+              </div>
+            </div>
+          </div>
+
+          <!-- Question Card -->
+          <div style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-radius: 16px; padding: 25px; margin-bottom: 20px; border-left: 5px solid #dc2626;">
+            <div style="font-size: 14px; color: #991b1b; margin-bottom: 8px; font-weight: 600;">Customer says:</div>
+            <div id="closing-question" style="font-size: 22px; color: #1f2937; font-weight: 600; font-style: italic;">"Loading..."</div>
+          </div>
+
+          <!-- Answer Options -->
+          <div id="closing-answers" style="display: grid; gap: 12px;">
+            <!-- Answers populated by JS -->
+          </div>
+
+          <!-- Feedback Area (hidden initially) -->
+          <div id="closing-feedback" style="display: none; margin-top: 20px; padding: 20px; border-radius: 12px; text-align: center;">
+          </div>
+        </div>
+
+        <!-- Results Screen (hidden initially) -->
+        <div id="closing-quiz-results" style="display: none; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 16px; padding: 40px; text-align: center;">
+          <div id="closing-results-icon" style="font-size: 64px; margin-bottom: 20px;">🏆</div>
+          <h3 id="closing-results-title" style="color: #166534; font-size: 24px; margin: 0 0 15px 0;">Quiz Complete!</h3>
+          <p id="closing-results-text" style="color: #374151; font-size: 18px; margin: 0 0 25px 0;">You scored <strong><span id="closing-final-score">0</span></strong> out of 90 possible points</p>
+          <div id="closing-results-breakdown" style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 25px; text-align: left; max-width: 300px; margin-left: auto; margin-right: auto;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+              <span style="color: #6b7280;">Correct Answers:</span>
+              <span id="closing-correct-count" style="font-weight: 700; color: #16a34a;">0/6</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: #6b7280;">Speed Bonuses:</span>
+              <span id="closing-speed-bonus" style="font-weight: 700; color: #f59e0b;">0</span>
+            </div>
+          </div>
+          <button id="retry-closing-quiz" style="background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); color: white; border: none; padding: 14px 32px; border-radius: 25px; font-size: 16px; font-weight: 600; cursor: pointer; margin-right: 10px;">
+            🔄 Try Again
+          </button>
         </div>
       </div>
 
@@ -7283,6 +7462,328 @@ function resetSalesCycleGame() {
 
 (window as any).resetSalesCycleGame = resetSalesCycleGame;
 
+// --- Module 12: Closing Objections Quick-Fire Quiz ---
+function initClosingQuizGame() {
+    const startBtn = document.getElementById('start-closing-quiz');
+    const retryBtn = document.getElementById('retry-closing-quiz');
+    const startScreen = document.getElementById('closing-quiz-start');
+    const gameScreen = document.getElementById('closing-quiz-game');
+    const resultsScreen = document.getElementById('closing-quiz-results');
+
+    if (!startBtn || !startScreen || !gameScreen || !resultsScreen) return;
+
+    const questions = [
+        {
+            objection: "I want to wait for more bids",
+            answers: [
+                { text: "Take your time, call me when ready", correct: false },
+                { text: "We're very competitive, but I understand", correct: true },
+                { text: "Other companies will charge you more", correct: false },
+                { text: "You won't find anyone better", correct: false }
+            ]
+        },
+        {
+            objection: "I need to think about it",
+            answers: [
+                { text: "What specifically are you thinking about? Maybe I can help clarify", correct: true },
+                { text: "Don't think too long, prices go up", correct: false },
+                { text: "That's fine, I'll check back next month", correct: false },
+                { text: "Most people who wait regret it", correct: false }
+            ]
+        },
+        {
+            objection: "Call me next week",
+            answers: [
+                { text: "Sure, I'll call Monday at 9am", correct: false },
+                { text: "I can do that! Any specific concerns in the meantime I can address now?", correct: true },
+                { text: "Next week might be too late", correct: false },
+                { text: "Why wait when we can finish today?", correct: false }
+            ]
+        },
+        {
+            objection: "I'm not sure about the deductible",
+            answers: [
+                { text: "Most deductibles are $1,000, you can afford that", correct: false },
+                { text: "Don't worry about it, insurance handles everything", correct: false },
+                { text: "The deductible is the only thing you pay—insurance covers the rest. And you're paying for a brand new roof", correct: true },
+                { text: "We can work around the deductible", correct: false }
+            ]
+        },
+        {
+            objection: "My spouse handles this stuff",
+            answers: [
+                { text: "Can we get them on the phone right now to go over everything together?", correct: true },
+                { text: "Tell them I stopped by", correct: false },
+                { text: "You can sign and explain it to them later", correct: false },
+                { text: "They'll agree with whatever you decide", correct: false }
+            ]
+        },
+        {
+            objection: "I don't trust contractors",
+            answers: [
+                { text: "We're different, trust me", correct: false },
+                { text: "I totally understand—that's why we have our contingency. You don't pay us anything unless insurance approves", correct: true },
+                { text: "Check our online reviews", correct: false },
+                { text: "We've been in business for years", correct: false }
+            ]
+        }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let correctCount = 0;
+    let speedBonuses = 0;
+    let timerInterval: ReturnType<typeof setInterval> | null = null;
+    let timeLeft = 15;
+    let questionStartTime = 0;
+
+    function shuffleAnswers(answers: { text: string; correct: boolean }[]) {
+        const shuffled = [...answers];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+    }
+
+    function startQuiz() {
+        currentQuestion = 0;
+        score = 0;
+        correctCount = 0;
+        speedBonuses = 0;
+        startScreen.style.display = 'none';
+        resultsScreen.style.display = 'none';
+        gameScreen.style.display = 'block';
+        showQuestion();
+    }
+
+    function showQuestion() {
+        const q = questions[currentQuestion];
+        const qNumEl = document.getElementById('closing-q-num');
+        const scoreEl = document.getElementById('closing-score');
+        const questionEl = document.getElementById('closing-question');
+        const answersEl = document.getElementById('closing-answers');
+        const progressEl = document.getElementById('closing-quiz-progress');
+        const feedbackEl = document.getElementById('closing-feedback');
+
+        if (!qNumEl || !scoreEl || !questionEl || !answersEl || !progressEl) return;
+
+        // Hide feedback
+        if (feedbackEl) feedbackEl.style.display = 'none';
+
+        // Update UI
+        qNumEl.textContent = String(currentQuestion + 1);
+        scoreEl.textContent = String(score);
+        progressEl.style.width = `${((currentQuestion) / questions.length) * 100}%`;
+        questionEl.textContent = `"${q.objection}"`;
+
+        // Shuffle and render answers
+        const shuffled = shuffleAnswers(q.answers);
+        answersEl.innerHTML = shuffled.map((ans, idx) => `
+            <button class="closing-answer-btn" data-correct="${ans.correct}" style="
+                background: white;
+                border: 2px solid #e5e7eb;
+                border-radius: 12px;
+                padding: 16px 20px;
+                text-align: left;
+                font-size: 15px;
+                color: #374151;
+                cursor: pointer;
+                transition: all 0.2s;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            ">
+                <span style="background: #f3f4f6; padding: 6px 12px; border-radius: 6px; font-weight: 600; color: #6b7280;">${String.fromCharCode(65 + idx)}</span>
+                <span>${ans.text}</span>
+            </button>
+        `).join('');
+
+        // Add click handlers
+        answersEl.querySelectorAll('.closing-answer-btn').forEach(btn => {
+            btn.addEventListener('click', handleAnswer);
+        });
+
+        // Start timer
+        questionStartTime = Date.now();
+        timeLeft = 15;
+        updateTimer();
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            updateTimer();
+            if (timeLeft <= 0) {
+                handleTimeout();
+            }
+        }, 1000);
+    }
+
+    function updateTimer() {
+        const timerEl = document.getElementById('closing-timer');
+        if (timerEl) {
+            timerEl.textContent = String(timeLeft);
+            if (timeLeft <= 5) {
+                timerEl.style.background = 'linear-gradient(135deg, #991b1b 0%, #dc2626 100%)';
+                timerEl.style.animation = 'pulse 0.5s ease-in-out';
+            } else {
+                timerEl.style.background = 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)';
+            }
+        }
+    }
+
+    function handleAnswer(e: Event) {
+        if (timerInterval) clearInterval(timerInterval);
+
+        const btn = e.currentTarget as HTMLElement;
+        const isCorrect = btn.dataset.correct === 'true';
+        const elapsed = (Date.now() - questionStartTime) / 1000;
+
+        // Disable all buttons
+        document.querySelectorAll('.closing-answer-btn').forEach(b => {
+            (b as HTMLElement).style.pointerEvents = 'none';
+        });
+
+        // Find correct answer and highlight
+        document.querySelectorAll('.closing-answer-btn').forEach(b => {
+            const el = b as HTMLElement;
+            if (el.dataset.correct === 'true') {
+                el.style.background = 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)';
+                el.style.borderColor = '#16a34a';
+            }
+        });
+
+        let pointsEarned = 0;
+        let speedBonus = 0;
+
+        if (isCorrect) {
+            btn.style.background = 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)';
+            btn.style.borderColor = '#16a34a';
+            pointsEarned = 10;
+            correctCount++;
+            if (elapsed < 5) {
+                speedBonus = 5;
+                speedBonuses += 5;
+            }
+            score += pointsEarned + speedBonus;
+        } else {
+            btn.style.background = 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)';
+            btn.style.borderColor = '#dc2626';
+        }
+
+        showFeedback(isCorrect, pointsEarned, speedBonus);
+    }
+
+    function handleTimeout() {
+        if (timerInterval) clearInterval(timerInterval);
+
+        // Disable all buttons and show correct answer
+        document.querySelectorAll('.closing-answer-btn').forEach(b => {
+            const el = b as HTMLElement;
+            el.style.pointerEvents = 'none';
+            if (el.dataset.correct === 'true') {
+                el.style.background = 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)';
+                el.style.borderColor = '#16a34a';
+            }
+        });
+
+        showFeedback(false, 0, 0, true);
+    }
+
+    function showFeedback(isCorrect: boolean, points: number, bonus: number, timeout = false) {
+        const feedbackEl = document.getElementById('closing-feedback');
+        const scoreEl = document.getElementById('closing-score');
+        if (!feedbackEl) return;
+
+        if (scoreEl) scoreEl.textContent = String(score);
+
+        if (timeout) {
+            feedbackEl.innerHTML = `
+                <div style="color: #991b1b; font-size: 18px; font-weight: 600;">⏱️ Time's up!</div>
+                <div style="color: #6b7280; font-size: 14px; margin-top: 5px;">The correct answer is highlighted above</div>
+            `;
+            feedbackEl.style.background = 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)';
+        } else if (isCorrect) {
+            feedbackEl.innerHTML = `
+                <div style="color: #166534; font-size: 18px; font-weight: 600;">✅ Correct! +${points}${bonus > 0 ? ` <span style="color: #f59e0b;">+${bonus} Speed Bonus!</span>` : ''}</div>
+            `;
+            feedbackEl.style.background = 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)';
+        } else {
+            feedbackEl.innerHTML = `
+                <div style="color: #991b1b; font-size: 18px; font-weight: 600;">❌ Not quite</div>
+                <div style="color: #6b7280; font-size: 14px; margin-top: 5px;">The correct answer is highlighted above</div>
+            `;
+            feedbackEl.style.background = 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)';
+        }
+
+        feedbackEl.style.display = 'block';
+
+        // Auto advance after 1.5 seconds
+        setTimeout(() => {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }, 1500);
+    }
+
+    function showResults() {
+        gameScreen.style.display = 'none';
+        resultsScreen.style.display = 'block';
+
+        const finalScoreEl = document.getElementById('closing-final-score');
+        const correctCountEl = document.getElementById('closing-correct-count');
+        const speedBonusEl = document.getElementById('closing-speed-bonus');
+        const iconEl = document.getElementById('closing-results-icon');
+        const titleEl = document.getElementById('closing-results-title');
+
+        if (finalScoreEl) finalScoreEl.textContent = String(score);
+        if (correctCountEl) correctCountEl.textContent = `${correctCount}/6`;
+        if (speedBonusEl) speedBonusEl.textContent = `+${speedBonuses}`;
+
+        // Update results based on score
+        const percentage = (correctCount / 6) * 100;
+        if (percentage >= 80) {
+            if (iconEl) iconEl.textContent = '🏆';
+            if (titleEl) {
+                titleEl.textContent = 'Excellent!';
+                titleEl.style.color = '#166534';
+            }
+            resultsScreen.style.background = 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)';
+            // Show module completion
+            const completeSection = document.getElementById('module-complete-section');
+            if (completeSection) completeSection.style.display = 'block';
+        } else if (percentage >= 50) {
+            if (iconEl) iconEl.textContent = '👍';
+            if (titleEl) {
+                titleEl.textContent = 'Good effort!';
+                titleEl.style.color = '#ca8a04';
+            }
+            resultsScreen.style.background = 'linear-gradient(135deg, #fefce8 0%, #fef9c3 100%)';
+            // Show module completion
+            const completeSection = document.getElementById('module-complete-section');
+            if (completeSection) completeSection.style.display = 'block';
+        } else {
+            if (iconEl) iconEl.textContent = '📚';
+            if (titleEl) {
+                titleEl.textContent = 'Keep practicing!';
+                titleEl.style.color = '#dc2626';
+            }
+            resultsScreen.style.background = 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)';
+        }
+    }
+
+    // Event listeners
+    startBtn.addEventListener('click', startQuiz);
+    if (retryBtn) {
+        retryBtn.addEventListener('click', () => {
+            resultsScreen.style.display = 'none';
+            startQuiz();
+        });
+    }
+}
+
 // --- Module 7: Inspection Step Card Toggle ---
 function toggleStepCard(cardElement: HTMLElement) {
   const wasExpanded = cardElement.classList.contains('expanded');
@@ -7730,6 +8231,219 @@ function initModule9RoleplayButtons() {
   });
 
   console.log(`✅ Initialized ${practiceButtons.length} inline practice sessions`);
+
+  // Also initialize the Module 10 quiz
+  initModule10Quiz();
+}
+
+// --- Module 10 Mini Quiz ---
+function initModule10Quiz() {
+  const quizContainer = document.getElementById('m10-quiz-container');
+  const resultsDiv = document.getElementById('m10-quiz-results');
+  const retryBtn = document.getElementById('m10-retry-quiz');
+
+  if (!quizContainer) return;
+
+  const questions = [
+    {
+      question: "Which urgency approach is most effective?",
+      answers: [
+        { text: "\"Sign today or the price goes up\"", correct: false },
+        { text: "\"Our schedule fills up fast after storms—locking in now ensures priority\"", correct: true },
+        { text: "\"Other companies will take your business\"", correct: false },
+        { text: "\"This is a limited time offer\"", correct: false }
+      ]
+    },
+    {
+      question: "What is the first step in the Empathy Framework?",
+      answers: [
+        { text: "Educate them on the process", correct: false },
+        { text: "Offer a solution right away", correct: false },
+        { text: "Acknowledge their concern", correct: true },
+        { text: "Ask for the sale", correct: false }
+      ]
+    },
+    {
+      question: "When creating urgency, you should focus on:",
+      answers: [
+        { text: "Pressuring the customer to decide", correct: false },
+        { text: "Real consequences of waiting (weather, schedule, costs)", correct: true },
+        { text: "Discounts that expire soon", correct: false },
+        { text: "Comparing to competitors", correct: false }
+      ]
+    },
+    {
+      question: "In the Empathy Framework, \"Educate\" means:",
+      answers: [
+        { text: "Telling them they're wrong", correct: false },
+        { text: "Sharing what most people don't know about the process", correct: true },
+        { text: "Reading from a script", correct: false },
+        { text: "Showing them competitor pricing", correct: false }
+      ]
+    },
+    {
+      question: "The best way to create urgency is to:",
+      answers: [
+        { text: "Pressure them to sign immediately", correct: false },
+        { text: "Focus on real-world consequences while giving them space", correct: true },
+        { text: "Mention competitor pricing", correct: false },
+        { text: "Offer a one-day discount", correct: false }
+      ]
+    }
+  ];
+
+  let currentQ = 0;
+  let correct = 0;
+
+  function showQuestion() {
+    const q = questions[currentQ];
+    const qNumEl = document.getElementById('m10-q-num');
+    const qTextEl = document.getElementById('m10-q-text');
+    const answersEl = document.getElementById('m10-quiz-answers');
+    const feedbackEl = document.getElementById('m10-quiz-feedback');
+
+    if (!qNumEl || !qTextEl || !answersEl) return;
+
+    qNumEl.textContent = String(currentQ + 1);
+    qTextEl.textContent = q.question;
+    if (feedbackEl) feedbackEl.style.display = 'none';
+
+    // Shuffle answers
+    const shuffled = [...q.answers].sort(() => Math.random() - 0.5);
+
+    answersEl.innerHTML = shuffled.map((ans, idx) => `
+      <button class="m10-answer-btn" data-correct="${ans.correct}" style="
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 14px 18px;
+        text-align: left;
+        font-size: 14px;
+        color: #374151;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      ">
+        <span style="background: #f3f4f6; padding: 4px 10px; border-radius: 6px; font-weight: 600; color: #6b7280;">${String.fromCharCode(65 + idx)}</span>
+        <span>${ans.text}</span>
+      </button>
+    `).join('');
+
+    // Add click handlers
+    answersEl.querySelectorAll('.m10-answer-btn').forEach(btn => {
+      btn.addEventListener('click', handleM10Answer);
+    });
+  }
+
+  function handleM10Answer(e: Event) {
+    const btn = e.currentTarget as HTMLElement;
+    const isCorrect = btn.dataset.correct === 'true';
+    const feedbackEl = document.getElementById('m10-quiz-feedback');
+    const answersEl = document.getElementById('m10-quiz-answers');
+
+    // Disable all buttons
+    answersEl?.querySelectorAll('.m10-answer-btn').forEach(b => {
+      (b as HTMLElement).style.pointerEvents = 'none';
+    });
+
+    // Highlight correct answer
+    answersEl?.querySelectorAll('.m10-answer-btn').forEach(b => {
+      const el = b as HTMLElement;
+      if (el.dataset.correct === 'true') {
+        el.style.background = 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)';
+        el.style.borderColor = '#16a34a';
+      }
+    });
+
+    if (isCorrect) {
+      correct++;
+      btn.style.background = 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)';
+      btn.style.borderColor = '#16a34a';
+      if (feedbackEl) {
+        feedbackEl.innerHTML = '<div style="color: #166534; font-weight: 600;">✅ Correct!</div>';
+        feedbackEl.style.background = 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)';
+        feedbackEl.style.display = 'block';
+      }
+    } else {
+      btn.style.background = 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)';
+      btn.style.borderColor = '#dc2626';
+      if (feedbackEl) {
+        feedbackEl.innerHTML = '<div style="color: #991b1b; font-weight: 600;">❌ Not quite. The correct answer is highlighted.</div>';
+        feedbackEl.style.background = 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)';
+        feedbackEl.style.display = 'block';
+      }
+    }
+
+    // Advance after delay
+    setTimeout(() => {
+      currentQ++;
+      if (currentQ < questions.length) {
+        showQuestion();
+      } else {
+        showM10Results();
+      }
+    }, 1200);
+  }
+
+  function showM10Results() {
+    if (quizContainer) quizContainer.style.display = 'none';
+    if (resultsDiv) {
+      resultsDiv.style.display = 'block';
+      const scoreEl = document.getElementById('m10-score');
+      const iconEl = document.getElementById('m10-results-icon');
+      const titleEl = document.getElementById('m10-results-title');
+
+      if (scoreEl) scoreEl.textContent = String(correct);
+
+      const percentage = (correct / 5) * 100;
+      if (percentage >= 80) {
+        if (iconEl) iconEl.textContent = '🎉';
+        if (titleEl) {
+          titleEl.textContent = 'Great job!';
+          titleEl.style.color = '#166534';
+        }
+        resultsDiv.style.background = 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)';
+        // Show module completion
+        const completeSection = document.getElementById('module-complete-section');
+        if (completeSection) completeSection.style.display = 'block';
+      } else if (percentage >= 60) {
+        if (iconEl) iconEl.textContent = '👍';
+        if (titleEl) {
+          titleEl.textContent = 'Good effort!';
+          titleEl.style.color = '#ca8a04';
+        }
+        resultsDiv.style.background = 'linear-gradient(135deg, #fefce8 0%, #fef9c3 100%)';
+        // Still show completion for 60%+
+        const completeSection = document.getElementById('module-complete-section');
+        if (completeSection) completeSection.style.display = 'block';
+      } else {
+        if (iconEl) iconEl.textContent = '📚';
+        if (titleEl) {
+          titleEl.textContent = 'Keep studying!';
+          titleEl.style.color = '#dc2626';
+        }
+        resultsDiv.style.background = 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)';
+      }
+    }
+  }
+
+  function resetM10Quiz() {
+    currentQ = 0;
+    correct = 0;
+    if (quizContainer) quizContainer.style.display = 'block';
+    if (resultsDiv) resultsDiv.style.display = 'none';
+    showQuestion();
+  }
+
+  // Event listeners
+  if (retryBtn) {
+    retryBtn.addEventListener('click', resetM10Quiz);
+  }
+
+  // Start the quiz
+  showQuestion();
 }
 
 // Helper: Start inline practice session
@@ -10826,6 +11540,9 @@ function renderModule(moduleName: string) {
           break;
       case 'shingle-types-materials':
           initShingleGame();
+          break;
+      case 'closing-objections':
+          initClosingQuizGame();
           break;
   }
 }
