@@ -7151,6 +7151,8 @@ function resetQuizM11() {
 (window as any).resetQuizM11 = resetQuizM11;
 
 // --- Game Logic ---
+let salesCycleAttempts = 0;
+
 function initSalesCycleSorter() {
     const pool = document.getElementById('items-pool');
     const dropZone = document.getElementById('sorted-list');
@@ -7160,6 +7162,8 @@ function initSalesCycleSorter() {
     let draggedItem: HTMLElement | null = null;
     let dragSource: 'pool' | 'dropzone' | null = null;
     const correctOrder = ['1', '2', '3', '4', '5'];
+    const phaseNames = ['Generating New Business', 'Adjuster Meeting', 'Project Meeting', 'Installation', 'Final Payment'];
+    salesCycleAttempts = 0;
 
     // Handle drag from pool
     pool.addEventListener('dragstart', (e) => {
@@ -7228,15 +7232,56 @@ function initSalesCycleSorter() {
         const currentOrder = Array.from(items).map(item => (item as HTMLElement).dataset.order);
 
         if (JSON.stringify(currentOrder) === JSON.stringify(correctOrder)) {
-            feedbackEl.textContent = 'Correct! That is the right order.';
+            feedbackEl.innerHTML = `
+                <div style="color: #166534;">✅ Correct! That is the right order.</div>
+            `;
             feedbackEl.className = 'feedback-message correct';
+            // Show completion section
+            const completeSection = document.getElementById('module-complete-section');
+            if (completeSection) completeSection.style.display = 'block';
         } else {
-            feedbackEl.textContent = 'Not quite right. Try again!';
+            salesCycleAttempts++;
+            let hint = '';
+            if (salesCycleAttempts === 1) {
+                hint = `<div style="margin-top: 10px; font-size: 13px; color: #6b7280;">💡 <strong>Hint:</strong> Think about what happens FIRST when you meet a homeowner...</div>`;
+            } else if (salesCycleAttempts === 2) {
+                hint = `<div style="margin-top: 10px; font-size: 13px; color: #6b7280;">💡 <strong>Hint:</strong> The first phase is "<strong>${phaseNames[0]}</strong>" - that's when you're door knocking or getting referrals!</div>`;
+            } else {
+                hint = `<div style="margin-top: 10px; font-size: 13px; color: #6b7280;">💡 <strong>Hint:</strong> The correct order is: <strong>1.</strong> ${phaseNames[0]} → <strong>2.</strong> ${phaseNames[1]} → <strong>3.</strong> ${phaseNames[2]} → ...</div>`;
+            }
+            feedbackEl.innerHTML = `
+                <div style="color: #991b1b;">❌ Not quite right. Try again!</div>
+                ${hint}
+                <button onclick="resetSalesCycleGame()" style="margin-top: 12px; background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); color: white; border: none; padding: 10px 20px; border-radius: 20px; font-weight: 600; font-size: 14px; cursor: pointer;">
+                    🔄 Reset & Try Again
+                </button>
+            `;
             feedbackEl.className = 'feedback-message incorrect';
         }
         feedbackEl.style.display = 'block';
     }
 }
+
+// Reset Sales Cycle Game
+function resetSalesCycleGame() {
+    const pool = document.getElementById('items-pool');
+    const dropZone = document.getElementById('sorted-list');
+    const feedbackEl = document.getElementById('sales-cycle-feedback');
+
+    if (!pool || !dropZone) return;
+
+    // Move all items back to pool
+    const items = dropZone.querySelectorAll('.draggable-item');
+    items.forEach(item => {
+        pool.appendChild(item);
+        (item as HTMLElement).style.opacity = '1';
+    });
+
+    // Hide feedback
+    if (feedbackEl) feedbackEl.style.display = 'none';
+}
+
+(window as any).resetSalesCycleGame = resetSalesCycleGame;
 
 // --- Module 7: Inspection Step Card Toggle ---
 function toggleStepCard(cardElement: HTMLElement) {
