@@ -6941,7 +6941,7 @@ button:disabled {
 }
 
 .exam-stat .stat-label {
-  color: #666;
+  color: #555; /* Darker for better visibility */
   font-size: 0.9em;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -7196,7 +7196,7 @@ button:disabled {
 
 .sa-hint {
   font-size: 0.85em;
-  color: #666;
+  color: #555; /* Darker for better visibility */
   font-style: italic;
   margin-top: 8px;
 }
@@ -7313,7 +7313,7 @@ button:disabled {
 }
 
 .breakdown-item .breakdown-label {
-  color: #666;
+  color: #555; /* Darker for better visibility */
   font-size: 0.9em;
   text-transform: uppercase;
 }
@@ -7727,7 +7727,7 @@ button:disabled {
 }
 
 .correct-answer .label {
-  color: #2e7d32;
+  color: #1b5e20; /* Darker green for better contrast */
 }
 
 .answer-comparison .value {
@@ -9007,7 +9007,7 @@ button:disabled {
 
 .answer-item .q-num {
   font-weight: 600;
-  color: #6b7280;
+  color: #374151; /* Darker for better visibility */
   min-width: 35px;
 }
 
