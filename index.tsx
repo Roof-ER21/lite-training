@@ -4092,11 +4092,11 @@ const trainingContent = {
                 <div style="background: white; border-radius: 12px; padding: 20px;">
                     <h4 style="color: #7c3aed; margin: 0 0 15px 0; font-size: 16px; text-align: center;">📦 Phases (Drag from here)</h4>
                     <div id="items-pool" style="min-height: 200px; background: #faf5ff; border-radius: 8px; padding: 10px; border: 2px dashed #c4b5fd;">
-                        <div class="draggable-item" draggable="true" data-order="2" style="background: white; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; cursor: grab; border: 2px solid #e9d5ff; font-size: 14px; font-weight: 500; color: #1f2937; transition: all 0.2s;">2️⃣ Adjuster Meeting</div>
-                        <div class="draggable-item" draggable="true" data-order="1" style="background: white; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; cursor: grab; border: 2px solid #e9d5ff; font-size: 14px; font-weight: 500; color: #1f2937; transition: all 0.2s;">1️⃣ Generating New Business</div>
-                        <div class="draggable-item" draggable="true" data-order="5" style="background: white; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; cursor: grab; border: 2px solid #e9d5ff; font-size: 14px; font-weight: 500; color: #1f2937; transition: all 0.2s;">5️⃣ Final Payment</div>
-                        <div class="draggable-item" draggable="true" data-order="4" style="background: white; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; cursor: grab; border: 2px solid #e9d5ff; font-size: 14px; font-weight: 500; color: #1f2937; transition: all 0.2s;">4️⃣ Installation</div>
-                        <div class="draggable-item" draggable="true" data-order="3" style="background: white; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; cursor: grab; border: 2px solid #e9d5ff; font-size: 14px; font-weight: 500; color: #1f2937; transition: all 0.2s;">3️⃣ Project Meeting</div>
+                        <div class="draggable-item" draggable="true" data-order="2" style="background: white; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; cursor: grab; border: 2px solid #e9d5ff; font-size: 14px; font-weight: 500; color: #1f2937; transition: all 0.2s;">Adjuster Meeting</div>
+                        <div class="draggable-item" draggable="true" data-order="1" style="background: white; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; cursor: grab; border: 2px solid #e9d5ff; font-size: 14px; font-weight: 500; color: #1f2937; transition: all 0.2s;">Generating New Business</div>
+                        <div class="draggable-item" draggable="true" data-order="5" style="background: white; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; cursor: grab; border: 2px solid #e9d5ff; font-size: 14px; font-weight: 500; color: #1f2937; transition: all 0.2s;">Final Payment</div>
+                        <div class="draggable-item" draggable="true" data-order="4" style="background: white; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; cursor: grab; border: 2px solid #e9d5ff; font-size: 14px; font-weight: 500; color: #1f2937; transition: all 0.2s;">Installation</div>
+                        <div class="draggable-item" draggable="true" data-order="3" style="background: white; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; cursor: grab; border: 2px solid #e9d5ff; font-size: 14px; font-weight: 500; color: #1f2937; transition: all 0.2s;">Project Meeting</div>
                     </div>
                 </div>
                 <div style="background: white; border-radius: 12px; padding: 20px;">
@@ -4349,137 +4349,77 @@ const trainingContent = {
           </h2>
 
           <div id="module11-quiz" style="background: linear-gradient(135deg, #ecfeff 0%, #cffafe 100%); border-radius: 16px; padding: 25px; margin-bottom: 30px;">
-            <p style="color: #0e7490; font-size: 15px; margin: 0 0 20px 0; text-align: center;">
-              <strong>Test your knowledge!</strong> Answer these 5 questions about filing claims and closing.
-            </p>
+            <!-- Progress Bar -->
+            <div id="quiz-progress-m11" style="margin-bottom: 20px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="color: #0e7490; font-weight: 600; font-size: 14px;">Question <span id="current-q-num">1</span> of 5</span>
+                <span id="quiz-score-display" style="color: #0e7490; font-size: 14px;"></span>
+              </div>
+              <div style="background: #cffafe; border-radius: 10px; height: 8px; overflow: hidden;">
+                <div id="quiz-progress-bar" style="background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); height: 100%; width: 20%; transition: width 0.3s;"></div>
+              </div>
+            </div>
 
             <!-- Quiz Questions Container -->
-            <div id="quiz-questions-m11" style="display: grid; gap: 20px;">
+            <div id="quiz-questions-m11">
               <!-- Q1 -->
-              <div class="quiz-question-m11" data-correct="1" style="background: white; border-radius: 12px; padding: 20px;">
-                <p style="font-weight: 600; color: #1f2937; margin: 0 0 15px 0;">1. When is the BEST time to file a claim?</p>
+              <div class="quiz-question-m11" data-question="1" data-correct="1" style="background: white; border-radius: 12px; padding: 20px;">
+                <p style="font-weight: 600; color: #1f2937; margin: 0 0 15px 0; font-size: 16px;">When is the BEST time to file a claim?</p>
                 <div style="display: grid; gap: 8px;">
-                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
-                    <input type="radio" name="q1-m11" value="0" style="width: 18px; height: 18px;">
-                    <span style="color: #374151; font-size: 14px;">Within a week</span>
-                  </label>
-                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
-                    <input type="radio" name="q1-m11" value="1" style="width: 18px; height: 18px;">
-                    <span style="color: #374151; font-size: 14px;">Same day - immediately</span>
-                  </label>
-                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
-                    <input type="radio" name="q1-m11" value="2" style="width: 18px; height: 18px;">
-                    <span style="color: #374151; font-size: 14px;">After getting other estimates</span>
-                  </label>
-                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
-                    <input type="radio" name="q1-m11" value="3" style="width: 18px; height: 18px;">
-                    <span style="color: #374151; font-size: 14px;">After the adjuster visits</span>
-                  </label>
+                  <button onclick="answerQuizM11(this, 0)" class="quiz-option-m11" data-value="0" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">Within a week</button>
+                  <button onclick="answerQuizM11(this, 1)" class="quiz-option-m11" data-value="1" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">Same day - immediately</button>
+                  <button onclick="answerQuizM11(this, 2)" class="quiz-option-m11" data-value="2" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">After getting other estimates</button>
+                  <button onclick="answerQuizM11(this, 3)" class="quiz-option-m11" data-value="3" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">After the adjuster visits</button>
                 </div>
               </div>
 
               <!-- Q2 -->
-              <div class="quiz-question-m11" data-correct="1" style="background: white; border-radius: 12px; padding: 20px;">
-                <p style="font-weight: 600; color: #1f2937; margin: 0 0 15px 0;">2. What should the homeowner tell insurance about having an estimate?</p>
+              <div class="quiz-question-m11" data-question="2" data-correct="1" style="display: none; background: white; border-radius: 12px; padding: 20px;">
+                <p style="font-weight: 600; color: #1f2937; margin: 0 0 15px 0; font-size: 16px;">What should the homeowner tell insurance about having an estimate?</p>
                 <div style="display: grid; gap: 8px;">
-                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
-                    <input type="radio" name="q2-m11" value="0" style="width: 18px; height: 18px;">
-                    <span style="color: #374151; font-size: 14px;">Yes, we have one</span>
-                  </label>
-                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
-                    <input type="radio" name="q2-m11" value="1" style="width: 18px; height: 18px;">
-                    <span style="color: #374151; font-size: 14px;">No</span>
-                  </label>
-                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
-                    <input type="radio" name="q2-m11" value="2" style="width: 18px; height: 18px;">
-                    <span style="color: #374151; font-size: 14px;">We're getting one soon</span>
-                  </label>
-                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
-                    <input type="radio" name="q2-m11" value="3" style="width: 18px; height: 18px;">
-                    <span style="color: #374151; font-size: 14px;">Just the approximate cost</span>
-                  </label>
+                  <button onclick="answerQuizM11(this, 0)" class="quiz-option-m11" data-value="0" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">Yes, we have one</button>
+                  <button onclick="answerQuizM11(this, 1)" class="quiz-option-m11" data-value="1" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">No</button>
+                  <button onclick="answerQuizM11(this, 2)" class="quiz-option-m11" data-value="2" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">We're getting one soon</button>
+                  <button onclick="answerQuizM11(this, 3)" class="quiz-option-m11" data-value="3" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">Just the approximate cost</button>
                 </div>
               </div>
 
               <!-- Q3 -->
-              <div class="quiz-question-m11" data-correct="1" style="background: white; border-radius: 12px; padding: 20px;">
-                <p style="font-weight: 600; color: #1f2937; margin: 0 0 15px 0;">3. What does the Claim Authorization Form allow ROOF-ER to do?</p>
+              <div class="quiz-question-m11" data-question="3" data-correct="1" style="display: none; background: white; border-radius: 12px; padding: 20px;">
+                <p style="font-weight: 600; color: #1f2937; margin: 0 0 15px 0; font-size: 16px;">What does the Claim Authorization Form allow ROOF-ER to do?</p>
                 <div style="display: grid; gap: 8px;">
-                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
-                    <input type="radio" name="q3-m11" value="0" style="width: 18px; height: 18px;">
-                    <span style="color: #374151; font-size: 14px;">Start the roof work immediately</span>
-                  </label>
-                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
-                    <input type="radio" name="q3-m11" value="1" style="width: 18px; height: 18px;">
-                    <span style="color: #374151; font-size: 14px;">Communicate with insurance on homeowner's behalf</span>
-                  </label>
-                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
-                    <input type="radio" name="q3-m11" value="2" style="width: 18px; height: 18px;">
-                    <span style="color: #374151; font-size: 14px;">Collect payment from insurance</span>
-                  </label>
-                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
-                    <input type="radio" name="q3-m11" value="3" style="width: 18px; height: 18px;">
-                    <span style="color: #374151; font-size: 14px;">Schedule the installation</span>
-                  </label>
+                  <button onclick="answerQuizM11(this, 0)" class="quiz-option-m11" data-value="0" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">Start the roof work immediately</button>
+                  <button onclick="answerQuizM11(this, 1)" class="quiz-option-m11" data-value="1" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">Communicate with insurance on homeowner's behalf</button>
+                  <button onclick="answerQuizM11(this, 2)" class="quiz-option-m11" data-value="2" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">Collect payment from insurance</button>
+                  <button onclick="answerQuizM11(this, 3)" class="quiz-option-m11" data-value="3" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">Schedule the installation</button>
                 </div>
               </div>
 
               <!-- Q4 -->
-              <div class="quiz-question-m11" data-correct="2" style="background: white; border-radius: 12px; padding: 20px;">
-                <p style="font-weight: 600; color: #1f2937; margin: 0 0 15px 0;">4. What happens if insurance denies the claim?</p>
+              <div class="quiz-question-m11" data-question="4" data-correct="2" style="display: none; background: white; border-radius: 12px; padding: 20px;">
+                <p style="font-weight: 600; color: #1f2937; margin: 0 0 15px 0; font-size: 16px;">What happens if insurance denies the claim?</p>
                 <div style="display: grid; gap: 8px;">
-                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
-                    <input type="radio" name="q4-m11" value="0" style="width: 18px; height: 18px;">
-                    <span style="color: #374151; font-size: 14px;">Homeowner pays full cost</span>
-                  </label>
-                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
-                    <input type="radio" name="q4-m11" value="1" style="width: 18px; height: 18px;">
-                    <span style="color: #374151; font-size: 14px;">15% cancellation fee applies</span>
-                  </label>
-                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
-                    <input type="radio" name="q4-m11" value="2" style="width: 18px; height: 18px;">
-                    <span style="color: #374151; font-size: 14px;">The contract is null and void</span>
-                  </label>
-                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
-                    <input type="radio" name="q4-m11" value="3" style="width: 18px; height: 18px;">
-                    <span style="color: #374151; font-size: 14px;">ROOF-ER appeals automatically</span>
-                  </label>
+                  <button onclick="answerQuizM11(this, 0)" class="quiz-option-m11" data-value="0" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">Homeowner pays full cost</button>
+                  <button onclick="answerQuizM11(this, 1)" class="quiz-option-m11" data-value="1" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">15% cancellation fee applies</button>
+                  <button onclick="answerQuizM11(this, 2)" class="quiz-option-m11" data-value="2" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">The contract is null and void</button>
+                  <button onclick="answerQuizM11(this, 3)" class="quiz-option-m11" data-value="3" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">ROOF-ER appeals automatically</button>
                 </div>
               </div>
 
               <!-- Q5 -->
-              <div class="quiz-question-m11" data-correct="1" style="background: white; border-radius: 12px; padding: 20px;">
-                <p style="font-weight: 600; color: #1f2937; margin: 0 0 15px 0;">5. What is the rescission period for the Insurance Claim Agreement?</p>
+              <div class="quiz-question-m11" data-question="5" data-correct="1" style="display: none; background: white; border-radius: 12px; padding: 20px;">
+                <p style="font-weight: 600; color: #1f2937; margin: 0 0 15px 0; font-size: 16px;">What is the rescission period for the Insurance Claim Agreement?</p>
                 <div style="display: grid; gap: 8px;">
-                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
-                    <input type="radio" name="q5-m11" value="0" style="width: 18px; height: 18px;">
-                    <span style="color: #374151; font-size: 14px;">24 hours</span>
-                  </label>
-                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
-                    <input type="radio" name="q5-m11" value="1" style="width: 18px; height: 18px;">
-                    <span style="color: #374151; font-size: 14px;">3 business days</span>
-                  </label>
-                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
-                    <input type="radio" name="q5-m11" value="2" style="width: 18px; height: 18px;">
-                    <span style="color: #374151; font-size: 14px;">7 days</span>
-                  </label>
-                  <label style="display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
-                    <input type="radio" name="q5-m11" value="3" style="width: 18px; height: 18px;">
-                    <span style="color: #374151; font-size: 14px;">30 days</span>
-                  </label>
+                  <button onclick="answerQuizM11(this, 0)" class="quiz-option-m11" data-value="0" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">24 hours</button>
+                  <button onclick="answerQuizM11(this, 1)" class="quiz-option-m11" data-value="1" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">3 business days</button>
+                  <button onclick="answerQuizM11(this, 2)" class="quiz-option-m11" data-value="2" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">7 days</button>
+                  <button onclick="answerQuizM11(this, 3)" class="quiz-option-m11" data-value="3" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">30 days</button>
                 </div>
               </div>
             </div>
 
-            <!-- Quiz Submit Button -->
-            <div style="text-align: center; margin-top: 20px;">
-              <button onclick="checkModule11Quiz()" style="background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); color: white; border: none; padding: 14px 32px; border-radius: 25px; font-weight: 600; font-size: 16px; cursor: pointer; transition: all 0.3s;">
-                Check Answers ✓
-              </button>
-            </div>
-
-            <!-- Quiz Feedback -->
-            <div id="quiz-feedback-m11" style="display: none; margin-top: 20px; padding: 20px; border-radius: 12px; text-align: center;"></div>
+            <!-- Quiz Final Results (hidden initially) -->
+            <div id="quiz-results-m11" style="display: none; background: white; border-radius: 12px; padding: 30px; text-align: center;"></div>
           </div>
 
           <div class="module-completion-section" id="module-complete-section" style="display: none; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 30px; border-radius: 16px; text-align: center; margin-top: 30px;">
@@ -7059,76 +6999,153 @@ function initDamageMatchingGame() {
 (window as any).checkDocSequence = checkDocSequence;
 (window as any).resetDocSequence = resetDocSequence;
 
-// --- Module 11 Mini Quiz ---
-function checkModule11Quiz() {
-  const questions = document.querySelectorAll('.quiz-question-m11');
-  const feedbackEl = document.getElementById('quiz-feedback-m11');
-  if (!feedbackEl) return;
+// --- Module 11 Mini Quiz (Progressive) ---
+let quizStateM11 = {
+  currentQuestion: 1,
+  correct: 0,
+  total: 5
+};
 
-  let correct = 0;
-  let total = questions.length;
-  let allAnswered = true;
+function answerQuizM11(button: HTMLElement, selectedValue: number) {
+  const questionDiv = button.closest('.quiz-question-m11') as HTMLElement;
+  if (!questionDiv) return;
 
-  questions.forEach((q, index) => {
-    const correctAnswer = (q as HTMLElement).dataset.correct;
-    const selected = (q as HTMLElement).querySelector(`input[name="q${index + 1}-m11"]:checked`) as HTMLInputElement;
+  const correctAnswer = parseInt(questionDiv.dataset.correct || '0');
+  const isCorrect = selectedValue === correctAnswer;
 
-    // Reset styles
-    q.querySelectorAll('label').forEach(label => {
-      (label as HTMLElement).style.background = '#f8fafc';
-      (label as HTMLElement).style.border = 'none';
-    });
-
-    if (!selected) {
-      allAnswered = false;
-      return;
-    }
-
-    const selectedLabel = selected.closest('label') as HTMLElement;
-
-    if (selected.value === correctAnswer) {
-      correct++;
-      selectedLabel.style.background = 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)';
-      selectedLabel.style.border = '2px solid #16a34a';
-    } else {
-      selectedLabel.style.background = 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)';
-      selectedLabel.style.border = '2px solid #dc2626';
-      // Highlight correct answer
-      const correctLabel = (q as HTMLElement).querySelector(`input[value="${correctAnswer}"]`)?.closest('label') as HTMLElement;
-      if (correctLabel) {
-        correctLabel.style.background = 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)';
-        correctLabel.style.border = '2px solid #16a34a';
-      }
-    }
+  // Disable all buttons in this question
+  questionDiv.querySelectorAll('.quiz-option-m11').forEach(btn => {
+    (btn as HTMLButtonElement).disabled = true;
+    (btn as HTMLElement).style.cursor = 'default';
   });
 
-  if (!allAnswered) {
-    feedbackEl.textContent = 'Please answer all questions before checking!';
-    feedbackEl.style.background = 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)';
-    feedbackEl.style.color = '#92400e';
-    feedbackEl.style.display = 'block';
-    return;
-  }
-
-  const score = Math.round((correct / total) * 100);
-
-  if (score >= 80) {
-    feedbackEl.innerHTML = `<div style="font-size: 32px; margin-bottom: 10px;">🎉</div><strong>Great job!</strong> You got ${correct}/${total} correct (${score}%)`;
-    feedbackEl.style.background = 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)';
-    feedbackEl.style.color = '#166534';
-    // Show module completion
-    const completeSection = document.getElementById('module-complete-section');
-    if (completeSection) completeSection.style.display = 'block';
+  // Show feedback on selected answer
+  if (isCorrect) {
+    quizStateM11.correct++;
+    button.style.background = 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)';
+    button.style.border = '2px solid #16a34a';
+    button.style.color = '#166534';
   } else {
-    feedbackEl.innerHTML = `<div style="font-size: 32px; margin-bottom: 10px;">📚</div><strong>Keep studying!</strong> You got ${correct}/${total} correct (${score}%). Review the material and try again!`;
-    feedbackEl.style.background = 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)';
-    feedbackEl.style.color = '#991b1b';
+    button.style.background = 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)';
+    button.style.border = '2px solid #dc2626';
+    button.style.color = '#991b1b';
+    // Highlight correct answer
+    const correctBtn = questionDiv.querySelector(`[data-value="${correctAnswer}"]`) as HTMLElement;
+    if (correctBtn) {
+      correctBtn.style.background = 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)';
+      correctBtn.style.border = '2px solid #16a34a';
+      correctBtn.style.color = '#166534';
+    }
   }
 
-  feedbackEl.style.display = 'block';
+  // Update score display
+  const scoreDisplay = document.getElementById('quiz-score-display');
+  if (scoreDisplay) {
+    scoreDisplay.textContent = `Score: ${quizStateM11.correct}/${quizStateM11.currentQuestion}`;
+  }
+
+  // Move to next question after a short delay
+  setTimeout(() => {
+    if (quizStateM11.currentQuestion < quizStateM11.total) {
+      // Hide current question
+      questionDiv.style.display = 'none';
+
+      // Show next question
+      quizStateM11.currentQuestion++;
+      const nextQuestion = document.querySelector(`[data-question="${quizStateM11.currentQuestion}"]`) as HTMLElement;
+      if (nextQuestion) {
+        nextQuestion.style.display = 'block';
+      }
+
+      // Update progress bar
+      const progressBar = document.getElementById('quiz-progress-bar');
+      const currentNum = document.getElementById('current-q-num');
+      if (progressBar) {
+        progressBar.style.width = `${(quizStateM11.currentQuestion / quizStateM11.total) * 100}%`;
+      }
+      if (currentNum) {
+        currentNum.textContent = String(quizStateM11.currentQuestion);
+      }
+    } else {
+      // Quiz complete - show results
+      showQuizResultsM11();
+    }
+  }, 800);
 }
 
-(window as any).checkModule11Quiz = checkModule11Quiz;
+function showQuizResultsM11() {
+  const questionsContainer = document.getElementById('quiz-questions-m11');
+  const progressBar = document.getElementById('quiz-progress-m11');
+  const resultsDiv = document.getElementById('quiz-results-m11');
+
+  if (questionsContainer) questionsContainer.style.display = 'none';
+  if (progressBar) progressBar.style.display = 'none';
+
+  if (resultsDiv) {
+    const score = Math.round((quizStateM11.correct / quizStateM11.total) * 100);
+    const passed = score >= 80;
+
+    if (passed) {
+      resultsDiv.innerHTML = `
+        <div style="font-size: 64px; margin-bottom: 15px;">🎉</div>
+        <h3 style="color: #166534; font-size: 24px; margin: 0 0 10px 0;">Great job!</h3>
+        <p style="color: #374151; font-size: 18px; margin: 0 0 20px 0;">You got <strong>${quizStateM11.correct}/${quizStateM11.total}</strong> correct (${score}%)</p>
+        <div style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); padding: 15px; border-radius: 10px;">
+          <p style="color: #166534; margin: 0; font-weight: 500;">You're ready to move on!</p>
+        </div>
+      `;
+      // Show module completion
+      const completeSection = document.getElementById('module-complete-section');
+      if (completeSection) completeSection.style.display = 'block';
+    } else {
+      resultsDiv.innerHTML = `
+        <div style="font-size: 64px; margin-bottom: 15px;">📚</div>
+        <h3 style="color: #991b1b; font-size: 24px; margin: 0 0 10px 0;">Keep studying!</h3>
+        <p style="color: #374151; font-size: 18px; margin: 0 0 20px 0;">You got <strong>${quizStateM11.correct}/${quizStateM11.total}</strong> correct (${score}%)</p>
+        <div style="background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+          <p style="color: #991b1b; margin: 0; font-weight: 500;">You need 80% to pass. Review the material and try again!</p>
+        </div>
+        <button onclick="resetQuizM11()" style="background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); color: white; border: none; padding: 14px 28px; border-radius: 25px; font-weight: 600; font-size: 16px; cursor: pointer;">
+          Try Again
+        </button>
+      `;
+    }
+    resultsDiv.style.display = 'block';
+  }
+}
+
+function resetQuizM11() {
+  quizStateM11 = { currentQuestion: 1, correct: 0, total: 5 };
+
+  const questionsContainer = document.getElementById('quiz-questions-m11');
+  const progressBar = document.getElementById('quiz-progress-m11');
+  const resultsDiv = document.getElementById('quiz-results-m11');
+  const progressBarFill = document.getElementById('quiz-progress-bar');
+  const currentNum = document.getElementById('current-q-num');
+  const scoreDisplay = document.getElementById('quiz-score-display');
+
+  if (questionsContainer) questionsContainer.style.display = 'block';
+  if (progressBar) progressBar.style.display = 'block';
+  if (resultsDiv) resultsDiv.style.display = 'none';
+  if (progressBarFill) progressBarFill.style.width = '20%';
+  if (currentNum) currentNum.textContent = '1';
+  if (scoreDisplay) scoreDisplay.textContent = '';
+
+  // Reset all questions
+  document.querySelectorAll('.quiz-question-m11').forEach((q, index) => {
+    (q as HTMLElement).style.display = index === 0 ? 'block' : 'none';
+    q.querySelectorAll('.quiz-option-m11').forEach(btn => {
+      (btn as HTMLButtonElement).disabled = false;
+      (btn as HTMLElement).style.background = '#f8fafc';
+      (btn as HTMLElement).style.border = '2px solid #e2e8f0';
+      (btn as HTMLElement).style.color = '#374151';
+      (btn as HTMLElement).style.cursor = 'pointer';
+    });
+  });
+}
+
+(window as any).answerQuizM11 = answerQuizM11;
+(window as any).resetQuizM11 = resetQuizM11;
 
 // --- Game Logic ---
 function initSalesCycleSorter() {
