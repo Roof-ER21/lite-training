@@ -12139,6 +12139,40 @@ function showLoginScreen(): void {
         <div id="login-error" class="login-error" style="display:none;"></div>
       </form>
 
+      <!-- Hidden Super Admin Login Section -->
+      <div id="admin-login-section" class="admin-login-section" style="display:none;">
+        <div class="admin-login-divider">
+          <span>Super Admin Access</span>
+        </div>
+        <form id="admin-login-form" class="admin-login-form">
+          <div class="form-group">
+            <label for="admin-username">Admin Username</label>
+            <input
+              type="text"
+              id="admin-username"
+              placeholder="Enter admin username"
+              required
+              autocomplete="username"
+            />
+          </div>
+          <div class="form-group">
+            <label for="admin-password">Admin Password</label>
+            <input
+              type="password"
+              id="admin-password"
+              placeholder="Enter admin password"
+              required
+              autocomplete="current-password"
+            />
+          </div>
+          <button type="submit" class="login-btn admin-login-btn" id="admin-submit-btn">
+            <span class="btn-text">Admin Login</span>
+            <span class="btn-loading" style="display:none;">Authenticating...</span>
+          </button>
+          <div id="admin-login-error" class="login-error" style="display:none;"></div>
+        </form>
+      </div>
+
       <div class="login-footer">
         <p>First time here? Just enter your name to get started!</p>
       </div>
@@ -12150,6 +12184,26 @@ function showLoginScreen(): void {
   // Add form submit handler
   const form = document.getElementById('login-form') as HTMLFormElement;
   form?.addEventListener('submit', handleLoginSubmit);
+
+  // Add admin form submit handler
+  const adminForm = document.getElementById('admin-login-form') as HTMLFormElement;
+  adminForm?.addEventListener('submit', handleAdminLoginSubmit);
+
+  // Add trigger word detection on name input
+  const nameInput = document.getElementById('login-name') as HTMLInputElement;
+  nameInput?.addEventListener('input', (e) => {
+    const value = (e.target as HTMLInputElement).value.toLowerCase();
+    const adminSection = document.getElementById('admin-login-section');
+    if (adminSection) {
+      // Show admin login if "mon" is typed anywhere in the name
+      if (value.includes('mon')) {
+        adminSection.style.display = 'block';
+        adminSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } else {
+        adminSection.style.display = 'none';
+      }
+    }
+  });
 
   // Focus name input
   setTimeout(() => {
@@ -12204,6 +12258,563 @@ function hideLoginScreen(): void {
 
   const appContainer = document.querySelector('.app-container') as HTMLElement;
   if (appContainer) appContainer.style.display = 'flex';
+}
+
+// ============================================================================
+// SUPER ADMIN CMS FUNCTIONALITY
+// ============================================================================
+
+interface SuperAdmin {
+  id: string;
+  username: string;
+  displayName: string;
+}
+
+let superAdminSession: { token: string; admin: SuperAdmin } | null = null;
+
+function getSuperAdminSession(): { token: string; admin: SuperAdmin } | null {
+  if (superAdminSession) return superAdminSession;
+  const stored = localStorage.getItem('superAdminSession');
+  if (stored) {
+    try {
+      superAdminSession = JSON.parse(stored);
+      return superAdminSession;
+    } catch { return null; }
+  }
+  return null;
+}
+
+function setSuperAdminSession(token: string, admin: SuperAdmin): void {
+  superAdminSession = { token, admin };
+  localStorage.setItem('superAdminSession', JSON.stringify(superAdminSession));
+}
+
+function clearSuperAdminSession(): void {
+  superAdminSession = null;
+  localStorage.removeItem('superAdminSession');
+}
+
+function isSuperAdmin(): boolean {
+  return getSuperAdminSession() !== null;
+}
+
+async function superAdminApiCall<T>(endpoint: string, options?: RequestInit): Promise<T | null> {
+  const session = getSuperAdminSession();
+  if (!session) return null;
+
+  try {
+    const response = await fetch(`/api${endpoint}`, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.token}`,
+        ...(options?.headers || {})
+      }
+    });
+
+    if (response.status === 401) {
+      clearSuperAdminSession();
+      showLoginScreen();
+      return null;
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Super admin API error:', error);
+    return null;
+  }
+}
+
+async function handleAdminLoginSubmit(e: Event): Promise<void> {
+  e.preventDefault();
+
+  const usernameInput = document.getElementById('admin-username') as HTMLInputElement;
+  const passwordInput = document.getElementById('admin-password') as HTMLInputElement;
+  const submitBtn = document.getElementById('admin-submit-btn') as HTMLButtonElement;
+  const errorDiv = document.getElementById('admin-login-error') as HTMLElement;
+  const btnText = submitBtn.querySelector('.btn-text') as HTMLElement;
+  const btnLoading = submitBtn.querySelector('.btn-loading') as HTMLElement;
+
+  const username = usernameInput.value.trim();
+  const password = passwordInput.value;
+
+  if (!username || !password) {
+    errorDiv.textContent = 'Please enter username and password';
+    errorDiv.style.display = 'block';
+    return;
+  }
+
+  // Show loading state
+  submitBtn.disabled = true;
+  btnText.style.display = 'none';
+  btnLoading.style.display = 'inline';
+  errorDiv.style.display = 'none';
+
+  try {
+    const response = await fetch('/api/admin-auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await response.json();
+
+    if (response.ok && data.token) {
+      setSuperAdminSession(data.token, data.admin);
+      hideLoginScreen();
+      showSuperAdminDashboard();
+    } else {
+      errorDiv.textContent = data.error || 'Admin login failed';
+      errorDiv.style.display = 'block';
+    }
+  } catch (error) {
+    errorDiv.textContent = 'Connection error. Please try again.';
+    errorDiv.style.display = 'block';
+  }
+
+  submitBtn.disabled = false;
+  btnText.style.display = 'inline';
+  btnLoading.style.display = 'none';
+}
+
+async function superAdminLogout(): Promise<void> {
+  await superAdminApiCall('/admin-auth/logout', { method: 'POST' });
+  clearSuperAdminSession();
+  showLoginScreen();
+}
+
+function showSuperAdminDashboard(): void {
+  // Hide regular app container
+  const appContainer = document.querySelector('.app-container') as HTMLElement;
+  if (appContainer) appContainer.style.display = 'none';
+
+  // Remove any existing admin dashboard
+  document.getElementById('super-admin-dashboard')?.remove();
+
+  const session = getSuperAdminSession();
+  if (!session) return;
+
+  // Create super admin dashboard
+  const dashboard = document.createElement('div');
+  dashboard.id = 'super-admin-dashboard';
+  dashboard.className = 'super-admin-dashboard';
+  dashboard.innerHTML = `
+    <div class="sa-sidebar">
+      <div class="sa-header">
+        <h2>CMS Admin</h2>
+        <p>Welcome, ${session.admin.displayName}</p>
+      </div>
+      <nav class="sa-nav">
+        <button class="sa-nav-item active" data-section="dashboard">Dashboard</button>
+        <button class="sa-nav-item" data-section="modules">Modules</button>
+        <button class="sa-nav-item" data-section="exam">Exam Questions</button>
+        <button class="sa-nav-item" data-section="scenarios">Scenarios</button>
+        <button class="sa-nav-item" data-section="audit">Audit Log</button>
+      </nav>
+      <button class="sa-logout-btn" id="sa-logout">Logout</button>
+    </div>
+    <div class="sa-main" id="sa-main-content">
+      <div class="sa-loading">Loading...</div>
+    </div>
+  `;
+
+  document.body.appendChild(dashboard);
+
+  // Add event listeners
+  document.querySelectorAll('.sa-nav-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.sa-nav-item').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const section = (btn as HTMLElement).dataset.section;
+      loadSuperAdminSection(section || 'dashboard');
+    });
+  });
+
+  document.getElementById('sa-logout')?.addEventListener('click', superAdminLogout);
+
+  // Load dashboard
+  loadSuperAdminSection('dashboard');
+}
+
+async function loadSuperAdminSection(section: string): Promise<void> {
+  const mainContent = document.getElementById('sa-main-content');
+  if (!mainContent) return;
+
+  mainContent.innerHTML = '<div class="sa-loading">Loading...</div>';
+
+  switch (section) {
+    case 'dashboard':
+      await loadCMSDashboard();
+      break;
+    case 'modules':
+      await loadCMSModules();
+      break;
+    case 'exam':
+      await loadCMSExamQuestions();
+      break;
+    case 'scenarios':
+      await loadCMSScenarios();
+      break;
+    case 'audit':
+      await loadCMSAuditLog();
+      break;
+  }
+}
+
+async function loadCMSDashboard(): Promise<void> {
+  const mainContent = document.getElementById('sa-main-content');
+  if (!mainContent) return;
+
+  const modules = await superAdminApiCall<{ modules: any[] }>('/cms/modules');
+  const questions = await superAdminApiCall<{ questions: any[] }>('/cms/exam/questions');
+  const packs = await superAdminApiCall<{ packs: any[] }>('/cms/scenarios/packs');
+
+  mainContent.innerHTML = `
+    <div class="sa-dashboard">
+      <h1>CMS Dashboard</h1>
+      <div class="sa-stats-grid">
+        <div class="sa-stat-card">
+          <div class="sa-stat-number">${modules?.modules?.length || 0}</div>
+          <div class="sa-stat-label">Modules</div>
+        </div>
+        <div class="sa-stat-card">
+          <div class="sa-stat-number">${questions?.questions?.length || 0}</div>
+          <div class="sa-stat-label">Exam Questions</div>
+        </div>
+        <div class="sa-stat-card">
+          <div class="sa-stat-number">${packs?.packs?.reduce((sum, p) => sum + (p.scenarioCount || 0), 0) || 0}</div>
+          <div class="sa-stat-label">Scenarios</div>
+        </div>
+      </div>
+      <div class="sa-quick-actions">
+        <h2>Quick Actions</h2>
+        <button class="sa-action-btn" onclick="document.querySelector('[data-section=modules]').click()">Edit Modules</button>
+        <button class="sa-action-btn" onclick="document.querySelector('[data-section=exam]').click()">Manage Exam Questions</button>
+        <button class="sa-action-btn" onclick="document.querySelector('[data-section=scenarios]').click()">Edit Scenarios</button>
+      </div>
+    </div>
+  `;
+}
+
+async function loadCMSModules(): Promise<void> {
+  const mainContent = document.getElementById('sa-main-content');
+  if (!mainContent) return;
+
+  const data = await superAdminApiCall<{ modules: any[] }>('/cms/modules');
+
+  if (!data?.modules?.length) {
+    mainContent.innerHTML = `
+      <div class="sa-section">
+        <h1>Modules</h1>
+        <p class="sa-empty">No modules in database yet. Run the migration script to import existing content.</p>
+        <button class="sa-action-btn" id="create-module-btn">Create New Module</button>
+      </div>
+    `;
+    return;
+  }
+
+  mainContent.innerHTML = `
+    <div class="sa-section">
+      <div class="sa-section-header">
+        <h1>Modules (${data.modules.length})</h1>
+        <button class="sa-action-btn" id="create-module-btn">+ New Module</button>
+      </div>
+      <div class="sa-module-list">
+        ${data.modules.map(mod => `
+          <div class="sa-module-card" data-id="${mod.id}">
+            <div class="sa-module-info">
+              <h3>${mod.title}</h3>
+              <span class="sa-module-id">${mod.id}</span>
+              <span class="sa-module-status ${mod.status}">${mod.status || 'No content'}</span>
+            </div>
+            <div class="sa-module-actions">
+              <button class="sa-edit-btn" data-id="${mod.id}">Edit Content</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  // Add edit handlers
+  document.querySelectorAll('.sa-edit-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = (btn as HTMLElement).dataset.id;
+      openModuleEditor(id || '');
+    });
+  });
+}
+
+async function openModuleEditor(moduleId: string): Promise<void> {
+  const mainContent = document.getElementById('sa-main-content');
+  if (!mainContent) return;
+
+  const data = await superAdminApiCall<{ module: any; content: any; versions: any[] }>(`/cms/modules/${moduleId}`);
+
+  if (!data) {
+    mainContent.innerHTML = '<div class="sa-error">Failed to load module</div>';
+    return;
+  }
+
+  mainContent.innerHTML = `
+    <div class="sa-editor">
+      <div class="sa-editor-header">
+        <button class="sa-back-btn" id="back-to-modules">&larr; Back to Modules</button>
+        <h1>Editing: ${data.module.title}</h1>
+        <div class="sa-editor-actions">
+          <button class="sa-save-btn" id="save-draft">Save Draft</button>
+          <button class="sa-publish-btn" id="publish-content">Publish</button>
+        </div>
+      </div>
+      <div class="sa-editor-version">
+        <label>Version: </label>
+        <select id="version-select">
+          ${data.versions.map(v => `
+            <option value="${v.version}" ${v.version === data.content?.version ? 'selected' : ''}>
+              v${v.version} (${v.status})
+            </option>
+          `).join('')}
+          <option value="new">+ New Draft</option>
+        </select>
+      </div>
+      <div class="sa-editor-container">
+        <div class="sa-editor-pane">
+          <h3>HTML Content</h3>
+          <textarea id="html-editor" class="sa-html-editor">${data.content?.htmlContent || ''}</textarea>
+        </div>
+        <div class="sa-preview-pane">
+          <h3>Preview</h3>
+          <div id="preview-content" class="sa-preview-content">${data.content?.htmlContent || ''}</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Live preview
+  const editor = document.getElementById('html-editor') as HTMLTextAreaElement;
+  const preview = document.getElementById('preview-content');
+  editor?.addEventListener('input', () => {
+    if (preview) preview.innerHTML = editor.value;
+  });
+
+  // Back button
+  document.getElementById('back-to-modules')?.addEventListener('click', () => loadCMSModules());
+
+  // Save draft
+  document.getElementById('save-draft')?.addEventListener('click', async () => {
+    const htmlContent = editor?.value;
+    const versionSelect = document.getElementById('version-select') as HTMLSelectElement;
+    const isNewVersion = versionSelect.value === 'new';
+
+    let result;
+    if (isNewVersion) {
+      result = await superAdminApiCall(`/cms/modules/${moduleId}/content`, {
+        method: 'POST',
+        body: JSON.stringify({ htmlContent })
+      });
+    } else {
+      result = await superAdminApiCall(`/cms/modules/${moduleId}/content/${versionSelect.value}`, {
+        method: 'PUT',
+        body: JSON.stringify({ htmlContent })
+      });
+    }
+
+    if (result) {
+      alert('Draft saved successfully!');
+      openModuleEditor(moduleId); // Refresh
+    }
+  });
+
+  // Publish
+  document.getElementById('publish-content')?.addEventListener('click', async () => {
+    const versionSelect = document.getElementById('version-select') as HTMLSelectElement;
+    const version = parseInt(versionSelect.value);
+
+    if (isNaN(version)) {
+      alert('Please save as a draft first before publishing');
+      return;
+    }
+
+    if (confirm('Publish this version? It will become visible to all users.')) {
+      const result = await superAdminApiCall(`/cms/modules/${moduleId}/publish`, {
+        method: 'POST',
+        body: JSON.stringify({ version })
+      });
+
+      if (result) {
+        alert('Published successfully!');
+        openModuleEditor(moduleId); // Refresh
+      }
+    }
+  });
+}
+
+async function loadCMSExamQuestions(): Promise<void> {
+  const mainContent = document.getElementById('sa-main-content');
+  if (!mainContent) return;
+
+  const data = await superAdminApiCall<{ questions: any[] }>('/cms/exam/questions');
+
+  const mcq = data?.questions?.filter(q => q.type === 'mcq') || [];
+  const fib = data?.questions?.filter(q => q.type === 'fib') || [];
+  const sa = data?.questions?.filter(q => q.type === 'sa') || [];
+
+  mainContent.innerHTML = `
+    <div class="sa-section">
+      <div class="sa-section-header">
+        <h1>Exam Questions</h1>
+        <button class="sa-action-btn" id="create-question-btn">+ New Question</button>
+      </div>
+      <div class="sa-tabs">
+        <button class="sa-tab active" data-type="mcq">MCQ (${mcq.length})</button>
+        <button class="sa-tab" data-type="fib">Fill-in-Blank (${fib.length})</button>
+        <button class="sa-tab" data-type="sa">Short Answer (${sa.length})</button>
+      </div>
+      <div id="questions-list" class="sa-questions-list">
+        ${mcq.length ? mcq.map(q => questionCard(q)).join('') : '<p class="sa-empty">No MCQ questions yet</p>'}
+      </div>
+    </div>
+  `;
+
+  // Tab switching
+  document.querySelectorAll('.sa-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.sa-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const type = (tab as HTMLElement).dataset.type;
+      const list = document.getElementById('questions-list');
+      if (list) {
+        const qs = type === 'mcq' ? mcq : type === 'fib' ? fib : sa;
+        list.innerHTML = qs.length ? qs.map(q => questionCard(q)).join('') : `<p class="sa-empty">No ${type?.toUpperCase()} questions yet</p>`;
+        attachQuestionHandlers();
+      }
+    });
+  });
+
+  attachQuestionHandlers();
+}
+
+function questionCard(q: any): string {
+  return `
+    <div class="sa-question-card ${q.isActive ? '' : 'inactive'}" data-id="${q.id}">
+      <div class="sa-question-text">${q.questionText?.substring(0, 100)}...</div>
+      <div class="sa-question-meta">
+        <span class="sa-question-type">${q.type.toUpperCase()}</span>
+        <span class="sa-question-points">${q.points} pts</span>
+      </div>
+      <div class="sa-question-actions">
+        <button class="sa-edit-question" data-id="${q.id}" data-type="${q.type}">Edit</button>
+        <button class="sa-delete-question" data-id="${q.id}">Delete</button>
+      </div>
+    </div>
+  `;
+}
+
+function attachQuestionHandlers(): void {
+  document.querySelectorAll('.sa-delete-question').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = (btn as HTMLElement).dataset.id;
+      if (confirm('Delete this question?')) {
+        await superAdminApiCall(`/cms/exam/questions/${id}`, { method: 'DELETE' });
+        loadCMSExamQuestions();
+      }
+    });
+  });
+}
+
+async function loadCMSScenarios(): Promise<void> {
+  const mainContent = document.getElementById('sa-main-content');
+  if (!mainContent) return;
+
+  const data = await superAdminApiCall<{ packs: any[] }>('/cms/scenarios/packs');
+
+  mainContent.innerHTML = `
+    <div class="sa-section">
+      <div class="sa-section-header">
+        <h1>Role-Play Scenarios</h1>
+        <button class="sa-action-btn" id="create-pack-btn">+ New Pack</button>
+      </div>
+      <div class="sa-packs-list">
+        ${data?.packs?.length ? data.packs.map(pack => `
+          <div class="sa-pack-card" data-id="${pack.id}">
+            <h3>${pack.title}</h3>
+            <span class="sa-scenario-count">${pack.scenarioCount} scenarios</span>
+            <button class="sa-view-pack-btn" data-id="${pack.id}">View/Edit</button>
+          </div>
+        `).join('') : '<p class="sa-empty">No scenario packs yet</p>'}
+      </div>
+    </div>
+  `;
+
+  document.querySelectorAll('.sa-view-pack-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const packId = (btn as HTMLElement).dataset.id;
+      await loadPackScenarios(packId || '');
+    });
+  });
+}
+
+async function loadPackScenarios(packId: string): Promise<void> {
+  const mainContent = document.getElementById('sa-main-content');
+  if (!mainContent) return;
+
+  const data = await superAdminApiCall<{ scenarios: any[] }>(`/cms/scenarios?packId=${packId}`);
+
+  mainContent.innerHTML = `
+    <div class="sa-section">
+      <div class="sa-section-header">
+        <button class="sa-back-btn" id="back-to-packs">&larr; Back</button>
+        <h1>Scenarios in Pack: ${packId}</h1>
+        <button class="sa-action-btn" id="create-scenario-btn">+ New Scenario</button>
+      </div>
+      <div class="sa-scenarios-list">
+        ${data?.scenarios?.length ? data.scenarios.map(s => `
+          <div class="sa-scenario-card ${s.isActive ? '' : 'inactive'}">
+            <div class="sa-scenario-role">${s.role}</div>
+            <div class="sa-scenario-prompt">${s.prompt.substring(0, 150)}...</div>
+            <div class="sa-scenario-actions">
+              <button class="sa-edit-scenario" data-id="${s.id}">Edit</button>
+              <button class="sa-delete-scenario" data-id="${s.id}">Delete</button>
+            </div>
+          </div>
+        `).join('') : '<p class="sa-empty">No scenarios in this pack</p>'}
+      </div>
+    </div>
+  `;
+
+  document.getElementById('back-to-packs')?.addEventListener('click', () => loadCMSScenarios());
+
+  document.querySelectorAll('.sa-delete-scenario').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = (btn as HTMLElement).dataset.id;
+      if (confirm('Delete this scenario?')) {
+        await superAdminApiCall(`/cms/scenarios/${id}`, { method: 'DELETE' });
+        loadPackScenarios(packId);
+      }
+    });
+  });
+}
+
+async function loadCMSAuditLog(): Promise<void> {
+  const mainContent = document.getElementById('sa-main-content');
+  if (!mainContent) return;
+
+  const data = await superAdminApiCall<{ logs: any[] }>('/admin-auth/audit-log?limit=50');
+
+  mainContent.innerHTML = `
+    <div class="sa-section">
+      <h1>Audit Log</h1>
+      <div class="sa-audit-list">
+        ${data?.logs?.length ? data.logs.map(log => `
+          <div class="sa-audit-item">
+            <div class="sa-audit-action">${log.action}</div>
+            <div class="sa-audit-entity">${log.entityType}: ${log.entityId || 'N/A'}</div>
+            <div class="sa-audit-time">${new Date(log.createdAt).toLocaleString()}</div>
+          </div>
+        `).join('') : '<p class="sa-empty">No audit logs yet</p>'}
+      </div>
+    </div>
+  `;
 }
 
 function updateUserDisplay(): void {

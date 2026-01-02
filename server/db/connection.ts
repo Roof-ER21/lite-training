@@ -296,6 +296,121 @@ export async function initDatabase(): Promise<void> {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(user_id, endpoint)
       );
+
+      -- ============================================
+      -- CMS TABLES FOR SUPER ADMIN CONTENT MANAGEMENT
+      -- ============================================
+
+      -- Super admins (separate from regular users)
+      CREATE TABLE IF NOT EXISTS super_admins (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        username VARCHAR(100) UNIQUE NOT NULL,
+        password_hash VARCHAR(255) NOT NULL,
+        display_name VARCHAR(255),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        last_login TIMESTAMP,
+        is_active BOOLEAN DEFAULT TRUE
+      );
+
+      -- Admin sessions (separate from user sessions)
+      CREATE TABLE IF NOT EXISTS admin_sessions (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        admin_id UUID REFERENCES super_admins(id) ON DELETE CASCADE,
+        token VARCHAR(255) UNIQUE NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        expires_at TIMESTAMP,
+        is_active BOOLEAN DEFAULT TRUE
+      );
+      CREATE INDEX IF NOT EXISTS idx_admin_sessions_token ON admin_sessions(token);
+
+      -- Audit log for all admin actions
+      CREATE TABLE IF NOT EXISTS admin_audit_log (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        admin_id UUID REFERENCES super_admins(id),
+        action VARCHAR(100) NOT NULL,
+        entity_type VARCHAR(50) NOT NULL,
+        entity_id VARCHAR(100),
+        old_value JSONB,
+        new_value JSONB,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_audit_log_admin ON admin_audit_log(admin_id);
+      CREATE INDEX IF NOT EXISTS idx_audit_log_created ON admin_audit_log(created_at);
+
+      -- CMS Modules
+      CREATE TABLE IF NOT EXISTS cms_modules (
+        id VARCHAR(50) PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        order_index INTEGER NOT NULL,
+        is_active BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      -- Module content with versioning
+      CREATE TABLE IF NOT EXISTS cms_module_content (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        module_id VARCHAR(50) REFERENCES cms_modules(id) ON DELETE CASCADE,
+        version INTEGER DEFAULT 1,
+        status VARCHAR(20) DEFAULT 'draft',
+        html_content TEXT NOT NULL,
+        published_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(module_id, version)
+      );
+      CREATE INDEX IF NOT EXISTS idx_cms_module_content_status ON cms_module_content(module_id, status);
+
+      -- CMS Exam questions
+      CREATE TABLE IF NOT EXISTS cms_exam_questions (
+        id VARCHAR(50) PRIMARY KEY,
+        question_type VARCHAR(10) NOT NULL,
+        module_reference INTEGER,
+        question_text TEXT NOT NULL,
+        options JSONB,
+        correct_answer_index INTEGER,
+        acceptable_answers TEXT[],
+        keywords TEXT[],
+        min_keywords INTEGER,
+        sample_answer TEXT,
+        explanation TEXT,
+        points INTEGER DEFAULT 2,
+        is_active BOOLEAN DEFAULT TRUE,
+        order_index INTEGER,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_cms_exam_questions_type ON cms_exam_questions(question_type);
+      CREATE INDEX IF NOT EXISTS idx_cms_exam_questions_active ON cms_exam_questions(is_active);
+
+      -- CMS Role-play packs
+      CREATE TABLE IF NOT EXISTS cms_roleplay_packs (
+        id VARCHAR(50) PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        trainer_tips TEXT[],
+        order_index INTEGER,
+        is_active BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      -- CMS Role-play scenarios
+      CREATE TABLE IF NOT EXISTS cms_roleplay_scenarios (
+        id VARCHAR(100) PRIMARY KEY,
+        pack_id VARCHAR(50) REFERENCES cms_roleplay_packs(id) ON DELETE CASCADE,
+        role VARCHAR(20) NOT NULL,
+        prompt TEXT NOT NULL,
+        expected_key_points TEXT[],
+        rubric JSONB NOT NULL,
+        follow_ups TEXT[],
+        difficulty VARCHAR(20) DEFAULT 'medium',
+        is_active BOOLEAN DEFAULT TRUE,
+        order_index INTEGER,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_cms_scenarios_pack ON cms_roleplay_scenarios(pack_id);
+      CREATE INDEX IF NOT EXISTS idx_cms_scenarios_active ON cms_roleplay_scenarios(is_active);
     `;
 
     await pool.query(migrations);

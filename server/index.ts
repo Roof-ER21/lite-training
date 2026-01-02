@@ -12,6 +12,9 @@ import examRoutes from './routes/exam.js';
 import roleplayRoutes from './routes/roleplay.js';
 import adminRoutes from './routes/admin.js';
 import aiRoutes from './routes/ai.js';
+import superadminAuthRoutes, { seedInitialAdmin } from './routes/superadmin-auth.js';
+import cmsRoutes from './routes/cms.js';
+import contentRoutes from './routes/content.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -47,6 +50,9 @@ app.use('/api/exam', examRoutes);
 app.use('/api/roleplay', roleplayRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/admin-auth', superadminAuthRoutes);
+app.use('/api/cms', cmsRoutes);
+app.use('/api/content', contentRoutes);
 
 // Serve static files from the dist directory (built frontend)
 const distPath = path.join(__dirname, '..', 'dist');
@@ -77,6 +83,9 @@ async function start() {
   try {
     // Initialize database
     await initDatabase();
+
+    // Seed initial super admin if needed
+    await seedInitialAdmin();
 
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
