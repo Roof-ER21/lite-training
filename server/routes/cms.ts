@@ -691,10 +691,11 @@ router.post('/seed-modules', async (req: Request, res: Response) => {
       `, [mod.id, mod.title, mod.orderIndex]);
 
       // Insert published content (version 1)
+      const contentId = `${mod.id}-content-v1`;
       await query(`
         INSERT INTO cms_module_content (id, module_id, version, status, html_content, published_at, created_at, updated_at)
-        VALUES (gen_random_uuid(), $1, 1, 'published', $2, NOW(), NOW(), NOW())
-      `, [mod.id, mod.htmlContent]);
+        VALUES ($1, $2, 1, 'published', $3, NOW(), NOW(), NOW())
+      `, [contentId, mod.id, mod.htmlContent]);
 
       seededCount++;
     }
@@ -707,9 +708,12 @@ router.post('/seed-modules', async (req: Request, res: Response) => {
       skippedCount,
       message: `Seeded ${seededCount} modules, skipped ${skippedCount} existing`
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Seed modules error:', error);
-    res.status(500).json({ error: 'Failed to seed modules' });
+    res.status(500).json({
+      error: 'Failed to seed modules',
+      details: error?.message || String(error)
+    });
   }
 });
 
