@@ -651,6 +651,149 @@ router.delete('/scenarios/:id', async (req: Request, res: Response) => {
 });
 
 // ============================================
+// SEEDING / IMPORT ENDPOINTS
+// ============================================
+
+// POST /api/cms/seed-modules - Import modules from frontend trainingContent
+router.post('/seed-modules', async (req: Request, res: Response) => {
+  try {
+    const { modules } = req.body as {
+      modules: Array<{
+        id: string;
+        title: string;
+        orderIndex: number;
+        htmlContent: string;
+      }>;
+    };
+
+    if (!modules || !Array.isArray(modules) || modules.length === 0) {
+      return res.status(400).json({ error: 'No modules provided' });
+    }
+
+    let seededCount = 0;
+    let skippedCount = 0;
+
+    for (const mod of modules) {
+      // Check if module already exists
+      const existing = await queryOne<{ id: string }>(`
+        SELECT id FROM cms_modules WHERE id = $1
+      `, [mod.id]);
+
+      if (existing) {
+        skippedCount++;
+        continue;
+      }
+
+      // Insert module
+      await query(`
+        INSERT INTO cms_modules (id, title, order_index, is_active, created_at, updated_at)
+        VALUES ($1, $2, $3, TRUE, NOW(), NOW())
+      `, [mod.id, mod.title, mod.orderIndex]);
+
+      // Insert published content (version 1)
+      await query(`
+        INSERT INTO cms_module_content (id, module_id, version, status, html_content, published_at, created_at, updated_at)
+        VALUES (gen_random_uuid(), $1, 1, 'published', $2, NOW(), NOW(), NOW())
+      `, [mod.id, mod.htmlContent]);
+
+      seededCount++;
+    }
+
+    await logAdminAction(req.admin!.id, 'seed', 'modules', null, null, { seededCount, skippedCount });
+
+    res.json({
+      success: true,
+      seededCount,
+      skippedCount,
+      message: `Seeded ${seededCount} modules, skipped ${skippedCount} existing`
+    });
+  } catch (error) {
+    console.error('Seed modules error:', error);
+    res.status(500).json({ error: 'Failed to seed modules' });
+  }
+});
+
+// POST /api/cms/seed-exam-questions - Import exam questions from frontend
+router.post('/seed-exam-questions', async (req: Request, res: Response) => {
+  try {
+    const { questions } = req.body as {
+      questions: Array<{
+        id: string;
+        type: 'mcq' | 'fib' | 'sa';
+        moduleReference: number;
+        questionText: string;
+        options?: string[];
+        correctAnswerIndex?: number;
+        acceptableAnswers?: string[];
+        keywords?: string[];
+        minKeywords?: number;
+        sampleAnswer?: string;
+        explanation?: string;
+      }>;
+    };
+
+    if (!questions || !Array.isArray(questions) || questions.length === 0) {
+      return res.status(400).json({ error: 'No questions provided' });
+    }
+
+    let seededCount = 0;
+    let skippedCount = 0;
+
+    for (let i = 0; i < questions.length; i++) {
+      const q = questions[i];
+
+      // Check if question already exists
+      const existing = await queryOne<{ id: string }>(`
+        SELECT id FROM cms_exam_questions WHERE id = $1
+      `, [q.id]);
+
+      if (existing) {
+        skippedCount++;
+        continue;
+      }
+
+      // Insert question
+      await query(`
+        INSERT INTO cms_exam_questions (
+          id, question_type, module_reference, question_text,
+          options, correct_answer_index, acceptable_answers,
+          keywords, min_keywords, sample_answer, explanation,
+          points, is_active, order_index, created_at, updated_at
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 2, TRUE, $12, NOW(), NOW())
+      `, [
+        q.id,
+        q.type,
+        q.moduleReference,
+        q.questionText,
+        q.options ? JSON.stringify(q.options) : null,
+        q.correctAnswerIndex ?? null,
+        q.acceptableAnswers || null,
+        q.keywords || null,
+        q.minKeywords ?? null,
+        q.sampleAnswer || null,
+        q.explanation || null,
+        i
+      ]);
+
+      seededCount++;
+    }
+
+    await logAdminAction(req.admin!.id, 'seed', 'exam_questions', null, null, { seededCount, skippedCount });
+
+    res.json({
+      success: true,
+      seededCount,
+      skippedCount,
+      message: `Seeded ${seededCount} questions, skipped ${skippedCount} existing`
+    });
+  } catch (error) {
+    console.error('Seed exam questions error:', error);
+    res.status(500).json({ error: 'Failed to seed exam questions' });
+  }
+});
+
+// ============================================
 // PUBLIC CONTENT DELIVERY (No auth required for these)
 // ============================================
 

@@ -12897,6 +12897,43 @@ button:disabled {
   font-style: italic;
 }
 
+.sa-import-section {
+  text-align: center;
+  padding: 30px;
+  background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+  border: 2px dashed #c62828;
+  border-radius: 12px;
+  margin: 20px 0;
+}
+
+.sa-import-btn {
+  background: linear-gradient(135deg, #c62828 0%, #8e0000 100%);
+  color: white;
+  font-size: 16px;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.sa-import-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(198, 40, 40, 0.4);
+}
+
+.sa-import-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.sa-import-hint {
+  color: #666;
+  font-size: 13px;
+  margin-top: 15px;
+  font-style: italic;
+}
+
 .sa-error {
   color: #c62828;
   text-align: center;
@@ -13049,12 +13086,19 @@ button:disabled {
 
 .sa-html-editor {
   flex: 1;
-  font-family: monospace;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   font-size: 13px;
+  line-height: 1.5;
   border: 1px solid #ddd;
   border-radius: 4px;
-  padding: 10px;
+  padding: 15px;
   resize: none;
+  background: #fafafa;
+  color: #333;
+  tab-size: 2;
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow-x: auto;
 }
 
 .sa-preview-content {

@@ -12502,6 +12502,70 @@ async function loadCMSDashboard(): Promise<void> {
   `;
 }
 
+async function seedModulesFromTrainingContent(): Promise<void> {
+  const importBtn = document.getElementById('import-content-btn') as HTMLButtonElement;
+  const btnText = importBtn?.querySelector('.btn-text') as HTMLElement;
+  const btnLoading = importBtn?.querySelector('.btn-loading') as HTMLElement;
+
+  if (importBtn) {
+    importBtn.disabled = true;
+    if (btnText) btnText.style.display = 'none';
+    if (btnLoading) btnLoading.style.display = 'inline';
+  }
+
+  const moduleNames: Record<string, string> = {
+    'welcome': 'Welcome & Company Intro',
+    'commitment': 'Your Commitment',
+    'general-knowledge': 'General Roofing Knowledge',
+    'shingle-types-materials': 'Shingle Types & Materials',
+    'initial-pitch': 'The Initial Pitch',
+    'handling-initial-pitch-objections': 'Initial Pitch Objections',
+    'inspection-process': 'The Inspection Process',
+    'post-inspection-pitch': 'Post-Inspection Pitch',
+    'post-inspection-objections': 'Post-Inspection Objections',
+    'damage-identification': 'Damage Identification',
+    'filing-claim-closing': 'Filing the Claim & Closing',
+    'closing-objections': 'Closing Objections',
+    'sales-cycle-job-flow': 'The Sales Cycle & Job Flow',
+    'role-play': 'AI Role-Play',
+    'final-exam': 'Final Exam'
+  };
+
+  const modules = MODULE_ORDER.map((id, index) => ({
+    id,
+    title: moduleNames[id] || id,
+    orderIndex: index,
+    htmlContent: trainingContent[id as keyof typeof trainingContent] || ''
+  }));
+
+  try {
+    const result = await superAdminApiCall<{ success: boolean; seededCount: number; message: string }>('/cms/seed-modules', {
+      method: 'POST',
+      body: JSON.stringify({ modules })
+    });
+
+    if (result?.success) {
+      alert(`Success! ${result.seededCount} modules imported to database.`);
+      await loadCMSModules(); // Refresh the list
+    } else {
+      alert('Import failed: ' + (result?.message || 'Unknown error'));
+      if (importBtn) {
+        importBtn.disabled = false;
+        if (btnText) btnText.style.display = 'inline';
+        if (btnLoading) btnLoading.style.display = 'none';
+      }
+    }
+  } catch (error) {
+    console.error('Seed error:', error);
+    alert('Import failed. Check console for details.');
+    if (importBtn) {
+      importBtn.disabled = false;
+      if (btnText) btnText.style.display = 'inline';
+      if (btnLoading) btnLoading.style.display = 'none';
+    }
+  }
+}
+
 async function loadCMSModules(): Promise<void> {
   const mainContent = document.getElementById('sa-main-content');
   if (!mainContent) return;
@@ -12512,10 +12576,19 @@ async function loadCMSModules(): Promise<void> {
     mainContent.innerHTML = `
       <div class="sa-section">
         <h1>Modules</h1>
-        <p class="sa-empty">No modules in database yet. Run the migration script to import existing content.</p>
-        <button class="sa-action-btn" id="create-module-btn">Create New Module</button>
+        <p class="sa-empty">No modules in database yet.</p>
+        <div class="sa-import-section">
+          <button class="sa-action-btn sa-import-btn" id="import-content-btn">
+            <span class="btn-text">📥 Import Existing Training Content</span>
+            <span class="btn-loading" style="display: none;">Importing...</span>
+          </button>
+          <p class="sa-import-hint">This will import all 15 training modules from the app into the CMS database.</p>
+        </div>
+        <button class="sa-action-btn" id="create-module-btn" style="margin-top: 20px;">Or Create New Module</button>
       </div>
     `;
+
+    document.getElementById('import-content-btn')?.addEventListener('click', seedModulesFromTrainingContent);
     return;
   }
 
