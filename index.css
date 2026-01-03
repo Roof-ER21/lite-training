@@ -12757,9 +12757,15 @@ button:disabled {
 
 /* Super Admin Dashboard */
 .super-admin-dashboard {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   display: flex;
-  min-height: 100vh;
   background: #f0f2f5;
+  z-index: 9999;
+  overflow: hidden;
 }
 
 .sa-sidebar {

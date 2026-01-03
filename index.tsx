@@ -11470,6 +11470,11 @@ function renderQuiz(quizData: QuizQuestion[]) {
 const cmsContentCache: Record<string, string> = {};
 
 async function fetchCMSContent(moduleName: string): Promise<string | null> {
+  // Skip CMS fetch for non-training pages (use hardcoded content only)
+  if (moduleName === 'my-page' || moduleName === 'admin-dashboard') {
+    return null;
+  }
+
   // Check cache first
   if (cmsContentCache[moduleName]) {
     return cmsContentCache[moduleName];
@@ -11492,6 +11497,9 @@ async function fetchCMSContent(moduleName: string): Promise<string | null> {
 
 async function renderModule(moduleName: string) {
   if (!mainContent) return;
+
+  // Don't render modules when in admin mode - admin has its own UI
+  if (isSuperAdmin()) return;
 
   // Clean up tip observers from previous module
   cleanupTipObservers();
