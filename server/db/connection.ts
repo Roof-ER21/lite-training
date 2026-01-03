@@ -337,14 +337,6 @@ export async function initDatabase(): Promise<void> {
       CREATE INDEX IF NOT EXISTS idx_audit_log_admin ON admin_audit_log(admin_id);
       CREATE INDEX IF NOT EXISTS idx_audit_log_created ON admin_audit_log(created_at);
 
-      -- CMS Tables: Reset schema (tables are empty, fixing UUID->VARCHAR migration)
-      -- TODO: Remove these DROP statements after successful deployment
-      DROP TABLE IF EXISTS cms_module_content CASCADE;
-      DROP TABLE IF EXISTS cms_modules CASCADE;
-      DROP TABLE IF EXISTS cms_exam_questions CASCADE;
-      DROP TABLE IF EXISTS cms_roleplay_scenario_packs CASCADE;
-      DROP TABLE IF EXISTS cms_roleplay_scenarios CASCADE;
-
       -- CMS Modules
       CREATE TABLE IF NOT EXISTS cms_modules (
         id VARCHAR(50) PRIMARY KEY,
