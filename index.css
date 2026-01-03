@@ -10601,7 +10601,7 @@ button:disabled {
   font-size: 1.3rem;
   line-height: 1.6;
   margin-bottom: 25px;
-  color: white;
+  color: #333333;
 }
 
 .answer-buttons {
