@@ -11466,13 +11466,45 @@ function renderQuiz(quizData: QuizQuestion[]) {
 
 // --- Module Navigation ---
 
-function renderModule(moduleName: string) {
+// Cache for CMS content to avoid repeated fetches
+const cmsContentCache: Record<string, string> = {};
+
+async function fetchCMSContent(moduleName: string): Promise<string | null> {
+  // Check cache first
+  if (cmsContentCache[moduleName]) {
+    return cmsContentCache[moduleName];
+  }
+
+  try {
+    const response = await fetch(`/api/content/modules/${moduleName}`);
+    if (response.ok) {
+      const data = await response.json();
+      if (data.htmlContent) {
+        cmsContentCache[moduleName] = data.htmlContent;
+        return data.htmlContent;
+      }
+    }
+  } catch (error) {
+    console.log('CMS fetch failed, using fallback content');
+  }
+  return null;
+}
+
+async function renderModule(moduleName: string) {
   if (!mainContent) return;
 
   // Clean up tip observers from previous module
   cleanupTipObservers();
 
-  mainContent.innerHTML = trainingContent[moduleName] || '<div>Content not found.</div>';
+  // Show loading state
+  mainContent.innerHTML = '<div class="module-loading"><div class="loading-spinner"></div><p>Loading content...</p></div>';
+
+  // Try to fetch from CMS first, fall back to hardcoded content
+  let content = await fetchCMSContent(moduleName);
+  if (!content) {
+    content = trainingContent[moduleName] || '<div>Content not found.</div>';
+  }
+  mainContent.innerHTML = content;
 
   // Cancel any ongoing TTS when changing modules
   stopAllTTS();
