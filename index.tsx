@@ -12680,9 +12680,15 @@ async function openModuleEditor(moduleId: string): Promise<void> {
       <div class="sa-editor-header">
         <button class="sa-back-btn" id="back-to-modules">&larr; Back to Modules</button>
         <h1>Editing: ${data.module.title}</h1>
-        <div class="sa-editor-actions">
-          <button class="sa-save-btn" id="save-draft">Save Draft</button>
-          <button class="sa-publish-btn" id="publish-content">Publish</button>
+        <div class="sa-editor-controls">
+          <div class="sa-editor-mode-toggle">
+            <button class="sa-mode-btn active" data-mode="html">HTML</button>
+            <button class="sa-mode-btn" data-mode="visual">Visual</button>
+          </div>
+          <div class="sa-editor-actions">
+            <button class="sa-save-btn" id="save-draft">Save Draft</button>
+            <button class="sa-publish-btn" id="publish-content">Publish</button>
+          </div>
         </div>
       </div>
       <div class="sa-editor-version">
@@ -12698,8 +12704,9 @@ async function openModuleEditor(moduleId: string): Promise<void> {
       </div>
       <div class="sa-editor-container">
         <div class="sa-editor-pane">
-          <h3>HTML Content</h3>
+          <h3 id="editor-mode-label">HTML Content</h3>
           <textarea id="html-editor" class="sa-html-editor">${data.content?.htmlContent || ''}</textarea>
+          <div id="visual-editor" class="sa-visual-editor" contenteditable="true" style="display: none;">${data.content?.htmlContent || ''}</div>
         </div>
         <div class="sa-preview-pane">
           <h3>Preview</h3>
@@ -12709,11 +12716,56 @@ async function openModuleEditor(moduleId: string): Promise<void> {
     </div>
   `;
 
-  // Live preview
-  const editor = document.getElementById('html-editor') as HTMLTextAreaElement;
+  // Editor elements
+  const htmlEditor = document.getElementById('html-editor') as HTMLTextAreaElement;
+  const visualEditor = document.getElementById('visual-editor') as HTMLDivElement;
   const preview = document.getElementById('preview-content');
-  editor?.addEventListener('input', () => {
-    if (preview) preview.innerHTML = editor.value;
+  const editorModeLabel = document.getElementById('editor-mode-label');
+  let currentMode: 'html' | 'visual' = 'html';
+
+  // Get current content from active editor
+  const getEditorContent = () => {
+    return currentMode === 'html' ? htmlEditor.value : visualEditor.innerHTML;
+  };
+
+  // Live preview for HTML mode
+  htmlEditor?.addEventListener('input', () => {
+    if (preview) preview.innerHTML = htmlEditor.value;
+  });
+
+  // Live preview for Visual mode
+  visualEditor?.addEventListener('input', () => {
+    if (preview) preview.innerHTML = visualEditor.innerHTML;
+  });
+
+  // Mode toggle buttons
+  document.querySelectorAll('.sa-mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const mode = (btn as HTMLElement).dataset.mode as 'html' | 'visual';
+      if (mode === currentMode) return;
+
+      // Update active button
+      document.querySelectorAll('.sa-mode-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      if (mode === 'visual') {
+        // Sync HTML to Visual
+        visualEditor.innerHTML = htmlEditor.value;
+        htmlEditor.style.display = 'none';
+        visualEditor.style.display = 'block';
+        if (editorModeLabel) editorModeLabel.textContent = 'Visual Editor';
+      } else {
+        // Sync Visual to HTML
+        htmlEditor.value = visualEditor.innerHTML;
+        visualEditor.style.display = 'none';
+        htmlEditor.style.display = 'block';
+        if (editorModeLabel) editorModeLabel.textContent = 'HTML Content';
+      }
+
+      // Update preview
+      if (preview) preview.innerHTML = mode === 'visual' ? visualEditor.innerHTML : htmlEditor.value;
+      currentMode = mode;
+    });
   });
 
   // Back button
@@ -12721,7 +12773,7 @@ async function openModuleEditor(moduleId: string): Promise<void> {
 
   // Save draft
   document.getElementById('save-draft')?.addEventListener('click', async () => {
-    const htmlContent = editor?.value;
+    const htmlContent = getEditorContent();
     const versionSelect = document.getElementById('version-select') as HTMLSelectElement;
     const isNewVersion = versionSelect.value === 'new';
 
