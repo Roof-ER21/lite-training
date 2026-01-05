@@ -3469,7 +3469,7 @@ const trainingContent = {
             <div class="damage-gallery">
               <div class="damage-image-item">
                 <img src="/assets/damage/hail/hail-damage-1.jpg" alt="Hail damage on shingles showing circular impact patterns">
-                <p class="image-caption">Circular hail impacts - note the bruising pattern</p>
+                <p class="image-caption">Circular hail impacts - marked test square</p>
               </div>
               <div class="damage-image-item">
                 <img src="/assets/damage/hail/hail-damage-2.jpg" alt="Hail damage showing granule loss">
@@ -3477,7 +3477,7 @@ const trainingContent = {
               </div>
               <div class="damage-image-item">
                 <img src="/assets/damage/hail/hail-damage-3.jpg" alt="Close-up of hail damage divots">
-                <p class="image-caption">Close-up of hail divots and soft spots</p>
+                <p class="image-caption">Close-up of hail divot and bruising</p>
               </div>
             </div>
 
@@ -3538,21 +3538,18 @@ const trainingContent = {
           <div class="damage-type">
             <h3>🎯 Collateral Damage</h3>
 
-            <div class="collateral-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 20px 0;">
-              <div class="collateral-item" style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); padding: 20px; border-radius: 12px; text-align: center; border: 2px solid #0ea5e9;">
-                <div style="font-size: 2.5rem; margin-bottom: 10px;">🔧</div>
-                <h4 style="margin: 0 0 8px 0; color: #0369a1;">Metal Items</h4>
-                <p style="margin: 0; font-size: 0.9rem; color: #334155;">Dented gutters, downspouts, vents, flashing, AC units</p>
+            <div class="damage-gallery">
+              <div class="damage-image-item">
+                <img src="/assets/damage/collateral/collateral-1.jpg" alt="Collateral damage on vent flashing">
+                <p class="image-caption">Metal vent/flashing impact marks</p>
               </div>
-              <div class="collateral-item" style="background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%); padding: 20px; border-radius: 12px; text-align: center; border: 2px solid #f59e0b;">
-                <div style="font-size: 2.5rem; margin-bottom: 10px;">🪟</div>
-                <h4 style="margin: 0 0 8px 0; color: #b45309;">Soft Items</h4>
-                <p style="margin: 0; font-size: 0.9rem; color: #334155;">Window screens with pitting, vinyl siding impacts</p>
+              <div class="damage-image-item">
+                <img src="/assets/damage/collateral/collateral-2.jpg" alt="Collateral damage on vinyl siding">
+                <p class="image-caption">Vinyl siding impacts</p>
               </div>
-              <div class="collateral-item" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 20px; border-radius: 12px; text-align: center; border: 2px solid #22c55e;">
-                <div style="font-size: 2.5rem; margin-bottom: 10px;">🏡</div>
-                <h4 style="margin: 0 0 8px 0; color: #15803d;">Ground Items</h4>
-                <p style="margin: 0; font-size: 0.9rem; color: #334155;">Deck railings, mailboxes, outdoor furniture</p>
+              <div class="damage-image-item">
+                <img src="/assets/damage/collateral/collateral-3.jpg" alt="Collateral damage on vinyl siding close up">
+                <p class="image-caption">Siding pitting close-up</p>
               </div>
             </div>
 

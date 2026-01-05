@@ -1,0 +1,16 @@
+Source: Wikimedia Commons
+
+1) Wind.jpg
+- File: Missing_shingles_(37075099182).jpg
+- URL: https://upload.wikimedia.org/wikipedia/commons/4/4c/Missing_shingles_%2837075099182%29.jpg
+- License: Commons (check file page for exact license)
+
+2) wind1.jpg
+- File: Asphalt_shingles_damage.jpg
+- URL: https://upload.wikimedia.org/wikipedia/commons/0/01/Asphalt_shingles_damage.jpg
+- License: Commons (check file page for exact license)
+
+3) wind2.jpg
+- File: WindDamageRoof.jpg
+- URL: https://upload.wikimedia.org/wikipedia/commons/9/9b/WindDamageRoof.jpg
+- License: Commons (check file page for exact license)
