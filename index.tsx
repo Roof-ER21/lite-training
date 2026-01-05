@@ -1880,23 +1880,6 @@ const trainingContent = {
             <p>🎥 Introduction video coming soon</p>
           </div>
         </div>
-
-        <!-- Ross Renzi -->
-        <div class="leader-card">
-          <div class="leader-avatar-placeholder">RR</div>
-          <h3>Ross Renzi</h3>
-          <p class="leader-title">Regional Sales Manager</p>
-          <p class="leader-highlight">Experienced regional sales leader driving team development and market expansion across territories.</p>
-          <button class="bio-toggle-btn" data-bio="ross-bio">My Bio</button>
-          <div id="ross-bio" class="leader-bio-full" style="display: none;">
-            <p>Ross Renzi serves as Regional Sales Manager at Roof-ER, where he leads sales operations and team development across his assigned territories. His leadership focuses on building high-performing sales teams and expanding market presence.</p>
-            <p>With a strong background in sales management and team leadership, Ross brings valuable experience in coaching and developing sales professionals. He is dedicated to implementing best practices and ensuring consistent execution of Roof-ER's customer-first approach.</p>
-            <p>Ross's commitment to excellence and team success makes him an integral part of Roof-ER's growth strategy as the company continues to expand its regional footprint.</p>
-          </div>
-          <div class="video-placeholder">
-            <p>🎥 Introduction video coming soon</p>
-          </div>
-        </div>
       </div>
 
       <h2 id="mission-values-section">Our Mission & Values</h2>
@@ -5077,11 +5060,12 @@ trainingContent['general-knowledge'] = `
     </div>
 
     <h2>Parts of a Roof</h2>
-    <p class="section-intro">Study this labeled diagram - hover over the numbers to see what each part does!</p>
+    <p class="section-intro">Study these labeled diagrams to learn the key parts of a roof.</p>
 
     <div class="roof-diagram-interactive">
-      <div class="diagram-container">
-        <img src="/assets/training/parts-of-a-roof-diagram.jpg" alt="Parts of a Roof Diagram" class="roof-diagram-img">
+      <div class="diagram-container roof-diagram-grid">
+        <img src="/assets/training/hip-roof.png" alt="Hip Roof Diagram" class="roof-diagram-img">
+        <img src="/assets/training/gable-roof.png" alt="Gable Roof Diagram" class="roof-diagram-img">
       </div>
 
       <div class="roof-parts-legend">
@@ -14118,13 +14102,6 @@ const LEADER_BIOS: Record<string, {name: string; title: string; img: string; lin
     img: '/resources/images/ford-theroofdocs.jpg',
     link: 'https://www.theroofdocs.com/about/',
     summary: 'Oversees operations and execution, aligning teams and process from inspection to completion.'
-  },
-  ross: {
-    name: 'Ross Renzi',
-    title: 'Regional Sales Manager',
-    img: '',
-    link: 'https://www.theroofdocs.com/about/',
-    summary: 'Leads regional sales operations and team development, driving market expansion and sales excellence.'
   }
 };
 
@@ -15855,15 +15832,15 @@ function initQuickQuiz1() {
           <div class="quiz-options">
             <button class="quiz-option-btn" data-answer="a" data-question="qa1">
               <span class="option-letter">A</span>
-              <span>Oliver Brown (Owner), Reese Samala (Director of Sales), Ford Barsi (GM), Ross Renzi (Regional Sales Manager)</span>
+              <span>Oliver Brown (Owner &amp; Founder), Reese Samala (Director of Sales), Ford Barsi (General Manager)</span>
             </button>
             <button class="quiz-option-btn" data-answer="b" data-question="qa1">
               <span class="option-letter">B</span>
-              <span>Ford Barsi (Owner), Oliver Brown (Director of Sales), Reese Samala (GM), Ross Renzi (Marketing)</span>
+              <span>Ford Barsi (Owner), Oliver Brown (Director of Sales), Reese Samala (General Manager)</span>
             </button>
             <button class="quiz-option-btn" data-answer="c" data-question="qa1">
               <span class="option-letter">C</span>
-              <span>Reese Samala (Owner), Ford Barsi (Director of Sales), Oliver Brown (GM), Ross Renzi (Operations)</span>
+              <span>Reese Samala (Owner), Ford Barsi (Director of Sales), Oliver Brown (General Manager)</span>
             </button>
           </div>
         </div>

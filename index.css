@@ -11775,30 +11775,22 @@ button:disabled {
 }
 
 .diagram-container {
-  text-align: center;
   margin-bottom: 20px;
-  position: relative;
+}
+
+.roof-diagram-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  align-items: start;
 }
 
 .diagram-container img {
+  width: 100%;
   max-width: 100%;
   height: auto;
   border-radius: 8px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-/* Black bar to cover watermark text at bottom of image */
-.diagram-container::after {
-  content: '';
-  position: absolute;
-  bottom: 6px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 380px;
-  height: 120px;
-  background: #1a1a1a;
-  border-radius: 4px;
-  z-index: 10;
 }
 
 .roof-parts-legend {
