@@ -4002,319 +4002,241 @@ const trainingContent = {
     </div>
   `,
   'claim-closing': `
-    <div class="content-card" style="background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%); padding: 0; overflow: hidden;">
-        <!-- Hero Header -->
-        <div style="background: linear-gradient(135deg, #0891b2 0%, #06b6d4 50%, #22d3ee 100%); padding: 40px 30px; text-align: center; color: white;">
-          <div style="font-size: 48px; margin-bottom: 15px;">📋</div>
-          <h1 style="margin: 0 0 10px 0; font-size: 28px; font-weight: 700;">Filing the Claim & Closing</h1>
-          <p style="margin: 0; opacity: 0.9; font-size: 16px;">From inspection to signed contract - lock in the deal</p>
-        </div>
-
-        <div style="padding: 30px;">
-          <!-- Quick Stats -->
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;">
-            <div style="background: linear-gradient(135deg, #ecfeff 0%, #cffafe 100%); padding: 20px; border-radius: 12px; text-align: center;">
-              <div style="font-size: 28px; font-weight: 700; color: #0891b2;">📞</div>
-              <div style="font-size: 13px; color: #0e7490;">File Same Day</div>
-            </div>
-            <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 20px; border-radius: 12px; text-align: center;">
-              <div style="font-size: 28px; font-weight: 700; color: #16a34a;">2</div>
-              <div style="font-size: 13px; color: #166534;">Key Forms</div>
-            </div>
-            <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 20px; border-radius: 12px; text-align: center;">
-              <div style="font-size: 28px; font-weight: 700; color: #d97706;">48hr</div>
-              <div style="font-size: 13px; color: #92400e;">Max Wait Time</div>
-            </div>
-          </div>
-
-          <!-- When to File -->
-          <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-            <span style="background: #ecfeff; padding: 8px 12px; border-radius: 8px;">⏰</span>
-            When to File the Claim
-          </h2>
-
-          <div style="display: grid; gap: 15px; margin-bottom: 35px;">
-            <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 16px; padding: 20px; border-left: 4px solid #16a34a;">
-              <h3 style="color: #16a34a; font-size: 18px; margin: 0 0 12px 0;">✅ Immediately (Same Day) - BEST</h3>
-              <p style="color: #374151; font-size: 14px; line-height: 1.6; margin: 0 0 12px 0;">If homeowner is ready, file before you leave. Strike while the iron is hot!</p>
-              <div style="background: white; padding: 15px; border-radius: 10px;">
-                <p style="color: #374151; font-size: 13px; margin: 0; font-weight: 600;">You'll need:</p>
-                <ul style="color: #374151; font-size: 13px; margin: 8px 0 0 0; padding-left: 20px;">
-                  <li>Policy number (on insurance card)</li>
-                  <li>Date of loss (storm date - check weather reports)</li>
-                  <li>Contact information</li>
-                  <li>Brief description: "Hail/wind damage to roof"</li>
-                </ul>
-              </div>
-            </div>
-
-            <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 16px; padding: 20px; border-left: 4px solid #f59e0b;">
-              <h3 style="color: #d97706; font-size: 18px; margin: 0 0 12px 0;">⏰ Within 24 Hours - OK</h3>
-              <p style="color: #374151; font-size: 14px; line-height: 1.6; margin: 0 0 12px 0;">If they need to "think about it," follow up next morning:</p>
-              <div style="background: white; padding: 15px; border-radius: 10px;">
-                <ul style="color: #374151; font-size: 13px; margin: 0; padding-left: 20px;">
-                  <li>Send photo gallery link</li>
-                  <li>Text: "Hi [Name]! Following up on your roof. Ready to file that claim? I can do it over the phone in 2 minutes."</li>
-                </ul>
-              </div>
-            </div>
-
-            <div style="background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border-radius: 16px; padding: 20px; border-left: 4px solid #dc2626;">
-              <h3 style="color: #dc2626; font-size: 18px; margin: 0 0 12px 0;">🚫 Never Wait More Than 48 Hours</h3>
-              <p style="color: #374151; font-size: 14px; line-height: 1.6; margin: 0;">After 48 hours, they'll cool off, get other opinions, forget urgency. <strong>File ASAP or risk losing the deal.</strong></p>
-            </div>
-          </div>
-
-          <!-- Prepping the Homeowner -->
-          <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-            <span style="background: #ecfeff; padding: 8px 12px; border-radius: 8px;">📝</span>
-            Prepping the Homeowner for the Call
-          </h2>
-
-          <div style="background: linear-gradient(135deg, #ecfeff 0%, #cffafe 100%); border-radius: 16px; padding: 25px; margin-bottom: 35px;">
-            <p style="color: #0e7490; font-size: 15px; margin: 0 0 20px 0; font-weight: 500;">Use a blank note on your iPad to go over these key points so they know what to say:</p>
-            <div style="display: grid; gap: 12px;">
-              <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
-                <span style="background: #0891b2; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">1</span>
-                <div>
-                  <span style="color: #0e7490; font-weight: 600;">Reason for claim:</span>
-                  <span style="color: #374151; font-size: 14px;"> "I'd like to file a claim for hail and wind damage." (Never only one type)</span>
-                </div>
-              </div>
-              <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
-                <span style="background: #0891b2; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">2</span>
-                <div>
-                  <span style="color: #0e7490; font-weight: 600;">Damaged items:</span>
-                  <span style="color: #374151; font-size: 14px;"> Roof, Downspouts, Gutters, Siding, etc.</span>
-                </div>
-              </div>
-              <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
-                <span style="background: #0891b2; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">3</span>
-                <div>
-                  <span style="color: #0e7490; font-weight: 600;">Selected Contractor:</span>
-                  <span style="color: #374151; font-size: 14px;"> "Yes, we have selected Roof-ER."</span>
-                </div>
-              </div>
-              <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
-                <span style="background: #0891b2; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">4</span>
-                <div>
-                  <span style="color: #0e7490; font-weight: 600;">Have an estimate:</span>
-                  <span style="color: #374151; font-size: 14px;"> "No."</span>
-                </div>
-              </div>
-            </div>
-            <p style="color: #0e7490; font-size: 13px; margin: 15px 0 0 0; font-style: italic;">💡 Tip: Ask if they have the app or website login to file the claim first. Use the homeowner's phone when possible.</p>
-          </div>
-
-          <!-- After Filing: The Close -->
-          <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-            <span style="background: #f0fdf4; padding: 8px 12px; border-radius: 8px;">✅</span>
-            After Filing: Setting Expectations
-          </h2>
-
-          <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 16px; padding: 25px; margin-bottom: 35px;">
-            <p style="color: #166534; font-size: 16px; font-weight: 600; margin: 0 0 20px 0; text-align: center;">"Great! Claim #[number] is filed. Here's what happens next:"</p>
-            <div style="display: grid; gap: 12px;">
-              <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
-                <span style="background: #16a34a; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">1</span>
-                <span style="color: #374151; font-size: 14px;"><strong>Adjuster Contact:</strong> "They'll call you in 3-5 days to schedule their inspection."</span>
-              </div>
-              <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
-                <span style="background: #16a34a; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">2</span>
-                <span style="color: #374151; font-size: 14px;"><strong>Our Role:</strong> "I'll meet the adjuster here to make sure they see ALL the damage."</span>
-              </div>
-              <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
-                <span style="background: #16a34a; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">3</span>
-                <span style="color: #374151; font-size: 14px;"><strong>Authorization:</strong> "I'll text you a contract now. E-sign so I'm authorized to work with the adjuster."</span>
-              </div>
-              <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
-                <span style="background: #16a34a; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">4</span>
-                <span style="color: #374151; font-size: 14px;"><strong>Timeline:</strong> "Once approved, 3-4 weeks to completion. I'll update you every step."</span>
-              </div>
-              <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
-                <span style="background: #16a34a; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">5</span>
-                <span style="color: #374151; font-size: 14px;"><strong>Reassurance:</strong> "You did the right thing. This protects your biggest investment."</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- The Contingency & Claim Authorization -->
-          <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-            <span style="background: #eff6ff; padding: 8px 12px; border-radius: 8px;">📄</span>
-            The Contingency & Claim Authorization
-          </h2>
-
-          <div style="display: grid; gap: 15px; margin-bottom: 35px;">
-            <div style="background: white; border: 2px solid #dbeafe; border-radius: 16px; padding: 20px; border-left: 4px solid #3b82f6;">
-              <h3 style="color: #1e40af; font-size: 16px; margin: 0 0 12px 0;">📝 Contingency Agreement</h3>
-              <p style="color: #374151; font-size: 14px; line-height: 1.7; margin: 0; background: #f8fafc; padding: 15px; border-radius: 8px; font-style: italic;">"This basic agreement backs you as the homeowner by guaranteeing your only cost will be your deductible if we get you fully approved. If it is a partial approval or denial, we will fight for you. But if we are not able to get you fully approved, this contract is null and void and you do not owe us a penny."</p>
-            </div>
-
-            <div style="background: white; border: 2px solid #dbeafe; border-radius: 16px; padding: 20px; border-left: 4px solid #3b82f6;">
-              <h3 style="color: #1e40af; font-size: 16px; margin: 0 0 12px 0;">📋 Claim Authorization</h3>
-              <p style="color: #374151; font-size: 14px; line-height: 1.7; margin: 0; background: #f8fafc; padding: 15px; border-radius: 8px; font-style: italic;">"This next form is our Claim Authorization. Very simple, it allows us to communicate with your insurance company on your behalf. I'll be here for the inspection and will communicate with them, so you don't have to be the middle-man. Of course, I'll always keep you looped in."</p>
-            </div>
-          </div>
-
-          <!-- Key Documents Section -->
-          <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-            <span style="background: #f3e8ff; padding: 8px 12px; border-radius: 8px;">📎</span>
-            View Key Documents
-          </h2>
-
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 35px;">
-            <!-- Claim Authorization PDF -->
-            <div style="background: white; border: 2px solid #e9d5ff; border-radius: 16px; padding: 25px; text-align: center;">
-              <div style="font-size: 48px; margin-bottom: 15px;">📄</div>
-              <h3 style="color: #7c3aed; font-size: 18px; margin: 0 0 10px 0;">Claim Authorization Form</h3>
-              <p style="color: #6b7280; font-size: 14px; margin: 0 0 15px 0; line-height: 1.5;">Authorizes ROOF-ER to communicate with the homeowner's insurance company on their behalf.</p>
-              <div style="background: #f3e8ff; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
-                <p style="color: #6b21a8; font-size: 13px; margin: 0;"><strong>When to use:</strong> After filing the claim</p>
-              </div>
-              <a href="/resources/Claim Authorization Form.pdf" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; padding: 12px 24px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: all 0.3s;">
-                📥 View PDF
-              </a>
-            </div>
-
-            <!-- Insurance Claim Agreement (Contingency) PDF -->
-            <div style="background: white; border: 2px solid #e9d5ff; border-radius: 16px; padding: 25px; text-align: center;">
-              <div style="font-size: 48px; margin-bottom: 15px;">📋</div>
-              <h3 style="color: #7c3aed; font-size: 18px; margin: 0 0 10px 0;">Insurance Claim Agreement</h3>
-              <p style="color: #6b7280; font-size: 14px; margin: 0 0 15px 0; line-height: 1.5;">The contingency contract - only cost to homeowner is their deductible if fully approved.</p>
-              <div style="background: #f3e8ff; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
-                <p style="color: #6b21a8; font-size: 13px; margin: 0;"><strong>Key term:</strong> Null & void if claim denied</p>
-              </div>
-              <a href="/resources/DMV Blank Contingency.pdf" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; padding: 12px 24px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: all 0.3s;">
-                📥 View PDF
-              </a>
-            </div>
-          </div>
-
-          <!-- Common Mistakes -->
-          <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-            <span style="background: #fef2f2; padding: 8px 12px; border-radius: 8px;">⚠️</span>
-            Common Filing Mistakes to Avoid
-          </h2>
-
-          <div style="display: grid; gap: 12px; margin-bottom: 30px;">
-            <div style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); padding: 15px 20px; border-radius: 10px; display: flex; align-items: flex-start; gap: 12px;">
-              <span style="font-size: 20px;">❌</span>
-              <div>
-                <strong style="color: #dc2626;">Filing without homeowner present:</strong>
-                <span style="color: #374151; font-size: 14px;"> Always file WITH them on speakerphone</span>
-              </div>
-            </div>
-            <div style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); padding: 15px 20px; border-radius: 10px; display: flex; align-items: flex-start; gap: 12px;">
-              <span style="font-size: 20px;">❌</span>
-              <div>
-                <strong style="color: #dc2626;">Saying "full roof replacement":</strong>
-                <span style="color: #374151; font-size: 14px;"> Say "damage to roof" - let adjuster determine scope</span>
-              </div>
-            </div>
-            <div style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); padding: 15px 20px; border-radius: 10px; display: flex; align-items: flex-start; gap: 12px;">
-              <span style="font-size: 20px;">❌</span>
-              <div>
-                <strong style="color: #dc2626;">Not getting claim number:</strong>
-                <span style="color: #374151; font-size: 14px;"> Write it down immediately, text it to homeowner</span>
-              </div>
-            </div>
-            <div style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); padding: 15px 20px; border-radius: 10px; display: flex; align-items: flex-start; gap: 12px;">
-              <span style="font-size: 20px;">❌</span>
-              <div>
-                <strong style="color: #dc2626;">Forgetting to ask about inspection timeline:</strong>
-                <span style="color: #374151; font-size: 14px;"> Ask when adjuster will contact them</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Mini Quiz -->
-          <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-            <span style="background: #ecfeff; padding: 8px 12px; border-radius: 8px;">✅</span>
-            Quick Knowledge Check
-          </h2>
-
-          <div id="module11-quiz" style="background: linear-gradient(135deg, #ecfeff 0%, #cffafe 100%); border-radius: 16px; padding: 25px; margin-bottom: 30px;">
-            <!-- Progress Bar -->
-            <div id="quiz-progress-m11" style="margin-bottom: 20px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <span style="color: #0e7490; font-weight: 600; font-size: 14px;">Question <span id="current-q-num">1</span> of 5</span>
-                <span id="quiz-score-display" style="color: #0e7490; font-size: 14px;"></span>
-              </div>
-              <div style="background: #cffafe; border-radius: 10px; height: 8px; overflow: hidden;">
-                <div id="quiz-progress-bar" style="background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); height: 100%; width: 20%; transition: width 0.3s;"></div>
-              </div>
-            </div>
-
-            <!-- Quiz Questions Container -->
-            <div id="quiz-questions-m11">
-              <!-- Q1 -->
-              <div class="quiz-question-m11" data-question="1" data-correct="1" style="background: white; border-radius: 12px; padding: 20px;">
-                <p style="font-weight: 600; color: #1f2937; margin: 0 0 15px 0; font-size: 16px;">When is the BEST time to file a claim?</p>
-                <div style="display: grid; gap: 8px;">
-                  <button onclick="answerQuizM11(this, 0)" class="quiz-option-m11" data-value="0" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">Within a week</button>
-                  <button onclick="answerQuizM11(this, 1)" class="quiz-option-m11" data-value="1" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">Same day - immediately</button>
-                  <button onclick="answerQuizM11(this, 2)" class="quiz-option-m11" data-value="2" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">After getting other estimates</button>
-                  <button onclick="answerQuizM11(this, 3)" class="quiz-option-m11" data-value="3" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">After the adjuster visits</button>
-                </div>
-              </div>
-
-              <!-- Q2 -->
-              <div class="quiz-question-m11" data-question="2" data-correct="1" style="display: none; background: white; border-radius: 12px; padding: 20px;">
-                <p style="font-weight: 600; color: #1f2937; margin: 0 0 15px 0; font-size: 16px;">What should the homeowner tell insurance about having an estimate?</p>
-                <div style="display: grid; gap: 8px;">
-                  <button onclick="answerQuizM11(this, 0)" class="quiz-option-m11" data-value="0" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">Yes, we have one</button>
-                  <button onclick="answerQuizM11(this, 1)" class="quiz-option-m11" data-value="1" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">No</button>
-                  <button onclick="answerQuizM11(this, 2)" class="quiz-option-m11" data-value="2" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">We're getting one soon</button>
-                  <button onclick="answerQuizM11(this, 3)" class="quiz-option-m11" data-value="3" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">Just the approximate cost</button>
-                </div>
-              </div>
-
-              <!-- Q3 -->
-              <div class="quiz-question-m11" data-question="3" data-correct="1" style="display: none; background: white; border-radius: 12px; padding: 20px;">
-                <p style="font-weight: 600; color: #1f2937; margin: 0 0 15px 0; font-size: 16px;">What does the Claim Authorization Form allow ROOF-ER to do?</p>
-                <div style="display: grid; gap: 8px;">
-                  <button onclick="answerQuizM11(this, 0)" class="quiz-option-m11" data-value="0" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">Start the roof work immediately</button>
-                  <button onclick="answerQuizM11(this, 1)" class="quiz-option-m11" data-value="1" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">Communicate with insurance on homeowner's behalf</button>
-                  <button onclick="answerQuizM11(this, 2)" class="quiz-option-m11" data-value="2" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">Collect payment from insurance</button>
-                  <button onclick="answerQuizM11(this, 3)" class="quiz-option-m11" data-value="3" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">Schedule the installation</button>
-                </div>
-              </div>
-
-              <!-- Q4 -->
-              <div class="quiz-question-m11" data-question="4" data-correct="2" style="display: none; background: white; border-radius: 12px; padding: 20px;">
-                <p style="font-weight: 600; color: #1f2937; margin: 0 0 15px 0; font-size: 16px;">What happens if insurance denies the claim?</p>
-                <div style="display: grid; gap: 8px;">
-                  <button onclick="answerQuizM11(this, 0)" class="quiz-option-m11" data-value="0" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">Homeowner pays full cost</button>
-                  <button onclick="answerQuizM11(this, 1)" class="quiz-option-m11" data-value="1" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">15% cancellation fee applies</button>
-                  <button onclick="answerQuizM11(this, 2)" class="quiz-option-m11" data-value="2" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">The contract is null and void</button>
-                  <button onclick="answerQuizM11(this, 3)" class="quiz-option-m11" data-value="3" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">ROOF-ER appeals automatically</button>
-                </div>
-              </div>
-
-              <!-- Q5 -->
-              <div class="quiz-question-m11" data-question="5" data-correct="1" style="display: none; background: white; border-radius: 12px; padding: 20px;">
-                <p style="font-weight: 600; color: #1f2937; margin: 0 0 15px 0; font-size: 16px;">What is the rescission period for the Insurance Claim Agreement?</p>
-                <div style="display: grid; gap: 8px;">
-                  <button onclick="answerQuizM11(this, 0)" class="quiz-option-m11" data-value="0" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">24 hours</button>
-                  <button onclick="answerQuizM11(this, 1)" class="quiz-option-m11" data-value="1" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">3 business days</button>
-                  <button onclick="answerQuizM11(this, 2)" class="quiz-option-m11" data-value="2" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">7 days</button>
-                  <button onclick="answerQuizM11(this, 3)" class="quiz-option-m11" data-value="3" style="display: flex; align-items: center; gap: 10px; padding: 14px 18px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; font-size: 14px; color: #374151;">30 days</button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Quiz Final Results (hidden initially) -->
-            <div id="quiz-results-m11" style="display: none; background: white; border-radius: 12px; padding: 30px; text-align: center;"></div>
-          </div>
-
-          <div class="module-completion-section" id="module-complete-section" style="display: none; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 30px; border-radius: 16px; text-align: center; margin-top: 30px;">
-            <p style="color: #166534; font-size: 16px; margin: 0 0 20px 0; font-weight: 500;">🎉 Ready to continue?</p>
-            <button class="complete-module-btn" onclick="completeModule('filing-claim-closing')" style="padding: 16px 40px; font-size: 16px; font-weight: 600; background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: white; border: none; border-radius: 12px; cursor: pointer; transition: all 0.3s;">
-              Complete Module & Continue →
-            </button>
-          </div>
-        </div>
+  <div class="content-card" style="background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%); padding: 0; overflow: hidden;">
+    <!-- Hero Header -->
+    <div style="background: linear-gradient(135deg, #0891b2 0%, #06b6d4 50%, #22d3ee 100%); padding: 40px 30px; text-align: center; color: white;">
+      <div style="font-size: 48px; margin-bottom: 15px;">📋</div>
+      <h1 style="margin: 0 0 10px 0; font-size: 28px; font-weight: 700;">Filing the Claim & Closing</h1>
+      <p style="margin: 0; opacity: 0.9; font-size: 16px;">Claim filing, contingency, and claim authorization - step by step</p>
     </div>
+
+    <div style="padding: 30px;">
+      <!-- Quick Stats -->
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;">
+        <div style="background: linear-gradient(135deg, #ecfeff 0%, #cffafe 100%); padding: 20px; border-radius: 12px; text-align: center;">
+          <div style="font-size: 28px; font-weight: 700; color: #0891b2;">🧾</div>
+          <div style="font-size: 13px; color: #0e7490;">Info Sheet Ready</div>
+        </div>
+        <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 20px; border-radius: 12px; text-align: center;">
+          <div style="font-size: 28px; font-weight: 700; color: #16a34a;">2</div>
+          <div style="font-size: 13px; color: #166534;">Key Forms</div>
+        </div>
+        <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 20px; border-radius: 12px; text-align: center;">
+          <div style="font-size: 28px; font-weight: 700; color: #d97706;">24-48</div>
+          <div style="font-size: 13px; color: #92400e;">Adjuster Contact (hrs)</div>
+        </div>
+      </div>
+
+      <!-- Claim Filing Information Sheet -->
+      <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+        <span style="background: #ecfeff; padding: 8px 12px; border-radius: 8px;">🧾</span>
+        Claim Filing Information Sheet
+      </h2>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-bottom: 20px;">
+        <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-radius: 16px; padding: 20px; border-left: 4px solid #3b82f6;">
+          <h3 style="color: #1e40af; font-size: 16px; margin: 0 0 12px 0;">What to tell the insurance company</h3>
+          <ul style="color: #374151; font-size: 14px; line-height: 1.7; margin: 0; padding-left: 18px;">
+            <li>"I would like to file a claim for hail and wind damage" (never only wind)</li>
+            <li>Damaged items: roof, downspouts, gutters, window wraps, siding, etc.</li>
+            <li>Have you selected a contractor? Yes, Roof-ER</li>
+            <li>Do you have an estimate? No</li>
+          </ul>
+        </div>
+        <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 16px; padding: 20px; border-left: 4px solid #16a34a;">
+          <h3 style="color: #166534; font-size: 16px; margin: 0 0 12px 0;">Questions they may ask</h3>
+          <ul style="color: #374151; font-size: 14px; line-height: 1.7; margin: 0; padding-left: 18px;">
+            <li>Date of loss and time of storm</li>
+            <li>Hail size (usually 1-1.5 inches)</li>
+            <li>Type of shingle and/or siding</li>
+            <li>Interior damage? Is the house livable?</li>
+            <li>Any personal property damaged? Lose power?</li>
+            <li>Is the roof steeper than a staircase? Access difficulty?</li>
+          </ul>
+        </div>
+      </div>
+
+      <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px; margin-bottom: 20px;">
+        <img src="/assets/training/module11/claim-filing-info-sheet.png" alt="Claim Filing Information Sheet slide" style="width: 100%; border-radius: 12px; display: block;">
+        <div style="text-align: center; color: #6b7280; font-size: 12px; margin-top: 8px;">Claim Filing Information Sheet (reference)</div>
+      </div>
+
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 25px;">
+        <strong style="color: #0f172a;">Field Translator:</strong>
+        <span style="color: #475569;"> 20+ languages for the doors.</span>
+      </div>
+
+      <div style="background: white; border: 2px solid #e9d5ff; border-radius: 16px; padding: 20px; margin-bottom: 35px;">
+        <h3 style="color: #7c3aed; font-size: 16px; margin: 0 0 12px 0;">Example Customer Info Sheet</h3>
+        <div style="color: #374151; font-size: 14px; line-height: 1.7;">
+          <div><strong>Let them know:</strong> You want to file a claim for hail and wind damage</div>
+          <div><strong>Damaged:</strong> Roof and aluminum siding</div>
+          <div><strong>Date of storm:</strong> September 8, 2023</div>
+          <div><strong>Time of storm:</strong> Around 5pm</div>
+          <div><strong>Size of hail:</strong> 1 inch</div>
+          <div><strong>Type of shingle:</strong> Asphalt</div>
+          <div><strong>Type of siding:</strong> Aluminum</div>
+          <div><strong>Interior damage:</strong> Yes, 1 bedroom upstairs</div>
+          <div><strong>House livable:</strong> Yes</div>
+          <div><strong>Personal property damaged:</strong> No</div>
+          <div><strong>Lost power:</strong> No</div>
+          <div><strong>Selected contractor:</strong> Yes, Roof ER out of Vienna, VA (all info on business card)</div>
+          <div><strong>Estimate:</strong> No</div>
+          <div><strong>Roof steep / access:</strong> No, 1-story access</div>
+        </div>
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; margin-top: 16px;">
+          <img src="/assets/training/module11/example-customer-info-sheet.png" alt="Example customer info sheet slide" style="width: 100%; border-radius: 10px; display: block;">
+        </div>
+        <div style="margin-top: 12px; color: #6b7280; font-size: 13px;">
+          After the claim is filed, ask for the claim number and whether an adjuster has been assigned.
+        </div>
+      </div>
+
+      <!-- Calling the Insurance Company -->
+      <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+        <span style="background: #fef3c7; padding: 8px 12px; border-radius: 8px;">📞</span>
+        Calling the Insurance Company
+      </h2>
+
+      <div style="background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%); border-radius: 16px; padding: 20px; margin-bottom: 30px;">
+        <ul style="color: #374151; font-size: 14px; line-height: 1.7; margin: 0; padding-left: 18px;">
+          <li>Examples will be demonstrated in training</li>
+          <li>We will walk through a few example calls</li>
+          <li>Connect with your trainers on how to assist clients with filing the claim</li>
+        </ul>
+      </div>
+      <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px; margin-bottom: 35px;">
+        <img src="/assets/training/module11/calling-insurance-company.png" alt="Calling the Insurance Company slide" style="width: 100%; border-radius: 12px; display: block;">
+      </div>
+
+      <!-- Sales App -->
+      <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+        <span style="background: #e0f2fe; padding: 8px 12px; border-radius: 8px;">📱</span>
+        Sales App (iPad Only)
+      </h2>
+
+      <div style="background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); border-radius: 16px; padding: 20px; margin-bottom: 35px;">
+        <p style="color: #0f172a; font-size: 14px; margin: 0;">Use the Sales App on your iPad to capture claim details and submit forms.</p>
+      </div>
+      <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px; margin-bottom: 35px;">
+        <img src="/assets/training/module11/sales-app-ipad.png" alt="Sales App on iPad slide" style="width: 100%; border-radius: 12px; display: block;">
+      </div>
+
+      <!-- Contingency & Claim Authorization Script -->
+      <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+        <span style="background: #f0fdf4; padding: 8px 12px; border-radius: 8px;">✅</span>
+        Contingency & Claim Authorization Script
+      </h2>
+
+      <div style="display: grid; gap: 15px; margin-bottom: 35px;">
+        <div style="background: white; border: 2px solid #dcfce7; border-radius: 16px; padding: 20px;">
+          <h3 style="color: #166534; font-size: 16px; margin: 0 0 12px 0;">1) After filing the claim</h3>
+          <p style="color: #374151; font-size: 14px; line-height: 1.7; margin: 0;">"Okay, perfect! Like they said, an adjuster will be reaching out to you in the next 24 to 48 hours to schedule the inspection. The absolute most important part of this process is that I am at this inspection. Insurance companies do not want to pay out. They are trying to mitigate their losses after storms. I am there as your representation to make sure you get a fair shake."</p>
+          <p style="color: #166534; font-size: 13px; margin: 10px 0 0 0; font-style: italic;">Turn the iPad so you and the homeowner can see.</p>
+        </div>
+
+        <div style="background: white; border: 2px solid #dbeafe; border-radius: 16px; padding: 20px;">
+          <h3 style="color: #1e40af; font-size: 16px; margin: 0 0 12px 0;">2) Contingency Agreement</h3>
+          <p style="color: #374151; font-size: 14px; line-height: 1.7; margin: 0 0 10px 0;">"This basic agreement backs you as the homeowner by guaranteeing you that your only cost will be your deductible if we get you fully approved. If it is a partial approval or denial, first we will fight and jump through the necessary hoops to turn that into a full approval; but if we are not able to get you fully approved, this contract is null and void and you do not owe us a penny."</p>
+          <p style="color: #374151; font-size: 14px; line-height: 1.7; margin: 0;">"What is in it for us is we just want to get to do the work. This agreement commits you to using us if we hold up our end of the bargain and achieve a full approval."</p>
+          <div style="color: #1e40af; font-size: 13px; margin-top: 10px;">
+            <strong>You sign</strong> • <strong>They sign</strong>
+          </div>
+        </div>
+
+        <div style="background: white; border: 2px solid #e9d5ff; border-radius: 16px; padding: 20px;">
+          <h3 style="color: #7c3aed; font-size: 16px; margin: 0 0 12px 0;">3) Claim Authorization Form</h3>
+          <p style="color: #374151; font-size: 14px; line-height: 1.7; margin: 0 0 10px 0;">"This next form is our Claim Authorization form. Very simple, it allows us to communicate with your insurance company. I will be here for the inspection and we will also communicate with them through email and phone calls so you do not have to be a middle-man. Of course, I will always keep you looped in with our communication by CCing you in all emails and updating you on any conversations we have."</p>
+          <div style="color: #7c3aed; font-size: 13px;">
+            <strong>They sign</strong> • Press Submit, enter password "roofer" if it asks.
+          </div>
+        </div>
+
+        <div style="background: white; border: 2px solid #fee2e2; border-radius: 16px; padding: 20px;">
+          <h3 style="color: #b91c1c; font-size: 16px; margin: 0 0 12px 0;">4) Final handoff</h3>
+          <p style="color: #374151; font-size: 14px; line-height: 1.7; margin: 0;">"Alright, we are all set! Again, the most important part of this process is that I am here when the insurance company comes out. Ideally you can have them call me to schedule that directly. If they call me, great! But, regardless, please get the adjuster information (name, email, phone number) and send that over to me so that I can communicate with them before the inspection. If they insist on scheduling with you, go ahead and pencil in a time and avoid these times and days [provide your schedule]."</p>
+          <p style="color: #b91c1c; font-size: 13px; margin: 10px 0 0 0;">Answer any questions the homeowner may have.</p>
+          <p style="color: #374151; font-size: 14px; margin: 8px 0 0 0;">"Thank you, sir/ma'am. Looking forward to seeing you on the day of inspection. You have my contact information on my card if you need anything else."</p>
+        </div>
+      </div>
+
+      <!-- Lesson Plan -->
+      <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+        <span style="background: #f3e8ff; padding: 8px 12px; border-radius: 8px;">🧭</span>
+        Lesson Plan: Filing to Signature
+      </h2>
+
+      <div style="background: linear-gradient(135deg, #f3e8ff 0%, #ede9fe 100%); border-radius: 16px; padding: 25px; margin-bottom: 35px;">
+        <ol style="color: #4c1d95; font-size: 14px; line-height: 1.8; margin: 0; padding-left: 18px;">
+          <li>Prep the homeowner with the Claim Filing Information Sheet.</li>
+          <li>File the claim together and capture the claim number.</li>
+          <li>Ask for adjuster contact information or assignment status.</li>
+          <li>Deliver the contingency agreement script and collect signatures.</li>
+          <li>Present the Claim Authorization form and submit (password "roofer" if prompted).</li>
+          <li>Set expectations and confirm how adjuster scheduling will be handled.</li>
+        </ol>
+      </div>
+
+      <!-- Key Documents Section -->
+      <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+        <span style="background: #f3e8ff; padding: 8px 12px; border-radius: 8px;">📎</span>
+        View Key Documents
+      </h2>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 35px;">
+        <!-- Claim Authorization PDF -->
+        <div style="background: white; border: 2px solid #e9d5ff; border-radius: 16px; padding: 25px; text-align: center;">
+          <div style="font-size: 48px; margin-bottom: 15px;">📄</div>
+          <h3 style="color: #7c3aed; font-size: 18px; margin: 0 0 10px 0;">Claim Authorization Form</h3>
+          <p style="color: #6b7280; font-size: 14px; margin: 0 0 15px 0; line-height: 1.5;">Authorizes ROOF-ER to communicate with the homeowner's insurance company on their behalf.</p>
+          <div style="background: #f3e8ff; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+            <p style="color: #6b21a8; font-size: 13px; margin: 0;"><strong>When to use:</strong> After filing the claim</p>
+          </div>
+          <a href="/resources/Claim Authorization Form.pdf" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; padding: 12px 24px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: all 0.3s;">
+            📥 View PDF
+          </a>
+        </div>
+
+        <!-- Insurance Claim Agreement (Contingency) PDF -->
+        <div style="background: white; border: 2px solid #e9d5ff; border-radius: 16px; padding: 25px; text-align: center;">
+          <div style="font-size: 48px; margin-bottom: 15px;">📋</div>
+          <h3 style="color: #7c3aed; font-size: 18px; margin: 0 0 10px 0;">Insurance Claim Agreement</h3>
+          <p style="color: #6b7280; font-size: 14px; margin: 0 0 15px 0; line-height: 1.5;">The contingency contract - only cost to homeowner is their deductible if fully approved.</p>
+          <div style="background: #f3e8ff; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+            <p style="color: #6b21a8; font-size: 13px; margin: 0;"><strong>Key term:</strong> Null and void if not fully approved</p>
+          </div>
+          <a href="/resources/DMV Blank Contingency.pdf" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; padding: 12px 24px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: all 0.3s;">
+            📥 View PDF
+          </a>
+        </div>
+      </div>
+
+      <!-- End Activity -->
+      <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+        <span style="background: #fef2f2; padding: 8px 12px; border-radius: 8px;">🎯</span>
+        End Activity: Call Practice Drill
+      </h2>
+
+      <div style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-radius: 16px; padding: 25px; margin-bottom: 30px;">
+        <p style="color: #991b1b; font-size: 14px; margin: 0 0 12px 0;">Pair up and run a full claim filing scenario. One person is the homeowner, one is the rep. Use the script above and check each item as you cover it.</p>
+        <div style="display: grid; gap: 10px; color: #7f1d1d; font-size: 14px;">
+          <label><input type="checkbox"> Claim filed for hail and wind damage</label>
+          <label><input type="checkbox"> Claim number captured</label>
+          <label><input type="checkbox"> Adjuster info requested</label>
+          <label><input type="checkbox"> Contingency agreement explained and signed</label>
+          <label><input type="checkbox"> Claim Authorization form signed and submitted</label>
+          <label><input type="checkbox"> Adjuster scheduling expectations set</label>
+        </div>
+      </div>
+
+      <div class="module-completion-section" id="module-complete-section" style="display: none; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 30px; border-radius: 16px; text-align: center; margin-top: 30px;">
+        <p style="color: #166534; font-size: 16px; margin: 0 0 20px 0; font-weight: 500;">🎉 Ready to continue?</p>
+        <button class="complete-module-btn" onclick="completeModule('filing-claim-closing')" style="padding: 16px 40px; font-size: 16px; font-weight: 600; background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: white; border: none; border-radius: 12px; cursor: pointer; transition: all 0.3s;">
+          Complete Module & Continue →
+        </button>
+      </div>
+    </div>
+  </div>
   `,
   'role-play': `
     <div class="content-card agnes-roleplay-container" style="background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%); padding: 0; overflow: hidden;">
@@ -6820,157 +6742,6 @@ function initDamageMatchingGame() {
 (window as any).selectSeqItem = selectSeqItem;
 (window as any).checkDocSequence = checkDocSequence;
 (window as any).resetDocSequence = resetDocSequence;
-
-// --- Module 11 Mini Quiz (Progressive) ---
-let quizStateM11 = {
-  currentQuestion: 1,
-  correct: 0,
-  total: 5
-};
-
-function answerQuizM11(button: HTMLElement, selectedValue: number) {
-  const questionDiv = button.closest('.quiz-question-m11') as HTMLElement;
-  if (!questionDiv) return;
-
-  const correctAnswer = parseInt(questionDiv.dataset.correct || '0');
-  const isCorrect = selectedValue === correctAnswer;
-
-  // Disable all buttons in this question
-  questionDiv.querySelectorAll('.quiz-option-m11').forEach(btn => {
-    (btn as HTMLButtonElement).disabled = true;
-    (btn as HTMLElement).style.cursor = 'default';
-  });
-
-  // Show feedback on selected answer
-  if (isCorrect) {
-    quizStateM11.correct++;
-    button.style.background = 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)';
-    button.style.border = '2px solid #16a34a';
-    button.style.color = '#166534';
-  } else {
-    button.style.background = 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)';
-    button.style.border = '2px solid #dc2626';
-    button.style.color = '#991b1b';
-    // Highlight correct answer
-    const correctBtn = questionDiv.querySelector(`[data-value="${correctAnswer}"]`) as HTMLElement;
-    if (correctBtn) {
-      correctBtn.style.background = 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)';
-      correctBtn.style.border = '2px solid #16a34a';
-      correctBtn.style.color = '#166534';
-    }
-  }
-
-  // Update score display
-  const scoreDisplay = document.getElementById('quiz-score-display');
-  if (scoreDisplay) {
-    scoreDisplay.textContent = `Score: ${quizStateM11.correct}/${quizStateM11.currentQuestion}`;
-  }
-
-  // Move to next question after a short delay
-  setTimeout(() => {
-    if (quizStateM11.currentQuestion < quizStateM11.total) {
-      // Hide current question
-      questionDiv.style.display = 'none';
-
-      // Show next question
-      quizStateM11.currentQuestion++;
-      const nextQuestion = document.querySelector(`[data-question="${quizStateM11.currentQuestion}"]`) as HTMLElement;
-      if (nextQuestion) {
-        nextQuestion.style.display = 'block';
-      }
-
-      // Update progress bar
-      const progressBar = document.getElementById('quiz-progress-bar');
-      const currentNum = document.getElementById('current-q-num');
-      if (progressBar) {
-        progressBar.style.width = `${(quizStateM11.currentQuestion / quizStateM11.total) * 100}%`;
-      }
-      if (currentNum) {
-        currentNum.textContent = String(quizStateM11.currentQuestion);
-      }
-    } else {
-      // Quiz complete - show results
-      showQuizResultsM11();
-    }
-  }, 800);
-}
-
-function showQuizResultsM11() {
-  const questionsContainer = document.getElementById('quiz-questions-m11');
-  const progressBar = document.getElementById('quiz-progress-m11');
-  const resultsDiv = document.getElementById('quiz-results-m11');
-
-  if (questionsContainer) questionsContainer.style.display = 'none';
-  if (progressBar) progressBar.style.display = 'none';
-
-  if (resultsDiv) {
-    const score = Math.round((quizStateM11.correct / quizStateM11.total) * 100);
-    const passed = score >= 80;
-
-    if (passed) {
-      resultsDiv.innerHTML = `
-        <div style="font-size: 64px; margin-bottom: 15px;">🎉</div>
-        <h3 style="color: #166534; font-size: 24px; margin: 0 0 10px 0;">Great job!</h3>
-        <p style="color: #374151; font-size: 18px; margin: 0 0 20px 0;">You got <strong>${quizStateM11.correct}/${quizStateM11.total}</strong> correct (${score}%)</p>
-        <div style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-          <p style="color: #166534; margin: 0; font-weight: 500;">You're ready to move on!</p>
-        </div>
-        <button onclick="resetQuizM11()" style="background: linear-gradient(135deg, #64748b 0%, #94a3b8 100%); color: white; border: none; padding: 12px 24px; border-radius: 25px; font-weight: 600; font-size: 14px; cursor: pointer;">
-          🔄 Retake Quiz
-        </button>
-      `;
-      // Show module completion
-      const completeSection = document.getElementById('module-complete-section');
-      if (completeSection) completeSection.style.display = 'block';
-    } else {
-      resultsDiv.innerHTML = `
-        <div style="font-size: 64px; margin-bottom: 15px;">📚</div>
-        <h3 style="color: #991b1b; font-size: 24px; margin: 0 0 10px 0;">Keep studying!</h3>
-        <p style="color: #374151; font-size: 18px; margin: 0 0 20px 0;">You got <strong>${quizStateM11.correct}/${quizStateM11.total}</strong> correct (${score}%)</p>
-        <div style="background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-          <p style="color: #991b1b; margin: 0; font-weight: 500;">You need 80% to pass. Review the material and try again!</p>
-        </div>
-        <button onclick="resetQuizM11()" style="background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); color: white; border: none; padding: 14px 28px; border-radius: 25px; font-weight: 600; font-size: 16px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-          🔄 Try Again
-        </button>
-      `;
-    }
-    resultsDiv.style.display = 'block';
-  }
-}
-
-function resetQuizM11() {
-  quizStateM11 = { currentQuestion: 1, correct: 0, total: 5 };
-
-  const questionsContainer = document.getElementById('quiz-questions-m11');
-  const progressBar = document.getElementById('quiz-progress-m11');
-  const resultsDiv = document.getElementById('quiz-results-m11');
-  const progressBarFill = document.getElementById('quiz-progress-bar');
-  const currentNum = document.getElementById('current-q-num');
-  const scoreDisplay = document.getElementById('quiz-score-display');
-
-  if (questionsContainer) questionsContainer.style.display = 'block';
-  if (progressBar) progressBar.style.display = 'block';
-  if (resultsDiv) resultsDiv.style.display = 'none';
-  if (progressBarFill) progressBarFill.style.width = '20%';
-  if (currentNum) currentNum.textContent = '1';
-  if (scoreDisplay) scoreDisplay.textContent = '';
-
-  // Reset all questions
-  document.querySelectorAll('.quiz-question-m11').forEach((q, index) => {
-    (q as HTMLElement).style.display = index === 0 ? 'block' : 'none';
-    q.querySelectorAll('.quiz-option-m11').forEach(btn => {
-      (btn as HTMLButtonElement).disabled = false;
-      (btn as HTMLElement).style.background = '#f8fafc';
-      (btn as HTMLElement).style.border = '2px solid #e2e8f0';
-      (btn as HTMLElement).style.color = '#374151';
-      (btn as HTMLElement).style.cursor = 'pointer';
-    });
-  });
-}
-
-(window as any).answerQuizM11 = answerQuizM11;
-(window as any).resetQuizM11 = resetQuizM11;
 
 // --- Game Logic ---
 let salesCycleAttempts = 0;
