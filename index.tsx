@@ -301,20 +301,19 @@ const FINAL_EXAM_MCQ: MCQQuestion[] = [
   { id: 'mcq-25', module: 10, question: 'What is considered wind damage on a roof?', options: ['Round spots', 'Lifted, creased, or missing shingles', 'Granule loss only', 'Color fading'], correctAnswer: 1, explanation: 'Wind damage shows as lifted edges, creased shingles, or completely missing shingles.' },
   { id: 'mcq-26', module: 10, question: 'What is the first step in the Empathy Framework when handling objections?', options: ['Educate them on the process', 'Offer a solution right away', 'Acknowledge their concern', 'Ask for the sale'], correctAnswer: 2, explanation: 'The first step in the Empathy Framework is to acknowledge their concern - show you understand before educating.' },
 
-  // Module 11: Filing Claims & Closing (3 MCQ)
+  // Module 11: Filing Claims & Closing (6 MCQ)
   { id: 'mcq-27', module: 11, question: 'When is the BEST time to file a claim?', options: ['Within a week', 'Same day - immediately', 'After getting other estimates', 'After the adjuster visits'], correctAnswer: 1, explanation: 'File the claim the same day, immediately after finding damage - timing is critical for insurance claims.' },
   { id: 'mcq-28', module: 11, question: 'What is a supplement in the insurance claim process?', options: ['A vitamin', 'Additional documentation for work not covered in initial estimate', 'The homeowner\'s payment', 'A second insurance policy'], correctAnswer: 1, explanation: 'A supplement requests additional funds for work discovered after the initial estimate.' },
   { id: 'mcq-29', module: 11, question: 'Who typically meets with the insurance adjuster at the property?', options: ['Only the homeowner', 'The Roof E.R. representative', 'The neighbor', 'No one - it\'s done remotely'], correctAnswer: 1, explanation: 'A Roof E.R. representative meets the adjuster to ensure all damage is properly documented.' },
 
-  // Module 12: Closing Objections (3 MCQ)
-  { id: 'mcq-30', module: 12, question: 'What is the "Assumptive Close"?', options: ['Assuming they won\'t buy', 'Acting as if they\'ve already agreed and moving to next steps', 'Assuming the insurance will deny', 'Guessing their concerns'], correctAnswer: 1, explanation: 'Assumptive close: proceed as if they\'ve said yes - "I\'ll get that contract texted to you now."' },
-  { id: 'mcq-31', module: 12, question: 'The homeowner says "I want to get other quotes." Best response?', options: ['Fine, get 10 quotes', 'Explain you\'re a claims specialist, not just a roofer, and what sets you apart', 'Lower your price immediately', 'Criticize other companies'], correctAnswer: 1, explanation: 'Differentiate by explaining you\'re a claims specialist who handles insurance, not just a roofer.' },
-  { id: 'mcq-32', module: 12, question: 'What should you do immediately after getting a signature?', options: ['Leave quickly', 'Set clear next-step expectations and timeline', 'Ask for referrals only', 'Nothing - job is done'], correctAnswer: 1, explanation: 'Set clear expectations: what happens next, when they\'ll hear from you, timeline for process.' },
+  { id: 'mcq-30', module: 11, question: 'What is the "Assumptive Close"?', options: ['Assuming they won\'t buy', 'Acting as if they\'ve already agreed and moving to next steps', 'Assuming the insurance will deny', 'Guessing their concerns'], correctAnswer: 1, explanation: 'Assumptive close: proceed as if they\'ve said yes - "I\'ll get that contract texted to you now."' },
+  { id: 'mcq-31', module: 11, question: 'The homeowner says "I want to get other quotes." Best response?', options: ['Fine, get 10 quotes', 'Explain you\'re a claims specialist, not just a roofer, and what sets you apart', 'Lower your price immediately', 'Criticize other companies'], correctAnswer: 1, explanation: 'Differentiate by explaining you\'re a claims specialist who handles insurance, not just a roofer.' },
+  { id: 'mcq-32', module: 11, question: 'What should you do immediately after getting a signature?', options: ['Leave quickly', 'Set clear next-step expectations and timeline', 'Ask for referrals only', 'Nothing - job is done'], correctAnswer: 1, explanation: 'Set clear expectations: what happens next, when they\'ll hear from you, timeline for process.' },
 
-  // Module 13: Sales Cycle & Job Flow (3 MCQ)
-  { id: 'mcq-33', module: 13, question: 'What are the 5 phases of the Roof E.R. sales cycle?', options: ['Call, Sell, Install, Bill, Collect', 'Generating New Business, Adjuster Meeting, Project Meeting, Installation, Final Payment', 'Knock, Pitch, Sign, Build, Done', 'Advertise, Estimate, Contract, Build, Invoice'], correctAnswer: 1, explanation: 'The 5 phases are: Generating New Business → Adjuster Meeting → Project Meeting → Installation → Final Payment.' },
-  { id: 'mcq-34', module: 13, question: 'How long does the total Roof E.R. sales cycle typically take from start to finish?', options: ['1-2 weeks', '3-4 weeks', '9-16 weeks', '6-12 months'], correctAnswer: 2, explanation: 'The complete sales cycle from initial knock to final payment typically takes 9-16 weeks.' },
-  { id: 'mcq-35', module: 13, question: 'What are the main stages of the Roof E.R. sales cycle?', options: ['Call, Sell, Install', 'Knock, Inspect, File claim, Meet adjuster, Install, Collect', 'Email, Quote, Invoice', 'Advertise, Estimate, Build'], correctAnswer: 1, explanation: 'Full cycle: Door knock → Inspection → File claim → Adjuster meeting → Installation → Collection.' }
+  // Module 12: Sales Cycle & Job Flow (3 MCQ)
+  { id: 'mcq-33', module: 12, question: 'What are the 5 phases of the Roof E.R. sales cycle?', options: ['Call, Sell, Install, Bill, Collect', 'Generating New Business, Adjuster Meeting, Project Meeting, Installation, Final Payment', 'Knock, Pitch, Sign, Build, Done', 'Advertise, Estimate, Contract, Build, Invoice'], correctAnswer: 1, explanation: 'The 5 phases are: Generating New Business → Adjuster Meeting → Project Meeting → Installation → Final Payment.' },
+  { id: 'mcq-34', module: 12, question: 'How long does the total Roof E.R. sales cycle typically take from start to finish?', options: ['1-2 weeks', '3-4 weeks', '9-16 weeks', '6-12 months'], correctAnswer: 2, explanation: 'The complete sales cycle from initial knock to final payment typically takes 9-16 weeks.' },
+  { id: 'mcq-35', module: 12, question: 'What are the main stages of the Roof E.R. sales cycle?', options: ['Call, Sell, Install', 'Knock, Inspect, File claim, Meet adjuster, Install, Collect', 'Email, Quote, Invoice', 'Advertise, Estimate, Build'], correctAnswer: 1, explanation: 'Full cycle: Door knock → Inspection → File claim → Adjuster meeting → Installation → Collection.' }
 ];
 
 const FINAL_EXAM_FIB: FIBQuestion[] = [
@@ -346,7 +345,7 @@ const FINAL_EXAM_FIB: FIBQuestion[] = [
   { id: 'fib-9', module: 11, question: 'The remaining insurance funds that the insurance company holds until we complete the work are called _____.', acceptableAnswers: ['depreciation', 'Depreciation', 'DEPRECIATION', 'depreciation holdback', 'Depreciation Holdback'], explanation: 'The depreciation holdback is released by the insurance company after the work is completed.' },
 
   // Assumptive close
-  { id: 'fib-10', module: 12, question: 'The _____ close means acting as if they\'ve already agreed and moving forward.', acceptableAnswers: ['assumptive', 'Assumptive', 'ASSUMPTIVE'], explanation: 'The assumptive close proceeds as if they\'ve already said yes.' }
+  { id: 'fib-10', module: 11, question: 'The _____ close means acting as if they\'ve already agreed and moving forward.', acceptableAnswers: ['assumptive', 'Assumptive', 'ASSUMPTIVE'], explanation: 'The assumptive close proceeds as if they\'ve already said yes.' }
 ];
 
 const FINAL_EXAM_SA: SAQuestion[] = [
@@ -397,7 +396,6 @@ const MODULE_ORDER = [
   'post-inspection-objections',
   'damage-identification',
   'filing-claim-closing',
-  'closing-objections',
   'sales-cycle-job-flow',
   'role-play',
   'final-exam'
@@ -427,7 +425,6 @@ const MODULE_REQUIREMENTS: Record<string, ModuleRequirements> = {
   'post-inspection-objections': { needsTime: 60, needsScroll: true },
   'damage-identification': { needsQuiz: true, needsScroll: true },
   'filing-claim-closing': { needsTime: 60, needsScroll: true },
-  'closing-objections': { needsTime: 60, needsScroll: true },
   'sales-cycle-job-flow': { needsTime: 60, needsScroll: true },
   'role-play': { needsScroll: true }, // Special: unlock when role-play starts
   'final-exam': { needsQuiz: true, needsScroll: true },
@@ -1267,7 +1264,6 @@ function getNextTrainingModule(): { module: string; displayName: string } {
     'post-inspection-objections': 'Post-Inspection Objections',
     'damage-identification': 'Damage Identification',
     'filing-claim-closing': 'Filing the Claim & Closing',
-    'closing-objections': 'Closing Objections',
     'sales-cycle-job-flow': 'The Sales Cycle & Job Flow',
     'role-play': 'AI Role-Play',
     'final-exam': 'Final Exam'
@@ -1379,7 +1375,7 @@ async function initMyPage() {
 
   // Update stats
   const modulesEl = document.getElementById('stat-modules');
-  if (modulesEl) modulesEl.textContent = `${completedModulesCount}/16`;
+  if (modulesEl) modulesEl.textContent = `${completedModulesCount}/${MODULE_ORDER.length}`;
 
   const streakEl = document.getElementById('stat-streak');
   if (streakEl) streakEl.textContent = streak.toString();
@@ -1396,8 +1392,8 @@ async function initMyPage() {
   // Determine next milestone
   const milestoneEl = document.getElementById('stat-milestone');
   if (milestoneEl) {
-    if (completedModulesCount < 15) {
-      const remaining = 15 - completedModulesCount;
+    if (completedModulesCount < MODULE_ORDER.length) {
+      const remaining = MODULE_ORDER.length - completedModulesCount;
       milestoneEl.textContent = `${remaining} modules`;
     } else {
       milestoneEl.textContent = 'Complete!';
@@ -1410,7 +1406,7 @@ async function initMyPage() {
   if (continueBtnText) {
     if (completedModulesCount === 0) {
       continueBtnText.textContent = 'Start Training';
-    } else if (completedModulesCount >= 16) {
+    } else if (completedModulesCount >= MODULE_ORDER.length) {
       continueBtnText.textContent = 'Review Training';
     } else {
       continueBtnText.textContent = `Continue - ${nextModule.displayName}`;
@@ -1749,7 +1745,7 @@ const trainingContent = {
           <div class="stat-icon modules-icon">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/></svg>
           </div>
-          <div class="stat-value" id="stat-modules">0/16</div>
+          <div class="stat-value" id="stat-modules">0/${MODULE_ORDER.length}</div>
           <div class="stat-label">Modules Completed</div>
         </div>
         <div class="stat-card">
@@ -5400,229 +5396,12 @@ trainingContent['filing-claim-closing'] = trainingContent['claim-closing'] || `
   <div class="content-card"><h1>Filing the Claim & Closing</h1><p>Content coming soon.</p></div>
 `;
 
-// 12. Closing Objections (new) — ties into Filing the Claim & Closing
-trainingContent['closing-objections'] = `
-  <div class="content-card" style="background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%); padding: 0; overflow: hidden;">
-    <!-- Hero Header -->
-    <div style="background: linear-gradient(135deg, #dc2626 0%, #ef4444 50%, #f87171 100%); padding: 40px 30px; text-align: center; color: white;">
-      <div style="font-size: 48px; margin-bottom: 15px;">🎯</div>
-      <h1 style="margin: 0 0 10px 0; font-size: 28px; font-weight: 700;">Closing Objections</h1>
-      <p style="margin: 0; opacity: 0.9; font-size: 16px;">Master the final hurdles to seal the deal</p>
-    </div>
-
-    <div style="padding: 30px;">
-      <!-- Quick Stats -->
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;">
-        <div style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); padding: 20px; border-radius: 12px; text-align: center;">
-          <div style="font-size: 28px; font-weight: 700; color: #dc2626;">6</div>
-          <div style="font-size: 13px; color: #991b1b;">Key Objections</div>
-        </div>
-        <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 20px; border-radius: 12px; text-align: center;">
-          <div style="font-size: 28px; font-weight: 700; color: #16a34a;">4</div>
-          <div style="font-size: 13px; color: #166534;">Closing Phrases</div>
-        </div>
-        <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 20px; border-radius: 12px; text-align: center;">
-          <div style="font-size: 28px; font-weight: 700; color: #2563eb;">5</div>
-          <div style="font-size: 13px; color: #1e40af;">Steps to Close</div>
-        </div>
-      </div>
-
-      <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-        <span style="background: #fef2f2; padding: 8px 12px; border-radius: 8px;">🛑</span>
-        Top 6 Closing Objections & Responses
-      </h2>
-
-      <div style="display: grid; gap: 15px; margin-bottom: 35px;">
-        <div style="background: white; border: 2px solid #fee2e2; border-radius: 12px; padding: 20px; border-left: 4px solid #dc2626;">
-          <h3 style="color: #dc2626; font-size: 16px; margin: 0 0 12px 0;">"I want to wait for more bids"</h3>
-          <p style="color: #374151; font-size: 14px; line-height: 1.6; margin: 0;"><strong style="color: #059669;">Response:</strong> "I respect that. But here's what happens: We file TODAY, start your timeline. Other contractors will bid the same - insurance sets the price. Difference is, we're the fastest in the area. Every week you wait is a week later you get your new roof. File now, get other bids while we wait for the adjuster?"</p>
-        </div>
-
-        <div style="background: white; border: 2px solid #fee2e2; border-radius: 12px; padding: 20px; border-left: 4px solid #dc2626;">
-          <h3 style="color: #dc2626; font-size: 16px; margin: 0 0 12px 0;">"I need to think about it"</h3>
-          <p style="color: #374151; font-size: 14px; line-height: 1.6; margin: 0;"><strong style="color: #059669;">Response:</strong> "Absolutely. What specifically do you need to think about? [Listen] ... Most people say that when they're unsure about [objection]. Let me address that: [handle objection]. Does that help?"</p>
-        </div>
-
-        <div style="background: white; border: 2px solid #fee2e2; border-radius: 12px; padding: 20px; border-left: 4px solid #dc2626;">
-          <h3 style="color: #dc2626; font-size: 16px; margin: 0 0 12px 0;">"Call me next week"</h3>
-          <p style="color: #374151; font-size: 14px; line-height: 1.6; margin: 0;"><strong style="color: #059669;">Response:</strong> "I can do that. But can I ask - what changes between now and next week? [Listen] ... My concern is the adjuster calendar and getting clear documentation while everything is fresh. Can we at least file today? You can still compare options after the adjuster report."</p>
-        </div>
-
-        <div style="background: white; border: 2px solid #fee2e2; border-radius: 12px; padding: 20px; border-left: 4px solid #dc2626;">
-          <h3 style="color: #dc2626; font-size: 16px; margin: 0 0 12px 0;">"I'm not sure about the deductible"</h3>
-          <p style="color: #374151; font-size: 14px; line-height: 1.6; margin: 0;"><strong style="color: #059669;">Response:</strong> "I get it - deductibles can sting. But let's look at the math: Your deductible is probably $1,000-2,500. A new roof costs $15,000-25,000. You're paying 5-10% for a brand new roof. Where else can you get that return?"</p>
-        </div>
-
-        <div style="background: white; border: 2px solid #fee2e2; border-radius: 12px; padding: 20px; border-left: 4px solid #dc2626;">
-          <h3 style="color: #dc2626; font-size: 16px; margin: 0 0 12px 0;">"My spouse handles this stuff"</h3>
-          <p style="color: #374151; font-size: 14px; line-height: 1.6; margin: 0;"><strong style="color: #059669;">Response:</strong> "Perfect! Are they home? I can wait. Or we can do a quick 3-way call - takes 5 minutes to walk through the photos. I'm here now, roof's already documented, let's get them on the same page."</p>
-        </div>
-
-        <div style="background: white; border: 2px solid #fee2e2; border-radius: 12px; padding: 20px; border-left: 4px solid #dc2626;">
-          <h3 style="color: #dc2626; font-size: 16px; margin: 0 0 12px 0;">"I don't trust contractors"</h3>
-          <p style="color: #374151; font-size: 14px; line-height: 1.6; margin: 0;"><strong style="color: #059669;">Response:</strong> "I totally understand - this industry has a bad reputation. That's exactly why we do things differently. Contingency agreement means you only pay if we deliver. No money upfront, no risk to you."</p>
-        </div>
-      </div>
-
-      <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-        <span style="background: #f0fdf4; padding: 8px 12px; border-radius: 8px;">✅</span>
-        The Assumptive Close
-      </h2>
-
-      <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 16px; padding: 25px; margin-bottom: 35px;">
-        <p style="color: #166534; font-size: 15px; margin: 0 0 20px 0; font-weight: 500;">After handling objections, assume the sale with these phrases:</p>
-        <div style="display: grid; gap: 12px;">
-          <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 12px;">
-            <span style="background: #16a34a; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">1</span>
-            <span style="color: #374151; font-size: 14px;">"Let me text you that contract now - what's your cell?"</span>
-          </div>
-          <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 12px;">
-            <span style="background: #16a34a; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">2</span>
-            <span style="color: #374151; font-size: 14px;">"I'll mark you down for [color]. Any preference on shingle style?"</span>
-          </div>
-          <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 12px;">
-            <span style="background: #16a34a; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">3</span>
-            <span style="color: #374151; font-size: 14px;">"Perfect! I'll get with my scheduling team and text you a date this week."</span>
-          </div>
-          <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 12px;">
-            <span style="background: #16a34a; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">4</span>
-            <span style="color: #374151; font-size: 14px;">"Great! Let me pull up the contract - I'll walk you through it real quick."</span>
-          </div>
-        </div>
-      </div>
-
-      <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-        <span style="background: #eff6ff; padding: 8px 12px; border-radius: 8px;">📋</span>
-        5-Step Flow to Close
-      </h2>
-
-      <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-radius: 16px; padding: 25px; margin-bottom: 30px;">
-        <div style="display: grid; gap: 12px;">
-          <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
-            <span style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700;">1</span>
-            <span style="color: #1e40af; font-size: 15px; font-weight: 500;">Secure and conduct the inspection</span>
-          </div>
-          <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
-            <span style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700;">2</span>
-            <span style="color: #1e40af; font-size: 15px; font-weight: 500;">Clarify deductible and timeline</span>
-          </div>
-          <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
-            <span style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700;">3</span>
-            <span style="color: #1e40af; font-size: 15px; font-weight: 500;">Present contingency/agreement forms</span>
-          </div>
-          <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
-            <span style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700;">4</span>
-            <span style="color: #1e40af; font-size: 15px; font-weight: 500;">Set expectations for adjuster meeting</span>
-          </div>
-          <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px;">
-            <span style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700;">5</span>
-            <span style="color: #1e40af; font-size: 15px; font-weight: 500;">Stay in regular contact with the Home Owner</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick-Fire Closing Quiz -->
-      <div id="closing-quiz-section" style="margin-top: 40px;">
-        <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-          <span style="background: #fef3c7; padding: 8px 12px; border-radius: 8px;">⚡</span>
-          Quick-Fire Closing Quiz
-        </h2>
-
-        <!-- Start Screen -->
-        <div id="closing-quiz-start" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 16px; padding: 40px; text-align: center;">
-          <div style="font-size: 64px; margin-bottom: 20px;">🎯</div>
-          <h3 style="color: #92400e; font-size: 24px; margin: 0 0 15px 0;">Test Your Closing Skills!</h3>
-          <p style="color: #a16207; font-size: 16px; margin: 0 0 25px 0;">6 objections. 15 seconds each. Pick the BEST response.</p>
-          <div style="display: flex; gap: 20px; justify-content: center; margin-bottom: 25px;">
-            <div style="background: white; padding: 15px 25px; border-radius: 10px;">
-              <div style="font-size: 20px; font-weight: 700; color: #dc2626;">+10</div>
-              <div style="font-size: 12px; color: #6b7280;">Correct Answer</div>
-            </div>
-            <div style="background: white; padding: 15px 25px; border-radius: 10px;">
-              <div style="font-size: 20px; font-weight: 700; color: #16a34a;">+5</div>
-              <div style="font-size: 12px; color: #6b7280;">Speed Bonus (&lt;5s)</div>
-            </div>
-          </div>
-          <button id="start-closing-quiz" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border: none; padding: 16px 40px; border-radius: 30px; font-size: 18px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);">
-            Start Quiz ⚡
-          </button>
-        </div>
-
-        <!-- Quiz Game Area (hidden initially) -->
-        <div id="closing-quiz-game" style="display: none;">
-          <!-- Progress Bar -->
-          <div style="background: #e5e7eb; border-radius: 10px; height: 8px; margin-bottom: 20px; overflow: hidden;">
-            <div id="closing-quiz-progress" style="background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%); height: 100%; width: 0%; transition: width 0.3s;"></div>
-          </div>
-
-          <!-- Header with Question # and Timer -->
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <div style="font-size: 16px; color: #6b7280;">
-              Question <span id="closing-q-num">1</span> of 6
-            </div>
-            <div style="display: flex; align-items: center; gap: 20px;">
-              <div style="font-size: 16px; color: #6b7280;">
-                Score: <span id="closing-score" style="font-weight: 700; color: #f59e0b;">0</span>
-              </div>
-              <div id="closing-timer" style="background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); color: white; padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 18px; min-width: 50px; text-align: center;">
-                15
-              </div>
-            </div>
-          </div>
-
-          <!-- Question Card -->
-          <div style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-radius: 16px; padding: 25px; margin-bottom: 20px; border-left: 5px solid #dc2626;">
-            <div style="font-size: 14px; color: #991b1b; margin-bottom: 8px; font-weight: 600;">Customer says:</div>
-            <div id="closing-question" style="font-size: 22px; color: #1f2937; font-weight: 600; font-style: italic;">"Loading..."</div>
-          </div>
-
-          <!-- Answer Options -->
-          <div id="closing-answers" style="display: grid; gap: 12px;">
-            <!-- Answers populated by JS -->
-          </div>
-
-          <!-- Feedback Area (hidden initially) -->
-          <div id="closing-feedback" style="display: none; margin-top: 20px; padding: 20px; border-radius: 12px; text-align: center;">
-          </div>
-        </div>
-
-        <!-- Results Screen (hidden initially) -->
-        <div id="closing-quiz-results" style="display: none; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 16px; padding: 40px; text-align: center;">
-          <div id="closing-results-icon" style="font-size: 64px; margin-bottom: 20px;">🏆</div>
-          <h3 id="closing-results-title" style="color: #166534; font-size: 24px; margin: 0 0 15px 0;">Quiz Complete!</h3>
-          <p id="closing-results-text" style="color: #374151; font-size: 18px; margin: 0 0 25px 0;">You scored <strong><span id="closing-final-score">0</span></strong> out of 90 possible points</p>
-          <div id="closing-results-breakdown" style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 25px; text-align: left; max-width: 300px; margin-left: auto; margin-right: auto;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-              <span style="color: #6b7280;">Correct Answers:</span>
-              <span id="closing-correct-count" style="font-weight: 700; color: #16a34a;">0/6</span>
-            </div>
-            <div style="display: flex; justify-content: space-between;">
-              <span style="color: #6b7280;">Speed Bonuses:</span>
-              <span id="closing-speed-bonus" style="font-weight: 700; color: #f59e0b;">0</span>
-            </div>
-          </div>
-          <button id="retry-closing-quiz" style="background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); color: white; border: none; padding: 14px 32px; border-radius: 25px; font-size: 16px; font-weight: 600; cursor: pointer; margin-right: 10px;">
-            🔄 Try Again
-          </button>
-        </div>
-      </div>
-
-      <div class="module-completion-section" id="module-complete-section" style="display: none; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 30px; border-radius: 16px; text-align: center; margin-top: 30px;">
-        <p style="color: #166534; font-size: 16px; margin: 0 0 20px 0; font-weight: 500;">🎉 Ready to continue?</p>
-        <button class="complete-module-btn" onclick="completeModule('closing-objections')" style="padding: 16px 40px; font-size: 16px; font-weight: 600; background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: white; border: none; border-radius: 12px; cursor: pointer; transition: all 0.3s;">
-          Complete Module & Continue →
-        </button>
-      </div>
-    </div>
-  </div>
-`;
-
-// 13. Sales Cycle & Job Flow (remap existing)
+// 12. Sales Cycle & Job Flow (remap existing)
 trainingContent['sales-cycle-job-flow'] = trainingContent['sales-cycle'] || `
   <div class="content-card"><h1>Sales Cycle & Job Flow</h1><p>Content coming soon.</p></div>
 `;
 
-// 15. Final Exam (new)
+// 14. Final Exam (new)
 trainingContent['final-exam'] = `
   <div class="content-card" id="final-exam">
     <h1>🎯 Final Certification Exam</h1>
@@ -7325,328 +7104,6 @@ function resetSalesCycleGame() {
 }
 
 (window as any).resetSalesCycleGame = resetSalesCycleGame;
-
-// --- Module 12: Closing Objections Quick-Fire Quiz ---
-function initClosingQuizGame() {
-    const startBtn = document.getElementById('start-closing-quiz');
-    const retryBtn = document.getElementById('retry-closing-quiz');
-    const startScreen = document.getElementById('closing-quiz-start');
-    const gameScreen = document.getElementById('closing-quiz-game');
-    const resultsScreen = document.getElementById('closing-quiz-results');
-
-    if (!startBtn || !startScreen || !gameScreen || !resultsScreen) return;
-
-    const questions = [
-        {
-            objection: "I want to wait for more bids",
-            answers: [
-                { text: "Take your time, call me when ready", correct: false },
-                { text: "We're very competitive, but I understand", correct: true },
-                { text: "Other companies will charge you more", correct: false },
-                { text: "You won't find anyone better", correct: false }
-            ]
-        },
-        {
-            objection: "I need to think about it",
-            answers: [
-                { text: "What specifically are you thinking about? Maybe I can help clarify", correct: true },
-                { text: "Don't think too long, prices go up", correct: false },
-                { text: "That's fine, I'll check back next month", correct: false },
-                { text: "Most people who wait regret it", correct: false }
-            ]
-        },
-        {
-            objection: "Call me next week",
-            answers: [
-                { text: "Sure, I'll call Monday at 9am", correct: false },
-                { text: "I can do that! Any specific concerns in the meantime I can address now?", correct: true },
-                { text: "Next week might be too late", correct: false },
-                { text: "Why wait when we can finish today?", correct: false }
-            ]
-        },
-        {
-            objection: "I'm not sure about the deductible",
-            answers: [
-                { text: "Most deductibles are $1,000, you can afford that", correct: false },
-                { text: "Don't worry about it, insurance handles everything", correct: false },
-                { text: "The deductible is the only thing you pay—insurance covers the rest. And you're paying for a brand new roof", correct: true },
-                { text: "We can work around the deductible", correct: false }
-            ]
-        },
-        {
-            objection: "My spouse handles this stuff",
-            answers: [
-                { text: "Can we get them on the phone right now to go over everything together?", correct: true },
-                { text: "Tell them I stopped by", correct: false },
-                { text: "You can sign and explain it to them later", correct: false },
-                { text: "They'll agree with whatever you decide", correct: false }
-            ]
-        },
-        {
-            objection: "I don't trust contractors",
-            answers: [
-                { text: "We're different, trust me", correct: false },
-                { text: "I totally understand—that's why we have our contingency. You don't pay us anything unless insurance approves", correct: true },
-                { text: "Check our online reviews", correct: false },
-                { text: "We've been in business for years", correct: false }
-            ]
-        }
-    ];
-
-    let currentQuestion = 0;
-    let score = 0;
-    let correctCount = 0;
-    let speedBonuses = 0;
-    let timerInterval: ReturnType<typeof setInterval> | null = null;
-    let timeLeft = 15;
-    let questionStartTime = 0;
-
-    function shuffleAnswers(answers: { text: string; correct: boolean }[]) {
-        const shuffled = [...answers];
-        for (let i = shuffled.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-        }
-        return shuffled;
-    }
-
-    function startQuiz() {
-        currentQuestion = 0;
-        score = 0;
-        correctCount = 0;
-        speedBonuses = 0;
-        startScreen.style.display = 'none';
-        resultsScreen.style.display = 'none';
-        gameScreen.style.display = 'block';
-        showQuestion();
-    }
-
-    function showQuestion() {
-        const q = questions[currentQuestion];
-        const qNumEl = document.getElementById('closing-q-num');
-        const scoreEl = document.getElementById('closing-score');
-        const questionEl = document.getElementById('closing-question');
-        const answersEl = document.getElementById('closing-answers');
-        const progressEl = document.getElementById('closing-quiz-progress');
-        const feedbackEl = document.getElementById('closing-feedback');
-
-        if (!qNumEl || !scoreEl || !questionEl || !answersEl || !progressEl) return;
-
-        // Hide feedback
-        if (feedbackEl) feedbackEl.style.display = 'none';
-
-        // Update UI
-        qNumEl.textContent = String(currentQuestion + 1);
-        scoreEl.textContent = String(score);
-        progressEl.style.width = `${((currentQuestion) / questions.length) * 100}%`;
-        questionEl.textContent = `"${q.objection}"`;
-
-        // Shuffle and render answers
-        const shuffled = shuffleAnswers(q.answers);
-        answersEl.innerHTML = shuffled.map((ans, idx) => `
-            <button class="closing-answer-btn" data-correct="${ans.correct}" style="
-                background: white;
-                border: 2px solid #e5e7eb;
-                border-radius: 12px;
-                padding: 16px 20px;
-                text-align: left;
-                font-size: 15px;
-                color: #374151;
-                cursor: pointer;
-                transition: all 0.2s;
-                display: flex;
-                align-items: center;
-                gap: 12px;
-            ">
-                <span style="background: #f3f4f6; padding: 6px 12px; border-radius: 6px; font-weight: 600; color: #6b7280;">${String.fromCharCode(65 + idx)}</span>
-                <span>${ans.text}</span>
-            </button>
-        `).join('');
-
-        // Add click handlers
-        answersEl.querySelectorAll('.closing-answer-btn').forEach(btn => {
-            btn.addEventListener('click', handleAnswer);
-        });
-
-        // Start timer
-        questionStartTime = Date.now();
-        timeLeft = 15;
-        updateTimer();
-        if (timerInterval) clearInterval(timerInterval);
-        timerInterval = setInterval(() => {
-            timeLeft--;
-            updateTimer();
-            if (timeLeft <= 0) {
-                handleTimeout();
-            }
-        }, 1000);
-    }
-
-    function updateTimer() {
-        const timerEl = document.getElementById('closing-timer');
-        if (timerEl) {
-            timerEl.textContent = String(timeLeft);
-            if (timeLeft <= 5) {
-                timerEl.style.background = 'linear-gradient(135deg, #991b1b 0%, #dc2626 100%)';
-                timerEl.style.animation = 'pulse 0.5s ease-in-out';
-            } else {
-                timerEl.style.background = 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)';
-            }
-        }
-    }
-
-    function handleAnswer(e: Event) {
-        if (timerInterval) clearInterval(timerInterval);
-
-        const btn = e.currentTarget as HTMLElement;
-        const isCorrect = btn.dataset.correct === 'true';
-        const elapsed = (Date.now() - questionStartTime) / 1000;
-
-        // Disable all buttons
-        document.querySelectorAll('.closing-answer-btn').forEach(b => {
-            (b as HTMLElement).style.pointerEvents = 'none';
-        });
-
-        // Find correct answer and highlight
-        document.querySelectorAll('.closing-answer-btn').forEach(b => {
-            const el = b as HTMLElement;
-            if (el.dataset.correct === 'true') {
-                el.style.background = 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)';
-                el.style.borderColor = '#16a34a';
-            }
-        });
-
-        let pointsEarned = 0;
-        let speedBonus = 0;
-
-        if (isCorrect) {
-            btn.style.background = 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)';
-            btn.style.borderColor = '#16a34a';
-            pointsEarned = 10;
-            correctCount++;
-            if (elapsed < 5) {
-                speedBonus = 5;
-                speedBonuses += 5;
-            }
-            score += pointsEarned + speedBonus;
-        } else {
-            btn.style.background = 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)';
-            btn.style.borderColor = '#dc2626';
-        }
-
-        showFeedback(isCorrect, pointsEarned, speedBonus);
-    }
-
-    function handleTimeout() {
-        if (timerInterval) clearInterval(timerInterval);
-
-        // Disable all buttons and show correct answer
-        document.querySelectorAll('.closing-answer-btn').forEach(b => {
-            const el = b as HTMLElement;
-            el.style.pointerEvents = 'none';
-            if (el.dataset.correct === 'true') {
-                el.style.background = 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)';
-                el.style.borderColor = '#16a34a';
-            }
-        });
-
-        showFeedback(false, 0, 0, true);
-    }
-
-    function showFeedback(isCorrect: boolean, points: number, bonus: number, timeout = false) {
-        const feedbackEl = document.getElementById('closing-feedback');
-        const scoreEl = document.getElementById('closing-score');
-        if (!feedbackEl) return;
-
-        if (scoreEl) scoreEl.textContent = String(score);
-
-        if (timeout) {
-            feedbackEl.innerHTML = `
-                <div style="color: #991b1b; font-size: 18px; font-weight: 600;">⏱️ Time's up!</div>
-                <div style="color: #6b7280; font-size: 14px; margin-top: 5px;">The correct answer is highlighted above</div>
-            `;
-            feedbackEl.style.background = 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)';
-        } else if (isCorrect) {
-            feedbackEl.innerHTML = `
-                <div style="color: #166534; font-size: 18px; font-weight: 600;">✅ Correct! +${points}${bonus > 0 ? ` <span style="color: #f59e0b;">+${bonus} Speed Bonus!</span>` : ''}</div>
-            `;
-            feedbackEl.style.background = 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)';
-        } else {
-            feedbackEl.innerHTML = `
-                <div style="color: #991b1b; font-size: 18px; font-weight: 600;">❌ Not quite</div>
-                <div style="color: #6b7280; font-size: 14px; margin-top: 5px;">The correct answer is highlighted above</div>
-            `;
-            feedbackEl.style.background = 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)';
-        }
-
-        feedbackEl.style.display = 'block';
-
-        // Auto advance after 1.5 seconds
-        setTimeout(() => {
-            currentQuestion++;
-            if (currentQuestion < questions.length) {
-                showQuestion();
-            } else {
-                showResults();
-            }
-        }, 1500);
-    }
-
-    function showResults() {
-        gameScreen.style.display = 'none';
-        resultsScreen.style.display = 'block';
-
-        const finalScoreEl = document.getElementById('closing-final-score');
-        const correctCountEl = document.getElementById('closing-correct-count');
-        const speedBonusEl = document.getElementById('closing-speed-bonus');
-        const iconEl = document.getElementById('closing-results-icon');
-        const titleEl = document.getElementById('closing-results-title');
-
-        if (finalScoreEl) finalScoreEl.textContent = String(score);
-        if (correctCountEl) correctCountEl.textContent = `${correctCount}/6`;
-        if (speedBonusEl) speedBonusEl.textContent = `+${speedBonuses}`;
-
-        // Update results based on score
-        const percentage = (correctCount / 6) * 100;
-        if (percentage >= 80) {
-            if (iconEl) iconEl.textContent = '🏆';
-            if (titleEl) {
-                titleEl.textContent = 'Excellent!';
-                titleEl.style.color = '#166534';
-            }
-            resultsScreen.style.background = 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)';
-            // Show module completion
-            const completeSection = document.getElementById('module-complete-section');
-            if (completeSection) completeSection.style.display = 'block';
-        } else if (percentage >= 50) {
-            if (iconEl) iconEl.textContent = '👍';
-            if (titleEl) {
-                titleEl.textContent = 'Good effort!';
-                titleEl.style.color = '#ca8a04';
-            }
-            resultsScreen.style.background = 'linear-gradient(135deg, #fefce8 0%, #fef9c3 100%)';
-            // Show module completion
-            const completeSection = document.getElementById('module-complete-section');
-            if (completeSection) completeSection.style.display = 'block';
-        } else {
-            if (iconEl) iconEl.textContent = '📚';
-            if (titleEl) {
-                titleEl.textContent = 'Keep practicing!';
-                titleEl.style.color = '#dc2626';
-            }
-            resultsScreen.style.background = 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)';
-        }
-    }
-
-    // Event listeners
-    startBtn.addEventListener('click', startQuiz);
-    if (retryBtn) {
-        retryBtn.addEventListener('click', () => {
-            resultsScreen.style.display = 'none';
-            startQuiz();
-        });
-    }
-}
 
 // --- Module 7: Inspection Step Card Toggle ---
 function toggleStepCard(cardElement: HTMLElement) {
@@ -11445,9 +10902,6 @@ async function renderModule(moduleName: string) {
       case 'shingle-types-materials':
           initShingleGame();
           break;
-      case 'closing-objections':
-          initClosingQuizGame();
-          break;
   }
 }
 
@@ -11778,7 +11232,6 @@ function getModuleDisplayName(moduleId: string): string {
     'post-inspection-objections': 'Post-Inspection Objections',
     'damage-identification': 'Damage Identification',
     'filing-claim-closing': 'Filing Claim & Closing',
-    'closing-objections': 'Closing Objections',
     'sales-cycle-job-flow': 'Sales Cycle & Job Flow',
     'role-play': 'Role Play Practice',
     'final-exam': 'Final Exam'
@@ -12423,7 +11876,6 @@ async function seedModulesFromTrainingContent(): Promise<void> {
     'post-inspection-objections': 'Post-Inspection Objections',
     'damage-identification': 'Damage Identification',
     'filing-claim-closing': 'Filing the Claim & Closing',
-    'closing-objections': 'Closing Objections',
     'sales-cycle-job-flow': 'The Sales Cycle & Job Flow',
     'role-play': 'AI Role-Play',
     'final-exam': 'Final Exam'
@@ -12480,7 +11932,7 @@ async function loadCMSModules(): Promise<void> {
             <span class="btn-text">📥 Import Existing Training Content</span>
             <span class="btn-loading" style="display: none;">Importing...</span>
           </button>
-          <p class="sa-import-hint">This will import all 15 training modules from the app into the CMS database.</p>
+          <p class="sa-import-hint">This will import all ${MODULE_ORDER.length} training modules from the app into the CMS database.</p>
         </div>
         <button class="sa-action-btn" id="create-module-btn" style="margin-top: 20px;">Or Create New Module</button>
       </div>
@@ -13081,7 +12533,7 @@ function renderUsersTable(users: AdminUser[]): void {
             <td>${user.isManager ? '<span class="role-badge manager">Manager</span>' : '<span class="role-badge user">User</span>'}</td>
             <td>
               <div class="progress-cell">
-                <span class="modules-count">${user.modulesCompleted}/15 modules</span>
+                <span class="modules-count">${user.modulesCompleted}/${MODULE_ORDER.length} modules</span>
                 <span class="exam-count">${user.examAttempts}/3 attempts</span>
               </div>
             </td>
@@ -13203,7 +12655,7 @@ async function showUserDetail(userId: string): Promise<void> {
         <h3>📚 Training Transcript</h3>
         <div class="transcript-summary">
           <span class="summary-item"><strong>Total Time:</strong> ${formatSeconds(totalTimeSeconds)}</span>
-          <span class="summary-item"><strong>Modules:</strong> ${completedCount}/16 Complete</span>
+          <span class="summary-item"><strong>Modules:</strong> ${completedCount}/${MODULE_ORDER.length} Complete</span>
           <button class="btn-unlock-all" data-user-id="${userId}">🔓 Unlock All Modules</button>
         </div>
         <table class="transcript-table">
@@ -13829,7 +13281,7 @@ function renderProgressGrid(data: ProgressGridData): void {
             // Create a map for quick lookup
             const statusMap = new Map(user.moduleStatus.map(m => [m.module, m]));
             const completedCount = user.moduleStatus.filter(m => m.status === 'completed').length;
-            const progressPct = Math.round((completedCount / 16) * 100);
+            const progressPct = Math.round((completedCount / moduleOrder.length) * 100);
 
             return `
               <tr>
@@ -13850,7 +13302,7 @@ function renderProgressGrid(data: ProgressGridData): void {
                   <div class="mini-progress-bar">
                     <div class="mini-progress-fill" style="width: ${progressPct}%"></div>
                   </div>
-                  <span class="progress-text">${completedCount}/16</span>
+                  <span class="progress-text">${completedCount}/${moduleOrder.length}</span>
                 </td>
               </tr>
             `;
@@ -14698,7 +14150,7 @@ function updateSidebarCertifiedBadge(isCertified: boolean): void {
     }
     if (badge) badge.style.display = 'inline-flex';
 
-    // Add trophy to Module 16
+    // Add trophy to Final Exam module
     const examModule = document.querySelector('li[data-module="final-exam"]');
     if (examModule) examModule.classList.add('certified');
   } else if (badge) {
@@ -14824,7 +14276,7 @@ function showLockoutScreen(root: HTMLElement, state: ExamState) {
           <ul>
             <li>Module 5: Initial Pitch & 5 Non-Negotiables</li>
             <li>Module 6-9: Objection Handling</li>
-            <li>Module 12: Closing Objections</li>
+            <li>Module 11: Filing the Claim & Closing</li>
           </ul>
         </div>
       </div>
@@ -15569,7 +15021,7 @@ function showExamResults(root: HTMLElement, attempt: ExamAttempt, detailedResult
           <ul>
             <li>Module 5: Initial Pitch & 5 Non-Negotiables</li>
             <li>Module 6-9: Handling Objections</li>
-            <li>Module 12: Closing Techniques</li>
+            <li>Module 11: Filing the Claim & Closing</li>
           </ul>
         </div>
 
