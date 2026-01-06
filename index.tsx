@@ -3968,103 +3968,6 @@ const trainingContent = {
             <p style="color: #3b82f6; margin: 0; font-size: 15px;">From initial knock to final payment - stay in regular contact throughout!</p>
           </div>
 
-        <h2 style="color: #1f2937; font-size: 22px; margin: 35px 0 20px 0; display: flex; align-items: center; gap: 10px;">
-          <span style="background: #f0fdf4; padding: 8px 12px; border-radius: 8px;">💰</span>
-          Key Milestones & Commissions
-        </h2>
-
-        <div style="display: grid; gap: 20px; margin-bottom: 30px;">
-          <!-- Payment Milestones -->
-          <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-radius: 16px; padding: 25px;">
-            <h3 style="color: #1e40af; margin: 0 0 15px 0; font-size: 18px;">📋 Payment Milestones</h3>
-            <div style="display: grid; gap: 12px;">
-              <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px; border-left: 4px solid #3b82f6;">
-                <div style="background: #3b82f6; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">1</div>
-                <div>
-                  <div style="font-weight: 600; color: #1f2937;">Downpayment</div>
-                  <div style="color: #16a34a; font-weight: 700; font-size: 18px;">$1,000</div>
-                  <div style="color: #6b7280; font-size: 13px;">Paid when homeowner submits ACV (Actual Cash Value)</div>
-                </div>
-              </div>
-              <div style="background: white; padding: 15px 20px; border-radius: 10px; display: flex; align-items: center; gap: 15px; border-left: 4px solid #3b82f6;">
-                <div style="background: #3b82f6; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">2</div>
-                <div>
-                  <div style="font-weight: 600; color: #1f2937;">Final Payment</div>
-                  <div style="color: #16a34a; font-weight: 700; font-size: 18px;">Remaining 12%+ of job</div>
-                  <div style="color: #6b7280; font-size: 13px;">After depreciation release + homeowner pays deductible</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Commission Scale -->
-          <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 16px; padding: 25px;">
-            <h3 style="color: #166534; margin: 0 0 15px 0; font-size: 18px;">📊 Commission Percentage Scale</h3>
-            <p style="color: #374151; font-size: 14px; margin: 0 0 15px 0;"><em>First 6 weeks: Automatic top tier on all completed jobs. After that, qualify based on monthly sign-ups:</em></p>
-
-            <div style="display: grid; gap: 15px;">
-              <!-- March - October -->
-              <div style="background: white; padding: 15px 20px; border-radius: 10px;">
-                <div style="font-weight: 600; color: #1f2937; margin-bottom: 10px;">🌞 March - October (Peak Season)</div>
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center;">
-                  <div style="background: #dcfce7; padding: 12px; border-radius: 8px;">
-                    <div style="font-size: 20px; font-weight: 700; color: #16a34a;">12%+</div>
-                    <div style="font-size: 12px; color: #166534;">10+ Sign-ups</div>
-                  </div>
-                  <div style="background: #fef3c7; padding: 12px; border-radius: 8px;">
-                    <div style="font-size: 20px; font-weight: 700; color: #d97706;">10%</div>
-                    <div style="font-size: 12px; color: #92400e;">8-9 Sign-ups</div>
-                  </div>
-                  <div style="background: #fee2e2; padding: 12px; border-radius: 8px;">
-                    <div style="font-size: 20px; font-weight: 700; color: #dc2626;">6%</div>
-                    <div style="font-size: 12px; color: #991b1b;">&lt;8 Sign-ups</div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- November & February -->
-              <div style="background: white; padding: 15px 20px; border-radius: 10px;">
-                <div style="font-weight: 600; color: #1f2937; margin-bottom: 10px;">🍂 November & February</div>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; text-align: center;">
-                  <div style="background: #dcfce7; padding: 12px; border-radius: 8px;">
-                    <div style="font-size: 20px; font-weight: 700; color: #16a34a;">12%+</div>
-                    <div style="font-size: 12px; color: #166534;">8+ Sign-ups</div>
-                  </div>
-                  <div style="background: #fee2e2; padding: 12px; border-radius: 8px;">
-                    <div style="font-size: 20px; font-weight: 700; color: #dc2626;">6%</div>
-                    <div style="font-size: 12px; color: #991b1b;">&lt;8 Sign-ups</div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- December & January -->
-              <div style="background: white; padding: 15px 20px; border-radius: 10px;">
-                <div style="font-weight: 600; color: #1f2937; margin-bottom: 10px;">❄️ December & January (Off-Season)</div>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; text-align: center;">
-                  <div style="background: #dcfce7; padding: 12px; border-radius: 8px;">
-                    <div style="font-size: 20px; font-weight: 700; color: #16a34a;">12%+</div>
-                    <div style="font-size: 12px; color: #166534;">4+ Sign-ups</div>
-                  </div>
-                  <div style="background: #fee2e2; padding: 12px; border-radius: 8px;">
-                    <div style="font-size: 20px; font-weight: 700; color: #dc2626;">6%</div>
-                    <div style="font-size: 12px; color: #991b1b;">&lt;4 Sign-ups</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Important Notes -->
-          <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 16px; padding: 20px; border-left: 4px solid #f59e0b;">
-            <h4 style="color: #92400e; margin: 0 0 10px 0; font-size: 16px;">⚠️ Important Notes</h4>
-            <ul style="color: #78350f; margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.8;">
-              <li><strong>Townhomes</strong> do not count as a sign-up unless: Has aluminum siding OR minimum 15 squares</li>
-              <li><strong>Retail jobs</strong> (non-insurance): Nothing at Downpayment, 2% commission</li>
-              <li><strong>Solar referrals:</strong> 2% commission</li>
-            </ul>
-          </div>
-        </div>
-
           <h2 style="color: #1f2937; font-size: 22px; margin: 35px 0 20px 0; display: flex; align-items: center; gap: 10px;">
             <span style="background: #f3e8ff; padding: 8px 12px; border-radius: 8px;">🎮</span>
             Sales Cycle Sorter Game
@@ -4436,7 +4339,7 @@ const trainingContent = {
             <!-- Step 1: Training Type Selector -->
             <div id="agnes-mode-selector" style="display: block;">
                 <h2 style="text-align: center; color: #1f2937; margin-bottom: 10px;">Choose Your Training Mode</h2>
-                <p style="text-align: center; color: #6b7280; margin-bottom: 30px;">Two focused modules to perfect your pitch and inspection skills</p>
+                <p style="text-align: center; color: #6b7280; margin-bottom: 30px;">Focused modules to perfect your pitch skills</p>
 
                 <div class="agnes-mode-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px;">
                     <button id="agnes-roleplay-btn" class="agnes-mode-card voice-mode" style="padding: 30px; border: 2px solid #e5e7eb; border-radius: 16px; background: white; cursor: pointer; text-align: left; transition: all 0.3s; position: relative;">
@@ -4498,10 +4401,10 @@ const trainingContent = {
                 <button onclick="showAgnesScreen('agnes-mode-selector')" class="btn-secondary" style="margin-top: 10px;">← Back</button>
             </div>
 
-            <!-- Step 3: Module Selector (Focused on Module 5 & 7) -->
+            <!-- Step 3: Module Selector (Focused on Module 5) -->
             <div id="agnes-module-selector" style="display: none;">
                 <h2 style="text-align: center; color: #1f2937; margin-bottom: 10px;">Select Your Focus Area</h2>
-                <p style="text-align: center; color: #6b7280; margin-bottom: 30px;">Master these two critical skills</p>
+                <p style="text-align: center; color: #6b7280; margin-bottom: 30px;">Master this critical skill</p>
 
                 <div class="agnes-module-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 25px 0;">
                     <button class="agnes-module-card" data-module="5" style="padding: 30px; border: 3px solid #8b5cf6; border-radius: 16px; background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); cursor: pointer; text-align: left; transition: all 0.3s; position: relative;">
@@ -4520,26 +4423,6 @@ const trainingContent = {
                         </div>
                         <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd6fe; display: flex; align-items: center; justify-content: space-between;">
                             <span style="font-size: 13px; color: #8b5cf6; font-weight: 600;">9 scenarios</span>
-                            <span style="font-size: 20px;">→</span>
-                        </div>
-                    </button>
-
-                    <button class="agnes-module-card" data-module="7" style="padding: 30px; border: 3px solid #0ea5e9; border-radius: 16px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); cursor: pointer; text-align: left; transition: all 0.3s; position: relative;">
-                        <div style="position: absolute; top: 15px; right: 15px; background: #0ea5e9; color: white; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 600;">MODULE 7</div>
-                        <div style="font-size: 48px; margin-bottom: 15px;">🔍</div>
-                        <div style="font-weight: 700; font-size: 20px; color: #0369a1; margin-bottom: 8px;">The Inspection Process</div>
-                        <div style="font-size: 14px; color: #0284c7; margin-bottom: 15px;">Nail the inspection conversation</div>
-                        <div style="background: white; border-radius: 10px; padding: 15px; margin-top: 10px;">
-                            <div style="font-size: 13px; color: #6b7280; margin-bottom: 8px;">You'll practice:</div>
-                            <ul style="list-style: none; padding: 0; margin: 0; font-size: 13px; color: #374151;">
-                                <li style="margin-bottom: 6px;">• Explaining the process</li>
-                                <li style="margin-bottom: 6px;">• Handling hesitation</li>
-                                <li style="margin-bottom: 6px;">• The inspection order</li>
-                                <li>• Post-inspection handoff</li>
-                            </ul>
-                        </div>
-                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #bae6fd; display: flex; align-items: center; justify-content: space-between;">
-                            <span style="font-size: 13px; color: #0ea5e9; font-weight: 600;">9 scenarios</span>
                             <span style="font-size: 20px;">→</span>
                         </div>
                     </button>
@@ -4661,7 +4544,7 @@ const trainingContent = {
             <!-- Screen 1: Category Selection (Module 5 & 7 focused) -->
             <div id="category-selector" style="display: block;">
                 <h2 style="text-align: center; color: #1f2937; margin-bottom: 10px;">Choose Your Scenario Type</h2>
-                <p style="text-align: center; color: #6b7280; margin-bottom: 25px;">Practice specific skills from Module 5 & 7</p>
+                <p style="text-align: center; color: #6b7280; margin-bottom: 25px;">Practice specific skills from Module 5</p>
                 <div class="category-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px;">
                     <button class="category-card" data-category="initialPitch" style="padding: 25px; border: 2px solid #8b5cf6; border-radius: 14px; background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); cursor: pointer; text-align: left; transition: all 0.3s;">
                         <div style="font-size: 36px; margin-bottom: 12px;">🚪</div>
@@ -4674,12 +4557,6 @@ const trainingContent = {
                         <div style="font-weight: 700; font-size: 16px; color: #92400e;">Initial Objections</div>
                         <div style="font-size: 13px; color: #b45309; margin-top: 5px;">From Module 5</div>
                         <div style="font-size: 12px; color: #d97706; margin-top: 8px; font-weight: 600;">5 scenarios</div>
-                    </button>
-                    <button class="category-card" data-category="inspection" style="padding: 25px; border: 2px solid #0ea5e9; border-radius: 14px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); cursor: pointer; text-align: left; transition: all 0.3s;">
-                        <div style="font-size: 36px; margin-bottom: 12px;">🔍</div>
-                        <div style="font-weight: 700; font-size: 16px; color: #0369a1;">Inspection Process</div>
-                        <div style="font-size: 13px; color: #0284c7; margin-top: 5px;">From Module 7</div>
-                        <div style="font-size: 12px; color: #0ea5e9; margin-top: 8px; font-weight: 600;">5 scenarios</div>
                     </button>
                 </div>
                 <div class="quick-actions" style="margin-top: 25px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
@@ -5369,8 +5246,8 @@ trainingContent['post-inspection-objections'] = `
 
       <div class="objection-card">
         <h3>7. "I'm going to wait and see if it gets worse"</h3>
-        <p><strong>Response:</strong> "I understand the hesitation, but here's the problem: Insurance only covers storm damage within your policy's statute of limitations - usually 1-2 years. Wait too long, and you lose coverage entirely. Plus, every day UV light and weather degrade the damaged shingles more. File now while you're protected."</p>
-        <p><strong>Why it works:</strong> Creates urgency with real consequences.</p>
+        <p><strong>Response:</strong> "I totally understand. The downside to waiting is the process slows down - adjuster calendars fill up and the clearest documentation is right after the storm. Filing today just starts the claim; you still control the decision after the adjuster report."</p>
+        <p><strong>Why it works:</strong> Urgency without pressure and lowers commitment risk.</p>
         <button class="practice-agnes-btn" data-scenario="m9-wait-and-see">🎭 Practice with Agnes</button>
 
         <!-- Inline Practice Container -->
@@ -5410,25 +5287,25 @@ trainingContent['post-inspection-objections'] = `
           <p style="color: #374151; font-size: 14px; margin: 0; font-style: italic;">"We're 3 weeks out on scheduling. If we file today, we can get you on the schedule before winter."</p>
         </div>
 
-        <!-- Schedule Reality Card -->
+        <!-- Adjuster Calendar Card -->
         <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 16px; padding: 20px; border-left: 4px solid #16a34a;">
-          <div style="font-size: 32px; margin-bottom: 10px;">📋</div>
-          <h4 style="color: #166534; margin: 0 0 10px 0; font-size: 16px; font-weight: 600;">Statute of Limitations</h4>
-          <p style="color: #374151; font-size: 14px; margin: 0; font-style: italic;">"Storm was [date]. You have [X] months to file. After that, insurance won't cover it."</p>
+          <div style="font-size: 32px; margin-bottom: 10px;">📅</div>
+          <h4 style="color: #166534; margin: 0 0 10px 0; font-size: 16px; font-weight: 600;">Adjuster Calendar</h4>
+          <p style="color: #374151; font-size: 14px; margin: 0; font-style: italic;">"If we file today, we can get the adjuster scheduled sooner and avoid the backlog."</p>
         </div>
 
-        <!-- Cost Reality Card -->
+        <!-- Documentation Clarity Card -->
         <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 16px; padding: 20px; border-left: 4px solid #f59e0b;">
-          <div style="font-size: 32px; margin-bottom: 10px;">💰</div>
-          <h4 style="color: #92400e; margin: 0 0 10px 0; font-size: 16px; font-weight: 600;">Deterioration</h4>
-          <p style="color: #374151; font-size: 14px; margin: 0; font-style: italic;">"Every day without protection, UV damages the shingles more. In 6 months, this could be a leak."</p>
+          <div style="font-size: 32px; margin-bottom: 10px;">📸</div>
+          <h4 style="color: #92400e; margin: 0 0 10px 0; font-size: 16px; font-weight: 600;">Documentation Clarity</h4>
+          <p style="color: #374151; font-size: 14px; margin: 0; font-style: italic;">"The closer we are to the storm, the easier it is to document everything clearly for the adjuster."</p>
         </div>
 
-        <!-- Home Protection Card -->
+        <!-- Project Timeline Card -->
         <div style="background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); border-radius: 16px; padding: 20px; border-left: 4px solid #db2777;">
-          <div style="font-size: 32px; margin-bottom: 10px;">🏠</div>
-          <h4 style="color: #9d174d; margin: 0 0 10px 0; font-size: 16px; font-weight: 600;">Matching Availability</h4>
-          <p style="color: #374151; font-size: 14px; margin: 0; font-style: italic;">"We can only guarantee color match if we order within 30 days. After that, discontinued colors become a problem."</p>
+          <div style="font-size: 32px; margin-bottom: 10px;">🛠️</div>
+          <h4 style="color: #9d174d; margin: 0 0 10px 0; font-size: 16px; font-weight: 600;">Project Timeline</h4>
+          <p style="color: #374151; font-size: 14px; margin: 0; font-style: italic;">"Once approved, ordering materials and scheduling crews takes time. Starting now keeps the project moving."</p>
         </div>
       </div>
     </div>
@@ -5568,7 +5445,7 @@ trainingContent['closing-objections'] = `
 
         <div style="background: white; border: 2px solid #fee2e2; border-radius: 12px; padding: 20px; border-left: 4px solid #dc2626;">
           <h3 style="color: #dc2626; font-size: 16px; margin: 0 0 12px 0;">"Call me next week"</h3>
-          <p style="color: #374151; font-size: 14px; line-height: 1.6; margin: 0;"><strong style="color: #059669;">Response:</strong> "I can do that. But can I ask - what changes between now and next week? [Listen] ... Here's my concern: your statute of limitations is ticking, weather window is closing. Can we at least file the claim today? That reserves your rights."</p>
+          <p style="color: #374151; font-size: 14px; line-height: 1.6; margin: 0;"><strong style="color: #059669;">Response:</strong> "I can do that. But can I ask - what changes between now and next week? [Listen] ... My concern is the adjuster calendar and getting clear documentation while everything is fresh. Can we at least file today? You can still compare options after the adjuster report."</p>
         </div>
 
         <div style="background: white; border: 2px solid #fee2e2; border-radius: 12px; padding: 20px; border-left: 4px solid #dc2626;">
@@ -10131,10 +10008,9 @@ function renderAgnesXPBar() {
   `;
 }
 
-// Module to categories mapping (focused on Module 5 & 7 only)
+// Module to categories mapping (focused on Module 5 only)
 const moduleToCategories: Record<string, string[]> = {
-  '5': ['initialPitch', 'initialObjections'],
-  '7': ['inspection', 'initialPitch']
+  '5': ['initialPitch', 'initialObjections']
 };
 
 // Session state for the new simplified flow
@@ -11183,10 +11059,11 @@ Provide a JSON response with these exact fields:
     const randomBtn = document.getElementById('random-scenario-btn');
     if (randomBtn) {
       randomBtn.addEventListener('click', () => {
-        const allScenarios = (window as any).getAllCategorizedScenarios?.() || [];
-        if (allScenarios.length > 0) {
-          const randomIndex = Math.floor(Math.random() * allScenarios.length);
-          const randomScenario = allScenarios[randomIndex];
+        const allowedCategories = moduleToCategories['5'] || [];
+        const allowedScenarios = allowedCategories.flatMap(cat => (window as any).getScenariosByCategory?.(cat) || []);
+        if (allowedScenarios.length > 0) {
+          const randomIndex = Math.floor(Math.random() * allowedScenarios.length);
+          const randomScenario = allowedScenarios[randomIndex];
           sessionState.scenarios = [randomScenario];
           sessionState.currentScenarioIndex = 0;
           sessionState.selectedCategory = randomScenario.category || 'random';
