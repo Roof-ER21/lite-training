@@ -4192,10 +4192,10 @@ const trainingContent = {
   'role-play': `
     <div class="content-card agnes-roleplay-container" style="background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%); padding: 0; overflow: hidden;">
         <!-- Hero Header -->
-        <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%); padding: 40px 30px; text-align: center; color: white;">
-            <div style="font-size: 48px; margin-bottom: 15px;">🎭</div>
-            <h1 style="margin: 0 0 10px 0; font-size: 28px; font-weight: 700;">AI Role-Play Training</h1>
-            <p style="margin: 0; opacity: 0.9; font-size: 16px;">Master your pitch with real-time AI feedback</p>
+        <div style="background: radial-gradient(circle at top left, #0ea5e9 0%, #1e3a8a 45%, #0f172a 100%); padding: 42px 30px; text-align: center; color: white;">
+            <div style="font-size: 48px; margin-bottom: 15px;">🔍</div>
+            <h1 style="margin: 0 0 10px 0; font-size: 28px; font-weight: 700;">Live Role-Play: Inspection Process</h1>
+            <p style="margin: 0; opacity: 0.9; font-size: 16px;">Voice-only training with live feedback (Module 7)</p>
         </div>
 
         <div style="padding: 30px;">
@@ -4205,111 +4205,43 @@ const trainingContent = {
             <!-- XP Progress Bar -->
             <div id="agnes-xp-bar" class="agnes-xp-bar" style="margin-bottom: 30px;"></div>
 
-            <!-- Step 1: Training Type Selector -->
+            <!-- Live Role-Play (Module 7 only) -->
             <div id="agnes-mode-selector" style="display: block;">
-                <h2 style="text-align: center; color: #1f2937; margin-bottom: 10px;">Choose Your Training Mode</h2>
-                <p style="text-align: center; color: #6b7280; margin-bottom: 30px;">Focused modules to perfect your pitch skills</p>
+                <div style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #0284c7 100%); border-radius: 24px; padding: 28px; color: white; margin-bottom: 24px;">
+                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 18px; flex-wrap: wrap;">
+                        <div style="font-size: 44px;">🔍</div>
+                        <div>
+                            <div style="font-size: 20px; font-weight: 700;">Live Role-Play: Inspection Process</div>
+                            <div style="font-size: 14px; opacity: 0.9;">Module 7 only • Voice role-play with live feedback</div>
+                        </div>
+                        <div style="margin-left: auto; background: rgba(255,255,255,0.18); padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 600;">LIVE</div>
+                    </div>
 
-                <div class="agnes-mode-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px;">
-                    <button id="agnes-roleplay-btn" class="agnes-mode-card voice-mode" style="padding: 30px; border: 2px solid #e5e7eb; border-radius: 16px; background: white; cursor: pointer; text-align: left; transition: all 0.3s; position: relative;">
-                        <div style="position: absolute; top: -12px; right: 20px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 600;">RECOMMENDED</div>
-                        <div style="font-size: 42px; margin-bottom: 15px;">🎯</div>
-                        <div style="font-weight: 700; font-size: 20px; color: #1f2937; margin-bottom: 5px;">Free Practice</div>
-                        <div style="font-size: 14px; color: #6b7280; margin-bottom: 15px;">Jump into real scenarios</div>
-                        <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; color: #374151;">
-                            <li style="margin-bottom: 8px;">✓ Real-time AI conversation</li>
-                            <li style="margin-bottom: 8px;">✓ Instant scoring & feedback</li>
-                            <li style="margin-bottom: 8px;">✓ Voice or text input</li>
-                            <li>✓ Build confidence fast</li>
-                        </ul>
-                    </button>
-
-                    <button id="agnes-walkthrough-btn" class="agnes-mode-card text-mode" style="padding: 30px; border: 2px solid #e5e7eb; border-radius: 16px; background: white; cursor: pointer; text-align: left; transition: all 0.3s;">
-                        <div style="font-size: 42px; margin-bottom: 15px;">📖</div>
-                        <div style="font-weight: 700; font-size: 20px; color: #1f2937; margin-bottom: 5px;">Guided Practice</div>
-                        <div style="font-size: 14px; color: #6b7280; margin-bottom: 15px;">Learn the ideal responses first</div>
-                        <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; color: #374151;">
-                            <li style="margin-bottom: 8px;">✓ See example responses</li>
-                            <li style="margin-bottom: 8px;">✓ Learn the best approach</li>
-                            <li style="margin-bottom: 8px;">✓ Then practice yourself</li>
-                            <li>✓ Compare side-by-side</li>
-                        </ul>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Step 2: Input Mode Selector -->
-            <div id="agnes-input-mode-selector" style="display: none;">
-                <h2 style="text-align: center; color: #1f2937; margin-bottom: 10px;">How Do You Want to Practice?</h2>
-                <p style="text-align: center; color: #6b7280; margin-bottom: 30px;">Choose your preferred input method</p>
-
-                <div class="agnes-mode-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px;">
-                    <button id="agnes-voice-mode-btn" class="agnes-mode-card voice-mode" style="padding: 30px; border: 2px solid #3b82f6; border-radius: 16px; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); cursor: pointer; text-align: left; transition: all 0.3s; position: relative;">
-                        <div style="position: absolute; top: -12px; right: 20px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 600;">MOST REALISTIC</div>
-                        <div style="font-size: 42px; margin-bottom: 15px;">🎤</div>
-                        <div style="font-weight: 700; font-size: 20px; color: #1e40af; margin-bottom: 5px;">Voice Mode</div>
-                        <div style="font-size: 14px; color: #3b82f6; margin-bottom: 15px;">Speak naturally with Agnes</div>
-                        <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; color: #1e40af;">
-                            <li style="margin-bottom: 8px;">🗣️ Real conversation feel</li>
-                            <li style="margin-bottom: 8px;">📹 Optional video recording</li>
-                            <li>⚡ Instant audio feedback</li>
-                        </ul>
-                    </button>
-
-                    <button id="agnes-text-mode-btn" class="agnes-mode-card text-mode" style="padding: 30px; border: 2px solid #e5e7eb; border-radius: 16px; background: white; cursor: pointer; text-align: left; transition: all 0.3s;">
-                        <div style="font-size: 42px; margin-bottom: 15px;">⌨️</div>
-                        <div style="font-weight: 700; font-size: 20px; color: #1f2937; margin-bottom: 5px;">Text Mode</div>
-                        <div style="font-size: 14px; color: #6b7280; margin-bottom: 15px;">Type your responses</div>
-                        <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; color: #374151;">
-                            <li style="margin-bottom: 8px;">✍️ Think at your own pace</li>
-                            <li style="margin-bottom: 8px;">📝 Review before sending</li>
-                            <li>📊 Detailed scoring</li>
-                        </ul>
-                    </button>
-                </div>
-                <button onclick="showAgnesScreen('agnes-mode-selector')" class="btn-secondary" style="margin-top: 10px;">← Back</button>
-            </div>
-
-            <!-- Step 3: Module Selector (Focused on Module 5) -->
-            <div id="agnes-module-selector" style="display: none;">
-                <h2 style="text-align: center; color: #1f2937; margin-bottom: 10px;">Select Your Focus Area</h2>
-                <p style="text-align: center; color: #6b7280; margin-bottom: 30px;">Master this critical skill</p>
-
-                <div class="agnes-module-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 25px 0;">
-                    <button class="agnes-module-card" data-module="5" style="padding: 30px; border: 3px solid #8b5cf6; border-radius: 16px; background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); cursor: pointer; text-align: left; transition: all 0.3s; position: relative;">
-                        <div style="position: absolute; top: 15px; right: 15px; background: #8b5cf6; color: white; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 600;">MODULE 5</div>
-                        <div style="font-size: 48px; margin-bottom: 15px;">🚪</div>
-                        <div style="font-weight: 700; font-size: 20px; color: #5b21b6; margin-bottom: 8px;">The Initial Pitch</div>
-                        <div style="font-size: 14px; color: #7c3aed; margin-bottom: 15px;">Master your door approach</div>
-                        <div style="background: white; border-radius: 10px; padding: 15px; margin-top: 10px;">
-                            <div style="font-size: 13px; color: #6b7280; margin-bottom: 8px;">You'll practice:</div>
-                            <ul style="list-style: none; padding: 0; margin: 0; font-size: 13px; color: #374151;">
-                                <li style="margin-bottom: 6px;">• The 5 Non-Negotiables</li>
-                                <li style="margin-bottom: 6px;">• Opening statements</li>
-                                <li style="margin-bottom: 6px;">• Building rapport</li>
-                                <li>• Getting permission to inspect</li>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
+                        <div style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); border-radius: 14px; padding: 14px;">
+                            <div style="font-weight: 700; margin-bottom: 6px;">You'll practice</div>
+                            <ul style="margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.6;">
+                                <li>Explain the inspection flow</li>
+                                <li>Ask permission to use the ladder</li>
+                                <li>Handle hesitation</li>
+                                <li>Clean post‑inspection handoff</li>
                             </ul>
                         </div>
-                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd6fe; display: flex; align-items: center; justify-content: space-between;">
-                            <span style="font-size: 13px; color: #8b5cf6; font-weight: 600;">9 scenarios</span>
-                            <span style="font-size: 20px;">→</span>
+                        <div style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); border-radius: 14px; padding: 14px;">
+                            <div style="font-weight: 700; margin-bottom: 6px;">How it works</div>
+                            <ol style="margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.6;">
+                                <li>Start live role‑play</li>
+                                <li>Talk it through with Agnes</li>
+                                <li>End & score your session</li>
+                            </ol>
                         </div>
-                    </button>
-                </div>
-                <button id="agnes-module-back-btn" class="btn-secondary" style="margin-top: 10px;">← Back</button>
-            </div>
+                    </div>
 
-        <!-- Step 4: Quick Start (Skip old difficulty selector) -->
-        <div id="agnes-difficulty-selector" style="display: none;">
-            <h2 style="text-align: center; color: #1f2937; margin-bottom: 10px;">Ready to Practice!</h2>
-            <p style="text-align: center; color: #6b7280; margin-bottom: 25px;">You can adjust difficulty during the session</p>
-            <div style="text-align: center;">
-                <button id="agnes-start-session-btn" style="padding: 18px 50px; font-size: 18px; font-weight: 700; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; border-radius: 12px; cursor: pointer; transition: all 0.3s;">
-                    🚀 Start Role-Play
-                </button>
+                    <div style="margin-top: 18px; text-align: center;">
+                        <button id="agnes-roleplay-btn" style="padding: 16px 42px; font-size: 16px; font-weight: 700; background: #22c55e; color: #0f172a; border: none; border-radius: 999px; cursor: pointer; transition: all 0.2s;">Start Live Role-Play</button>
+                    </div>
+                </div>
             </div>
-            <button onclick="showAgnesScreen('agnes-module-selector')" class="btn-secondary" style="margin-top: 20px;">← Back to Module Selection</button>
-        </div>
 
         <!-- Voice UI Screen -->
         <div id="agnes-voice-ui" style="display: none;">
@@ -4360,7 +4292,7 @@ const trainingContent = {
                     <div id="agnes-transcript" class="agnes-transcript">
                         <div class="transcript-placeholder">
                             <p>🎤 Start speaking to begin the roleplay...</p>
-                            <p class="hint">Say "Hi, my name is..." to start your pitch</p>
+                            <p class="hint">Try: "Here’s how the inspection works..."</p>
                         </div>
                     </div>
                     <div id="agnes-score-display" class="agnes-score-display" style="display: none;"></div>
@@ -4399,254 +4331,11 @@ const trainingContent = {
             <div class="agnes-tips">
                 <h4>💡 Tips:</h4>
                 <ul>
-                    <li>Speak clearly and at a natural pace</li>
-                    <li>Cover the 5 non-negotiables in your pitch</li>
-                    <li>Say "Score me" when ready for feedback</li>
+                    <li>Explain the inspection process in simple steps</li>
+                    <li>Ask permission before using the ladder or taking photos</li>
+                    <li>Set a clear next step before ending the session</li>
                 </ul>
             </div>
-        </div>
-
-        <!-- Text UI Screen (wraps original content) -->
-        <div id="agnes-text-ui" style="display: none;">
-            <div id="roleplay-live-region" class="sr-only" aria-live="polite" aria-atomic="true"></div>
-
-            <!-- Screen 1: Category Selection (Module 5 & 7 focused) -->
-            <div id="category-selector" style="display: block;">
-                <h2 style="text-align: center; color: #1f2937; margin-bottom: 10px;">Choose Your Scenario Type</h2>
-                <p style="text-align: center; color: #6b7280; margin-bottom: 25px;">Practice specific skills from Module 5</p>
-                <div class="category-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px;">
-                    <button class="category-card" data-category="initialPitch" style="padding: 25px; border: 2px solid #8b5cf6; border-radius: 14px; background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); cursor: pointer; text-align: left; transition: all 0.3s;">
-                        <div style="font-size: 36px; margin-bottom: 12px;">🚪</div>
-                        <div style="font-weight: 700; font-size: 16px; color: #5b21b6;">Door Knock & Pitch</div>
-                        <div style="font-size: 13px; color: #7c3aed; margin-top: 5px;">From Module 5</div>
-                        <div style="font-size: 12px; color: #8b5cf6; margin-top: 8px; font-weight: 600;">4 scenarios</div>
-                    </button>
-                    <button class="category-card" data-category="initialObjections" style="padding: 25px; border: 2px solid #8b5cf6; border-radius: 14px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); cursor: pointer; text-align: left; transition: all 0.3s;">
-                        <div style="font-size: 36px; margin-bottom: 12px;">🛑</div>
-                        <div style="font-weight: 700; font-size: 16px; color: #92400e;">Initial Objections</div>
-                        <div style="font-size: 13px; color: #b45309; margin-top: 5px;">From Module 5</div>
-                        <div style="font-size: 12px; color: #d97706; margin-top: 8px; font-weight: 600;">5 scenarios</div>
-                    </button>
-                </div>
-                <div class="quick-actions" style="margin-top: 25px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                    <button id="random-scenario-btn" class="btn-secondary" style="padding: 12px 24px; border-radius: 10px;">🎲 Random Scenario</button>
-                </div>
-                <button onclick="showAgnesScreen('agnes-mode-selector')" class="btn-secondary" style="margin-top: 20px;">← Back to Mode Selection</button>
-            </div>
-
-            <!-- Screen 1.5: Scenario List for Selected Category -->
-            <div id="scenario-list" style="display: none;">
-                <div class="scenario-list-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
-                    <button id="back-to-categories" class="btn-back" style="background: #f0f0f0; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">← Back</button>
-                    <h2 id="category-title-display" style="margin: 0; flex: 1; text-align: center;">Scenarios</h2>
-                    <div class="filter-controls">
-                        <select id="role-filter" style="padding: 8px 15px; border-radius: 6px; border: 1px solid #ddd;">
-                            <option value="all">All Roles</option>
-                            <option value="homeowner">Homeowner</option>
-                            <option value="rep">Sales Rep</option>
-                            <option value="adjuster">Adjuster</option>
-                        </select>
-                    </div>
-                </div>
-                <div id="scenario-cards" class="scenario-cards-grid"></div>
-            </div>
-
-            <!-- Screen 1.75: Legacy Role Selection -->
-            <div id="roleplay-setup" style="display: none;">
-                <h2>Browse by Role</h2>
-                <p>Choose a role to see all scenarios for that perspective.</p>
-                <div class="role-selection-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 30px 0;">
-                    <button class="role-btn" data-role="homeowner" style="padding: 30px; border: 2px solid #8b4fbe; border-radius: 10px; background: linear-gradient(135deg, #8b4fbe 0%, #a370d1 100%); color: white; font-size: 18px; cursor: pointer; transition: all 0.3s;">
-                        <div style="font-size: 48px; margin-bottom: 10px;">🏠</div>
-                        <div style="font-weight: bold; margin-bottom: 10px;">Homeowner</div>
-                        <div style="font-size: 14px; opacity: 0.9;">Practice handling common objections and concerns</div>
-                    </button>
-                    <button class="role-btn" data-role="rep" style="padding: 30px; border: 2px solid #8b4fbe; border-radius: 10px; background: linear-gradient(135deg, #8b4fbe 0%, #a370d1 100%); color: white; font-size: 18px; cursor: pointer; transition: all 0.3s;">
-                        <div style="font-size: 48px; margin-bottom: 10px;">💼</div>
-                        <div style="font-weight: bold; margin-bottom: 10px;">Sales Rep</div>
-                        <div style="font-size: 14px; opacity: 0.9;">Refine your pitch and closing techniques</div>
-                    </button>
-                    <button class="role-btn" data-role="adjuster" style="padding: 30px; border: 2px solid #8b4fbe; border-radius: 10px; background: linear-gradient(135deg, #8b4fbe 0%, #a370d1 100%); color: white; font-size: 18px; cursor: pointer; transition: all 0.3s;">
-                        <div style="font-size: 48px; margin-bottom: 10px;">📋</div>
-                        <div style="font-weight: bold; margin-bottom: 10px;">Adjuster</div>
-                        <div style="font-size: 14px; opacity: 0.9;">Master technical documentation and negotiation</div>
-                    </button>
-                </div>
-                <button onclick="showAgnesTextScreen('category-selector')" class="btn-secondary">← Back to Categories</button>
-            </div>
-
-            <!-- Screen 1.5: Personality Selection -->
-            <div id="personality-selector" style="display: none;">
-                <h2>Choose Your Agnes AI Coach</h2>
-                <p>Select the AI personality that best matches your training goals.</p>
-                <div class="personality-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 30px 0;">
-                    <button class="personality-card" data-personality="supportive" data-difficulty="1" style="padding: 25px; border: 3px solid #4caf50; border-radius: 12px; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); cursor: pointer; text-align: left;">
-                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                            <div style="font-size: 42px; margin-right: 15px;">😊</div>
-                            <div>
-                                <div style="font-weight: bold; font-size: 18px; color: #2e7d32;">Agnes the Supportive Coach</div>
-                                <div style="font-size: 14px; color: #1b5e20; margin-top: 5px;">⭐ Easy</div>
-                            </div>
-                        </div>
-                        <p style="margin: 0; font-size: 14px; color: #555;">Encouraging and patient. Perfect for beginners.</p>
-                    </button>
-                    <button class="personality-card" data-personality="realistic" data-difficulty="2" style="padding: 25px; border: 3px solid #2196f3; border-radius: 12px; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); cursor: pointer; text-align: left;">
-                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                            <div style="font-size: 42px; margin-right: 15px;">🏠</div>
-                            <div>
-                                <div style="font-weight: bold; font-size: 18px; color: #1565c0;">Agnes the Real Homeowner</div>
-                                <div style="font-size: 14px; color: #0d47a1; margin-top: 5px;">⭐⭐ Medium</div>
-                            </div>
-                        </div>
-                        <p style="margin: 0; font-size: 14px; color: #555;">Realistic homeowner with real concerns.</p>
-                    </button>
-                    <button class="personality-card" data-personality="skeptical" data-difficulty="3" style="padding: 25px; border: 3px solid #ff9800; border-radius: 12px; background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); cursor: pointer; text-align: left;">
-                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                            <div style="font-size: 42px; margin-right: 15px;">🤔</div>
-                            <div>
-                                <div style="font-weight: bold; font-size: 18px; color: #e65100;">Agnes the Skeptical Buyer</div>
-                                <div style="font-size: 14px; color: #bf360c; margin-top: 5px;">⭐⭐⭐ Hard</div>
-                            </div>
-                        </div>
-                        <p style="margin: 0; font-size: 14px; color: #555;">Questioning and doubtful. Requires strong persuasion.</p>
-                    </button>
-                    <button class="personality-card" data-personality="rushed" data-difficulty="4" style="padding: 25px; border: 3px solid #f44336; border-radius: 12px; background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%); cursor: pointer; text-align: left;">
-                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                            <div style="font-size: 42px; margin-right: 15px;">⏰</div>
-                            <div>
-                                <div style="font-weight: bold; font-size: 18px; color: #c62828;">Agnes the Rushed</div>
-                                <div style="font-size: 14px; color: #b71c1c; margin-top: 5px;">⭐⭐⭐⭐ Expert</div>
-                            </div>
-                        </div>
-                        <p style="margin: 0; font-size: 14px; color: #555;">Impatient and time-sensitive. Be concise!</p>
-                    </button>
-                    <button class="personality-card" data-personality="final-boss" data-difficulty="5" style="padding: 25px; border: 3px solid #9c27b0; border-radius: 12px; background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); cursor: pointer; text-align: left;">
-                        <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                            <div style="font-size: 42px; margin-right: 15px;">👑</div>
-                            <div>
-                                <div style="font-weight: bold; font-size: 18px; color: #6a1b9a;">Agnes the Final Boss</div>
-                                <div style="font-size: 14px; color: #4a148c; margin-top: 5px;">⭐⭐⭐⭐⭐ Master</div>
-                            </div>
-                        </div>
-                        <p style="margin: 0; font-size: 14px; color: #555;">Ultimate challenge. All objection types combined.</p>
-                    </button>
-                </div>
-                <button id="back-to-roles" class="btn-secondary">← Back to Role Selection</button>
-            </div>
-
-            <!-- Screen 2: Scenario Display -->
-            <div id="scenario-display" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <div id="scenario-progress" style="font-weight: 500; color: #8b4fbe;"></div>
-                    <div id="turn-counter" style="font-weight: 600; color: #8b4fbe; background: #f8f4fc; padding: 8px 16px; border-radius: 20px; border: 2px solid #8b4fbe;">Turn 1 of 5</div>
-                </div>
-
-                <!-- In-Session Difficulty Selector (Text Mode) -->
-                <div id="text-difficulty-buttons" style="display: flex; gap: 8px; justify-content: center; padding: 12px 0; background: #f8fafc; border-radius: 10px; margin-bottom: 20px;">
-                    <span style="font-size: 13px; color: #64748b; align-self: center; margin-right: 8px;">Difficulty:</span>
-                    <button class="difficulty-btn active" data-difficulty="easy" style="padding: 8px 20px; border: 2px solid #10b981; background: #10b981; color: white; border-radius: 20px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s;">
-                        😊 Easy
-                    </button>
-                    <button class="difficulty-btn" data-difficulty="medium" style="padding: 8px 20px; border: 2px solid #f59e0b; background: white; color: #f59e0b; border-radius: 20px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s;">
-                        🤔 Medium
-                    </button>
-                    <button class="difficulty-btn" data-difficulty="hard" style="padding: 8px 20px; border: 2px solid #ef4444; background: white; color: #ef4444; border-radius: 20px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s;">
-                        😤 Hard
-                    </button>
-                </div>
-                <div class="roleplay-container-with-feedback">
-                    <div class="roleplay-main-content">
-                        <div style="background: #f8f4fc; border-left: 4px solid #8b4fbe; padding: 20px; margin-bottom: 20px; border-radius: 5px;">
-                            <h3 id="scenario-title" style="margin: 0 0 10px 0; color: #8b4fbe;">Scenario</h3>
-                            <p id="scenario-context" style="margin: 0 0 15px 0; color: #555;"></p>
-                        </div>
-                        <div style="margin-bottom: 20px;">
-                            <h4 style="color: #8b4fbe; margin-bottom: 10px;">Conversation:</h4>
-                            <div id="conversation-thread" style="max-height: 400px; overflow-y: auto; background: white; border: 2px solid #e0d4f0; border-radius: 8px; padding: 15px;"></div>
-                        </div>
-                        <div style="margin-bottom: 20px;">
-                            <label for="user-response" style="display: block; font-weight: 500; margin-bottom: 10px;">Your Response:</label>
-                            <textarea id="user-response" rows="4" style="width: 100%; padding: 15px; border: 2px solid #e0d4f0; border-radius: 5px; font-size: 16px;" placeholder="Type your response here..."></textarea>
-                        </div>
-                        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                            <button id="submit-response" class="btn-primary" style="flex: 1;">Submit Response</button>
-                            <button id="voice-input-btn" class="btn-secondary">🎤 Voice</button>
-                            <button id="hint-btn" class="btn-secondary">💡 Hint</button>
-                        </div>
-                        <div id="hint-display" style="display: none; background: #fff9e6; border-left: 4px solid #ffc107; padding: 15px; border-radius: 5px;"></div>
-
-                        <!-- Contextual AI Hint Panel -->
-                        <div id="contextual-hint-panel" class="contextual-hint-panel" style="display: none;">
-                            <div class="hint-header">
-                                <span class="hint-icon">💡</span>
-                                <span class="hint-title">AI Coach Suggestion</span>
-                                <button class="hint-close" onclick="document.getElementById('contextual-hint-panel').style.display='none'">×</button>
-                            </div>
-                            <div class="hint-content">
-                                <div class="suggested-response">
-                                    <h4>Try saying:</h4>
-                                    <p id="hint-suggestion-text"></p>
-                                </div>
-                                <div class="key-points-reminder">
-                                    <h4>Remember to include:</h4>
-                                    <ul id="hint-key-points"></ul>
-                                </div>
-                                <div class="tone-guidance">
-                                    <h4>Tone tip:</h4>
-                                    <p id="hint-tone-text"></p>
-                                </div>
-                                <div class="script-reference">
-                                    <h4>From training:</h4>
-                                    <blockquote id="hint-script-reference"></blockquote>
-                                </div>
-                            </div>
-                            <div class="hint-footer">
-                                <button id="regenerate-hint" class="btn-secondary" onclick="showHint()">Different Suggestion</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="live-feedback-panel" class="live-feedback-panel">
-                        <div class="panel-header"><h3>Live Feedback</h3><button class="panel-toggle-btn" id="toggle-feedback-panel">−</button></div>
-                        <div class="panel-content">
-                            <div class="live-score-display"><div id="live-score-circle" class="live-score-circle score-low">0</div><div class="score-label">Score</div></div>
-                            <div class="key-points-live"><h4>📋 Key Points</h4><ul id="live-key-points" class="points-list"></ul></div>
-                            <div class="tone-indicator"><h4>💬 Tone</h4><div class="tone-bar-container"><div id="tone-bar" class="tone-bar neutral">Neutral</div></div></div>
-                            <div class="word-count-indicator"><div>Words: <strong id="live-word-count">0</strong></div></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Screen 3: Feedback Display -->
-            <div id="feedback-area" style="display: none;">
-                <h2 style="text-align: center; color: #8b4fbe;">Performance Feedback</h2>
-                <div style="text-align: center; margin-bottom: 30px;">
-                    <div id="score-circle" class="score-circle-large"></div>
-                    <p id="score-text" style="font-size: 18px; font-weight: 500;"></p>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
-                    <div style="background: #e8f5e9; padding: 20px; border-radius: 8px; border-left: 4px solid #4caf50;">
-                        <h3 style="color: #2e7d32;">✅ Matched Points</h3>
-                        <ul id="matched-points-list" style="list-style: none; padding: 0;"></ul>
-                    </div>
-                    <div style="background: #fff3e0; padding: 20px; border-radius: 8px; border-left: 4px solid #ff9800;">
-                        <h3 style="color: #e65100;">📈 Areas to Improve</h3>
-                        <ul id="missed-points-list" style="list-style: none; padding: 0;"></ul>
-                    </div>
-                </div>
-                <div style="background: #f8f4fc; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
-                    <h3 style="color: #8b4fbe;">AI Coach Feedback</h3>
-                    <div><h4 style="color: #4caf50;">Strengths:</h4><ul id="strengths-list"></ul></div>
-                    <div><h4 style="color: #ff9800;">Growth Areas:</h4><ul id="improvements-list"></ul></div>
-                </div>
-                <div style="display: flex; gap: 10px;">
-                    <button id="next-scenario-btn" class="btn-primary" style="flex: 1;">Next Scenario →</button>
-                    <button id="retry-scenario-btn" class="btn-secondary">🔄 Retry</button>
-                </div>
-            </div>
-
-            <!-- Screen 4: Session Summary -->
-            <div id="session-summary" style="display: none;"></div>
         </div>
 
         <!-- Door Slam Modal -->
@@ -4667,6 +4356,7 @@ const trainingContent = {
             </div>
         </div>
     </div>
+  
   `,
   quiz: `
     <div class="content-card" id="quiz-container">
@@ -9187,16 +8877,16 @@ function renderAgnesXPBar() {
   `;
 }
 
-// Module to categories mapping (focused on Module 5 only)
+// Module to categories mapping (Module 7 only)
 const moduleToCategories: Record<string, string[]> = {
-  '5': ['initialPitch', 'initialObjections']
+  '7': ['inspection']
 };
 
 // Session state for the new simplified flow
 let agnesSessionConfig = {
   trainingType: 'roleplay' as 'roleplay' | 'walkthrough',
-  inputMode: 'text' as 'voice' | 'text',
-  selectedModule: '' as string,
+  inputMode: 'voice' as 'voice' | 'text',
+  selectedModule: '7' as string,
   selectedScenarios: [] as any[],
   currentScenarioIndex: 0
 };
@@ -9225,76 +8915,25 @@ function getRandomScenarioFromModule(moduleId: string): any {
 function initAgnesLiveRolePlay() {
   console.log('🎙️ Initializing Agnes-21 Live Role-Play System...');
 
-  // Step 1: Training Type selector handlers
+  // Live role-play button (Module 7 only, voice only)
   const roleplayBtn = document.getElementById('agnes-roleplay-btn');
-  const walkthroughBtn = document.getElementById('agnes-walkthrough-btn');
-
   roleplayBtn?.addEventListener('click', () => {
     agnesSessionConfig.trainingType = 'roleplay';
-    showAgnesScreen('agnes-input-mode-selector');
-  });
-
-  walkthroughBtn?.addEventListener('click', () => {
-    agnesSessionConfig.trainingType = 'walkthrough';
-    agnesSessionConfig.inputMode = 'text'; // Walk through is always text mode
-    showAgnesScreen('agnes-module-selector');
-  });
-
-  // Step 2: Input Mode selector handlers
-  const voiceModeBtn = document.getElementById('agnes-voice-mode-btn');
-  const textModeBtn = document.getElementById('agnes-text-mode-btn');
-
-  voiceModeBtn?.addEventListener('click', () => {
-    localStorage.setItem('agnes_input_mode', 'voice');
-    agnesLiveState.inputMode = 'voice';
     agnesSessionConfig.inputMode = 'voice';
-    showAgnesScreen('agnes-module-selector');
-  });
+    agnesSessionConfig.selectedModule = '7';
+    agnesSessionConfig.selectedScenarios = getScenariosForModule('7');
 
-  textModeBtn?.addEventListener('click', () => {
-    localStorage.setItem('agnes_input_mode', 'text');
-    agnesLiveState.inputMode = 'text';
-    agnesSessionConfig.inputMode = 'text';
-    showAgnesScreen('agnes-module-selector');
-  });
+    // Default to beginner difficulty and start live session
+    agnesLiveState.difficulty = 'BEGINNER';
+    agnesLiveState.inputMode = 'voice';
 
-  // Step 3: Module selector handlers
-  const moduleCards = document.querySelectorAll('.agnes-module-card');
-  moduleCards.forEach(card => {
-    card.addEventListener('click', () => {
-      const moduleId = (card as HTMLElement).dataset.module;
-      if (!moduleId) return;
-
-      agnesSessionConfig.selectedModule = moduleId;
-      agnesSessionConfig.selectedScenarios = getScenariosForModule(moduleId);
-
-      console.log(`📚 Selected Module ${moduleId} with ${agnesSessionConfig.selectedScenarios.length} scenarios`);
-
-      showAgnesScreen('agnes-difficulty-selector');
-      renderAgnesDifficultyCards();
-    });
-
-    // Hover effects
-    card.addEventListener('mouseenter', () => {
-      (card as HTMLElement).style.borderColor = '#8b4fbe';
-      (card as HTMLElement).style.transform = 'translateY(-2px)';
-      (card as HTMLElement).style.boxShadow = '0 4px 12px rgba(139, 79, 190, 0.15)';
-    });
-    card.addEventListener('mouseleave', () => {
-      (card as HTMLElement).style.borderColor = '#e5e7eb';
-      (card as HTMLElement).style.transform = 'translateY(0)';
-      (card as HTMLElement).style.boxShadow = 'none';
-    });
-  });
-
-  // Module back button
-  const moduleBackBtn = document.getElementById('agnes-module-back-btn');
-  moduleBackBtn?.addEventListener('click', () => {
-    if (agnesSessionConfig.trainingType === 'walkthrough') {
-      showAgnesScreen('agnes-mode-selector');
-    } else {
-      showAgnesScreen('agnes-input-mode-selector');
+    if (agnesSessionConfig.selectedScenarios.length > 0) {
+      const randomIndex = Math.floor(Math.random() * agnesSessionConfig.selectedScenarios.length);
+      agnesSessionConfig.currentScenarioIndex = randomIndex;
     }
+
+    showAgnesScreen('agnes-voice-ui');
+    initAgnesLiveSession();
   });
 
   // Setup control buttons in voice UI
@@ -9369,29 +9008,7 @@ function initAgnesLiveRolePlay() {
     showAgnesScreen('agnes-mode-selector');
   });
 
-  // NEW: Start Session button (simplified flow - skip old difficulty selector)
-  const startSessionBtn = document.getElementById('agnes-start-session-btn');
-  startSessionBtn?.addEventListener('click', () => {
-    // Default to EASY difficulty
-    agnesLiveState.difficulty = 'BEGINNER';
-
-    // Pick a random scenario from the selected module
-    if (agnesSessionConfig.selectedScenarios.length > 0) {
-      const randomIndex = Math.floor(Math.random() * agnesSessionConfig.selectedScenarios.length);
-      agnesSessionConfig.currentScenarioIndex = randomIndex;
-    }
-
-    console.log(`🎯 Starting ${agnesSessionConfig.trainingType} mode (${agnesSessionConfig.inputMode}) with EASY difficulty`);
-
-    // Start the appropriate mode
-    if (agnesSessionConfig.inputMode === 'voice') {
-      showAgnesScreen('agnes-voice-ui');
-      initAgnesLiveSession();
-    } else {
-      showAgnesScreen('agnes-text-ui');
-      initRolePlayWithScenarios(agnesSessionConfig.selectedScenarios, agnesSessionConfig.trainingType);
-    }
-  });
+  // No text-mode entry points for live-only mode.
 
   // NEW: In-session difficulty buttons handler
   function setupDifficultyButtons() {
