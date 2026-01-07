@@ -44,7 +44,7 @@ Build Status: ✅ SUCCESS (Built in 410ms)
 
 ---
 
-### Module 11: Filing the Claim & Closing (Lines 526-619)
+### Module 11: Filing the Claim & Contingency + Claim Authorization Script (Lines 526-619)
 **Enhanced with:**
 - ✅ When to File the Claim (3 timeline scenarios)
 - ✅ The Filing Call Script (complete carrier call flow)
