@@ -4050,14 +4050,16 @@ const trainingContent = {
         <span style="color: #475569;"> Enter the claim details in the Sales App, move into the contingency + claim authorization agreements, and post in GroupMe when signed.</span>
       </div>
 
-      <div style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 14px; padding: 12px; margin-bottom: 14px;">
-        <div style="font-weight: 700; color: #9a3412; font-size: 13px; margin-bottom: 6px;">Phone Call (Only if app/website/guest filing fails)</div>
-        <ul style="color: #7c2d12; font-size: 12.5px; line-height: 1.6; margin: 0; padding-left: 18px;">
-          <li>Use the Claim Filing Information Sheet for answers.</li>
-          <li>Before ending: claim number out loud + adjuster info.</li>
-          <li>If scheduling now (Allstate), offer 3 time windows you can attend.</li>
-        </ul>
-      </div>
+      <details style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 14px; padding: 12px; margin-bottom: 14px;">
+        <summary style="font-weight: 700; color: #9a3412; font-size: 13px; cursor: pointer;">Phone Call (Only if app/website/guest filing fails)</summary>
+        <div style="margin-top: 10px;">
+          <ul style="color: #7c2d12; font-size: 12.5px; line-height: 1.6; margin: 0; padding-left: 18px;">
+            <li>Use the Claim Filing Information Sheet for answers.</li>
+            <li>Before ending: claim number out loud + adjuster info.</li>
+            <li>If scheduling now (Allstate), offer 3 time windows you can attend.</li>
+          </ul>
+        </div>
+      </details>
 
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 18px;">
         <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px;">
