@@ -4067,10 +4067,6 @@ const trainingContent = {
         </div>
       </div>
 
-      <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px; margin-bottom: 35px;">
-        <img src="/assets/training/module11/calling-insurance-company.png" alt="Calling the Insurance Company slide" style="width: 100%; border-radius: 12px; display: block;">
-      </div>
-
       <!-- Sales App -->
       <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
         <span style="background: #e0f2fe; padding: 8px 12px; border-radius: 8px;">📱</span>
