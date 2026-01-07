@@ -301,7 +301,7 @@ const FINAL_EXAM_MCQ: MCQQuestion[] = [
   { id: 'mcq-25', module: 10, question: 'What is considered wind damage on a roof?', options: ['Round spots', 'Lifted, creased, or missing shingles', 'Granule loss only', 'Color fading'], correctAnswer: 1, explanation: 'Wind damage shows as lifted edges, creased shingles, or completely missing shingles.' },
   { id: 'mcq-26', module: 10, question: 'What is the first step in the Empathy Framework when handling objections?', options: ['Educate them on the process', 'Offer a solution right away', 'Acknowledge their concern', 'Ask for the sale'], correctAnswer: 2, explanation: 'The first step in the Empathy Framework is to acknowledge their concern - show you understand before educating.' },
 
-  // Module 11: Filing Claims & Closing (6 MCQ)
+  // Module 11: Filing the Claim & Contingency + Claim Authorization Script
   { id: 'mcq-27', module: 11, question: 'When is the BEST time to file a claim?', options: ['Within a week', 'Same day - immediately', 'After getting other estimates', 'After the adjuster visits'], correctAnswer: 1, explanation: 'File the claim the same day, immediately after finding damage - timing is critical for insurance claims.' },
   { id: 'mcq-28', module: 11, question: 'What is a supplement in the insurance claim process?', options: ['A vitamin', 'Additional documentation for work not covered in initial estimate', 'The homeowner\'s payment', 'A second insurance policy'], correctAnswer: 1, explanation: 'A supplement requests additional funds for work discovered after the initial estimate.' },
   { id: 'mcq-29', module: 11, question: 'Who typically meets with the insurance adjuster at the property?', options: ['Only the homeowner', 'The Roof E.R. representative', 'The neighbor', 'No one - it\'s done remotely'], correctAnswer: 1, explanation: 'A Roof E.R. representative meets the adjuster to ensure all damage is properly documented.' },
@@ -1263,7 +1263,7 @@ function getNextTrainingModule(): { module: string; displayName: string } {
     'post-inspection-pitch': 'Post-Inspection Pitch',
     'post-inspection-objections': 'Post-Inspection Objections',
     'damage-identification': 'Damage Identification',
-    'filing-claim-closing': 'Filing the Claim & Closing',
+    'filing-claim-closing': 'Filing the Claim & Contingency + Claim Authorization Script',
     'sales-cycle-job-flow': 'The Sales Cycle & Job Flow',
     'role-play': 'AI Role-Play',
     'final-exam': 'Final Exam'
@@ -4006,65 +4006,73 @@ const trainingContent = {
     <!-- Hero Header -->
     <div style="background: linear-gradient(135deg, #0891b2 0%, #06b6d4 50%, #22d3ee 100%); padding: 40px 30px; text-align: center; color: white;">
       <div style="font-size: 48px; margin-bottom: 15px;">📋</div>
-      <h1 style="margin: 0 0 10px 0; font-size: 28px; font-weight: 700;">Filing the Claim & Closing</h1>
-      <p style="margin: 0; opacity: 0.9; font-size: 16px;">Claim filing, contingency, and claim authorization - step by step</p>
+      <h1 style="margin: 0 0 10px 0; font-size: 28px; font-weight: 700;">Filing the Claim & Contingency + Claim Authorization Script</h1>
+      <p style="margin: 0; opacity: 0.9; font-size: 16px;">Digital-first claim filing, contingency, and claim authorization</p>
     </div>
 
     <div style="padding: 30px;">
-      <!-- Lesson Plan: Filing the Claim -->
-      <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+      <!-- Lesson Plan: Filing the Claim (Digital First) -->
+      <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
         <span style="background: #ecfeff; padding: 8px 12px; border-radius: 8px;">🧭</span>
-        Lesson Plan: Filing the Claim
+        Lesson Plan: Filing the Claim (Digital First)
       </h2>
 
-      <div style="background: white; border: 2px solid #e2e8f0; border-radius: 18px; padding: 24px; margin-bottom: 24px;">
-        <ol style="color: #1f2937; font-size: 14px; line-height: 1.8; margin: 0; padding-left: 18px;">
-          <li>
-            <strong>Prep the homeowner to file the claim.</strong>
-            Use the Claim Filing Information Sheet so they can answer questions about hail and wind damage, damaged items, storm date/time, hail size, materials, interior damage, livability, personal property, power loss, and roof access.
-          </li>
-          <li>
-            <strong>Choose the filing method (in this order):</strong>
-            <ul style="margin: 8px 0 0 0; padding-left: 18px;">
-              <li>Insurance company app on the homeowner's phone (preferred).</li>
-              <li>Insurance website login on a computer (use the homeowner's credentials).</li>
-              <li>Guest online claim filing, if the website allows it.</li>
-              <li>If none of the above work, move to the phone call path.</li>
-            </ul>
-          </li>
-          <li>
-            <strong>Phone call path (if needed).</strong>
-            Have the homeowner call the insurance company on speakerphone and follow the Claim Filing Information Sheet.
-          </li>
-          <li>
-            <strong>Before ending the call:</strong>
-            Have them read the claim number out loud, ask if an adjuster is assigned, and capture the adjuster's name, phone, and email (or ask when assignment will happen).
-          </li>
-          <li><strong>Enter the claim details into your Sales App.</strong></li>
-          <li><strong>Move to the agreements.</strong> Present the contingency agreement and the claim authorization agreement, then collect signatures.</li>
-          <li><strong>Post in GroupMe.</strong> Share that the sign-up is complete and ask for help with the adjuster meeting if needed.</li>
-        </ol>
+      <div style="background: linear-gradient(135deg, #ecfeff 0%, #cffafe 100%); border-radius: 16px; padding: 18px; margin-bottom: 18px;">
+        <strong style="color: #0f172a;">Priority:</strong>
+        <span style="color: #0f172a;"> We want the homeowner to file the claim digitally (app or website). Phone calls are last resort only.</span>
       </div>
 
-      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
-        <strong style="color: #0f172a;">Field Translator:</strong>
-        <span style="color: #475569;"> Use it when language support is needed at the door.</span>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 22px;">
+        <div style="background: white; border: 2px solid #e2e8f0; border-radius: 16px; padding: 18px;">
+          <div style="font-size: 20px; font-weight: 700; color: #0e7490; margin-bottom: 6px;">1) Insurance App</div>
+          <div style="color: #475569; font-size: 14px; line-height: 1.6;">Have the homeowner file through their insurance app on their phone. You guide the steps.</div>
+        </div>
+        <div style="background: white; border: 2px solid #e2e8f0; border-radius: 16px; padding: 18px;">
+          <div style="font-size: 20px; font-weight: 700; color: #0e7490; margin-bottom: 6px;">2) Website Login</div>
+          <div style="color: #475569; font-size: 14px; line-height: 1.6;">If no app, use the homeowner's website login on their computer to file online.</div>
+        </div>
+        <div style="background: white; border: 2px solid #e2e8f0; border-radius: 16px; padding: 18px;">
+          <div style="font-size: 20px; font-weight: 700; color: #0e7490; margin-bottom: 6px;">3) Guest Claim</div>
+          <div style="color: #475569; font-size: 14px; line-height: 1.6;">Check the website for a guest filing option. Use it if available.</div>
+        </div>
       </div>
 
-      <div style="background: linear-gradient(135deg, #eff6ff 0%, #e0f2fe 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
-        <strong style="color: #0f172a;">Your responsibility:</strong>
-        <span style="color: #475569;"> Steps 1-7 above. Other teams handle the remaining portions of the claim, but you may be asked to assist as needed.</span>
+      <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 16px; padding: 16px; margin-bottom: 16px;">
+        <strong style="color: #166534;">Once the claim is filed (any method):</strong>
+        <ul style="color: #14532d; font-size: 14px; line-height: 1.7; margin: 8px 0 0 0; padding-left: 18px;">
+          <li>Have them read the claim number out loud and write it down.</li>
+          <li>Ask if an adjuster is assigned; get name, phone, and email (or when assignment will happen).</li>
+        </ul>
       </div>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 24px;">
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 14px; margin-bottom: 18px;">
+        <strong style="color: #0f172a;">Next steps:</strong>
+        <span style="color: #475569;"> Enter the claim details in the Sales App, move into the contingency + claim authorization agreements, and post in GroupMe when signed.</span>
+      </div>
+
+      <div style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 14px; padding: 12px; margin-bottom: 14px;">
+        <div style="font-weight: 700; color: #9a3412; font-size: 13px; margin-bottom: 6px;">Phone Call (Only if app/website/guest filing fails)</div>
+        <ul style="color: #7c2d12; font-size: 12.5px; line-height: 1.6; margin: 0; padding-left: 18px;">
+          <li>Use the Claim Filing Information Sheet for answers.</li>
+          <li>Before ending: claim number out loud + adjuster info.</li>
+          <li>If scheduling now (Allstate), offer 3 time windows you can attend.</li>
+        </ul>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 18px;">
         <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px;">
-          <img src="/assets/training/module11/claim-filing-info-sheet.png" alt="Claim Filing Information Sheet slide" style="width: 100%; border-radius: 12px; display: block;">
-          <div style="text-align: center; color: #6b7280; font-size: 12px; margin-top: 8px;">Claim Filing Information Sheet</div>
+          <img src="/assets/training/module11/claim-filing-info-sheet.png" alt="Claim Filing Information Sheet slide" style="width: 100%; max-height: 180px; object-fit: contain; border-radius: 12px; display: block;">
+          <div style="text-align: center; color: #6b7280; font-size: 12px; margin-top: 8px;">Claim Filing Information Sheet (phone call only)</div>
         </div>
         <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px;">
-          <img src="/assets/training/module11/example-customer-info-sheet.png" alt="Example customer info sheet slide" style="width: 100%; border-radius: 12px; display: block;">
+          <img src="/assets/training/module11/example-customer-info-sheet.png" alt="Example customer info sheet slide" style="width: 100%; max-height: 180px; object-fit: contain; border-radius: 12px; display: block;">
           <div style="text-align: center; color: #6b7280; font-size: 12px; margin-top: 8px;">Example Customer Info Sheet</div>
         </div>
+      </div>
+
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; margin-bottom: 20px;">
+        <strong style="color: #0f172a;">Field Translator:</strong>
+        <span style="color: #475569;"> Use it when language support is needed at the door.</span>
       </div>
 
       <!-- Sales App -->
@@ -4083,7 +4091,7 @@ const trainingContent = {
       <!-- Contingency & Claim Authorization Script -->
       <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
         <span style="background: #f0fdf4; padding: 8px 12px; border-radius: 8px;">✅</span>
-        Contingency & Claim Authorization Script
+        Contingency + Claim Authorization Script
       </h2>
 
       <div style="display: grid; gap: 15px; margin-bottom: 35px;">
@@ -5254,9 +5262,9 @@ trainingContent['damage-identification'] = trainingContent['roofing-damage-id'] 
   <div class="content-card"><h1>Damage Identification</h1><p>Content coming soon.</p></div>
 `;
 
-// 11. Filing the Claim & Closing (remap existing)
+// 11. Filing the Claim & Contingency + Claim Authorization Script (remap existing)
 trainingContent['filing-claim-closing'] = trainingContent['claim-closing'] || `
-  <div class="content-card"><h1>Filing the Claim & Closing</h1><p>Content coming soon.</p></div>
+  <div class="content-card"><h1>Filing the Claim & Contingency + Claim Authorization Script</h1><p>Content coming soon.</p></div>
 `;
 
 // 12. Sales Cycle & Job Flow (remap existing)
@@ -10943,7 +10951,7 @@ function getModuleDisplayName(moduleId: string): string {
     'post-inspection-pitch': 'Post-Inspection Pitch',
     'post-inspection-objections': 'Post-Inspection Objections',
     'damage-identification': 'Damage Identification',
-    'filing-claim-closing': 'Filing Claim & Closing',
+    'filing-claim-closing': 'Filing the Claim & Contingency + Claim Authorization Script',
     'sales-cycle-job-flow': 'Sales Cycle & Job Flow',
     'role-play': 'Role Play Practice',
     'final-exam': 'Final Exam'
@@ -11587,7 +11595,7 @@ async function seedModulesFromTrainingContent(): Promise<void> {
     'post-inspection-pitch': 'Post-Inspection Pitch',
     'post-inspection-objections': 'Post-Inspection Objections',
     'damage-identification': 'Damage Identification',
-    'filing-claim-closing': 'Filing the Claim & Closing',
+    'filing-claim-closing': 'Filing the Claim & Contingency + Claim Authorization Script',
     'sales-cycle-job-flow': 'The Sales Cycle & Job Flow',
     'role-play': 'AI Role-Play',
     'final-exam': 'Final Exam'
@@ -13988,7 +13996,7 @@ function showLockoutScreen(root: HTMLElement, state: ExamState) {
           <ul>
             <li>Module 5: Initial Pitch & 5 Non-Negotiables</li>
             <li>Module 6-9: Objection Handling</li>
-            <li>Module 11: Filing the Claim & Closing</li>
+            <li>Module 11: Filing the Claim & Contingency + Claim Authorization Script</li>
           </ul>
         </div>
       </div>
@@ -14733,7 +14741,7 @@ function showExamResults(root: HTMLElement, attempt: ExamAttempt, detailedResult
           <ul>
             <li>Module 5: Initial Pitch & 5 Non-Negotiables</li>
             <li>Module 6-9: Handling Objections</li>
-            <li>Module 11: Filing the Claim & Closing</li>
+            <li>Module 11: Filing the Claim & Contingency + Claim Authorization Script</li>
           </ul>
         </div>
 
