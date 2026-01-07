@@ -4011,100 +4011,62 @@ const trainingContent = {
     </div>
 
     <div style="padding: 30px;">
-      <!-- Quick Stats -->
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;">
-        <div style="background: linear-gradient(135deg, #ecfeff 0%, #cffafe 100%); padding: 20px; border-radius: 12px; text-align: center;">
-          <div style="font-size: 28px; font-weight: 700; color: #0891b2;">🧾</div>
-          <div style="font-size: 13px; color: #0e7490;">Info Sheet Ready</div>
-        </div>
-        <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 20px; border-radius: 12px; text-align: center;">
-          <div style="font-size: 28px; font-weight: 700; color: #16a34a;">2</div>
-          <div style="font-size: 13px; color: #166534;">Key Forms</div>
-        </div>
-        <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 20px; border-radius: 12px; text-align: center;">
-          <div style="font-size: 28px; font-weight: 700; color: #d97706;">24-48</div>
-          <div style="font-size: 13px; color: #92400e;">Adjuster Contact (hrs)</div>
-        </div>
-      </div>
-
-      <!-- Claim Filing Information Sheet -->
+      <!-- Lesson Plan: Filing the Claim -->
       <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-        <span style="background: #ecfeff; padding: 8px 12px; border-radius: 8px;">🧾</span>
-        Claim Filing Information Sheet
+        <span style="background: #ecfeff; padding: 8px 12px; border-radius: 8px;">🧭</span>
+        Lesson Plan: Filing the Claim
       </h2>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-bottom: 20px;">
-        <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-radius: 16px; padding: 20px; border-left: 4px solid #3b82f6;">
-          <h3 style="color: #1e40af; font-size: 16px; margin: 0 0 12px 0;">What to tell the insurance company</h3>
-          <ul style="color: #374151; font-size: 14px; line-height: 1.7; margin: 0; padding-left: 18px;">
-            <li>"I would like to file a claim for hail and wind damage" (never only wind)</li>
-            <li>Damaged items: roof, downspouts, gutters, window wraps, siding, etc.</li>
-            <li>Have you selected a contractor? Yes, Roof-ER</li>
-            <li>Do you have an estimate? No</li>
-          </ul>
-        </div>
-        <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 16px; padding: 20px; border-left: 4px solid #16a34a;">
-          <h3 style="color: #166534; font-size: 16px; margin: 0 0 12px 0;">Questions they may ask</h3>
-          <ul style="color: #374151; font-size: 14px; line-height: 1.7; margin: 0; padding-left: 18px;">
-            <li>Date of loss and time of storm</li>
-            <li>Hail size (usually 1-1.5 inches)</li>
-            <li>Type of shingle and/or siding</li>
-            <li>Interior damage? Is the house livable?</li>
-            <li>Any personal property damaged? Lose power?</li>
-            <li>Is the roof steeper than a staircase? Access difficulty?</li>
-          </ul>
-        </div>
+      <div style="background: white; border: 2px solid #e2e8f0; border-radius: 18px; padding: 24px; margin-bottom: 24px;">
+        <ol style="color: #1f2937; font-size: 14px; line-height: 1.8; margin: 0; padding-left: 18px;">
+          <li>
+            <strong>Prep the homeowner to file the claim.</strong>
+            Use the Claim Filing Information Sheet so they can answer questions about hail and wind damage, damaged items, storm date/time, hail size, materials, interior damage, livability, personal property, power loss, and roof access.
+          </li>
+          <li>
+            <strong>Choose the filing method (in this order):</strong>
+            <ul style="margin: 8px 0 0 0; padding-left: 18px;">
+              <li>Insurance company app on the homeowner's phone (preferred).</li>
+              <li>Insurance website login on a computer (use the homeowner's credentials).</li>
+              <li>Guest online claim filing, if the website allows it.</li>
+              <li>If none of the above work, move to the phone call path.</li>
+            </ul>
+          </li>
+          <li>
+            <strong>Phone call path (if needed).</strong>
+            Have the homeowner call the insurance company on speakerphone and follow the Claim Filing Information Sheet.
+          </li>
+          <li>
+            <strong>Before ending the call:</strong>
+            Have them read the claim number out loud, ask if an adjuster is assigned, and capture the adjuster's name, phone, and email (or ask when assignment will happen).
+          </li>
+          <li><strong>Enter the claim details into your Sales App.</strong></li>
+          <li><strong>Move to the agreements.</strong> Present the contingency agreement and the claim authorization agreement, then collect signatures.</li>
+          <li><strong>Post in GroupMe.</strong> Share that the sign-up is complete and ask for help with the adjuster meeting if needed.</li>
+        </ol>
       </div>
 
-      <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px; margin-bottom: 20px;">
-        <img src="/assets/training/module11/claim-filing-info-sheet.png" alt="Claim Filing Information Sheet slide" style="width: 100%; border-radius: 12px; display: block;">
-        <div style="text-align: center; color: #6b7280; font-size: 12px; margin-top: 8px;">Claim Filing Information Sheet (reference)</div>
-      </div>
-
-      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 25px;">
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
         <strong style="color: #0f172a;">Field Translator:</strong>
-        <span style="color: #475569;"> 20+ languages for the doors.</span>
+        <span style="color: #475569;"> Use it when language support is needed at the door.</span>
       </div>
 
-      <div style="background: white; border: 2px solid #e9d5ff; border-radius: 16px; padding: 20px; margin-bottom: 35px;">
-        <h3 style="color: #7c3aed; font-size: 16px; margin: 0 0 12px 0;">Example Customer Info Sheet</h3>
-        <div style="color: #374151; font-size: 14px; line-height: 1.7;">
-          <div><strong>Let them know:</strong> You want to file a claim for hail and wind damage</div>
-          <div><strong>Damaged:</strong> Roof and aluminum siding</div>
-          <div><strong>Date of storm:</strong> September 8, 2023</div>
-          <div><strong>Time of storm:</strong> Around 5pm</div>
-          <div><strong>Size of hail:</strong> 1 inch</div>
-          <div><strong>Type of shingle:</strong> Asphalt</div>
-          <div><strong>Type of siding:</strong> Aluminum</div>
-          <div><strong>Interior damage:</strong> Yes, 1 bedroom upstairs</div>
-          <div><strong>House livable:</strong> Yes</div>
-          <div><strong>Personal property damaged:</strong> No</div>
-          <div><strong>Lost power:</strong> No</div>
-          <div><strong>Selected contractor:</strong> Yes, Roof ER out of Vienna, VA (all info on business card)</div>
-          <div><strong>Estimate:</strong> No</div>
-          <div><strong>Roof steep / access:</strong> No, 1-story access</div>
+      <div style="background: linear-gradient(135deg, #eff6ff 0%, #e0f2fe 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
+        <strong style="color: #0f172a;">Your responsibility:</strong>
+        <span style="color: #475569;"> Steps 1-7 above. Other teams handle the remaining portions of the claim, but you may be asked to assist as needed.</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px;">
+          <img src="/assets/training/module11/claim-filing-info-sheet.png" alt="Claim Filing Information Sheet slide" style="width: 100%; border-radius: 12px; display: block;">
+          <div style="text-align: center; color: #6b7280; font-size: 12px; margin-top: 8px;">Claim Filing Information Sheet</div>
         </div>
-        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; margin-top: 16px;">
-          <img src="/assets/training/module11/example-customer-info-sheet.png" alt="Example customer info sheet slide" style="width: 100%; border-radius: 10px; display: block;">
-        </div>
-        <div style="margin-top: 12px; color: #6b7280; font-size: 13px;">
-          After the claim is filed, ask for the claim number and whether an adjuster has been assigned.
+        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px;">
+          <img src="/assets/training/module11/example-customer-info-sheet.png" alt="Example customer info sheet slide" style="width: 100%; border-radius: 12px; display: block;">
+          <div style="text-align: center; color: #6b7280; font-size: 12px; margin-top: 8px;">Example Customer Info Sheet</div>
         </div>
       </div>
 
-      <!-- Calling the Insurance Company -->
-      <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-        <span style="background: #fef3c7; padding: 8px 12px; border-radius: 8px;">📞</span>
-        Calling the Insurance Company
-      </h2>
-
-      <div style="background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%); border-radius: 16px; padding: 20px; margin-bottom: 30px;">
-        <ul style="color: #374151; font-size: 14px; line-height: 1.7; margin: 0; padding-left: 18px;">
-          <li>Examples will be demonstrated in training</li>
-          <li>We will walk through a few example calls</li>
-          <li>Connect with your trainers on how to assist clients with filing the claim</li>
-        </ul>
-      </div>
       <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px; margin-bottom: 35px;">
         <img src="/assets/training/module11/calling-insurance-company.png" alt="Calling the Insurance Company slide" style="width: 100%; border-radius: 12px; display: block;">
       </div>
@@ -4158,23 +4120,6 @@ const trainingContent = {
           <p style="color: #b91c1c; font-size: 13px; margin: 10px 0 0 0;">Answer any questions the homeowner may have.</p>
           <p style="color: #374151; font-size: 14px; margin: 8px 0 0 0;">"Thank you, sir/ma'am. Looking forward to seeing you on the day of inspection. You have my contact information on my card if you need anything else."</p>
         </div>
-      </div>
-
-      <!-- Lesson Plan -->
-      <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-        <span style="background: #f3e8ff; padding: 8px 12px; border-radius: 8px;">🧭</span>
-        Lesson Plan: Filing to Signature
-      </h2>
-
-      <div style="background: linear-gradient(135deg, #f3e8ff 0%, #ede9fe 100%); border-radius: 16px; padding: 25px; margin-bottom: 35px;">
-        <ol style="color: #4c1d95; font-size: 14px; line-height: 1.8; margin: 0; padding-left: 18px;">
-          <li>Prep the homeowner with the Claim Filing Information Sheet.</li>
-          <li>File the claim together and capture the claim number.</li>
-          <li>Ask for adjuster contact information or assignment status.</li>
-          <li>Deliver the contingency agreement script and collect signatures.</li>
-          <li>Present the Claim Authorization form and submit (password "roofer" if prompted).</li>
-          <li>Set expectations and confirm how adjuster scheduling will be handled.</li>
-        </ol>
       </div>
 
       <!-- Key Documents Section -->
