@@ -3430,16 +3430,16 @@ const trainingContent = {
             <!-- Image Gallery with Local Images -->
             <div class="damage-gallery">
               <div class="damage-image-item">
-                <img src="/assets/damage/wind/Wind.jpg" alt="Wind damage missing shingles">
-                <p class="image-caption">Missing shingles blown off by wind</p>
+                <img src="/assets/damage/wind/wind-damage-1.jpg" alt="Wind damage on shingles">
+                <p class="image-caption">Wind damage on shingles</p>
               </div>
               <div class="damage-image-item">
-                <img src="/assets/damage/wind/wind1.jpg" alt="Lifted and creased shingles">
-                <p class="image-caption">Lifted and creased shingles</p>
+                <img src="/assets/damage/wind/wind-damage-2.webp" alt="Lifted or creased shingles">
+                <p class="image-caption">Lifted or creased shingles</p>
               </div>
               <div class="damage-image-item">
-                <img src="/assets/damage/wind/wind2.jpg" alt="Torn shingle edges">
-                <p class="image-caption">Torn shingles at edges and ridges</p>
+                <img src="/assets/damage/wind/wind-damage-3.webp" alt="Missing or torn shingles">
+                <p class="image-caption">Missing or torn shingles</p>
               </div>
             </div>
 
@@ -3466,16 +3466,16 @@ const trainingContent = {
 
             <div class="damage-gallery">
               <div class="damage-image-item">
-                <img src="/assets/damage/collateral/collateral-1.jpg" alt="Collateral damage on vent flashing">
-                <p class="image-caption">Metal vent/flashing impact marks</p>
+                <img src="/assets/damage/collateral/collateral-damage-1.avif" alt="Collateral damage on siding">
+                <p class="image-caption">Aluminum siding impact marks</p>
               </div>
               <div class="damage-image-item">
-                <img src="/assets/damage/collateral/collateral-2.jpg" alt="Collateral damage on vinyl siding">
-                <p class="image-caption">Vinyl siding impacts</p>
+                <img src="/assets/damage/collateral/collateral-damage-2.jpg" alt="Collateral damage on soffit or fascia">
+                <p class="image-caption">Soffit or fascia impact marks</p>
               </div>
               <div class="damage-image-item">
-                <img src="/assets/damage/collateral/collateral-3.jpg" alt="Collateral damage on vinyl siding close up">
-                <p class="image-caption">Siding pitting close-up</p>
+                <img src="/assets/damage/collateral/collateral-damage-3.png" alt="Collateral damage on gutter">
+                <p class="image-caption">Gutter dent impact</p>
               </div>
             </div>
 
