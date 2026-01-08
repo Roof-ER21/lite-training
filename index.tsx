@@ -267,9 +267,9 @@ const FINAL_EXAM_MCQ: MCQQuestion[] = [
   { id: 'mcq-5', module: 2, question: 'According to Roof E.R.\'s values, what does "Integrity" mean?', options: ['Following company policies', 'Always do what\'s right for the homeowner, even when no one is watching', 'Maximizing sales numbers', 'Being faster than competitors'], correctAnswer: 1, explanation: 'Integrity means always doing what\'s right for the homeowner, even when no one is watching.' },
 
   // Module 4: Shingle Types & Materials (3 MCQ)
-  { id: 'mcq-6', module: 4, question: 'What is the warranty offered for the shingle that we upgrade our customers to (GAF Timberline HDZ)?', options: ['10 years', '25-30 years', 'Limited lifetime warranty', '50 years'], correctAnswer: 2, explanation: 'The GAF Timberline HDZ shingle comes with a limited lifetime warranty.' },
+  { id: 'mcq-6', module: 4, question: 'Which statement best describes the GAF Timberline HDZ shingle we upgrade customers to?', options: ['A basic 3-tab shingle with a 60 mph wind rating', 'An architectural shingle with a reinforced nailing zone and strong wind rating', 'A metal panel system used on low-slope roofs', 'A clay tile designed for custom homes'], correctAnswer: 1, explanation: 'Timberline HDZ is an architectural shingle with a reinforced nailing zone and strong wind performance.' },
   { id: 'mcq-7', module: 4, question: 'Which shingle type is most commonly used in residential roofing?', options: ['Metal shingles', '3-tab asphalt', 'Clay tiles', 'Slate'], correctAnswer: 1, explanation: '3-tab asphalt shingles are the most common residential roofing material.' },
-  { id: 'mcq-8', module: 4, question: 'What is the typical warranty period for architectural shingles?', options: ['10 years', '25-30 years', '50 years', 'Lifetime'], correctAnswer: 1, explanation: 'Most architectural shingles carry a 25-30 year warranty.' },
+  { id: 'mcq-8', module: 4, question: 'What is a defining feature of architectural shingles compared to 3-tab?', options: ['Single-layer, flat profile', 'Multiple laminated layers that create a dimensional look', 'Only used on flat roofs', 'Made from clay tiles'], correctAnswer: 1, explanation: 'Architectural shingles use multiple laminated layers to create a dimensional appearance.' },
 
   // Module 5: Initial Pitch (3 MCQ)
   { id: 'mcq-9', module: 5, question: 'What GAF certification does Rufiar have?', options: ['GAF Certified Contractor', 'GAF Master Elite', 'GAF Preferred Partner', 'GAF Basic Installer'], correctAnswer: 1, explanation: 'Rufiar holds the GAF Master Elite certification, the highest level of GAF contractor certification.' },
@@ -277,29 +277,29 @@ const FINAL_EXAM_MCQ: MCQQuestion[] = [
   { id: 'mcq-11', module: 5, question: 'If a homeowner says "Will my rates go up?", what is the best response?', options: ['Yes, they probably will', 'I understand your concern - rates cannot go up and an individual homeowner cannot be penalized for an act of God claim', 'You should not file then', 'I am not sure about insurance rates'], correctAnswer: 1, explanation: 'Following the objection framework, empathize and explain that rates cannot go up for act of God claims - individual homeowners are not penalized.' },
 
   // Module 6: Handling Initial Objections (3 MCQ)
-  { id: 'mcq-12', module: 6, question: 'When a homeowner says "We already have a roofer," what is the best response?', options: ['That is fine, we will leave', 'We hear that all the time - does the person you are working with specialize in insurance claims and storm restoration?', 'Our prices are lower than theirs', 'You should fire your current roofer'], correctAnswer: 1, explanation: 'Ask if their current roofer specializes in insurance claims and storm restoration to differentiate yourself.' },
+  { id: 'mcq-12', module: 6, question: 'When a homeowner says "We already have a roofer," what is the best response?', options: ['That is fine, we will leave', 'Totally. I just need 15 minutes to check for storm damage and show you what I find. It is free and quick.', 'Our prices are lower than theirs', 'You should fire your current roofer'], correctAnswer: 1, explanation: 'Acknowledge their relationship and move straight to a quick, free inspection.' },
   { id: 'mcq-13', module: 6, question: 'What is non-negotiable number three?', options: ['Who you are', 'Who we are', 'Make it relatable', 'Go for the close'], correctAnswer: 2, explanation: 'Non-negotiable #3 is Make it relatable - connect with the homeowner through recent storms and helping neighbors.' },
   { id: 'mcq-14', module: 6, question: 'What\'s the best response to "I don\'t have time right now"?', options: ['Leave your card and hope they call', 'Insist on doing it now', 'I completely understand - if you only have five minutes, that\'s all it\'s going to take me', 'Say you\'ll come back another day'], correctAnswer: 2, explanation: 'Acknowledge their concern while reassuring them it only takes a few minutes - this keeps the opportunity alive without being pushy.' },
 
-  // Module 7: Inspection Process (3 MCQ)
-  { id: 'mcq-15', module: 7, question: 'Which of the following is NOT important to inspect during your initial inspection for storm damage?', options: ['Shingles and gutters', 'Damage to wood fences and concrete structures', 'Flashing and downspouts', 'Vents and valleys'], correctAnswer: 1, explanation: 'Wood fences and concrete are not part of the roof inspection - focus on shingles, gutters, flashing, downspouts, vents, and valleys.' },
-  { id: 'mcq-16', module: 7, question: 'What is the first step to overcoming an objection?', options: ['Argue with the homeowner', 'React positively', 'Walk away', 'Offer a discount'], correctAnswer: 1, explanation: 'The first step to overcoming an objection is to react positively - stay calm and empathize.' },
-  { id: 'mcq-17', module: 7, question: 'What is an appropriate response to the objection "I\'ll think about it"?', options: ['Leave your card and hope they call', 'Ask what specifically they need to think about to address their concern', 'Apply heavy pressure to sign now', 'Tell them they are making a mistake'], correctAnswer: 1, explanation: 'Ask what specifically they need to think about - this helps uncover and address their real concern.' },
+  // Module 8: Inspection Process (3 MCQ)
+  { id: 'mcq-15', module: 8, question: 'Which of the following is NOT important to inspect during your initial inspection for storm damage?', options: ['Shingles and gutters', 'Damage to wood fences and concrete structures', 'Flashing and downspouts', 'Vents and valleys'], correctAnswer: 1, explanation: 'Wood fences and concrete are not part of the roof inspection - focus on shingles, gutters, flashing, downspouts, vents, and valleys.' },
+  { id: 'mcq-16', module: 8, question: 'What is the first step to overcoming an objection?', options: ['Argue with the homeowner', 'React positively', 'Walk away', 'Offer a discount'], correctAnswer: 1, explanation: 'The first step to overcoming an objection is to react positively - stay calm and empathize.' },
+  { id: 'mcq-17', module: 8, question: 'What is an appropriate response to the objection "I\'ll think about it"?', options: ['Leave your card and hope they call', 'Ask what specifically they need to think about to address their concern', 'Apply heavy pressure to sign now', 'Tell them they are making a mistake'], correctAnswer: 1, explanation: 'Ask what specifically they need to think about - this helps uncover and address their real concern.' },
 
-  // Module 8: Post-Inspection Pitch (3 MCQ)
-  { id: 'mcq-18', module: 8, question: 'What is the best response to "I don\'t have time right now" during post-inspection?', options: ['Leave and never return', 'I completely understand - you can go back and finish what you\'re doing, I\'ll go ahead and run up and do that inspection', 'Tell them you\'ll only take 2 minutes', 'Ask them to call you later'], correctAnswer: 1, explanation: 'Let them know they can continue their activities while you do the inspection - this respects their time while keeping the opportunity.' },
-  { id: 'mcq-19', module: 8, question: 'Which of the following is an example of wind damage on a roof?', options: ['Round circular divots', 'Missing tabs', 'Granule loss in a circle', 'Soft spots'], correctAnswer: 1, explanation: 'Missing tabs are a sign of wind damage on a roof.' },
-  { id: 'mcq-20', module: 8, question: 'What is the name of the form the customer signs that protects them by saying we only do work if we get them fully approved through their insurance?', options: ['Work Order Agreement', 'Contingency Agreement', 'Insurance Form', 'Payment Contract'], correctAnswer: 1, explanation: 'The Contingency Agreement protects the customer - we only do the work if they get fully approved by insurance.' },
+  // Module 9: Post-Inspection Pitch (3 MCQ)
+  { id: 'mcq-18', module: 9, question: 'What is the best response to "I don\'t have time right now" during post-inspection?', options: ['Leave and never return', 'I completely understand - you can go back and finish what you\'re doing, I\'ll go ahead and run up and do that inspection', 'Tell them you\'ll only take 2 minutes', 'Ask them to call you later'], correctAnswer: 1, explanation: 'Let them know they can continue their activities while you do the inspection - this respects their time while keeping the opportunity.' },
+  { id: 'mcq-19', module: 9, question: 'Which of the following is an example of wind damage on a roof?', options: ['Round circular divots', 'Missing tabs', 'Granule loss in a circle', 'Soft spots'], correctAnswer: 1, explanation: 'Missing tabs are a sign of wind damage on a roof.' },
+  { id: 'mcq-20', module: 9, question: 'What is the name of the form the customer signs that protects them by saying we only do work if we get them fully approved through their insurance?', options: ['Work Order Agreement', 'Contingency Agreement', 'Insurance Form', 'Payment Contract'], correctAnswer: 1, explanation: 'The Contingency Agreement protects the customer - we only do the work if they get fully approved by insurance.' },
 
-  // Module 9: Post-Inspection Objections (3 MCQ)
-  { id: 'mcq-21', module: 9, question: 'When a homeowner says "My rates will go up," what\'s the best response?', options: ['That\'s probably true', 'Rates increase due to regional claims, not individual claims, and not filing means $20K+ later', 'Don\'t file then', 'I don\'t know about insurance'], correctAnswer: 1, explanation: 'Explain rates increase regionally regardless, and not filing now means huge out-of-pocket costs later.' },
-  { id: 'mcq-22', module: 9, question: 'How do you handle "I need to talk to my spouse"?', options: ['Call them yourself', 'Leave and hope they call back', 'Ask when the spouse will be available and schedule a time to meet together', 'Tell them to convince their spouse'], correctAnswer: 2, explanation: 'Schedule a time to meet when both decision-makers are present.' },
-  { id: 'mcq-23', module: 9, question: 'What\'s the response to "I don\'t trust insurance claims"?', options: ['You shouldn\'t trust them', 'This is what you PAY insurance for - it\'s your right to file', 'Don\'t file then', 'Insurance is always trustworthy'], correctAnswer: 1, explanation: 'Remind them this is exactly what they pay premiums for - it\'s their right to use it.' },
+  // Module 10: Post-Inspection Objections (3 MCQ)
+  { id: 'mcq-21', module: 10, question: 'When a homeowner says "My rates will go up," what\'s the best response?', options: ['That\'s probably true', 'Rates increase due to regional claims, not individual claims, and not filing means $20K+ later', 'Don\'t file then', 'I don\'t know about insurance'], correctAnswer: 1, explanation: 'Explain rates increase regionally regardless, and not filing now means huge out-of-pocket costs later.' },
+  { id: 'mcq-22', module: 10, question: 'How do you handle "I need to talk to my spouse"?', options: ['Call them yourself', 'Leave and hope they call back', 'Ask when the spouse will be available and schedule a time to meet together', 'Tell them to convince their spouse'], correctAnswer: 2, explanation: 'Schedule a time to meet when both decision-makers are present.' },
+  { id: 'mcq-23', module: 10, question: 'What\'s the response to "I don\'t trust insurance claims"?', options: ['You shouldn\'t trust them', 'This is what you PAY insurance for - it\'s your right to file', 'Don\'t file then', 'Insurance is always trustworthy'], correctAnswer: 1, explanation: 'Remind them this is exactly what they pay premiums for - it\'s their right to use it.' },
 
-  // Module 10: Damage Identification (3 MCQ)
-  { id: 'mcq-24', module: 10, question: 'What does hail damage look like on asphalt shingles?', options: ['Straight cracks', 'Round bruises with granule loss and soft spots', 'Only missing shingles', 'Color changes only'], correctAnswer: 1, explanation: 'Hail causes round bruises with granule loss and creates soft spots when pressed.' },
-  { id: 'mcq-25', module: 10, question: 'What is considered wind damage on a roof?', options: ['Round spots', 'Lifted, creased, or missing shingles', 'Granule loss only', 'Color fading'], correctAnswer: 1, explanation: 'Wind damage shows as lifted edges, creased shingles, or completely missing shingles.' },
-  { id: 'mcq-26', module: 10, question: 'What is the first step in the Empathy Framework when handling objections?', options: ['Educate them on the process', 'Offer a solution right away', 'Acknowledge their concern', 'Ask for the sale'], correctAnswer: 2, explanation: 'The first step in the Empathy Framework is to acknowledge their concern - show you understand before educating.' },
+  // Module 7: Damage Identification (3 MCQ)
+  { id: 'mcq-24', module: 7, question: 'What does hail damage look like on asphalt shingles?', options: ['Straight cracks', 'Round bruises with granule loss and soft spots', 'Only missing shingles', 'Color changes only'], correctAnswer: 1, explanation: 'Hail causes round bruises with granule loss and creates soft spots when pressed.' },
+  { id: 'mcq-25', module: 7, question: 'What is considered wind damage on a roof?', options: ['Round spots', 'Lifted, creased, or missing shingles', 'Granule loss only', 'Color fading'], correctAnswer: 1, explanation: 'Wind damage shows as lifted edges, creased shingles, or completely missing shingles.' },
+  { id: 'mcq-26', module: 7, question: 'What is the first step in the Empathy Framework when handling objections?', options: ['Educate them on the process', 'Offer a solution right away', 'Acknowledge their concern', 'Ask for the sale'], correctAnswer: 2, explanation: 'The first step in the Empathy Framework is to acknowledge their concern - show you understand before educating.' },
 
   // Module 11: Filing the Claim & Contingency + Claim Authorization Script
   { id: 'mcq-27', module: 11, question: 'When is the BEST time to file a claim?', options: ['Within a week', 'Same day - immediately', 'After getting other estimates', 'After the adjuster visits'], correctAnswer: 1, explanation: 'File the claim the same day, immediately after finding damage - timing is critical for insurance claims.' },
@@ -339,7 +339,7 @@ const FINAL_EXAM_FIB: FIBQuestion[] = [
   { id: 'fib-7', module: 1, question: 'The director of sales of Rufiar is _____ _____.', acceptableAnswers: ['Reese Samala', 'reese samala', 'REESE SAMALA', 'Reese samala'], explanation: 'Reese Samala is the Director of Sales at Rufiar Roofing.' },
 
   // Wind damage
-  { id: 'fib-8', module: 10, question: 'Examples of _____ damage are missing tabs and creased shingles.', acceptableAnswers: ['wind', 'Wind', 'WIND'], explanation: 'Wind damage is characterized by missing tabs and creased shingles.' },
+  { id: 'fib-8', module: 7, question: 'Examples of _____ damage are missing tabs and creased shingles.', acceptableAnswers: ['wind', 'Wind', 'WIND'], explanation: 'Wind damage is characterized by missing tabs and creased shingles.' },
 
   // Depreciation holdback
   { id: 'fib-9', module: 11, question: 'The remaining insurance funds that the insurance company holds until we complete the work are called _____.', acceptableAnswers: ['depreciation', 'Depreciation', 'DEPRECIATION', 'depreciation holdback', 'Depreciation Holdback'], explanation: 'The depreciation holdback is released by the insurance company after the work is completed.' },
@@ -365,19 +365,19 @@ const FINAL_EXAM_SA: SAQuestion[] = [
   { id: 'sa-5', module: 5, prompt: 'Please write the section of your pitch that covers Non-Negotiable #5: Go for the close (over close).', keywords: ['find', 'damage', 'walk', 'through', 'process', 'don\'t', 'good shape', 'let you know'], minKeywords: 2, sampleAnswer: 'If I find damage, I\'ll walk you through the rest of the process. If I don\'t find damage, I\'ll let you know you\'re in good shape.' },
 
   // After homeowner agrees to inspection
-  { id: 'sa-6', module: 7, prompt: 'After the homeowner agrees to do the inspection right then, what will you tell them?', keywords: ['card', 'business card', 'roof', 'go up', 'look', 'back', 'minute', 'minutes', 'wait', 'inside'], minKeywords: 3, sampleAnswer: 'Great! Let me give you my card. I\'m going to go up on your roof and take a look. It should only take about 15 minutes. You can wait inside and I\'ll come back down to show you what I find.' },
+  { id: 'sa-6', module: 8, prompt: 'After the homeowner agrees to do the inspection right then, what will you tell them?', keywords: ['card', 'business card', 'roof', 'go up', 'look', 'back', 'minute', 'minutes', 'wait', 'inside'], minKeywords: 3, sampleAnswer: 'Great! Let me give you my card. I\'m going to go up on your roof and take a look. It should only take about 15 minutes. You can wait inside and I\'ll come back down to show you what I find.' },
 
   // After handing card, before inspection
-  { id: 'sa-7', module: 7, prompt: 'After you\'ve handed your homeowner your business card, what do you let them know before you conduct the inspection?', keywords: ['look us up', 'online', 'knock', 'finish', 'back', 'done', 'let you know'], minKeywords: 2, sampleAnswer: 'Take a moment to look us up online. I\'ll give you a knock when I finish up.' },
+  { id: 'sa-7', module: 8, prompt: 'After you\'ve handed your homeowner your business card, what do you let them know before you conduct the inspection?', keywords: ['look us up', 'online', 'knock', 'finish', 'back', 'done', 'let you know'], minKeywords: 2, sampleAnswer: 'Take a moment to look us up online. I\'ll give you a knock when I finish up.' },
 
   // Order of inspection
-  { id: 'sa-8', module: 7, prompt: 'Please write the order of the inspection (what do you inspect and in what order?).', keywords: ['elevations', 'collateral', 'house', 'roof', 'shingles', 'home'], minKeywords: 3, sampleAnswer: 'Elevations on the home, collateral damage around the house, collateral damage on the roof, and then shingles on the roof.' },
+  { id: 'sa-8', module: 8, prompt: 'Please write the order of the inspection (what do you inspect and in what order?).', keywords: ['safety', '360', 'collateral', 'roof', 'shingles', 'overview', 'granules', 'gutters', 'downspouts'], minKeywords: 3, sampleAnswer: 'Safety first, 360 walk for ground collateral, roof collateral damage, shingle inspection, damage overview shots, and granules in gutters/downspouts.' },
 
   // Collateral damage explanation
-  { id: 'sa-9', module: 8, prompt: 'After you finish the inspection, please write what you would explain to your homeowner about collateral damage.', keywords: ['collateral', 'damage', 'evidence', 'prove', 'hail', 'property', 'find', 'hit'], minKeywords: 3, sampleAnswer: 'This is the damage we need to find to prove that hail hit your property. Collateral damage serves as evidence that a storm event occurred and affected your home.' },
+  { id: 'sa-9', module: 9, prompt: 'After you finish the inspection, please write what you would explain to your homeowner about collateral damage.', keywords: ['collateral', 'damage', 'evidence', 'prove', 'hail', 'property', 'find', 'hit'], minKeywords: 3, sampleAnswer: 'This is the damage we need to find to prove that hail hit your property. Collateral damage serves as evidence that a storm event occurred and affected your home.' },
 
   // Most important step - post-inspection script
-  { id: 'sa-10', module: 8, prompt: 'What is the purpose of the post-inspection script and what do you tell them is the most important part of this process moving forward?', keywords: ['adjuster', 'inspection', 'present', 'there', 'insurance', 'fair shake', 'fair', 'I am there', 'we are there'], minKeywords: 3, sampleAnswer: 'The most important part of this process is that I am there when the insurance company sends their adjuster out to do their inspection so that you can get a fair shake.' }
+  { id: 'sa-10', module: 9, prompt: 'What is the purpose of the post-inspection script and what do you tell them is the most important part of this process moving forward?', keywords: ['adjuster', 'inspection', 'present', 'there', 'insurance', 'fair shake', 'fair', 'I am there', 'we are there'], minKeywords: 3, sampleAnswer: 'The most important part of this process is that I am there when the insurance company sends their adjuster out to do their inspection so that you can get a fair shake.' }
 ];
 
 // Manager access code (managers enter this to unlock all)
@@ -391,10 +391,10 @@ const MODULE_ORDER = [
   'shingle-types-materials',
   'initial-pitch',
   'handling-initial-pitch-objections',
+  'damage-identification',
   'inspection-process',
   'post-inspection-pitch',
   'post-inspection-objections',
-  'damage-identification',
   'filing-claim-closing',
   'sales-cycle-job-flow',
   'role-play',
@@ -2299,7 +2299,7 @@ const trainingContent = {
       <!-- Module Header with Gradient -->
       <div class="module-header-gradient" style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%); color: white; padding: 30px; margin: -20px -20px 30px -20px; border-radius: 12px 12px 0 0;">
         <h1 style="margin: 0; color: white;">🔍 The Inspection Process</h1>
-        <p style="margin: 10px 0 0 0; opacity: 0.9; font-size: 1.1rem;">Master the 10-step process that separates professionals from amateurs</p>
+        <p style="margin: 10px 0 0 0; opacity: 0.9; font-size: 1.1rem;">Master the 6-step process that separates professionals from amateurs</p>
       </div>
 
       <!-- Video Section -->
@@ -2308,11 +2308,11 @@ const trainingContent = {
       <!-- Introduction Card -->
       <div class="intro-highlight-card" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-left: 5px solid #3b82f6; padding: 24px; border-radius: 0 16px 16px 0; margin: 30px 0;">
         <h2 style="margin: 0 0 12px 0; color: #1e40af;">🎯 Why a Systematic Process Matters</h2>
-        <p style="margin: 0; color: #334155; line-height: 1.7;">A thorough, consistent inspection process ensures you never miss damage, builds trust with homeowners, and creates bulletproof documentation for insurance claims. Follow these 10 steps every time - no shortcuts.</p>
+        <p style="margin: 0; color: #334155; line-height: 1.7;">A thorough, consistent inspection process ensures you never miss damage, builds trust with homeowners, and creates bulletproof documentation for insurance claims. Follow these 6 steps every time - no shortcuts.</p>
       </div>
 
-      <!-- SECTION 1: Interactive 10-Step Cards -->
-      <h2 style="margin-bottom: 20px;">📋 The 10-Step Inspection Process</h2>
+      <!-- SECTION 1: Interactive 6-Step Cards -->
+      <h2 style="margin-bottom: 20px;">📋 The 6-Step Inspection Process</h2>
       <p style="color: #4a5568; margin-bottom: 24px;">Click any step to learn more. Each step builds on the previous one for a complete inspection.</p>
 
       <div class="inspection-steps-grid" id="inspection-steps-grid">
@@ -2339,13 +2339,13 @@ const trainingContent = {
           <div class="step-card-header">
             <span class="step-badge" style="background: #f97316;">2</span>
             <span class="step-icon">🔄</span>
-            <h3>360° Walk</h3>
+            <h3>360° Ground Walk</h3>
             <span class="expand-icon">+</span>
           </div>
           <div class="step-card-content">
-            <p>Walk entire perimeter, check all slopes and facets. Document the whole structure before focusing on damage.</p>
+            <p>Walk the full perimeter and capture collateral damage on the ground: siding, screens, gutters, downspouts, window trim, AC, fences.</p>
             <div class="step-pro-tip">
-              <strong>Pro Tip:</strong> Start at the front door and walk clockwise for consistency.
+              <strong>Pro Tip:</strong> Shoot damage on every elevation (front, right, rear, left) before you climb.
             </div>
           </div>
         </div>
@@ -2354,16 +2354,16 @@ const trainingContent = {
         <div class="inspection-step-card" data-step="3" onclick="toggleStepCard(this)">
           <div class="step-card-header">
             <span class="step-badge" style="background: #eab308;">3</span>
-            <span class="step-icon">🔍</span>
-            <h3>Shingle Inspection</h3>
+            <span class="step-icon">🏠</span>
+            <h3>Roof Collateral Damage</h3>
             <span class="expand-icon">+</span>
           </div>
           <div class="step-card-content">
-            <p>Look for missing granules, cracks, lifting, bruising. Use chalk or test square to mark hail strikes.</p>
+            <p>Once on the roof, check metals and components for hits: vents, flashing, drip edge, ridge caps, and soft metals.</p>
             <div class="step-checklist">
-              <label><input type="checkbox" /> Check for granule loss</label>
-              <label><input type="checkbox" /> Look for cracks/lifting</label>
-              <label><input type="checkbox" /> Mark hail strikes with chalk</label>
+              <label><input type="checkbox" /> Vents and flashing checked</label>
+              <label><input type="checkbox" /> Soft metals show dents/pitting</label>
+              <label><input type="checkbox" /> Drip edge and ridge caps reviewed</label>
             </div>
           </div>
         </div>
@@ -2372,14 +2372,16 @@ const trainingContent = {
         <div class="inspection-step-card" data-step="4" onclick="toggleStepCard(this)">
           <div class="step-card-header">
             <span class="step-badge" style="background: #84cc16;">4</span>
-            <span class="step-icon">⚡</span>
-            <h3>Flashing Check</h3>
+            <span class="step-icon">🔍</span>
+            <h3>Shingle Inspection</h3>
             <span class="expand-icon">+</span>
           </div>
           <div class="step-card-content">
-            <p>Inspect all flashing around chimneys, vents, valleys. Flashing failures are common leak sources.</p>
-            <div class="step-alert">
-              <strong>Critical:</strong> Flashing failures cause 90% of roof leaks!
+            <p>Look for bruising, missing granules, lifted tabs, creases, or missing shingles. Mark hail strikes with chalk or a test square.</p>
+            <div class="step-checklist">
+              <label><input type="checkbox" /> Check for granule loss</label>
+              <label><input type="checkbox" /> Look for creases/lifted tabs</label>
+              <label><input type="checkbox" /> Mark hail strikes with chalk</label>
             </div>
           </div>
         </div>
@@ -2388,16 +2390,14 @@ const trainingContent = {
         <div class="inspection-step-card" data-step="5" onclick="toggleStepCard(this)">
           <div class="step-card-header">
             <span class="step-badge" style="background: #22c55e;">5</span>
-            <span class="step-icon">🌀</span>
-            <h3>Vent Inspection</h3>
+            <span class="step-icon">📸</span>
+            <h3>Damage Overview</h3>
             <span class="expand-icon">+</span>
           </div>
           <div class="step-card-content">
-            <p>Check boot seals, housing damage, proper installation. Damaged vents mean water intrusion.</p>
-            <div class="step-checklist">
-              <label><input type="checkbox" /> Boot seals intact</label>
-              <label><input type="checkbox" /> No housing cracks</label>
-              <label><input type="checkbox" /> Proper flashing around base</label>
+            <p>After close-ups, take wide shots of each slope showing all checked damage for full context.</p>
+            <div class="step-pro-tip">
+              <strong>Pro Tip:</strong> Pair every close-up with an overview shot that shows location on the roof.
             </div>
           </div>
         </div>
@@ -2406,80 +2406,14 @@ const trainingContent = {
         <div class="inspection-step-card" data-step="6" onclick="toggleStepCard(this)">
           <div class="step-card-header">
             <span class="step-badge" style="background: #14b8a6;">6</span>
-            <span class="step-icon">🏔️</span>
-            <h3>Ridge/Hip Inspection</h3>
-            <span class="expand-icon">+</span>
-          </div>
-          <div class="step-card-content">
-            <p>Look for lifted caps, damage to ridge venting. Critical for structural integrity.</p>
-            <div class="step-pro-tip">
-              <strong>Pro Tip:</strong> Ridge caps are often the first to show wind damage.
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 7 -->
-        <div class="inspection-step-card" data-step="7" onclick="toggleStepCard(this)">
-          <div class="step-card-header">
-            <span class="step-badge" style="background: #06b6d4;">7</span>
-            <span class="step-icon">🌊</span>
-            <h3>Valley Inspection</h3>
-            <span class="expand-icon">+</span>
-          </div>
-          <div class="step-card-content">
-            <p>Check for debris, damage, proper water flow. Valleys handle high water volume - must be intact.</p>
-            <div class="step-alert">
-              <strong>Critical:</strong> Valleys see 10x the water flow of flat sections!
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 8 -->
-        <div class="inspection-step-card" data-step="8" onclick="toggleStepCard(this)">
-          <div class="step-card-header">
-            <span class="step-badge" style="background: #3b82f6;">8</span>
             <span class="step-icon">🪣</span>
-            <h3>Gutter Check</h3>
+            <h3>Granules in Gutters & Downspouts</h3>
             <span class="expand-icon">+</span>
           </div>
           <div class="step-card-content">
-            <p>Look for hail dents, granule accumulation. Granules in gutters prove recent shingle damage.</p>
+            <p>Check gutters and downspouts for granules. This is strong evidence of recent shingle damage.</p>
             <div class="step-pro-tip">
-              <strong>Pro Tip:</strong> Take close-up photos of granules - powerful insurance evidence.
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 9 -->
-        <div class="inspection-step-card" data-step="9" onclick="toggleStepCard(this)">
-          <div class="step-card-header">
-            <span class="step-badge" style="background: #8b5cf6;">9</span>
-            <span class="step-icon">📸</span>
-            <h3>Photo Documentation</h3>
-            <span class="expand-icon">+</span>
-          </div>
-          <div class="step-card-content">
-            <p>Take 20-40 photos covering all findings. Photos are your evidence - be thorough.</p>
-            <div class="step-checklist">
-              <label><input type="checkbox" /> 4 corner overview shots</label>
-              <label><input type="checkbox" /> Close-up of each damage area</label>
-              <label><input type="checkbox" /> Context shots showing location</label>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 10 -->
-        <div class="inspection-step-card" data-step="10" onclick="toggleStepCard(this)">
-          <div class="step-card-header">
-            <span class="step-badge" style="background: #ec4899;">10</span>
-            <span class="step-icon">🧹</span>
-            <h3>Ground Cleanup</h3>
-            <span class="expand-icon">+</span>
-          </div>
-          <div class="step-card-content">
-            <p>Pick up debris, leave property better than found. Professionalism builds trust.</p>
-            <div class="step-pro-tip">
-              <strong>Pro Tip:</strong> This simple step separates you from 90% of competitors.
+              <strong>Pro Tip:</strong> Get a tight close-up so granules are clearly visible on camera.
             </div>
           </div>
         </div>
@@ -2490,59 +2424,59 @@ const trainingContent = {
       <p style="color: #4a5568; margin-bottom: 24px;">A thorough inspection tells a story. Follow this order to capture all necessary evidence. This process should take 15-20 minutes.</p>
 
       <div class="photo-strategy-grid with-images">
-        <div class="photo-strategy-card has-image" onclick="openPhotoModal('/assets/photo-strategy/step1-overview.jpg', 'Step 1: Overview Shots', 'Mailbox, house number, full front view - set the scene for the entire inspection.')">
+        <div class="photo-strategy-card has-image" onclick="openPhotoModal('/assets/photo-strategy/step1-overview.jpg', 'Step 1: Ground Collateral Start', 'Begin your 360 walk. Capture the front of the home plus any visible collateral damage (siding, screens, downspouts, gutters).')">
           <div class="photo-card-number">1</div>
           <img src="/assets/photo-strategy/step1-overview.jpg" alt="Overview shot example" class="strategy-photo" />
-          <h4>Overview Shots</h4>
-          <p>Mailbox, house number, full front view - set the scene.</p>
+          <h4>Ground Collateral Start</h4>
+          <p>Front-of-home + visible collateral damage.</p>
         </div>
-        <div class="photo-strategy-card has-image" onclick="openPhotoModal('/assets/photo-strategy/step2-front-elevation.jpg', 'Step 2: Front Elevation', 'Document screens, gutters, downspouts, and any siding damage from the front.')">
+        <div class="photo-strategy-card has-image" onclick="openPhotoModal('/assets/photo-strategy/step2-front-elevation.jpg', 'Step 2: Front Elevation Damage', 'Document front-side collateral damage: downspout dents, gutter hits, siding or screen damage.')">
           <div class="photo-card-number">2</div>
           <img src="/assets/photo-strategy/step2-front-elevation.jpg" alt="Front elevation example" class="strategy-photo" />
-          <h4>Front Elevation</h4>
-          <p>Screens, gutters, downspouts, siding damage.</p>
+          <h4>Front Elevation Damage</h4>
+          <p>Front-side collateral damage details.</p>
         </div>
-        <div class="photo-strategy-card has-image" onclick="openPhotoModal('/assets/photo-strategy/step3-right-elevation.jpg', 'Step 3: Right Elevation', 'Same collateral damage check from the right side - be thorough.')">
+        <div class="photo-strategy-card has-image" onclick="openPhotoModal('/assets/photo-strategy/step3-right-elevation.jpg', 'Step 3: Right Elevation Damage', 'Capture right-side collateral damage (screens, gutters, siding, window trim).')">
           <div class="photo-card-number">3</div>
           <img src="/assets/photo-strategy/step3-right-elevation.jpg" alt="Right elevation example" class="strategy-photo" />
-          <h4>Right Elevation</h4>
-          <p>Same collateral damage check - be thorough.</p>
+          <h4>Right Elevation Damage</h4>
+          <p>Right-side collateral damage.</p>
         </div>
-        <div class="photo-strategy-card has-image" onclick="openPhotoModal('/assets/photo-strategy/step4-rear-elevation.jpg', 'Step 4: Rear Elevation', 'The rear often has the most damage - never skip this step!')">
+        <div class="photo-strategy-card has-image" onclick="openPhotoModal('/assets/photo-strategy/step4-rear-elevation.jpg', 'Step 4: Rear Elevation Damage', 'The rear often has the most collateral hits - document gutters, siding, and screens.')">
           <div class="photo-card-number">4</div>
           <img src="/assets/photo-strategy/step4-rear-elevation.jpg" alt="Rear elevation example" class="strategy-photo" />
-          <h4>Rear Elevation</h4>
-          <p>Often has the most damage - don't skip.</p>
+          <h4>Rear Elevation Damage</h4>
+          <p>Rear-side collateral damage.</p>
         </div>
-        <div class="photo-strategy-card has-image" onclick="openPhotoModal('/assets/photo-strategy/step5-left-elevation.jpg', 'Step 5: Left Elevation', 'Complete the perimeter documentation from all sides.')">
+        <div class="photo-strategy-card has-image" onclick="openPhotoModal('/assets/photo-strategy/step5-left-elevation.jpg', 'Step 5: Left Elevation Damage', 'Finish the 360 walk with left-side collateral damage.')">
           <div class="photo-card-number">5</div>
           <img src="/assets/photo-strategy/step5-left-elevation.jpg" alt="Left elevation example" class="strategy-photo" />
-          <h4>Left Elevation</h4>
-          <p>Complete the perimeter documentation.</p>
+          <h4>Left Elevation Damage</h4>
+          <p>Left-side collateral damage.</p>
         </div>
-        <div class="photo-strategy-card has-image" onclick="openPhotoModal('/assets/photo-strategy/step6-roof-overview.jpg', 'Step 6: Roof Overview', 'Document damage to roof metals, vents, and components from above.')">
+        <div class="photo-strategy-card has-image" onclick="openPhotoModal('/assets/photo-strategy/step6-roof-overview.jpg', 'Step 6: Roof Collateral Damage', 'On-roof collateral: vents, flashing, drip edge, ridge caps, soft metals.')">
           <div class="photo-card-number">6</div>
           <img src="/assets/photo-strategy/step6-roof-overview.jpg" alt="Roof overview example" class="strategy-photo" />
-          <h4>Roof Overview</h4>
-          <p>Damage to roof metals and components.</p>
+          <h4>Roof Collateral Damage</h4>
+          <p>Metals, vents, flashing hits.</p>
         </div>
-        <div class="photo-strategy-card has-image" onclick="openPhotoModal('/assets/photo-strategy/step7-mark-damage.jpg', 'Step 7: Mark Damage', 'Circle hail hits with chalk, slash marks for wind damage - get close-ups!')">
+        <div class="photo-strategy-card has-image" onclick="openPhotoModal('/assets/photo-strategy/step7-mark-damage.jpg', 'Step 7: Shingle Damage Close-Up', 'Close-up shingles showing hail hits or wind creases. Mark damage if needed.')">
           <div class="photo-card-number">7</div>
           <img src="/assets/photo-strategy/step7-mark-damage.jpg" alt="Mark damage example" class="strategy-photo" />
-          <h4>Mark Damage</h4>
-          <p>Circle hail hits, slash wind damage - close-ups.</p>
+          <h4>Shingle Damage Close-Up</h4>
+          <p>Close-up shingle hits or creases.</p>
         </div>
-        <div class="photo-strategy-card has-image" onclick="openPhotoModal('/assets/photo-strategy/step8-damage-overview.jpg', 'Step 8: Damage Overview', 'Wide shots showing chalked-up damage areas with test square markings.')">
+        <div class="photo-strategy-card has-image" onclick="openPhotoModal('/assets/photo-strategy/step8-damage-overview.jpg', 'Step 8: Damage Overview', 'Wide shots showing all checked damage areas on each slope.')">
           <div class="photo-card-number">8</div>
           <img src="/assets/photo-strategy/step8-damage-overview.jpg" alt="Damage overview example" class="strategy-photo" />
           <h4>Damage Overview</h4>
-          <p>Wide shots showing chalked-up damage areas.</p>
+          <p>Wide shots of checked damage.</p>
         </div>
-        <div class="photo-strategy-card has-image" onclick="openPhotoModal('/assets/photo-strategy/step9-gutters.jpg', 'Step 9: Granules in Gutters', 'Critical evidence of shingle deterioration - check gutters and downspouts.')">
+        <div class="photo-strategy-card has-image" onclick="openPhotoModal('/assets/photo-strategy/step9-gutters.jpg', 'Step 9: Granules in Gutters & Downspouts', 'Granules in gutters/downspouts are key evidence - get a tight close-up.')">
           <div class="photo-card-number">9</div>
           <img src="/assets/photo-strategy/step9-gutters.jpg" alt="Gutters example" class="strategy-photo" />
-          <h4>Granules in Gutters</h4>
-          <p>Critical evidence of shingle deterioration.</p>
+          <h4>Granules in Gutters & Downspouts</h4>
+          <p>Granule evidence in gutters/downspouts.</p>
         </div>
       </div>
 
@@ -2550,11 +2484,11 @@ const trainingContent = {
       <div class="photo-tips-box" style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 12px; padding: 24px; margin: 30px 0;">
         <h3 style="margin: 0 0 16px 0; color: #92400e;">📸 Key Photo Tips</h3>
         <ul style="margin: 0; padding-left: 24px; color: #78350f;">
-          <li><strong>Overall roof:</strong> 4 corners showing full house context</li>
-          <li><strong>Each damage area:</strong> Close-up + context shot (show location)</li>
-          <li><strong>Gutters:</strong> Evidence of recent granule loss</li>
-          <li><strong>Matching damage:</strong> Fence, AC unit, siding - builds convincing case</li>
-          <li><strong>Flashlight:</strong> Use to illuminate damage in shadows</li>
+          <li><strong>Make it look good on camera:</strong> If it doesn't read clearly, retake it.</li>
+          <li><strong>Use your phone camera only:</strong> No extra apps or filters.</li>
+          <li><strong>Quality over quantity:</strong> 1-2 great damage photos beat 100 mixed shots.</li>
+          <li><strong>Group your photos:</strong> Ground collateral → roof collateral → close-up shingles → overall shingles → granules.</li>
+          <li><strong>Delete bad shots:</strong> Keep the report clean and confident.</li>
         </ul>
         <p style="margin: 16px 0 0 0; font-weight: 600; color: #92400e;">💡 Key takeaway: Getting enough clear photos to convince the homeowner is the most important part. Without their belief, you can't file a claim.</p>
       </div>
@@ -2567,16 +2501,12 @@ const trainingContent = {
         <div class="game-column">
           <h4>🔀 Steps (Drag from here)</h4>
           <div id="inspection-items-pool">
-            <div class="inspection-drag-item" draggable="true" data-order="5">🌀 Vent Inspection</div>
-            <div class="inspection-drag-item" draggable="true" data-order="2">🔄 360° Walk</div>
-            <div class="inspection-drag-item" draggable="true" data-order="8">🪣 Gutter Check</div>
+            <div class="inspection-drag-item" draggable="true" data-order="2">🔄 360° Ground Walk</div>
+            <div class="inspection-drag-item" draggable="true" data-order="5">📸 Damage Overview</div>
             <div class="inspection-drag-item" draggable="true" data-order="1">🦺 Safety First</div>
-            <div class="inspection-drag-item" draggable="true" data-order="10">🧹 Ground Cleanup</div>
-            <div class="inspection-drag-item" draggable="true" data-order="3">🔍 Shingle Inspection</div>
-            <div class="inspection-drag-item" draggable="true" data-order="7">🌊 Valley Inspection</div>
-            <div class="inspection-drag-item" draggable="true" data-order="4">⚡ Flashing Check</div>
-            <div class="inspection-drag-item" draggable="true" data-order="9">📸 Photo Documentation</div>
-            <div class="inspection-drag-item" draggable="true" data-order="6">🏔️ Ridge/Hip Inspection</div>
+            <div class="inspection-drag-item" draggable="true" data-order="4">🔍 Shingle Inspection</div>
+            <div class="inspection-drag-item" draggable="true" data-order="6">🪣 Granules in Gutters</div>
+            <div class="inspection-drag-item" draggable="true" data-order="3">🏠 Roof Collateral Check</div>
           </div>
         </div>
         <div class="game-column">
@@ -2592,7 +2522,7 @@ const trainingContent = {
         <div class="completion-celebration" style="text-align: center; padding: 30px; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); border-radius: 16px; margin-top: 30px;">
           <span style="font-size: 3rem;">🎉</span>
           <h3 style="color: #166534; margin: 16px 0;">Excellent Work!</h3>
-          <p style="color: #15803d;">You've mastered the 10-step inspection process. Now you're ready to conduct professional roof inspections!</p>
+          <p style="color: #15803d;">You've mastered the 6-step inspection process. Now you're ready to conduct professional roof inspections!</p>
         </div>
         <button class="complete-module-btn" onclick="completeModule('inspection-process')">
           Complete Module & Continue →
@@ -2894,9 +2824,9 @@ const trainingContent = {
               </div>
               <div class="flip-card-back">
                 <div class="response-content">
-                  <p class="response-text">"That's great! When was your last inspection? Storm damage can happen without you knowing. A second opinion never hurts - it's free and takes 15 minutes."</p>
+                  <p class="response-text">"Totally. I'm not here to replace them — I just need 15 minutes to check for storm damage and show you what I find. It's free and quick."</p>
                   <div class="why-works">
-                    <strong>Why it works:</strong> Doesn't attack their relationship, positions as additional value.
+                    <strong>Why it works:</strong> Respects their relationship and moves straight to a quick inspection.
                   </div>
                 </div>
               </div>
@@ -3185,7 +3115,7 @@ const trainingContent = {
               <ul class="identification-list">
                 <li><span class="star-icon">★</span> Enhanced curb appeal improves home appearance</li>
                 <li><span class="star-icon">★</span> Superior wind resistance (130 mph vs 70 mph)</li>
-                <li><span class="star-icon">★</span> Longer warranty coverage (typically 30-50 years)</li>
+                <li><span class="star-icon">★</span> Thicker laminated build for stronger impact resistance</li>
                 <li><span class="star-icon">★</span> More durable construction with multiple layers</li>
               </ul>
             </div>
@@ -3271,7 +3201,7 @@ const trainingContent = {
           <ul>
             <li>North America's #1 roofing manufacturer</li>
             <li>StrikeZone nailing area (99% improvement in nail pull-through)</li>
-            <li>Industry-leading warranties up to Lifetime Limited</li>
+            <li>LayerLock tech for stronger fastening performance</li>
             <li>Most common brand in insurance claims</li>
           </ul>
           <div class="manufacturer-note">Most inspectors encounter GAF on 30-40% of roofs</div>
@@ -3314,7 +3244,7 @@ const trainingContent = {
             <li>Canadian-based manufacturer</li>
             <li>Budget-friendly pricing strategy</li>
             <li>Good value for rental properties</li>
-            <li>Limited warranty compared to premium brands</li>
+            <li>Lower wind ratings and thinner profile than premium brands</li>
           </ul>
           <div class="manufacturer-note">Commonly seen on cost-conscious projects and rentals</div>
         </div>
@@ -3327,7 +3257,7 @@ const trainingContent = {
           <p>Understanding shingle construction helps you explain the key differences to homeowners:</p>
           <ul>
             <li><strong>Wind Resistance:</strong> "130 mph rating means your roof survives storms that would destroy 3-tab shingles"</li>
-            <li><strong>Warranty Value:</strong> "30-year warranty vs. 20-year means peace of mind and transferability if you sell"</li>
+            <li><strong>Layered Build:</strong> "Multiple layers add depth and durability you can see"</li>
             <li><strong>Durability:</strong> "Architectural shingles have multiple layers that provide longer-lasting protection"</li>
           </ul>
         </div>
@@ -3576,7 +3506,7 @@ const trainingContent = {
                 <div style="background: #d1fae5; padding: 12px; border-radius: 8px; border-left: 4px solid #22c55e;">
                   <p style="margin: 0; font-size: 0.9rem; color: #065f46;"><strong>Key Features:</strong> Multi-layer laminated, dimensional texture, random pattern, 50% heavier</p>
                 </div>
-                <p style="margin: 12px 0 0 0; color: #166534; font-size: 0.9rem;">Industry standard post-2005. <strong>130 mph wind rating</strong>, 25-30 year warranty!</p>
+                <p style="margin: 12px 0 0 0; color: #166534; font-size: 0.9rem;">Industry standard post-2005. <strong>130 mph wind rating</strong> with a thicker laminated profile.</p>
             </div>
         </div>
         <hr>
@@ -4195,7 +4125,7 @@ const trainingContent = {
         <div style="background: radial-gradient(circle at top left, #0ea5e9 0%, #1e3a8a 45%, #0f172a 100%); padding: 42px 30px; text-align: center; color: white;">
             <div style="font-size: 48px; margin-bottom: 15px;">🔍</div>
             <h1 style="margin: 0 0 10px 0; font-size: 28px; font-weight: 700;">Live Role-Play: Inspection Process</h1>
-            <p style="margin: 0; opacity: 0.9; font-size: 16px;">Voice-only training with live feedback (Module 7)</p>
+            <p style="margin: 0; opacity: 0.9; font-size: 16px;">Voice-only training with live feedback (Module 8)</p>
         </div>
 
         <div style="padding: 30px;">
@@ -4205,14 +4135,14 @@ const trainingContent = {
             <!-- XP Progress Bar -->
             <div id="agnes-xp-bar" class="agnes-xp-bar" style="margin-bottom: 30px;"></div>
 
-            <!-- Live Role-Play (Module 7 only) -->
+            <!-- Live Role-Play (Module 8 only) -->
             <div id="agnes-mode-selector" style="display: block;">
                 <div style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #0284c7 100%); border-radius: 24px; padding: 28px; color: white; margin-bottom: 24px;">
                     <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 18px; flex-wrap: wrap;">
                         <div style="font-size: 44px;">🔍</div>
                         <div>
                             <div style="font-size: 20px; font-weight: 700;">Live Role-Play: Inspection Process</div>
-                            <div style="font-size: 14px; opacity: 0.9;">Module 7 only • Voice role-play with live feedback</div>
+                            <div style="font-size: 14px; opacity: 0.9;">Module 8 only • Voice role-play with live feedback</div>
                         </div>
                         <div style="margin-left: auto; background: rgba(255,255,255,0.18); padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 600;">LIVE</div>
                     </div>
@@ -4634,7 +4564,7 @@ trainingContent['handling-initial-pitch-objections'] = trainingContent['objectio
   <div class="content-card"><h1>Handling Initial Pitch Objections</h1><p>Content coming soon.</p></div>
 `;
 
-// 9. Post-Inspection Objections (new)
+// 10. Post-Inspection Objections (new)
 trainingContent['post-inspection-objections'] = `
   <div class="content-card">
     <h1>Post‑Inspection Objections</h1>
@@ -4949,7 +4879,7 @@ trainingContent['post-inspection-objections'] = `
   </div>
 `;
 
-// 10. Damage Identification (remap existing)
+// 8. Damage Identification (remap existing)
 trainingContent['damage-identification'] = trainingContent['roofing-damage-id'] || `
   <div class="content-card"><h1>Damage Identification</h1><p>Content coming soon.</p></div>
 `;
@@ -6151,7 +6081,7 @@ function resetLivePitchPractice() {
 (window as any).resetLivePitchPractice = resetLivePitchPractice;
 (window as any).toggleVoiceRecording = toggleVoiceRecording;
 
-// --- Module 8: Damage Matching Game ---
+// --- Module 7: Damage Matching Game ---
 let selectedMatchItem: HTMLElement | null = null;
 let matchedCount = 0;
 let selectedSeqItem: HTMLElement | null = null;
@@ -6517,7 +6447,7 @@ function resetSalesCycleGame() {
 
 (window as any).resetSalesCycleGame = resetSalesCycleGame;
 
-// --- Module 7: Inspection Step Card Toggle ---
+// --- Module 8: Inspection Step Card Toggle ---
 function toggleStepCard(cardElement: HTMLElement) {
   const wasExpanded = cardElement.classList.contains('expanded');
 
@@ -6535,7 +6465,7 @@ function toggleStepCard(cardElement: HTMLElement) {
 // Expose globally
 (window as any).toggleStepCard = toggleStepCard;
 
-// --- Module 7: Inspection Process Ordering Game ---
+// --- Module 8: Inspection Process Ordering Game ---
 function initInspectionOrderGame() {
   const pool = document.getElementById('inspection-items-pool');
   const dropZone = document.getElementById('inspection-sorted-list');
@@ -6545,7 +6475,7 @@ function initInspectionOrderGame() {
   if (!pool || !dropZone || !feedbackEl) return;
 
   let draggedItem: HTMLElement | null = null;
-  const correctOrder = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+  const correctOrder = ['1', '2', '3', '4', '5', '6'];
 
   // Shuffle items on init for randomness
   shufflePoolItems();
@@ -6630,7 +6560,7 @@ function initInspectionOrderGame() {
   function checkOrder() {
     const items = dropZone!.querySelectorAll('.inspection-drag-item');
     if (items.length !== correctOrder.length) {
-      feedbackEl!.textContent = `${items.length}/10 steps placed. Keep going!`;
+      feedbackEl!.textContent = `${items.length}/6 steps placed. Keep going!`;
       feedbackEl!.className = '';
       feedbackEl!.style.display = 'block';
       feedbackEl!.style.background = '#fef3c7';
@@ -6739,7 +6669,7 @@ const objectionChallengeQuestions = [
     scenario: "We already have a roofer we use.",
     options: [
       { text: "Our company is better than whoever you're using.", correct: false, feedback: "Never attack their existing relationships. It makes you look unprofessional." },
-      { text: "That's great! When was your last inspection? Storm damage can happen without you knowing. A second opinion never hurts - it's free.", correct: true, feedback: "Excellent! You validated their choice while positioning yourself as additional value." },
+      { text: "Totally. I'm not here to replace them — I just need 15 minutes to check for storm damage and show you what I find. It's free and quick.", correct: true, feedback: "Perfect. You respect their relationship and move straight to a quick inspection." },
       { text: "Well, let me know if you change your mind.", correct: false, feedback: "Too passive. You're giving up without offering any value." }
     ]
   },
@@ -6899,9 +6829,9 @@ function showChallengeComplete() {
 };
 
 
-// --- Module 9: Practice with Agnes Buttons ---
+// --- Module 10: Practice with Agnes Buttons ---
 function initModule9RoleplayButtons() {
-  console.log('🎭 Initializing Module 9 inline practice system...');
+  console.log('🎭 Initializing Module 10 inline practice system...');
 
   const practiceButtons = document.querySelectorAll('.practice-agnes-btn');
 
@@ -7360,7 +7290,7 @@ const shingleQuestions = [
   { q: "Features a thicker profile with shadow lines that add depth and curb appeal.", a: "arch", explain: "The dimensional design of architectural shingles creates natural shadow lines." },
   { q: "GAF's HDZ and Timberline series are examples of this premium shingle type.", a: "arch", explain: "GAF Timberline HDZ is their flagship architectural shingle line." },
   { q: "Weighs approximately 200-250 lbs per square. Thinner, lighter construction.", a: "3tab", explain: "3-Tab shingles are lighter due to their single-layer construction." },
-  { q: "This type often comes with enhanced warranty coverage of 30+ years.", a: "arch", explain: "Architectural shingles typically come with longer warranties due to better durability." },
+  { q: "This type has a layered, dimensional look and stronger wind performance.", a: "arch", explain: "Architectural shingles use multiple laminated layers and higher wind ratings." },
   { q: "Most common upgrade recommended by Roof-ER when replacing storm-damaged roofs.", a: "arch", explain: "We recommend architectural upgrades for their superior protection and appearance!" }
 ];
 
@@ -7504,7 +7434,7 @@ function endShingleGame() {
   initShingleGame();
 };
 
-// --- Module 10: Damage Identification Hotspot Quiz ---
+// --- Module 7: Damage Identification Hotspot Quiz ---
 function initDamageHotspotQuiz() {
   console.log('🎯 Initializing Damage Hotspot Quiz...');
 
@@ -8877,16 +8807,16 @@ function renderAgnesXPBar() {
   `;
 }
 
-// Module to categories mapping (Module 7 only)
+// Module to categories mapping (Module 8 only)
 const moduleToCategories: Record<string, string[]> = {
-  '7': ['inspection']
+  '8': ['inspection']
 };
 
 // Session state for the new simplified flow
 let agnesSessionConfig = {
   trainingType: 'roleplay' as 'roleplay' | 'walkthrough',
   inputMode: 'voice' as 'voice' | 'text',
-  selectedModule: '7' as string,
+  selectedModule: '8' as string,
   selectedScenarios: [] as any[],
   currentScenarioIndex: 0
 };
@@ -8915,13 +8845,13 @@ function getRandomScenarioFromModule(moduleId: string): any {
 function initAgnesLiveRolePlay() {
   console.log('🎙️ Initializing Agnes-21 Live Role-Play System...');
 
-  // Live role-play button (Module 7 only, voice only)
+  // Live role-play button (Module 8 only, voice only)
   const roleplayBtn = document.getElementById('agnes-roleplay-btn');
   roleplayBtn?.addEventListener('click', () => {
     agnesSessionConfig.trainingType = 'roleplay';
     agnesSessionConfig.inputMode = 'voice';
-    agnesSessionConfig.selectedModule = '7';
-    agnesSessionConfig.selectedScenarios = getScenariosForModule('7');
+    agnesSessionConfig.selectedModule = '8';
+    agnesSessionConfig.selectedScenarios = getScenariosForModule('8');
 
     // Default to beginner difficulty and start live session
     agnesLiveState.difficulty = 'BEGINNER';
@@ -13614,7 +13544,7 @@ function showLockoutScreen(root: HTMLElement, state: ExamState) {
           <h4>Recommended Review Areas:</h4>
           <ul>
             <li>Module 5: Initial Pitch & 5 Non-Negotiables</li>
-            <li>Module 6-9: Objection Handling</li>
+            <li>Module 6 & 10: Objection Handling</li>
             <li>Module 11: Filing the Claim & Contingency + Claim Authorization Script</li>
           </ul>
         </div>
@@ -14359,7 +14289,7 @@ function showExamResults(root: HTMLElement, attempt: ExamAttempt, detailedResult
           <h4>📚 Recommended Modules to Review:</h4>
           <ul>
             <li>Module 5: Initial Pitch & 5 Non-Negotiables</li>
-            <li>Module 6-9: Handling Objections</li>
+            <li>Module 6 & 10: Handling Objections</li>
             <li>Module 11: Filing the Claim & Contingency + Claim Authorization Script</li>
           </ul>
         </div>
