@@ -268,11 +268,11 @@ const FINAL_EXAM_MCQ: MCQQuestion[] = [
 
   // Module 4: Shingle Types & Materials (3 MCQ)
   { id: 'mcq-6', module: 4, question: 'Which statement best describes the GAF Timberline HDZ shingle we upgrade customers to?', options: ['A basic 3-tab shingle with a 60 mph wind rating', 'An architectural shingle with a reinforced nailing zone and strong wind rating', 'A metal panel system used on low-slope roofs', 'A clay tile designed for custom homes'], correctAnswer: 1, explanation: 'Timberline HDZ is an architectural shingle with a reinforced nailing zone and strong wind performance.' },
-  { id: 'mcq-7', module: 4, question: 'Which shingle type is most commonly used in residential roofing?', options: ['Metal shingles', '3-tab asphalt', 'Clay tiles', 'Slate'], correctAnswer: 1, explanation: '3-tab asphalt shingles are the most common residential roofing material.' },
+  { id: 'mcq-7', module: 4, question: 'Which shingle type is most commonly used in residential roofing?', options: ['Metal shingles', 'Asphalt', 'Clay tiles', 'Slate'], correctAnswer: 1, explanation: 'Asphalt shingles are the most common residential roofing material.' },
   { id: 'mcq-8', module: 4, question: 'What is a defining feature of architectural shingles compared to 3-tab?', options: ['Single-layer, flat profile', 'Multiple laminated layers that create a dimensional look', 'Only used on flat roofs', 'Made from clay tiles'], correctAnswer: 1, explanation: 'Architectural shingles use multiple laminated layers to create a dimensional appearance.' },
 
   // Module 5: Initial Pitch (3 MCQ)
-  { id: 'mcq-9', module: 5, question: 'What GAF certification does Rufiar have?', options: ['GAF Certified Contractor', 'GAF Master Elite', 'GAF Preferred Partner', 'GAF Basic Installer'], correctAnswer: 1, explanation: 'Rufiar holds the GAF Master Elite certification, the highest level of GAF contractor certification.' },
+  { id: 'mcq-9', module: 5, question: 'What GAF certification does Roof ER have?', options: ['GAF Certified Contractor', 'GAF Master Elite', 'GAF Preferred Partner', 'GAF Basic Installer'], correctAnswer: 1, explanation: 'Roof ER holds the GAF Master Elite certification, the highest level of GAF contractor certification.' },
   { id: 'mcq-10', module: 5, question: 'What does hail damage look like on asphalt shingles?', options: ['Straight line cracks', 'Round circular divots', 'Only color fading', 'Curled edges only'], correctAnswer: 1, explanation: 'Hail damage appears as round circular divots on asphalt shingles.' },
   { id: 'mcq-11', module: 5, question: 'If a homeowner says "Will my rates go up?", what is the best response?', options: ['Yes, they probably will', 'I understand your concern - rates cannot go up and an individual homeowner cannot be penalized for an act of God claim', 'You should not file then', 'I am not sure about insurance rates'], correctAnswer: 1, explanation: 'Following the objection framework, empathize and explain that rates cannot go up for act of God claims - individual homeowners are not penalized.' },
 
@@ -321,7 +321,7 @@ const FINAL_EXAM_FIB: FIBQuestion[] = [
   { id: 'fib-1', module: 7, question: 'When presenting a hail damage photo to your customer, you should say: "This is exactly what I was looking for. As you can see, it is _____."', acceptableAnswers: ['round', 'Round', 'ROUND'], explanation: 'Hail damage appears as round circular divots on asphalt shingles.' },
 
   // Non-negotiable #2
-  { id: 'fib-2', module: 5, question: 'Non-negotiable number two states who we are and what we _____.', acceptableAnswers: ['do', 'Do', 'DO'], explanation: 'Non-negotiable #2 covers who we are (Rufiar Roofing) and what we do (handle insurance claims and roofing).' },
+  { id: 'fib-2', module: 5, question: 'Non-negotiable number two states who we are and what we _____.', acceptableAnswers: ['do', 'Do', 'DO'], explanation: 'Non-negotiable #2 covers who we are (Roof ER) and what we do (handle insurance claims and roofing).' },
 
   // Non-negotiable #5 - going for the close
   { id: 'fib-3', module: 5, question: 'Non-negotiable number five is going for the close. That means you want to secure the _____.', acceptableAnswers: ['inspection', 'Inspection', 'INSPECTION'], explanation: 'Going for the close means securing the inspection appointment.' },
@@ -330,13 +330,13 @@ const FINAL_EXAM_FIB: FIBQuestion[] = [
   { id: 'fib-4', module: 6, question: 'If the objection you get at the door is that they need to talk to their spouse, you should let them know that you understand and ask them "_____ are they available?"', acceptableAnswers: ['when', 'When', 'WHEN'], explanation: 'Ask when the spouse will be available so you can schedule a follow-up.' },
 
   // Company leadership - GM
-  { id: 'fib-5', module: 1, question: 'The general manager of Rufiar is _____ _____.', acceptableAnswers: ['Ford Barsi', 'ford barsi', 'FORD BARSI', 'Ford barsi'], explanation: 'Ford Barsi is the General Manager of Rufiar Roofing.' },
+  { id: 'fib-5', module: 1, question: 'The general manager of Roof ER is _____ _____.', acceptableAnswers: ['Ford Barsi', 'ford barsi', 'FORD BARSI', 'Ford barsi'], explanation: 'Ford Barsi is the General Manager of Roof ER.' },
 
   // Company leadership - Founder
-  { id: 'fib-6', module: 1, question: 'Rufiar was founded by _____ _____.', acceptableAnswers: ['Oliver Brown', 'oliver brown', 'OLIVER BROWN', 'Oliver brown'], explanation: 'Oliver Brown is the founder of Rufiar Roofing.' },
+  { id: 'fib-6', module: 1, question: 'Roof ER was founded by _____ _____.', acceptableAnswers: ['Oliver Brown', 'oliver brown', 'OLIVER BROWN', 'Oliver brown'], explanation: 'Oliver Brown is the founder of Roof ER.' },
 
   // Company leadership - Director of Sales
-  { id: 'fib-7', module: 1, question: 'The director of sales of Rufiar is _____ _____.', acceptableAnswers: ['Reese Samala', 'reese samala', 'REESE SAMALA', 'Reese samala'], explanation: 'Reese Samala is the Director of Sales at Rufiar Roofing.' },
+  { id: 'fib-7', module: 1, question: 'The director of sales of Roof ER is _____ _____.', acceptableAnswers: ['Reese Samala', 'reese samala', 'REESE SAMALA', 'Reese samala'], explanation: 'Reese Samala is the Director of Sales at Roof ER.' },
 
   // Wind damage
   { id: 'fib-8', module: 7, question: 'Examples of _____ damage are missing tabs and creased shingles.', acceptableAnswers: ['wind', 'Wind', 'WIND'], explanation: 'Wind damage is characterized by missing tabs and creased shingles.' },
@@ -353,13 +353,13 @@ const FINAL_EXAM_SA: SAQuestion[] = [
   { id: 'sa-1', module: 5, prompt: 'Please write the section of your pitch that covers Non-Negotiable #1: Who you are.', keywords: ['name', 'my name is', 'hi', 'hello', 'introduce'], minKeywords: 2, sampleAnswer: 'Hi, my name is [Name].' },
 
   // Non-negotiable #2 - Who we are and what we do
-  { id: 'sa-2', module: 5, prompt: 'Please write the section of your pitch that covers Non-Negotiable #2: Who we are and what we do.', keywords: ['Rufiar', 'roofing', 'company', 'insurance', 'claims', 'storm', 'restoration', 'DC area', 'local'], minKeywords: 3, sampleAnswer: 'I\'m with Rufiar Roofing. We\'re a local roofing company that specializes in insurance claims and storm restoration in the DC area.' },
+  { id: 'sa-2', module: 5, prompt: 'Please write the section of your pitch that covers Non-Negotiable #2: Who we are and what we do.', keywords: ['Roof ER', 'roofing', 'company', 'insurance', 'claims', 'storm', 'restoration', 'DC area', 'local'], minKeywords: 3, sampleAnswer: 'I\'m with Roof ER. We\'re a local roofing company that specializes in insurance claims and storm restoration in the DC area.' },
 
   // Non-negotiable #3 - Make it relatable
   { id: 'sa-3', module: 5, prompt: 'Please write the section of your pitch that covers Non-Negotiable #3: Make it relatable.', keywords: ['storm', 'storms', 'neighbors', 'neighborhood', 'area', 'recently', 'helping', 'claims'], minKeywords: 3, sampleAnswer: 'We\'ve had some big storms recently and we\'ve been helping a lot of your neighbors file claims. We\'ve been working all through the neighborhood.' },
 
   // Non-negotiable #4 - What you're there to do
-  { id: 'sa-4', module: 5, prompt: 'Please write the section of your pitch that covers Non-Negotiable #4: What you\'re there to do.', keywords: ['free', 'inspection', '15 minutes', 'damage', 'roof', 'look', 'check'], minKeywords: 3, sampleAnswer: 'I\'d like to offer you a completely free inspection. It only takes about 15 minutes and I\'ll check your roof for any storm damage.' },
+  { id: 'sa-4', module: 5, prompt: 'Please write the section of your pitch that covers Non-Negotiable #4: What you\'re there to do.', keywords: ['free', 'inspection', '15 minutes', 'damage', 'roof', 'look', 'check'], minKeywords: 3, sampleAnswer: 'I\'m going to offer you a completely free inspection. It only takes about 15 minutes and I\'ll check your roof for any storm damage.' },
 
   // Non-negotiable #5 - Go for the close (over close)
   { id: 'sa-5', module: 5, prompt: 'Please write the section of your pitch that covers Non-Negotiable #5: Go for the close (over close).', keywords: ['find', 'damage', 'walk', 'through', 'process', 'don\'t', 'good shape', 'let you know'], minKeywords: 2, sampleAnswer: 'If I find damage, I\'ll walk you through the rest of the process. If I don\'t find damage, I\'ll let you know you\'re in good shape.' },
@@ -11972,9 +11972,9 @@ async function showUserDetail(userId: string): Promise<void> {
                   ${a.completedAt ? `<button class="btn-view-answers" data-user-id="${userId}" data-attempt-id="${a.id}">View Answers</button>` : ''}
                 </div>
                 <div class="attempt-breakdown">
-                  <span>MCQ: ${a.mcqScore || 0}/20</span>
+                  <span>MCQ: ${a.mcqScore || 0}/35</span>
                   <span>Fill-in: ${a.fibScore || 0}/10</span>
-                  <span>Short Answer: ${a.saScore || 0}/15 pts</span>
+                  <span>Short Answer: ${(a.saScore || 0) * 2}/20 pts</span>
                 </div>
                 <div class="exam-answers-container" id="exam-answers-${a.id}" style="display:none;">
                   <p class="loading-text">Loading answers...</p>
@@ -13496,9 +13496,9 @@ function showExamStartScreen(root: HTMLElement, state: ExamState) {
         <ul>
           <li><strong>35 Multiple Choice Questions</strong> (2 points each)</li>
           <li><strong>10 Fill-in-the-Blank Questions</strong> (2 points each)</li>
-          <li><strong>5 Short Answer Questions</strong> (2 points each)</li>
-          <li><strong>Total: 100 points</strong></li>
-          <li><strong>Passing Score: 80%</strong></li>
+          <li><strong>10 Short Answer Questions</strong> (2 points each)</li>
+          <li><strong>Total: 110 points</strong></li>
+          <li><strong>Passing Score: 80% (88 points)</strong></li>
         </ul>
       </div>
 
@@ -13884,7 +13884,7 @@ async function gradeFinalExam(root: HTMLElement) {
     }
   });
 
-  // Grade SA (5 questions, 2 pts each = 10 pts max) - AI scoring with fallback
+  // Grade SA (10 questions, 2 pts each = 20 pts max) - AI scoring with fallback
   let saPoints = 0;
   const saResults: Array<{score: number; feedback: string; strengths: string[]; improvements: string[]; aiScored: boolean}> = [];
 
@@ -13968,12 +13968,13 @@ async function gradeFinalExam(root: HTMLElement) {
     }
   });
 
-  // Calculate total score (out of 100)
+  // Calculate total score (out of 110 points, stored as percentage)
   const mcqScore = mcqCorrect * 2;      // 70 pts max
   const fibScore = fibCorrect * 2;      // 20 pts max
-  const saScore = Math.round(saPoints); // 10 pts max
-  const totalScore = mcqScore + fibScore + saScore;
-  const passed = totalScore >= 80;
+  const saScore = Math.round(saPoints); // 20 pts max
+  const rawTotal = mcqScore + fibScore + saScore; // Max 110 points
+  const totalScore = Math.round((rawTotal / 110) * 100); // Convert to percentage
+  const passed = totalScore >= 80; // 80%
 
   // Save attempt
   const state = getExamState();
@@ -14191,7 +14192,7 @@ function showExamResults(root: HTMLElement, attempt: ExamAttempt, detailedResult
           <ul>
             <li>Multiple Choice: ${attempt.mcqScore}/35 correct (${attempt.mcqScore * 2}/70 pts)</li>
             <li>Fill-in-the-Blank: ${attempt.fibScore}/10 correct (${attempt.fibScore * 2}/20 pts)</li>
-            <li>Short Answer: ${attempt.saScore * 2}/10 pts</li>
+            <li>Short Answer: ${attempt.saScore * 2}/20 pts</li>
           </ul>
         </div>
 
@@ -14261,7 +14262,7 @@ function showExamResults(root: HTMLElement, attempt: ExamAttempt, detailedResult
           <ul>
             <li>Multiple Choice: ${attempt.mcqScore}/35 correct</li>
             <li>Fill-in-the-Blank: ${attempt.fibScore}/10 correct</li>
-            <li>Short Answer: ${attempt.saScore * 2}/10 pts</li>
+            <li>Short Answer: ${attempt.saScore * 2}/20 pts</li>
           </ul>
         </div>
 
