@@ -3584,60 +3584,6 @@ const trainingContent = {
           </div>
         </div>
 
-        <h2>📋 Documentation Strategy Sequence</h2>
-        <p>Follow this exact order for professional, adjuster-ready documentation:</p>
-        <div class="doc-sequence" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 20px 0;">
-          <div class="doc-step" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-left: 4px solid #3b82f6; padding: 16px; border-radius: 0 8px 8px 0;">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-              <span style="background: #3b82f6; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem;">1</span>
-              <strong>Property ID</strong>
-            </div>
-            <p style="margin: 0; color: #475569; font-size: 0.9rem;">House number, full front view</p>
-          </div>
-          <div class="doc-step" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-left: 4px solid #3b82f6; padding: 16px; border-radius: 0 8px 8px 0;">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-              <span style="background: #3b82f6; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem;">2</span>
-              <strong>Overview Shots</strong>
-            </div>
-            <p style="margin: 0; color: #475569; font-size: 0.9rem;">All four elevations of the home</p>
-          </div>
-          <div class="doc-step" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-left: 4px solid #3b82f6; padding: 16px; border-radius: 0 8px 8px 0;">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-              <span style="background: #3b82f6; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem;">3</span>
-              <strong>Elevation Collateral</strong>
-            </div>
-            <p style="margin: 0; color: #475569; font-size: 0.9rem;">Gutters, siding, windows from each side</p>
-          </div>
-          <div class="doc-step" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-left: 4px solid #3b82f6; padding: 16px; border-radius: 0 8px 8px 0;">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-              <span style="background: #3b82f6; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem;">4</span>
-              <strong>Roof Overview</strong>
-            </div>
-            <p style="margin: 0; color: #475569; font-size: 0.9rem;">Wide shots of each slope</p>
-          </div>
-          <div class="doc-step" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-left: 4px solid #3b82f6; padding: 16px; border-radius: 0 8px 8px 0;">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-              <span style="background: #3b82f6; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem;">5</span>
-              <strong>Damage Markup</strong>
-            </div>
-            <p style="margin: 0; color: #475569; font-size: 0.9rem;">Circle hail hits with chalk, slash wind damage</p>
-          </div>
-          <div class="doc-step" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-left: 4px solid #3b82f6; padding: 16px; border-radius: 0 8px 8px 0;">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-              <span style="background: #3b82f6; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem;">6</span>
-              <strong>Close-ups</strong>
-            </div>
-            <p style="margin: 0; color: #475569; font-size: 0.9rem;">Individual damage photos with penny/quarter reference</p>
-          </div>
-          <div class="doc-step" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-left: 4px solid #3b82f6; padding: 16px; border-radius: 0 8px 8px 0;">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-              <span style="background: #3b82f6; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem;">7</span>
-              <strong>Granule Loss</strong>
-            </div>
-            <p style="margin: 0; color: #475569; font-size: 0.9rem;">Gutters and downspouts filled with granules</p>
-          </div>
-        </div>
-
         <!-- Interactive Matching Game - LAST before completion -->
         <h2>🎮 Damage Identification Challenge</h2>
         <p>Test your knowledge with these two interactive challenges!</p>
