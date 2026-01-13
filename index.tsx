@@ -3814,6 +3814,11 @@ const trainingContent = {
               </ul>
             </div>
 
+            <!-- Divider: Your Responsibility -->
+            <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 12px; padding: 16px 20px; margin: 10px 0; text-align: center; border-left: 4px solid #f59e0b;">
+              <p style="margin: 0; color: #92400e; font-size: 14px; font-weight: 600;">⬆️ Everything above is YOUR doing and control</p>
+            </div>
+
             <!-- Phase 2 -->
             <div style="background: white; border: 2px solid #e9d5ff; border-radius: 16px; padding: 20px; border-left: 4px solid #7c3aed;">
               <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
@@ -3833,6 +3838,11 @@ const trainingContent = {
               </ul>
             </div>
 
+            <!-- Divider: Team Handoff -->
+            <div style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border-radius: 12px; padding: 16px 20px; margin: 10px 0; text-align: center; border-left: 4px solid #3b82f6;">
+              <p style="margin: 0; color: #1e40af; font-size: 14px; font-weight: 600;">⬇️ Everything below is handed off to a team member</p>
+            </div>
+
             <!-- Phase 3 -->
             <div style="background: white; border: 2px solid #e9d5ff; border-radius: 16px; padding: 20px; border-left: 4px solid #7c3aed;">
               <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
@@ -3847,7 +3857,7 @@ const trainingContent = {
                 <li>Project Coordinator schedules meeting with homeowner</li>
                 <li>Homeowner signs Project Documents</li>
                 <li>Collect Downpayment (ACV payment from insurance)</li>
-                <li style="color: #16a34a; font-weight: 600;">💰 You receive $1,000 at Downpayment</li>
+                <li style="color: #16a34a; font-weight: 600;">💰 You receive portion of your commission at Downpayment</li>
               </ul>
             </div>
 
@@ -4013,8 +4023,11 @@ const trainingContent = {
         Sales App (iPad Only)
       </h2>
 
-      <div style="background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); border-radius: 16px; padding: 20px; margin-bottom: 35px;">
+      <div style="background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); border-radius: 16px; padding: 20px; margin-bottom: 15px;">
         <p style="color: #0f172a; font-size: 14px; margin: 0;">Use the Sales App on your iPad to capture claim details and submit forms.</p>
+      </div>
+      <div style="background: #fef3c7; border: 1px solid #fcd34d; border-radius: 10px; padding: 12px 16px; margin-bottom: 35px;">
+        <p style="color: #92400e; font-size: 13px; margin: 0; font-weight: 500;">📝 <strong>Note:</strong> We will go over this in more detail in person.</p>
       </div>
       <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px; margin-bottom: 35px;">
         <img src="/assets/training/module11/sales-app-ipad.png" alt="Sales App on iPad slide" style="width: 100%; border-radius: 12px; display: block;">
@@ -4065,7 +4078,20 @@ const trainingContent = {
       </h2>
 
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 35px;">
-        <!-- Claim Authorization PDF -->
+        <!-- Insurance Claim Agreement (Contingency) PDF - NOW FIRST -->
+        <div style="background: white; border: 2px solid #e9d5ff; border-radius: 16px; padding: 25px; text-align: center;">
+          <div style="font-size: 48px; margin-bottom: 15px;">📋</div>
+          <h3 style="color: #7c3aed; font-size: 18px; margin: 0 0 10px 0;">Insurance Claim Agreement</h3>
+          <p style="color: #6b7280; font-size: 14px; margin: 0 0 15px 0; line-height: 1.5;">The contingency agreement - only cost to homeowner is their deductible if fully approved.</p>
+          <div style="background: #f3e8ff; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+            <p style="color: #6b21a8; font-size: 13px; margin: 0;"><strong>Key term:</strong> Null and void if not fully approved</p>
+          </div>
+          <a href="/resources/DMV Blank Contingency.pdf" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; padding: 12px 24px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: all 0.3s;">
+            📥 View PDF
+          </a>
+        </div>
+
+        <!-- Claim Authorization PDF - NOW SECOND -->
         <div style="background: white; border: 2px solid #e9d5ff; border-radius: 16px; padding: 25px; text-align: center;">
           <div style="font-size: 48px; margin-bottom: 15px;">📄</div>
           <h3 style="color: #7c3aed; font-size: 18px; margin: 0 0 10px 0;">Claim Authorization Form</h3>
@@ -4077,36 +4103,23 @@ const trainingContent = {
             📥 View PDF
           </a>
         </div>
-
-        <!-- Insurance Claim Agreement (Contingency) PDF -->
-        <div style="background: white; border: 2px solid #e9d5ff; border-radius: 16px; padding: 25px; text-align: center;">
-          <div style="font-size: 48px; margin-bottom: 15px;">📋</div>
-          <h3 style="color: #7c3aed; font-size: 18px; margin: 0 0 10px 0;">Insurance Claim Agreement</h3>
-          <p style="color: #6b7280; font-size: 14px; margin: 0 0 15px 0; line-height: 1.5;">The contingency contract - only cost to homeowner is their deductible if fully approved.</p>
-          <div style="background: #f3e8ff; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
-            <p style="color: #6b21a8; font-size: 13px; margin: 0;"><strong>Key term:</strong> Null and void if not fully approved</p>
-          </div>
-          <a href="/resources/DMV Blank Contingency.pdf" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; padding: 12px 24px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: all 0.3s;">
-            📥 View PDF
-          </a>
-        </div>
       </div>
 
       <!-- End Activity -->
       <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-        <span style="background: #fef2f2; padding: 8px 12px; border-radius: 8px;">🎯</span>
-        End Activity: Call Practice Drill
+        <span style="background: #f0fdf4; padding: 8px 12px; border-radius: 8px;">🎯</span>
+        End Activity: Contingency + Claim Authorization Script Quiz
       </h2>
 
-      <div style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-radius: 16px; padding: 25px; margin-bottom: 30px;">
-        <p style="color: #991b1b; font-size: 14px; margin: 0 0 12px 0;">Pair up and run a full claim filing scenario. One person is the homeowner, one is the rep. Use the script above and check each item as you cover it.</p>
-        <div style="display: grid; gap: 10px; color: #7f1d1d; font-size: 14px;">
-          <label><input type="checkbox"> Claim filed for hail and wind damage</label>
-          <label><input type="checkbox"> Claim number captured</label>
-          <label><input type="checkbox"> Adjuster info requested</label>
-          <label><input type="checkbox"> Contingency agreement explained and signed</label>
-          <label><input type="checkbox"> Claim Authorization form signed and submitted</label>
-          <label><input type="checkbox"> Adjuster scheduling expectations set</label>
+      <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 16px; padding: 25px; margin-bottom: 30px;">
+        <p style="color: #166534; font-size: 14px; margin: 0 0 16px 0; font-weight: 500;">Test your knowledge of the Contingency + Claim Authorization Script. Check each item you can confidently explain to a homeowner:</p>
+        <div style="display: grid; gap: 12px; color: #15803d; font-size: 14px;">
+          <label style="display: flex; align-items: flex-start; gap: 10px;"><input type="checkbox" style="margin-top: 3px;"> <span>I can explain what a contingency agreement is and why it protects the homeowner</span></label>
+          <label style="display: flex; align-items: flex-start; gap: 10px;"><input type="checkbox" style="margin-top: 3px;"> <span>I understand "null and void if not fully approved" and can communicate this clearly</span></label>
+          <label style="display: flex; align-items: flex-start; gap: 10px;"><input type="checkbox" style="margin-top: 3px;"> <span>I can explain what the Claim Authorization form allows ROOF-ER to do</span></label>
+          <label style="display: flex; align-items: flex-start; gap: 10px;"><input type="checkbox" style="margin-top: 3px;"> <span>I know the correct order: file claim first, then contingency, then authorization</span></label>
+          <label style="display: flex; align-items: flex-start; gap: 10px;"><input type="checkbox" style="margin-top: 3px;"> <span>I can recite key parts of the script from memory</span></label>
+          <label style="display: flex; align-items: flex-start; gap: 10px;"><input type="checkbox" style="margin-top: 3px;"> <span>I understand the homeowner's only cost is their deductible if fully approved</span></label>
         </div>
       </div>
 
