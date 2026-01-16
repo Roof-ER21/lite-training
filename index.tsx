@@ -28,8 +28,102 @@ const STORAGE_KEYS = {
   sessionToken: 'roof-er.sessionToken',
   userId: 'roof-er.userId',
   userName: 'roof-er.userName',
-  userIsManager: 'roof-er.userIsManager'
+  userIsManager: 'roof-er.userIsManager',
+  // Theme preference key
+  themePreference: 'roof-er.themePreference'
 };
+
+// ============================================================================
+// THEME MANAGEMENT - Night Mode Support
+// ============================================================================
+
+type ThemePreference = 'light' | 'dark' | 'system';
+
+function getSystemTheme(): 'light' | 'dark' {
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+function getThemePreference(): ThemePreference {
+  const stored = localStorage.getItem(STORAGE_KEYS.themePreference);
+  if (stored === 'light' || stored === 'dark' || stored === 'system') {
+    return stored;
+  }
+  return 'system';
+}
+
+function getEffectiveTheme(): 'light' | 'dark' {
+  const preference = getThemePreference();
+  return preference === 'system' ? getSystemTheme() : preference;
+}
+
+function applyTheme(theme: 'light' | 'dark'): void {
+  document.documentElement.setAttribute('data-theme', theme);
+  updateThemeToggleUI(theme);
+}
+
+function setThemePreference(preference: ThemePreference): void {
+  localStorage.setItem(STORAGE_KEYS.themePreference, preference);
+  applyTheme(getEffectiveTheme());
+}
+
+function toggleTheme(): void {
+  const currentEffective = getEffectiveTheme();
+  const newTheme = currentEffective === 'light' ? 'dark' : 'light';
+  setThemePreference(newTheme);
+}
+
+function updateThemeToggleUI(theme: 'light' | 'dark'): void {
+  const toggles = document.querySelectorAll('.theme-toggle-btn');
+  toggles.forEach(toggle => {
+    const icon = toggle.querySelector('.theme-icon');
+    const label = toggle.querySelector('.theme-label');
+    if (icon) icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+    if (label) label.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
+  });
+}
+
+function initThemeSystem(): void {
+  // Apply initial theme
+  applyTheme(getEffectiveTheme());
+
+  // Listen for system theme changes
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    if (getThemePreference() === 'system') {
+      applyTheme(e.matches ? 'dark' : 'light');
+    }
+  });
+}
+
+// Expose toggle function globally for onclick handlers
+(window as any).toggleTheme = toggleTheme;
+
+// Inject theme toggle into the content area (top-right of content cards)
+function injectThemeToggle(): void {
+  // Find the first content-card
+  const mainContent = document.getElementById('main-content');
+  if (!mainContent) return;
+
+  const contentCard = mainContent.querySelector('.content-card');
+  if (!contentCard) return;
+
+  // Check if toggle already exists (prevent duplicates)
+  if (document.getElementById('theme-toggle-container')) return;
+
+  const currentTheme = getEffectiveTheme();
+  const toggleContainer = document.createElement('div');
+  toggleContainer.id = 'theme-toggle-container';
+  toggleContainer.style.cssText = 'position: absolute; top: 15px; right: 15px; z-index: 100;';
+  toggleContainer.innerHTML = `
+    <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle theme">
+      <span class="theme-icon">${currentTheme === 'dark' ? '☀️' : '🌙'}</span>
+      <span class="theme-label">${currentTheme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+    </button>
+  `;
+
+  // Make the content-card position relative for absolute positioning
+  (contentCard as HTMLElement).style.position = 'relative';
+  contentCard.prepend(toggleContainer);
+}
 
 // ============================================================================
 // API & SESSION MANAGEMENT
@@ -5901,9 +5995,9 @@ function startLivePitchPractice() {
   addPitchMessage('agnes', phase.agnesOpening);
 
   updateVoiceStatus('🧓 Agnes is speaking...');
-  speakAsAgnes(phase.agnesOpening).then(() => {
-    updateVoiceStatus('Your turn! Tap the mic to respond.');
-  });
+  speakAsAgnes(phase.agnesOpening)
+    .then(() => updateVoiceStatus('Your turn! Tap the mic to respond.'))
+    .catch(() => updateVoiceStatus('Your turn! Tap the mic to respond.')); // Fallback on TTS failure
 }
 
 function updatePitchPhaseUI() {
@@ -6019,9 +6113,9 @@ function skipPitchPhase() {
     const nextPhase = pitchPhases[currentPitchPhase];
     addPitchMessage('agnes', nextPhase.agnesOpening);
     updateVoiceStatus('🧓 Agnes is speaking...');
-    speakAsAgnes(nextPhase.agnesOpening).then(() => {
-      updateVoiceStatus('Your turn! Tap the mic to respond.');
-    });
+    speakAsAgnes(nextPhase.agnesOpening)
+      .then(() => updateVoiceStatus('Your turn! Tap the mic to respond.'))
+      .catch(() => updateVoiceStatus('Your turn! Tap the mic to respond.')); // Fallback on TTS failure
   }
 }
 
@@ -10146,6 +10240,9 @@ async function renderModule(moduleName: string) {
   }
   mainContent.innerHTML = content;
 
+  // Inject theme toggle into the content area
+  injectThemeToggle();
+
   // Cancel any ongoing TTS when changing modules
   stopAllTTS();
   currentUtterance = null;
@@ -10512,12 +10609,12 @@ function completeModule(moduleName: string) {
     }
   }
 
-  // Track module completion via API (silent - don't spam console)
-  apiCall('/progress/module', {
+  // Track module completion via API (silent - don't spam console, handle offline gracefully)
+  void apiCall('/progress/module', {
     method: 'POST',
     body: JSON.stringify({ moduleName, action: 'complete' }),
     silent: true
-  } as any);
+  } as any).catch(() => { /* Silent fail for offline mode */ });
 
   // Trigger confetti celebration
   triggerConfetti('module');
@@ -10716,13 +10813,13 @@ function closePhotoModal() {
 // END PHOTO MODAL
 // ============================================================================
 
-// Track module start
+// Track module start (handle offline gracefully)
 function trackModuleStart(moduleName: string) {
-  apiCall('/progress/module', {
+  void apiCall('/progress/module', {
     method: 'POST',
     body: JSON.stringify({ moduleName, action: 'start' }),
     silent: true
-  } as any);
+  } as any).catch(() => { /* Silent fail for offline mode */ });
 }
 
 // Activity heartbeat for time tracking
@@ -10737,14 +10834,14 @@ function startActivityTracking(moduleName: string) {
     clearInterval(activityHeartbeatInterval);
   }
 
-  // Send heartbeat every 30 seconds (silent - don't spam console)
+  // Send heartbeat every 30 seconds (silent - don't spam console, handle offline gracefully)
   activityHeartbeatInterval = window.setInterval(() => {
     if (currentModuleForTracking) {
-      apiCall('/progress/heartbeat', {
+      void apiCall('/progress/heartbeat', {
         method: 'POST',
         body: JSON.stringify({ moduleName: currentModuleForTracking, timeSpent: 30 }),
         silent: true
-      } as any);
+      } as any).catch(() => { /* Silent fail for offline mode */ });
     }
   }, 30000);
 }
@@ -12709,6 +12806,9 @@ function initializeApp(): void {
 
 // --- Initial Load ---
 document.addEventListener('DOMContentLoaded', async () => {
+  // Initialize theme system immediately (applies saved preference or system default)
+  initThemeSystem();
+
   // Check if user is logged in
   if (isLoggedIn()) {
     // Validate session with server (if available)
