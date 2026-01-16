@@ -5180,6 +5180,11 @@ function initVideoPlayers() {
     const newProgressBar = document.getElementById(`${videoId}-progress-bar`);
     const newProgressText = document.getElementById(`${videoId}-progress-text`);
 
+    // AbortController for cleanup - prevents memory leaks on module switch
+    const abortController = new AbortController();
+    const { signal } = abortController;
+    registerModuleCleanup(() => abortController.abort());
+
     newVideo.addEventListener('timeupdate', function() {
       if (!newVideo.duration) return;
       const progress = (newVideo.currentTime / newVideo.duration) * 100;
@@ -5220,7 +5225,7 @@ function initVideoPlayers() {
           markVideoWatched(currentModuleForEngagement);
         }
       }
-    });
+    }, { signal });
 
     // Handle video loaded - restore saved progress display
     newVideo.addEventListener('loadedmetadata', function() {
@@ -5230,7 +5235,7 @@ function initVideoPlayers() {
         if (newProgressBar) (newProgressBar as HTMLElement).style.width = savedPct + '%';
         if (newProgressText) newProgressText.textContent = savedPct + '%';
       }
-    });
+    }, { signal });
   });
 }
 
@@ -6416,6 +6421,11 @@ function initSalesCycleSorter() {
     const phaseNames = ['Generating New Business', 'Adjuster Meeting', 'Project Meeting', 'Installation', 'Final Payment'];
     salesCycleAttempts = 0;
 
+    // Touch support variables
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchClone: HTMLElement | null = null;
+
     // Handle drag from pool
     pool.addEventListener('dragstart', (e) => {
         draggedItem = e.target as HTMLElement;
@@ -6473,6 +6483,120 @@ function initSalesCycleSorter() {
         if (draggedItem && dragSource === 'dropzone') {
             pool.appendChild(draggedItem);
             feedbackEl.style.display = 'none'; // Hide feedback when moving items back
+        }
+    }, { signal });
+
+    // TOUCH SUPPORT - Pool items
+    pool.addEventListener('touchstart', (e) => {
+        const target = e.target as HTMLElement;
+        if (target.classList.contains('draggable-item')) {
+            e.preventDefault();
+            draggedItem = target;
+            dragSource = 'pool';
+            const touch = e.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+
+            // Create visual clone for dragging
+            touchClone = draggedItem.cloneNode(true) as HTMLElement;
+            touchClone.style.position = 'fixed';
+            touchClone.style.pointerEvents = 'none';
+            touchClone.style.opacity = '0.8';
+            touchClone.style.zIndex = '9999';
+            touchClone.style.width = draggedItem.offsetWidth + 'px';
+            touchClone.style.left = touch.clientX - draggedItem.offsetWidth / 2 + 'px';
+            touchClone.style.top = touch.clientY - draggedItem.offsetHeight / 2 + 'px';
+            document.body.appendChild(touchClone);
+
+            draggedItem.style.opacity = '0.5';
+        }
+    }, { signal });
+
+    pool.addEventListener('touchmove', (e) => {
+        if (draggedItem && touchClone) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            touchClone.style.left = touch.clientX - touchClone.offsetWidth / 2 + 'px';
+            touchClone.style.top = touch.clientY - touchClone.offsetHeight / 2 + 'px';
+        }
+    }, { signal });
+
+    pool.addEventListener('touchend', (e) => {
+        if (draggedItem && touchClone) {
+            e.preventDefault();
+            const touch = e.changedTouches[0];
+            const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+
+            // Clean up clone
+            document.body.removeChild(touchClone);
+            touchClone = null;
+            draggedItem.style.opacity = '1';
+
+            // Check if dropped on dropzone
+            if (dropTarget && (dropTarget === dropZone || dropZone.contains(dropTarget)) && dragSource === 'pool') {
+                dropZone.appendChild(draggedItem);
+                checkOrder();
+            }
+
+            draggedItem = null;
+            dragSource = null;
+        }
+    }, { signal });
+
+    // TOUCH SUPPORT - Dropzone items (to move back)
+    dropZone.addEventListener('touchstart', (e) => {
+        const target = e.target as HTMLElement;
+        if (target.classList.contains('draggable-item')) {
+            e.preventDefault();
+            draggedItem = target;
+            dragSource = 'dropzone';
+            const touch = e.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+
+            // Create visual clone for dragging
+            touchClone = draggedItem.cloneNode(true) as HTMLElement;
+            touchClone.style.position = 'fixed';
+            touchClone.style.pointerEvents = 'none';
+            touchClone.style.opacity = '0.8';
+            touchClone.style.zIndex = '9999';
+            touchClone.style.width = draggedItem.offsetWidth + 'px';
+            touchClone.style.left = touch.clientX - draggedItem.offsetWidth / 2 + 'px';
+            touchClone.style.top = touch.clientY - draggedItem.offsetHeight / 2 + 'px';
+            document.body.appendChild(touchClone);
+
+            draggedItem.style.opacity = '0.5';
+        }
+    }, { signal });
+
+    dropZone.addEventListener('touchmove', (e) => {
+        if (draggedItem && touchClone) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            touchClone.style.left = touch.clientX - touchClone.offsetWidth / 2 + 'px';
+            touchClone.style.top = touch.clientY - touchClone.offsetHeight / 2 + 'px';
+        }
+    }, { signal });
+
+    dropZone.addEventListener('touchend', (e) => {
+        if (draggedItem && touchClone) {
+            e.preventDefault();
+            const touch = e.changedTouches[0];
+            const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+
+            // Clean up clone
+            document.body.removeChild(touchClone);
+            touchClone = null;
+            draggedItem.style.opacity = '1';
+
+            // Check if dropped on pool
+            if (dropTarget && (dropTarget === pool || pool.contains(dropTarget)) && dragSource === 'dropzone') {
+                pool.appendChild(draggedItem);
+                feedbackEl.style.display = 'none';
+            }
+
+            draggedItem = null;
+            dragSource = null;
         }
     }, { signal });
 
@@ -6604,6 +6728,9 @@ function initInspectionOrderGame() {
   let draggedItem: HTMLElement | null = null;
   const correctOrder = ['1', '2', '3', '4', '5', '6'];
 
+  // Touch support variables
+  let touchClone: HTMLElement | null = null;
+
   // Shuffle items on init for randomness
   shufflePoolItems();
 
@@ -6681,6 +6808,112 @@ function initInspectionOrderGame() {
     if (draggedItem && !pool.contains(draggedItem)) {
       pool.appendChild(draggedItem);
       feedbackEl.style.display = 'none';
+    }
+  }, { signal });
+
+  // TOUCH SUPPORT - Pool items
+  pool.addEventListener('touchstart', (e) => {
+    const target = e.target as HTMLElement;
+    if (target.classList.contains('inspection-drag-item')) {
+      e.preventDefault();
+      draggedItem = target;
+      const touch = e.touches[0];
+
+      // Create visual clone for dragging
+      touchClone = draggedItem.cloneNode(true) as HTMLElement;
+      touchClone.style.position = 'fixed';
+      touchClone.style.pointerEvents = 'none';
+      touchClone.style.opacity = '0.8';
+      touchClone.style.zIndex = '9999';
+      touchClone.style.width = draggedItem.offsetWidth + 'px';
+      touchClone.style.left = touch.clientX - draggedItem.offsetWidth / 2 + 'px';
+      touchClone.style.top = touch.clientY - draggedItem.offsetHeight / 2 + 'px';
+      document.body.appendChild(touchClone);
+
+      draggedItem.style.opacity = '0.5';
+    }
+  }, { signal });
+
+  pool.addEventListener('touchmove', (e) => {
+    if (draggedItem && touchClone) {
+      e.preventDefault();
+      const touch = e.touches[0];
+      touchClone.style.left = touch.clientX - touchClone.offsetWidth / 2 + 'px';
+      touchClone.style.top = touch.clientY - touchClone.offsetHeight / 2 + 'px';
+    }
+  }, { signal });
+
+  pool.addEventListener('touchend', (e) => {
+    if (draggedItem && touchClone) {
+      e.preventDefault();
+      const touch = e.changedTouches[0];
+      const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+
+      // Clean up clone
+      document.body.removeChild(touchClone);
+      touchClone = null;
+      draggedItem.style.opacity = '1';
+
+      // Check if dropped on dropzone
+      if (dropTarget && (dropTarget === dropZone || dropZone.contains(dropTarget))) {
+        dropZone.appendChild(draggedItem);
+        checkOrder();
+      }
+
+      draggedItem = null;
+    }
+  }, { signal });
+
+  // TOUCH SUPPORT - Dropzone items (to move back to pool)
+  dropZone.addEventListener('touchstart', (e) => {
+    const target = e.target as HTMLElement;
+    if (target.classList.contains('inspection-drag-item')) {
+      e.preventDefault();
+      draggedItem = target;
+      const touch = e.touches[0];
+
+      // Create visual clone for dragging
+      touchClone = draggedItem.cloneNode(true) as HTMLElement;
+      touchClone.style.position = 'fixed';
+      touchClone.style.pointerEvents = 'none';
+      touchClone.style.opacity = '0.8';
+      touchClone.style.zIndex = '9999';
+      touchClone.style.width = draggedItem.offsetWidth + 'px';
+      touchClone.style.left = touch.clientX - draggedItem.offsetWidth / 2 + 'px';
+      touchClone.style.top = touch.clientY - draggedItem.offsetHeight / 2 + 'px';
+      document.body.appendChild(touchClone);
+
+      draggedItem.style.opacity = '0.5';
+    }
+  }, { signal });
+
+  dropZone.addEventListener('touchmove', (e) => {
+    if (draggedItem && touchClone) {
+      e.preventDefault();
+      const touch = e.touches[0];
+      touchClone.style.left = touch.clientX - touchClone.offsetWidth / 2 + 'px';
+      touchClone.style.top = touch.clientY - touchClone.offsetHeight / 2 + 'px';
+    }
+  }, { signal });
+
+  dropZone.addEventListener('touchend', (e) => {
+    if (draggedItem && touchClone) {
+      e.preventDefault();
+      const touch = e.changedTouches[0];
+      const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+
+      // Clean up clone
+      document.body.removeChild(touchClone);
+      touchClone = null;
+      draggedItem.style.opacity = '1';
+
+      // Check if dropped on pool
+      if (dropTarget && (dropTarget === pool || pool.contains(dropTarget))) {
+        pool.appendChild(draggedItem);
+        feedbackEl.style.display = 'none';
+      }
+
+      draggedItem = null;
     }
   }, { signal });
 
