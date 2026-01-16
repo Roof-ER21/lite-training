@@ -424,7 +424,7 @@ const MODULE_REQUIREMENTS: Record<string, ModuleRequirements> = {
   'post-inspection-pitch': { needsTime: 60, needsScroll: true },
   'post-inspection-objections': { needsTime: 60, needsScroll: true },
   'damage-identification': { needsQuiz: true, needsScroll: true },
-  'filing-claim-closing': { needsTime: 60, needsScroll: true },
+  'filing-claim-closing': { needsQuiz: true, needsScroll: true },
   'sales-cycle-job-flow': { needsTime: 60, needsScroll: true },
   'role-play': { needsScroll: true }, // Special: unlock when role-play starts
   'final-exam': { needsQuiz: true, needsScroll: true },
@@ -4057,16 +4057,17 @@ const trainingContent = {
         End Activity: Contingency + Claim Authorization Script Quiz
       </h2>
 
-      <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 16px; padding: 25px; margin-bottom: 30px;">
+      <div id="filing-claim-quiz" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 16px; padding: 25px; margin-bottom: 30px;">
         <p style="color: #166534; font-size: 14px; margin: 0 0 16px 0; font-weight: 500;">Test your knowledge of the Contingency + Claim Authorization Script. Check each item you can confidently explain to a homeowner:</p>
         <div style="display: grid; gap: 12px; color: #15803d; font-size: 14px;">
-          <label style="display: flex; align-items: flex-start; gap: 10px;"><input type="checkbox" style="margin-top: 3px;"> <span>I can explain what a contingency agreement is and why it protects the homeowner</span></label>
-          <label style="display: flex; align-items: flex-start; gap: 10px;"><input type="checkbox" style="margin-top: 3px;"> <span>I understand "null and void if not fully approved" and can communicate this clearly</span></label>
-          <label style="display: flex; align-items: flex-start; gap: 10px;"><input type="checkbox" style="margin-top: 3px;"> <span>I can explain what the Claim Authorization form allows ROOF-ER to do</span></label>
-          <label style="display: flex; align-items: flex-start; gap: 10px;"><input type="checkbox" style="margin-top: 3px;"> <span>I know the correct order: file claim first, then contingency, then authorization</span></label>
-          <label style="display: flex; align-items: flex-start; gap: 10px;"><input type="checkbox" style="margin-top: 3px;"> <span>I can recite key parts of the script from memory</span></label>
-          <label style="display: flex; align-items: flex-start; gap: 10px;"><input type="checkbox" style="margin-top: 3px;"> <span>I understand the homeowner's only cost is their deductible if fully approved</span></label>
+          <label style="display: flex; align-items: flex-start; gap: 10px;"><input type="checkbox" class="filing-quiz-checkbox" style="margin-top: 3px;"> <span>I can explain what a contingency agreement is and why it protects the homeowner</span></label>
+          <label style="display: flex; align-items: flex-start; gap: 10px;"><input type="checkbox" class="filing-quiz-checkbox" style="margin-top: 3px;"> <span>I understand "null and void if not fully approved" and can communicate this clearly</span></label>
+          <label style="display: flex; align-items: flex-start; gap: 10px;"><input type="checkbox" class="filing-quiz-checkbox" style="margin-top: 3px;"> <span>I can explain what the Claim Authorization form allows ROOF-ER to do</span></label>
+          <label style="display: flex; align-items: flex-start; gap: 10px;"><input type="checkbox" class="filing-quiz-checkbox" style="margin-top: 3px;"> <span>I know the correct order: file claim first, then contingency, then authorization</span></label>
+          <label style="display: flex; align-items: flex-start; gap: 10px;"><input type="checkbox" class="filing-quiz-checkbox" style="margin-top: 3px;"> <span>I can recite key parts of the script from memory</span></label>
+          <label style="display: flex; align-items: flex-start; gap: 10px;"><input type="checkbox" class="filing-quiz-checkbox" style="margin-top: 3px;"> <span>I understand the homeowner's only cost is their deductible if fully approved</span></label>
         </div>
+        <div id="filing-quiz-feedback" style="display: none; margin-top: 15px; padding: 12px; background: #22c55e; color: white; border-radius: 8px; text-align: center; font-weight: 600;">All items confirmed! You're ready to proceed.</div>
       </div>
 
       <div class="module-completion-section" id="module-complete-section" style="display: none; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 30px; border-radius: 16px; text-align: center; margin-top: 30px;">
@@ -6423,6 +6424,41 @@ function toggleStepCard(cardElement: HTMLElement) {
 
 // Expose globally
 (window as any).toggleStepCard = toggleStepCard;
+
+// --- Module 11: Filing Claim Quiz (Checkbox Self-Assessment) ---
+function initFilingClaimQuiz() {
+  const quizContainer = document.getElementById('filing-claim-quiz');
+  const feedbackEl = document.getElementById('filing-quiz-feedback');
+  if (!quizContainer) return;
+
+  const checkboxes = quizContainer.querySelectorAll('.filing-quiz-checkbox');
+  const totalRequired = checkboxes.length;
+
+  function checkCompletion() {
+    const checkedCount = quizContainer!.querySelectorAll('.filing-quiz-checkbox:checked').length;
+
+    if (checkedCount === totalRequired) {
+      // All checkboxes checked - mark quiz as passed
+      if (feedbackEl) {
+        feedbackEl.style.display = 'block';
+      }
+      markQuizPassed('filing-claim-closing');
+      checkModuleCompletion();
+    } else {
+      if (feedbackEl) {
+        feedbackEl.style.display = 'none';
+      }
+    }
+  }
+
+  // Add change listeners to all checkboxes
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', checkCompletion);
+  });
+
+  // Check initial state (in case page was reloaded with checked boxes)
+  checkCompletion();
+}
 
 // --- Module 8: Inspection Process Ordering Game ---
 function initInspectionOrderGame() {
@@ -10120,6 +10156,9 @@ async function renderModule(moduleName: string) {
           break;
       case 'inspection-process':
           initInspectionOrderGame();
+          break;
+      case 'filing-claim-closing':
+          initFilingClaimQuiz();
           break;
       case 'commitment':
           initCommitmentGate();
