@@ -780,18 +780,39 @@ function unlockNextModule(currentModule: string) {
 function updateSidebarLocks() {
   const unlocked = getUnlockedModules();
   const items = sidebar?.querySelectorAll('li[data-module]');
-  items?.forEach(item => {
+  const currentModuleName = localStorage.getItem(STORAGE_KEYS.currentModule) || '';
+
+  items?.forEach((item, index) => {
     const moduleName = (item as HTMLElement).dataset.module || '';
+
+    // Remove all state classes first
+    item.classList.remove('locked', 'unlocked', 'completed', 'current');
+
     // My Page and admin-dashboard are never locked
     if (moduleName === 'my-page' || moduleName === 'admin-dashboard') {
-      item.classList.remove('locked');
       item.classList.add('unlocked');
+      // Add dashboard-link-glass for My Page
+      if (moduleName === 'my-page') {
+        item.classList.add('dashboard-link-glass');
+      }
     } else if (unlocked.includes(moduleName)) {
-      item.classList.remove('locked');
       item.classList.add('unlocked');
+
+      // Check if this is the current module
+      if (moduleName === currentModuleName) {
+        item.classList.add('current');
+      }
+
+      // Check if modules after this one are unlocked (simple heuristic for completion)
+      const moduleIndex = MODULE_ORDER.indexOf(moduleName);
+      if (moduleIndex >= 0) {
+        const nextModule = MODULE_ORDER[moduleIndex + 1];
+        if (nextModule && unlocked.includes(nextModule)) {
+          item.classList.add('completed');
+        }
+      }
     } else {
       item.classList.add('locked');
-      item.classList.remove('unlocked');
     }
   });
 }
@@ -11948,6 +11969,11 @@ async function loadCMSAuditLog(): Promise<void> {
   `;
 }
 
+// Helper function to get user initials
+function getInitials(name: string): string {
+  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+}
+
 function updateUserDisplay(): void {
   const user = getCurrentUser();
   if (!user) return;
@@ -11960,14 +11986,28 @@ function updateUserDisplay(): void {
   if (!userInfo) {
     userInfo = document.createElement('div');
     userInfo.id = 'user-info';
-    userInfo.className = 'user-info';
+    userInfo.className = 'user-info user-card-glass';
     sidebarHeader.appendChild(userInfo);
   }
 
+  // Calculate progress percentage (completed modules / total modules)
+  const unlockedModules = getUnlockedModules();
+  const totalModules = MODULE_ORDER.length;
+  const completedCount = unlockedModules.length - 1; // Subtract 1 for initial unlocked modules
+  const progressPct = Math.min(100, Math.round((completedCount / totalModules) * 100));
+
+  userInfo.className = 'user-info user-card-glass';
   userInfo.innerHTML = `
-    <span class="user-name">👤 ${user.name}</span>
-    ${user.isManager ? '<span class="manager-badge-small">Manager</span>' : ''}
-    <button id="logout-btn" class="logout-btn" title="Log out">↪</button>
+    <div class="user-avatar-ring" style="--progress: ${progressPct}%">
+      <div class="user-avatar-inner">${getInitials(user.name)}</div>
+    </div>
+    <div class="user-details">
+      <div class="user-name-glass">${user.name}</div>
+      <div class="user-meta">
+        ${user.isManager ? '<span class="manager-badge-gradient">Manager</span>' : ''}
+      </div>
+    </div>
+    <button id="logout-btn" class="logout-btn-glass" title="Log out">↪</button>
   `;
 
   // Add logout handler
@@ -13797,11 +13837,14 @@ function updateSidebarCertifiedBadge(isCertified: boolean): void {
     if (!badge && sidebarHeader) {
       badge = document.createElement('div');
       badge.id = 'cert-badge';
-      badge.className = 'cert-badge';
+      badge.className = 'cert-badge certified-badge-glass';
       badge.innerHTML = '<span class="badge-icon">🏆</span><span class="badge-text">Certified</span>';
       sidebarHeader.appendChild(badge);
     }
-    if (badge) badge.style.display = 'inline-flex';
+    if (badge) {
+      badge.className = 'cert-badge certified-badge-glass';
+      badge.style.display = 'inline-flex';
+    }
 
     // Add trophy to Final Exam module
     const examModule = document.querySelector('li[data-module="final-exam"]');

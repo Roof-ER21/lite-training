@@ -356,6 +356,110 @@ body {
   border-color: rgba(255, 255, 255, 0.5);
 }
 
+/* Glass User Card */
+.user-card-glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 15px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+
+.user-card-glass::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 13px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(217,4,41,0.5) 0%, rgba(255,255,255,0.1) 50%, rgba(217,4,41,0.3) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.user-avatar-ring {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, #d90429 0%, #d90429 var(--progress, 65%), rgba(255,255,255,0.1) var(--progress, 65%));
+  padding: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.user-avatar-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3d2066 0%, #1a1a2e 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  color: white;
+}
+
+.user-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-name-glass {
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 4px;
+}
+
+.user-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.manager-badge-gradient {
+  background: linear-gradient(135deg, #d90429 0%, #ff6b6b 100%);
+  color: white;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(217, 4, 41, 0.3);
+}
+
+.logout-btn-glass {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.logout-btn-glass:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: white;
+}
+
 /* Hide app container initially when login is shown */
 .app-container.hidden {
   display: none !important;
@@ -368,11 +472,12 @@ body {
 
 #sidebar {
   width: 250px;
-  background-color: var(--dark-bg);
+  background: linear-gradient(180deg, #2d1b4e 0%, #1a1a2e 50%, #0f0f1a 100%);
   color: var(--white);
   padding: 20px;
   box-shadow: var(--shadow-md);
   flex-shrink: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .sidebar-header h2 {
@@ -385,15 +490,21 @@ body {
 .sidebar-logo {
   display: flex;
   justify-content: center;
-  background: white;
+  background: transparent;
   border-radius: 8px;
-  padding: 10px;
+  padding: 20px 15px;
   margin-bottom: 15px;
 }
 
 .sidebar-logo svg {
-  width: 180px;
-  height: 90px;
+  width: 150px;
+  height: 75px;
+  filter: drop-shadow(0 0 10px rgba(217, 4, 41, 0.3));
+  transition: filter 0.3s ease;
+}
+
+.sidebar-logo svg:hover {
+  filter: drop-shadow(0 0 15px rgba(217, 4, 41, 0.5));
 }
 
 .sidebar-nav {
@@ -9763,6 +9874,39 @@ button:disabled {
   flex-shrink: 0;
 }
 
+/* My Page Glass Style */
+.dashboard-link-glass {
+  position: relative;
+  background: rgba(217, 4, 41, 0.1) !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 14px 16px !important;
+  margin: 10px 12px !important;
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  color: white !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease;
+}
+
+.dashboard-link-glass::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 60%;
+  background: #d90429;
+  border-radius: 0 4px 4px 0;
+  box-shadow: 0 0 10px #d90429, 0 0 20px rgba(217, 4, 41, 0.5);
+}
+
+.dashboard-link-glass:hover {
+  background: rgba(217, 4, 41, 0.2) !important;
+}
+
 .sidebar-divider {
   padding: 12px 20px 8px 20px !important;
   font-size: 0.75rem !important;
@@ -9779,6 +9923,117 @@ button:disabled {
 .sidebar-divider:hover {
   background: transparent !important;
   color: #9ca3af !important;
+}
+
+/* Module Number Badges */
+.module-number-badge {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.module-number-badge.completed {
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(74, 222, 128, 0.3);
+}
+
+.module-number-badge.current {
+  background: linear-gradient(135deg, #d90429 0%, #ff6b6b 100%);
+  color: white;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.module-number-badge.unlocked {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.module-number-badge.locked {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.3);
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(217, 4, 41, 0.5); }
+  50% { box-shadow: 0 0 15px rgba(217, 4, 41, 0.8); }
+}
+
+/* Module list item glass style */
+.sidebar-nav li.module-item-glass {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+.module-item-glass .module-text {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Progress indicators */
+.sidebar-nav li.completed::after {
+  content: '✦';
+  color: #fbbf24;
+  font-size: 14px;
+  text-shadow: 0 0 8px rgba(251, 191, 36, 0.5);
+  margin-left: auto;
+  padding-left: 8px;
+}
+
+.sidebar-nav li.current::after {
+  content: '◈';
+  color: #d90429;
+  animation: pulse-opacity 1.5s ease-in-out infinite;
+  margin-left: auto;
+  padding-left: 8px;
+}
+
+@keyframes pulse-opacity {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* Glass section divider */
+.sidebar-divider-glass {
+  padding: 16px 12px 8px !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.12em !important;
+  color: rgba(255, 255, 255, 0.4) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: none !important;
+  margin-top: 10px !important;
+  cursor: default !important;
+  background: transparent !important;
+}
+
+/* Certified badge glass */
+.certified-badge-glass {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: linear-gradient(135deg, rgba(74, 222, 128, 0.2) 0%, rgba(34, 197, 94, 0.1) 100%);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #4ade80;
+  margin: 10px 12px;
+  box-shadow: 0 0 15px rgba(74, 222, 128, 0.2);
 }
 
 /* My Page Container */
