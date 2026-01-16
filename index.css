@@ -22,12 +22,12 @@
 [data-theme="dark"] {
   --primary-color: #ff3d5a;
   --primary-hover-color: #ff5c75;
-  --dark-bg: #1a1a2e;
-  --light-bg: #0f0f1a;
-  --surface-color: #1e1e2f;
+  --dark-bg: #1e1e24;
+  --light-bg: #121216;
+  --surface-color: #1e1e24;
   --text-primary: #e4e4e7;
   --text-secondary: #a1a1aa;
-  --border-color: #3f3f5a;
+  --border-color: #3a3a42;
   --white: #ffffff;
   --success-color: #4ade80;
   --error-color: #f87171;
@@ -35,12 +35,12 @@
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
 
   /* Additional dark mode colors */
-  --card-bg: #252538;
-  --input-bg: #1e1e2f;
-  --input-border: #3f3f5a;
+  --card-bg: #252530;
+  --input-bg: #1e1e24;
+  --input-border: #3a3a42;
   --hover-bg: rgba(255, 61, 90, 0.1);
-  --code-bg: #2d2d44;
-  --script-bg: #252538;
+  --code-bg: #2d2d35;
+  --script-bg: #252530;
   --highlight-bg: rgba(255, 61, 90, 0.15);
 }
 
@@ -145,7 +145,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  background: linear-gradient(135deg, #1e1e24 0%, #252530 50%, #2a2a35 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -192,7 +192,7 @@ body {
 .login-header h1 {
   margin: 0 0 8px 0;
   font-size: 28px;
-  color: #1a1a2e;
+  color: #1e1e24;
   font-weight: 700;
 }
 
@@ -216,7 +216,7 @@ body {
 
 .login-form label {
   font-weight: 600;
-  color: #1a1a2e;
+  color: #1e1e24;
   font-size: 14px;
 }
 
@@ -6860,7 +6860,7 @@ button:disabled {
 
 /* Video Section */
 .agnes-video-section {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  background: linear-gradient(135deg, #1e1e24 0%, #252530 100%);
   border-radius: 16px;
   padding: 30px;
   display: flex;
@@ -8035,7 +8035,7 @@ button:disabled {
 
 /* Admin sidebar item */
 .admin-sidebar-item {
-  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  background: linear-gradient(135deg, #1e1e24, #252530);
   border: 1px solid #d90429;
   margin-top: 20px;
   border-radius: 8px;
@@ -10875,7 +10875,7 @@ button:disabled {
    ============================================================================ */
 
 .mini-game-section {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  background: linear-gradient(135deg, #1e1e24 0%, #252530 100%);
   border-radius: 16px;
   padding: 30px;
   margin: 40px 0;
@@ -13105,7 +13105,7 @@ button:disabled {
 
 .sa-sidebar {
   width: 250px;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  background: linear-gradient(135deg, #1e1e24 0%, #252530 100%);
   color: white;
   padding: 20px;
   display: flex;
