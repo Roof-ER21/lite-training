@@ -444,6 +444,36 @@ let engagementTimeInterval: number | null = null;
 let moduleStartTime: number | null = null;
 let scrollListener: (() => void) | null = null;
 
+// Lazy initialization helper for moduleEngagement - ensures module exists before access
+function ensureModuleEngagement(moduleName: string): ModuleEngagement {
+  if (!moduleEngagement[moduleName]) {
+    moduleEngagement[moduleName] = {
+      scrolledToBottom: false,
+      timeSpent: 0,
+      videoWatched: false,
+      quizPassed: false,
+    };
+  }
+  return moduleEngagement[moduleName];
+}
+
+// ============================================================================
+// MODULE CLEANUP REGISTRY - Prevents memory leaks from event listeners
+// ============================================================================
+type CleanupFunction = () => void;
+const moduleCleanupFunctions: CleanupFunction[] = [];
+
+function registerModuleCleanup(cleanup: CleanupFunction): void {
+  moduleCleanupFunctions.push(cleanup);
+}
+
+function cleanupCurrentModule(): void {
+  moduleCleanupFunctions.forEach(fn => {
+    try { fn(); } catch (e) { console.warn('Module cleanup error:', e); }
+  });
+  moduleCleanupFunctions.length = 0; // Clear the array
+}
+
 // Initialize engagement state for a module
 function initModuleEngagement(moduleName: string) {
   // Stop previous tracking
@@ -560,22 +590,20 @@ function updateRequirementIndicator(moduleName: string, type: 'scroll' | 'video'
   }
 }
 
-// Mark video as watched in engagement state
+// Mark video as watched in engagement state (uses lazy init to prevent silent failures)
 function markVideoWatched(moduleName: string) {
-  if (moduleEngagement[moduleName]) {
-    moduleEngagement[moduleName].videoWatched = true;
-    updateRequirementIndicator(moduleName, 'video', true);
-    checkModuleCompletion(moduleName);
-  }
+  const engagement = ensureModuleEngagement(moduleName);
+  engagement.videoWatched = true;
+  updateRequirementIndicator(moduleName, 'video', true);
+  checkModuleCompletion(moduleName);
 }
 
-// Mark quiz as passed in engagement state
+// Mark quiz as passed in engagement state (uses lazy init to prevent silent failures)
 function markQuizPassed(moduleName: string) {
-  if (moduleEngagement[moduleName]) {
-    moduleEngagement[moduleName].quizPassed = true;
-    updateRequirementIndicator(moduleName, 'quiz', true);
-    checkModuleCompletion(moduleName);
-  }
+  const engagement = ensureModuleEngagement(moduleName);
+  engagement.quizPassed = true;
+  updateRequirementIndicator(moduleName, 'quiz', true);
+  checkModuleCompletion(moduleName);
 }
 
 // Check if all requirements are met and show/hide completion button
@@ -6283,6 +6311,11 @@ function initSalesCycleSorter() {
     const feedbackEl = document.getElementById('sales-cycle-feedback');
     if (!pool || !dropZone || !feedbackEl) return;
 
+    // AbortController for cleanup - prevents memory leaks
+    const abortController = new AbortController();
+    const { signal } = abortController;
+    registerModuleCleanup(() => abortController.abort());
+
     let draggedItem: HTMLElement | null = null;
     let dragSource: 'pool' | 'dropzone' | null = null;
     const correctOrder = ['1', '2', '3', '4', '5'];
@@ -6296,7 +6329,7 @@ function initSalesCycleSorter() {
         setTimeout(() => {
             if (draggedItem) draggedItem.style.opacity = '0.5';
         }, 0);
-    });
+    }, { signal });
 
     pool.addEventListener('dragend', () => {
         setTimeout(() => {
@@ -6306,7 +6339,7 @@ function initSalesCycleSorter() {
                 dragSource = null;
             }
         }, 0);
-    });
+    }, { signal });
 
     // Handle drag from drop zone (to move back to pool)
     dropZone.addEventListener('dragstart', (e) => {
@@ -6315,7 +6348,7 @@ function initSalesCycleSorter() {
         setTimeout(() => {
             if (draggedItem) draggedItem.style.opacity = '0.5';
         }, 0);
-    });
+    }, { signal });
 
     dropZone.addEventListener('dragend', () => {
         setTimeout(() => {
@@ -6325,10 +6358,10 @@ function initSalesCycleSorter() {
                 dragSource = null;
             }
         }, 0);
-    });
+    }, { signal });
 
     // Drop zone accepts items
-    dropZone.addEventListener('dragover', e => e.preventDefault());
+    dropZone.addEventListener('dragover', e => e.preventDefault(), { signal });
 
     dropZone.addEventListener('drop', (e) => {
         e.preventDefault();
@@ -6336,10 +6369,10 @@ function initSalesCycleSorter() {
             dropZone.appendChild(draggedItem);
             checkOrder();
         }
-    });
+    }, { signal });
 
     // Pool accepts items back from drop zone
-    pool.addEventListener('dragover', e => e.preventDefault());
+    pool.addEventListener('dragover', e => e.preventDefault(), { signal });
 
     pool.addEventListener('drop', (e) => {
         e.preventDefault();
@@ -6347,7 +6380,7 @@ function initSalesCycleSorter() {
             pool.appendChild(draggedItem);
             feedbackEl.style.display = 'none'; // Hide feedback when moving items back
         }
-    });
+    }, { signal });
 
     function checkOrder() {
         const items = dropZone.querySelectorAll('.draggable-item');
@@ -6469,6 +6502,11 @@ function initInspectionOrderGame() {
 
   if (!pool || !dropZone || !feedbackEl) return;
 
+  // AbortController for cleanup - prevents memory leaks
+  const abortController = new AbortController();
+  const { signal } = abortController;
+  registerModuleCleanup(() => abortController.abort());
+
   let draggedItem: HTMLElement | null = null;
   const correctOrder = ['1', '2', '3', '4', '5', '6'];
 
@@ -6486,7 +6524,7 @@ function initInspectionOrderGame() {
     setTimeout(() => {
       if (draggedItem) draggedItem.style.opacity = '0.5';
     }, 0);
-  });
+  }, { signal });
 
   pool.addEventListener('dragend', () => {
     setTimeout(() => {
@@ -6495,7 +6533,7 @@ function initInspectionOrderGame() {
         draggedItem = null;
       }
     }, 0);
-  });
+  }, { signal });
 
   // Also allow dragging from sorted list back to pool
   dropZone.addEventListener('dragstart', (e) => {
@@ -6503,7 +6541,7 @@ function initInspectionOrderGame() {
     setTimeout(() => {
       if (draggedItem) draggedItem.style.opacity = '0.5';
     }, 0);
-  });
+  }, { signal });
 
   dropZone.addEventListener('dragend', () => {
     setTimeout(() => {
@@ -6512,17 +6550,17 @@ function initInspectionOrderGame() {
         draggedItem = null;
       }
     }, 0);
-  });
+  }, { signal });
 
   // Drop zone handlers
   dropZone.addEventListener('dragover', (e) => {
     e.preventDefault();
     dropZone.classList.add('drag-over');
-  });
+  }, { signal });
 
   dropZone.addEventListener('dragleave', () => {
     dropZone.classList.remove('drag-over');
-  });
+  }, { signal });
 
   dropZone.addEventListener('drop', (e) => {
     e.preventDefault();
@@ -6531,17 +6569,17 @@ function initInspectionOrderGame() {
       dropZone.appendChild(draggedItem);
       checkOrder();
     }
-  });
+  }, { signal });
 
   // Allow dropping back to pool
   pool.addEventListener('dragover', (e) => {
     e.preventDefault();
     pool.classList.add('drag-over');
-  });
+  }, { signal });
 
   pool.addEventListener('dragleave', () => {
     pool.classList.remove('drag-over');
-  });
+  }, { signal });
 
   pool.addEventListener('drop', (e) => {
     e.preventDefault();
@@ -6550,7 +6588,7 @@ function initInspectionOrderGame() {
       pool.appendChild(draggedItem);
       feedbackEl.style.display = 'none';
     }
-  });
+  }, { signal });
 
   function checkOrder() {
     const items = dropZone!.querySelectorAll('.inspection-drag-item');
@@ -7828,47 +7866,59 @@ function completeQuiz(quizState) {
     : 100;
   const completionRate = Math.round((totalFound / quizState.totalPossible) * 100);
 
-  // Update final score display
-  document.getElementById('final-score').textContent = totalFound;
-  document.getElementById('total-possible').textContent = quizState.totalPossible;
+  // Update final score display (with null checks)
+  const finalScoreDisplay = document.getElementById('final-score');
+  const totalPossibleDisplay = document.getElementById('total-possible');
+  if (finalScoreDisplay) finalScoreDisplay.textContent = String(totalFound);
+  if (totalPossibleDisplay) totalPossibleDisplay.textContent = String(quizState.totalPossible);
 
-  // Add accuracy information
+  // Add accuracy information (with null checks)
   const finalScoreEl = document.querySelector('.final-score');
   let accuracyInfo = document.getElementById('accuracy-info');
   if (!accuracyInfo) {
     accuracyInfo = document.createElement('p');
     accuracyInfo.id = 'accuracy-info';
     accuracyInfo.className = 'accuracy-info';
-    finalScoreEl.after(accuracyInfo);
+    if (finalScoreEl) finalScoreEl.after(accuracyInfo);
   }
 
-  accuracyInfo.innerHTML = `
-    <strong>Overall Accuracy:</strong> ${overallAccuracy}%<br>
-    <small>(${totalCorrect} correct clicks, ${totalIncorrect} incorrect clicks)</small>
-  `;
+  if (accuracyInfo) {
+    accuracyInfo.innerHTML = `
+      <strong>Overall Accuracy:</strong> ${overallAccuracy}%<br>
+      <small>(${totalCorrect} correct clicks, ${totalIncorrect} incorrect clicks)</small>
+    `;
+  }
 
-  // Show completion message with performance feedback
+  // Show completion message with performance feedback (with null checks)
   const banner = document.querySelector('.success-banner');
-  let feedbackMsg = banner.querySelector('.performance-feedback');
-  if (!feedbackMsg) {
-    feedbackMsg = document.createElement('p');
-    feedbackMsg.className = 'performance-feedback';
-    banner.appendChild(feedbackMsg);
+  let feedbackMsg: Element | null = null;
+  if (banner) {
+    feedbackMsg = banner.querySelector('.performance-feedback');
+    if (!feedbackMsg) {
+      feedbackMsg = document.createElement('p');
+      feedbackMsg.className = 'performance-feedback';
+      banner.appendChild(feedbackMsg);
+    }
   }
 
-  // Performance feedback based on completion AND accuracy
-  if (completionRate === 100 && overallAccuracy >= 80) {
-    feedbackMsg.innerHTML = '🏆 <strong>Perfect performance!</strong> You have excellent damage identification skills with great accuracy.';
-  } else if (completionRate >= 80 && overallAccuracy >= 70) {
-    feedbackMsg.innerHTML = '🌟 <strong>Great job!</strong> You identified most damage with good accuracy. Review any missed spots.';
-  } else if (completionRate >= 60 && overallAccuracy >= 60) {
-    feedbackMsg.innerHTML = '👍 <strong>Good effort!</strong> Review the images again to improve precision and coverage.';
-  } else {
-    feedbackMsg.innerHTML = '📚 <strong>Keep practicing!</strong> Review the damage types and practice identifying key patterns.';
+  // Performance feedback based on completion AND accuracy (with null check)
+  if (feedbackMsg) {
+    if (completionRate === 100 && overallAccuracy >= 80) {
+      feedbackMsg.innerHTML = '🏆 <strong>Perfect performance!</strong> You have excellent damage identification skills with great accuracy.';
+    } else if (completionRate >= 80 && overallAccuracy >= 70) {
+      feedbackMsg.innerHTML = '🌟 <strong>Great job!</strong> You identified most damage with good accuracy. Review any missed spots.';
+    } else if (completionRate >= 60 && overallAccuracy >= 60) {
+      feedbackMsg.innerHTML = '👍 <strong>Good effort!</strong> Review the images again to improve precision and coverage.';
+    } else {
+      feedbackMsg.innerHTML = '📚 <strong>Keep practicing!</strong> Review the damage types and practice identifying key patterns.';
+    }
   }
 
-  document.getElementById('quiz-complete-message').style.display = 'block';
-  document.getElementById('quiz-complete-message').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const quizCompleteMsg = document.getElementById('quiz-complete-message');
+  if (quizCompleteMsg) {
+    quizCompleteMsg.style.display = 'block';
+    quizCompleteMsg.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 
   // Mark quiz as passed in engagement state
   markQuizPassed('damage-identification');
@@ -10079,6 +10129,9 @@ async function renderModule(moduleName: string) {
 
   // Don't render modules when in admin mode - admin has its own UI
   if (isSuperAdmin()) return;
+
+  // Clean up previous module's event listeners and resources (prevents memory leaks)
+  cleanupCurrentModule();
 
   // Clean up tip observers from previous module
   cleanupTipObservers();
