@@ -3,3 +3,8 @@ node_modules
 *.log
 .env.local
 .DS_Store
+dist
+dist-server
+.tmp
+*.png
+public/assets/training/videos/
