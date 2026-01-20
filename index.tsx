@@ -3929,7 +3929,8 @@ const trainingContent = {
 
             <!-- Divider: Team Handoff -->
             <div style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border-radius: 12px; padding: 16px 20px; margin: 10px 0; text-align: center; border-left: 4px solid #3b82f6;">
-              <p style="margin: 0; color: #1e40af; font-size: 14px; font-weight: 600;">⬇️ Everything below is handed off to a team member</p>
+              <p style="margin: 0; color: #1e40af; font-size: 14px; font-weight: 600;">⬇️ The office handles everything below</p>
+              <p style="margin: 5px 0 0 0; color: #3b82f6; font-size: 13px;">We'll discuss this process more in depth later</p>
             </div>
 
             <!-- Phase 3 -->
