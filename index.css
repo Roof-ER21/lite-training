@@ -11313,6 +11313,18 @@ button:disabled {
   margin: 0;
 }
 
+.nn-card p.nn-quote {
+  font-style: italic;
+  color: #374151;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  background: #f8f9fa;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border-left: 3px solid #d90429;
+  margin-top: 8px;
+}
+
 /* Script Cards */
 .script-section {
   display: flex;

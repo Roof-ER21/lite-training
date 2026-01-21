@@ -2235,31 +2235,31 @@ const trainingContent = {
           <div class="nn-icon">👤</div>
           <div class="nn-number">1</div>
           <h4>Who You Are</h4>
-          <p>Introduce yourself by name - be personable and memorable</p>
+          <p class="nn-quote">"Hi, how are you? My name is _____"</p>
         </div>
         <div class="nn-card" data-nn="2">
           <div class="nn-icon">🏠</div>
           <div class="nn-number">2</div>
           <h4>Who We Are</h4>
-          <p>Roof-ER: Local roofing company that helps homeowners with insurance claims</p>
+          <p class="nn-quote">"...with Roof-ER, we're a local roofing company that specializes in helping homeowners get their roof replaced, paid for by their insurance!"</p>
         </div>
         <div class="nn-card" data-nn="3">
           <div class="nn-icon">🤝</div>
           <div class="nn-number">3</div>
           <h4>Make It Relatable</h4>
-          <p>Reference local storms, neighbors you've helped, shared experiences</p>
+          <p class="nn-quote">"We've had a lot of storms here in [Region]... We're already working with your neighbors."</p>
         </div>
         <div class="nn-card" data-nn="4">
           <div class="nn-icon">🔍</div>
           <div class="nn-number">4</div>
           <h4>What You're Doing</h4>
-          <p>FREE inspection to check for qualifiable storm damage</p>
+          <p class="nn-quote">"I am conducting a completely free inspection to see if you have similar, qualifiable damage."</p>
         </div>
         <div class="nn-card" data-nn="5">
           <div class="nn-icon">✅</div>
           <div class="nn-number">5</div>
           <h4>Go For The Close</h4>
-          <p>Get them to agree to the inspection - that's your goal!</p>
+          <p class="nn-quote">"Do you mind if I hop up and take a look?"</p>
         </div>
       </div>
 
