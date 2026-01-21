@@ -2325,7 +2325,7 @@ const trainingContent = {
       </div>
 
       <!-- Specific/Storm Script -->
-      <h2>Storm-Specific Pitch Variation</h2>
+      <h2>If Referencing Specific Storm or Neighbor</h2>
       <p class="section-intro">Use this when there was a recent notable storm in the area.</p>
 
       <div class="script-section">
@@ -2335,7 +2335,7 @@ const trainingContent = {
             <button class="speak-btn" aria-label="Listen to script">🔊</button>
           </div>
           <div class="script-content">
-            <p>"Were you home for the storm we had in <span class="fill-blank">[date/description]</span>?"</p>
+            <p style="font-weight: 700; font-size: 1.1em; background: linear-gradient(120deg, #fef3c7 0%, #fde68a 100%); padding: 12px 16px; border-radius: 8px; border-left: 4px solid #f59e0b;">"Were you home for the storm we had in <span class="fill-blank">[date/description]</span>?"</p>
 
             <div class="response-branch">
               <div class="branch if-yes">
