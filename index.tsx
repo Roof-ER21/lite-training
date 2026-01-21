@@ -3808,7 +3808,7 @@ const trainingContent = {
           <!-- Challenge 2: Documentation Sequence -->
           <div id="doc-sequence-challenge" class="game-challenge">
             <h3 style="color: #7c3aed; margin: 0 0 16px 0;">📋 Challenge 2: Documentation Sequence</h3>
-            <p style="color: #6b7280; margin-bottom: 12px;">Put the documentation steps in the correct order!</p>
+            <p style="color: #6b7280; margin-bottom: 12px;">Select the following in the proper order:</p>
             <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 12px; padding: 14px 18px; margin-bottom: 20px;">
               <p style="color: #92400e; margin: 0; font-weight: 600; display: flex; align-items: center; gap: 8px;">
                 <span style="font-size: 1.3rem;">👆</span>
@@ -3817,33 +3817,25 @@ const trainingContent = {
             </div>
 
             <div id="doc-sequence-items" style="display: flex; flex-direction: column; gap: 8px;">
+              <div class="seq-item" data-order="3" onclick="selectSeqItem(this)" style="background: white; padding: 14px 20px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; display: flex; align-items: center; gap: 12px; transition: all 0.2s;">
+                <span class="seq-number" style="background: #e5e7eb; color: #6b7280; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">?</span>
+                <span>Up close hail damage photo</span>
+              </div>
               <div class="seq-item" data-order="5" onclick="selectSeqItem(this)" style="background: white; padding: 14px 20px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; display: flex; align-items: center; gap: 12px; transition: all 0.2s;">
                 <span class="seq-number" style="background: #e5e7eb; color: #6b7280; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">?</span>
-                <span>Damage Markup - Circle hail hits with chalk, slash wind damage</span>
-              </div>
-              <div class="seq-item" data-order="2" onclick="selectSeqItem(this)" style="background: white; padding: 14px 20px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; display: flex; align-items: center; gap: 12px; transition: all 0.2s;">
-                <span class="seq-number" style="background: #e5e7eb; color: #6b7280; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">?</span>
-                <span>Overview Shots - All four elevations of the home</span>
-              </div>
-              <div class="seq-item" data-order="7" onclick="selectSeqItem(this)" style="background: white; padding: 14px 20px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; display: flex; align-items: center; gap: 12px; transition: all 0.2s;">
-                <span class="seq-number" style="background: #e5e7eb; color: #6b7280; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">?</span>
-                <span>Granule Loss - Gutters and downspouts filled with granules</span>
+                <span>Granules in the gutters and downspouts</span>
               </div>
               <div class="seq-item" data-order="1" onclick="selectSeqItem(this)" style="background: white; padding: 14px 20px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; display: flex; align-items: center; gap: 12px; transition: all 0.2s;">
                 <span class="seq-number" style="background: #e5e7eb; color: #6b7280; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">?</span>
-                <span>Property ID - House number, full front view</span>
+                <span>Photos of collateral damage to the elevations</span>
               </div>
               <div class="seq-item" data-order="4" onclick="selectSeqItem(this)" style="background: white; padding: 14px 20px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; display: flex; align-items: center; gap: 12px; transition: all 0.2s;">
                 <span class="seq-number" style="background: #e5e7eb; color: #6b7280; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">?</span>
-                <span>Roof Overview - Wide shots of each slope</span>
+                <span>Overview of damage markings on roof</span>
               </div>
-              <div class="seq-item" data-order="3" onclick="selectSeqItem(this)" style="background: white; padding: 14px 20px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; display: flex; align-items: center; gap: 12px; transition: all 0.2s;">
+              <div class="seq-item" data-order="2" onclick="selectSeqItem(this)" style="background: white; padding: 14px 20px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; display: flex; align-items: center; gap: 12px; transition: all 0.2s;">
                 <span class="seq-number" style="background: #e5e7eb; color: #6b7280; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">?</span>
-                <span>Elevation Collateral - Gutters, siding, windows from each side</span>
-              </div>
-              <div class="seq-item" data-order="6" onclick="selectSeqItem(this)" style="background: white; padding: 14px 20px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; display: flex; align-items: center; gap: 12px; transition: all 0.2s;">
-                <span class="seq-number" style="background: #e5e7eb; color: #6b7280; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">?</span>
-                <span>Close-ups - Individual damage photos with penny/quarter reference</span>
+                <span>Photos of collateral damage on the roof</span>
               </div>
             </div>
 
