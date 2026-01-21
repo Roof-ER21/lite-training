@@ -3,7 +3,7 @@ node_modules
 *.log
 .env.local
 .DS_Store
+.tmp
 dist
 dist-server
-.tmp
 public/assets/training/videos/
