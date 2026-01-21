@@ -8,4 +8,4 @@ cacheDirectories = []
 cacheDirectories = []
 
 [start]
-cmd = "npx serve -s dist -l $PORT"
+cmd = "npm start"
