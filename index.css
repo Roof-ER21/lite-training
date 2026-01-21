@@ -12180,6 +12180,66 @@ button:disabled {
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
+.legend-item.clickable-component {
+  cursor: pointer;
+  position: relative;
+  border: 2px solid transparent;
+}
+
+.legend-item.clickable-component:hover {
+  border-color: #d90429;
+}
+
+.legend-item.clickable-component.expanded {
+  border-color: #d90429;
+  background: #fef2f2;
+}
+
+.expand-icon {
+  margin-left: auto;
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #d90429;
+  min-width: 24px;
+  text-align: center;
+}
+
+.component-image-container {
+  grid-column: 1 / -1;
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: -4px;
+  border: 2px solid #d90429;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.component-image-container img {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+.image-caption {
+  text-align: center;
+  color: #64748b;
+  font-size: 0.9rem;
+  margin-top: 12px;
+  font-style: italic;
+}
+
 .legend-marker {
   width: 28px;
   height: 28px;

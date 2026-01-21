@@ -4548,108 +4548,113 @@ trainingContent['general-knowledge'] = `
 
       <div class="roof-parts-legend">
         <h4>Key Components to Know:</h4>
+        <p style="color: #6b7280; font-size: 0.9rem; margin-bottom: 16px;">Click on any component to see a photo example</p>
         <div class="legend-grid">
-          <div class="legend-item">
+          <div class="legend-item clickable-component" onclick="toggleComponentImage(this, 'ridge')">
             <span class="legend-marker">1</span>
             <div>
               <strong>Ridge/Peak</strong>
               <p>Highest point where slopes meet</p>
             </div>
+            <span class="expand-icon">+</span>
           </div>
-          <div class="legend-item">
+          <div class="component-image-container" id="ridge-image" style="display: none;">
+            <img src="https://images.unsplash.com/photo-1632759145351-1d592919f522?w=400&h=250&fit=crop" alt="Ridge/Peak of a roof" style="width: 100%; border-radius: 8px;">
+            <p class="image-caption">The ridge is the horizontal line at the top where two roof slopes meet</p>
+          </div>
+
+          <div class="legend-item clickable-component" onclick="toggleComponentImage(this, 'valley')">
             <span class="legend-marker">2</span>
             <div>
               <strong>Valley</strong>
               <p>Where two slopes meet forming a channel</p>
             </div>
+            <span class="expand-icon">+</span>
           </div>
-          <div class="legend-item">
+          <div class="component-image-container" id="valley-image" style="display: none;">
+            <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=250&fit=crop" alt="Roof valley" style="width: 100%; border-radius: 8px;">
+            <p class="image-caption">Valleys channel water where two roof planes meet - critical area for leaks</p>
+          </div>
+
+          <div class="legend-item clickable-component" onclick="toggleComponentImage(this, 'fascia')">
             <span class="legend-marker">3</span>
             <div>
               <strong>Fascia</strong>
               <p>Board at roof edge, holds gutters</p>
             </div>
+            <span class="expand-icon">+</span>
           </div>
-          <div class="legend-item">
+          <div class="component-image-container" id="fascia-image" style="display: none;">
+            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=250&fit=crop" alt="Fascia board" style="width: 100%; border-radius: 8px;">
+            <p class="image-caption">The fascia is the vertical board running along the roof edge - gutters attach here</p>
+          </div>
+
+          <div class="legend-item clickable-component" onclick="toggleComponentImage(this, 'dripedge')">
             <span class="legend-marker">4</span>
             <div>
               <strong>Drip Edge</strong>
               <p>Metal strip directing water away</p>
             </div>
+            <span class="expand-icon">+</span>
           </div>
-          <div class="legend-item">
+          <div class="component-image-container" id="dripedge-image" style="display: none;">
+            <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&h=250&fit=crop" alt="Drip edge" style="width: 100%; border-radius: 8px;">
+            <p class="image-caption">Metal flashing installed at roof edges to direct water into gutters</p>
+          </div>
+
+          <div class="legend-item clickable-component" onclick="toggleComponentImage(this, 'gutter')">
             <span class="legend-marker">5</span>
             <div>
               <strong>Gutter</strong>
               <p>Channels water off the roof</p>
             </div>
+            <span class="expand-icon">+</span>
           </div>
-          <div class="legend-item">
+          <div class="component-image-container" id="gutter-image" style="display: none;">
+            <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&h=250&fit=crop" alt="Gutter system" style="width: 100%; border-radius: 8px;">
+            <p class="image-caption">Gutters collect and channel rainwater away from the foundation</p>
+          </div>
+
+          <div class="legend-item clickable-component" onclick="toggleComponentImage(this, 'flashing')">
             <span class="legend-marker">6</span>
             <div>
               <strong>Flashing</strong>
               <p>Waterproofs joints and edges</p>
             </div>
+            <span class="expand-icon">+</span>
           </div>
-          <div class="legend-item">
+          <div class="component-image-container" id="flashing-image" style="display: none;">
+            <img src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=400&h=250&fit=crop" alt="Roof flashing" style="width: 100%; border-radius: 8px;">
+            <p class="image-caption">Metal pieces that seal joints around chimneys, vents, and roof transitions</p>
+          </div>
+
+          <div class="legend-item clickable-component" onclick="toggleComponentImage(this, 'soffit')">
             <span class="legend-marker">7</span>
             <div>
               <strong>Soffit</strong>
               <p>Underside of roof overhang</p>
             </div>
+            <span class="expand-icon">+</span>
           </div>
-          <div class="legend-item">
+          <div class="component-image-container" id="soffit-image" style="display: none;">
+            <img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=400&h=250&fit=crop" alt="Soffit" style="width: 100%; border-radius: 8px;">
+            <p class="image-caption">The soffit covers the underside of roof overhangs and provides ventilation</p>
+          </div>
+
+          <div class="legend-item clickable-component" onclick="toggleComponentImage(this, 'eave')">
             <span class="legend-marker">8</span>
             <div>
               <strong>Eave</strong>
               <p>Lower edge of the roof</p>
             </div>
+            <span class="expand-icon">+</span>
+          </div>
+          <div class="component-image-container" id="eave-image" style="display: none;">
+            <img src="https://images.unsplash.com/photo-1600573472550-8090b5e0745e?w=400&h=250&fit=crop" alt="Roof eave" style="width: 100%; border-radius: 8px;">
+            <p class="image-caption">The eave is the lower edge of the roof that overhangs the wall</p>
           </div>
         </div>
       </div>
-    </div>
-
-    <div class="roof-layers-summary">
-      <h4>Roof System Layers (Top to Bottom):</h4>
-      <ol>
-        <li><strong>Shingles</strong> - Weather barrier, what you see from outside</li>
-        <li><strong>Underlayment/Felt</strong> - Secondary water protection</li>
-        <li><strong>Ice & Water Shield</strong> - Extra protection at eaves/valleys</li>
-        <li><strong>Roof Deck (Sheathing)</strong> - Plywood or OSB base</li>
-        <li><strong>Rafters/Trusses</strong> - Structural support</li>
-      </ol>
-    </div>
-
-    <hr>
-
-    <h2>📥 Download Full Sample Reports</h2>
-    <p class="section-intro">Download these complete inspection reports as PDFs to study the full documentation process:</p>
-
-    <div class="photo-reports-grid">
-      <a href="/resources/Sample Photo Report 1.pdf" download class="report-card">
-        <span class="report-icon">📋</span>
-        <span class="report-title">Sample Report 1</span>
-        <span class="report-desc">Hail damage documentation</span>
-        <span class="view-hint">Download PDF</span>
-      </a>
-      <a href="/resources/Sample Photo Report 2.pdf" download class="report-card">
-        <span class="report-icon">📋</span>
-        <span class="report-title">Sample Report 2</span>
-        <span class="report-desc">Wind damage example</span>
-        <span class="view-hint">Download PDF</span>
-      </a>
-      <a href="/resources/Sample Photo Report 3.pdf" download class="report-card">
-        <span class="report-icon">📋</span>
-        <span class="report-title">Sample Report 3</span>
-        <span class="report-desc">Mixed damage types</span>
-        <span class="view-hint">Download PDF</span>
-      </a>
-      <a href="/resources/Sample Photo Report 4.pdf" download class="report-card">
-        <span class="report-icon">📋</span>
-        <span class="report-title">Sample Report 4</span>
-        <span class="report-desc">Comprehensive inspection</span>
-        <span class="view-hint">Download PDF</span>
-      </a>
     </div>
 
     <hr>
@@ -6385,6 +6390,37 @@ function resetDocSequence() {
   const feedback = document.getElementById('seq-feedback');
   if (feedback) feedback.style.display = 'none';
 }
+
+// Toggle component image visibility
+function toggleComponentImage(element: HTMLElement, componentId: string) {
+  const imageContainer = document.getElementById(componentId + '-image');
+  const expandIcon = element.querySelector('.expand-icon');
+
+  if (imageContainer) {
+    const isVisible = imageContainer.style.display !== 'none';
+
+    // Close all other open images first
+    document.querySelectorAll('.component-image-container').forEach(container => {
+      (container as HTMLElement).style.display = 'none';
+    });
+    document.querySelectorAll('.expand-icon').forEach(icon => {
+      icon.textContent = '+';
+    });
+    document.querySelectorAll('.clickable-component').forEach(comp => {
+      (comp as HTMLElement).classList.remove('expanded');
+    });
+
+    // Toggle current one
+    if (!isVisible) {
+      imageContainer.style.display = 'block';
+      if (expandIcon) expandIcon.textContent = '−';
+      element.classList.add('expanded');
+    }
+  }
+}
+
+// Make toggleComponentImage available globally
+(window as any).toggleComponentImage = toggleComponentImage;
 
 function showSeqFeedback(message: string, success: boolean) {
   const feedback = document.getElementById('seq-feedback');
