@@ -4100,9 +4100,13 @@ const trainingContent = {
         </ul>
       </div>
 
-      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 14px; margin-bottom: 18px;">
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 14px; margin-bottom: 12px;">
         <strong style="color: #0f172a;">Next steps:</strong>
         <span style="color: #475569;"> Enter the claim details in the Sales App, move into the contingency + claim authorization agreements, and post in GroupMe when signed.</span>
+      </div>
+
+      <div style="background: #fef3c7; border: 1px solid #fcd34d; border-radius: 10px; padding: 12px 16px; margin-bottom: 18px;">
+        <p style="color: #92400e; font-size: 13px; margin: 0; font-weight: 500;">⚠️ <strong>Note:</strong> If the above claim methods do not work/not available, then proceed to phone call.</p>
       </div>
 
       <details style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 14px; padding: 12px; margin-bottom: 14px;">
@@ -4140,6 +4144,9 @@ const trainingContent = {
 
       <div style="background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); border-radius: 16px; padding: 20px; margin-bottom: 15px;">
         <p style="color: #0f172a; font-size: 14px; margin: 0;">Use the Sales App on your iPad to capture claim details and submit forms.</p>
+      </div>
+      <div style="background: #dbeafe; border: 1px solid #93c5fd; border-radius: 10px; padding: 12px 16px; margin-bottom: 12px;">
+        <p style="color: #1e40af; font-size: 13px; margin: 0; font-weight: 500;">📱 <strong>Note:</strong> You will be issued company iPads for field use.</p>
       </div>
       <div style="background: #fef3c7; border: 1px solid #fcd34d; border-radius: 10px; padding: 12px 16px; margin-bottom: 35px;">
         <p style="color: #92400e; font-size: 13px; margin: 0; font-weight: 500;">📝 <strong>Note:</strong> We will go over this in more detail in person.</p>
