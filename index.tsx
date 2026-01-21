@@ -2380,7 +2380,7 @@ const trainingContent = {
           style="width: 100%; border-radius: 12px; max-height: 500px; background: #000;"
           poster=""
         >
-          <source src="/assets/training/videos/reeses-pitch-cassidy.mp4" type="video/mp4">
+          <source src="/assets/training/videos/reeses-pitch-cassidy.mp4?v=20260121" type="video/mp4">
           Your browser does not support the video tag.
         </video>
         <div style="margin-top: 15px; padding: 15px; background: rgba(34, 197, 94, 0.1); border-radius: 10px; border-left: 4px solid #22c55e;">
@@ -3559,7 +3559,7 @@ const trainingContent = {
   'roofing-damage-id': `
    <div class="content-card">
         <h1>Roofing & Damage Identification</h1>
-        ${renderVideoPlayer('/assets/training/videos/module8-damage-id.mp4', 'damage-id-video', '📹 Identifying Storm Damage')}
+        ${renderVideoPlayer('/assets/training/videos/module8-damage-id.mp4?v=20260121', 'damage-id-video', '📹 Identifying Storm Damage')}
 
         <h2>Understanding Storm Damage Types</h2>
 
@@ -4573,7 +4573,7 @@ trainingContent['general-knowledge'] = `
             <span class="expand-icon">+</span>
           </div>
           <div class="component-image-container" id="ridge-image" style="display: none;">
-            <img src="/assets/roof-components/ridge.jpg" alt="Ridge/Peak of a roof" style="width: 100%; border-radius: 8px;">
+            <img src="/assets/roof-components/ridge.jpg?v=20260121" alt="Ridge/Peak of a roof" style="width: 100%; border-radius: 8px;">
             <p class="image-caption">The ridge is the horizontal line at the top where two roof slopes meet</p>
           </div>
 
@@ -4586,7 +4586,7 @@ trainingContent['general-knowledge'] = `
             <span class="expand-icon">+</span>
           </div>
           <div class="component-image-container" id="valley-image" style="display: none;">
-            <img src="/assets/roof-components/valley.jpg" alt="Roof valley" style="width: 100%; border-radius: 8px;">
+            <img src="/assets/roof-components/valley.jpg?v=20260121" alt="Roof valley" style="width: 100%; border-radius: 8px;">
             <p class="image-caption">Valleys channel water where two roof planes meet - critical area for leaks</p>
           </div>
 
@@ -4599,7 +4599,7 @@ trainingContent['general-knowledge'] = `
             <span class="expand-icon">+</span>
           </div>
           <div class="component-image-container" id="fascia-image" style="display: none;">
-            <img src="/assets/roof-components/fascia.jpg" alt="Fascia board" style="width: 100%; border-radius: 8px;">
+            <img src="/assets/roof-components/fascia.jpg?v=20260121" alt="Fascia board" style="width: 100%; border-radius: 8px;">
             <p class="image-caption">The fascia is the vertical board running along the roof edge - gutters attach here</p>
           </div>
 
@@ -4612,7 +4612,7 @@ trainingContent['general-knowledge'] = `
             <span class="expand-icon">+</span>
           </div>
           <div class="component-image-container" id="dripedge-image" style="display: none;">
-            <img src="/assets/roof-components/dripedge.jpg" alt="Drip edge" style="width: 100%; border-radius: 8px;">
+            <img src="/assets/roof-components/dripedge.jpg?v=20260121" alt="Drip edge" style="width: 100%; border-radius: 8px;">
             <p class="image-caption">Metal flashing installed at roof edges to direct water into gutters</p>
           </div>
 
@@ -4625,7 +4625,7 @@ trainingContent['general-knowledge'] = `
             <span class="expand-icon">+</span>
           </div>
           <div class="component-image-container" id="gutter-image" style="display: none;">
-            <img src="/assets/roof-components/gutter.jpg" alt="Gutter system" style="width: 100%; border-radius: 8px;">
+            <img src="/assets/roof-components/gutter.jpg?v=20260121" alt="Gutter system" style="width: 100%; border-radius: 8px;">
             <p class="image-caption">Gutters collect and channel rainwater away from the foundation</p>
           </div>
 
@@ -4638,7 +4638,7 @@ trainingContent['general-knowledge'] = `
             <span class="expand-icon">+</span>
           </div>
           <div class="component-image-container" id="flashing-image" style="display: none;">
-            <img src="/assets/roof-components/flashing.jpg" alt="Roof flashing" style="width: 100%; border-radius: 8px;">
+            <img src="/assets/roof-components/flashing.jpg?v=20260121" alt="Roof flashing" style="width: 100%; border-radius: 8px;">
             <p class="image-caption">Metal pieces that seal joints around chimneys, vents, and roof transitions</p>
           </div>
 
@@ -4651,7 +4651,7 @@ trainingContent['general-knowledge'] = `
             <span class="expand-icon">+</span>
           </div>
           <div class="component-image-container" id="soffit-image" style="display: none;">
-            <img src="/assets/roof-components/soffit.jpg" alt="Soffit" style="width: 100%; border-radius: 8px;">
+            <img src="/assets/roof-components/soffit.jpg?v=20260121" alt="Soffit" style="width: 100%; border-radius: 8px;">
             <p class="image-caption">The soffit covers the underside of roof overhangs and provides ventilation</p>
           </div>
 
@@ -4664,7 +4664,7 @@ trainingContent['general-knowledge'] = `
             <span class="expand-icon">+</span>
           </div>
           <div class="component-image-container" id="eave-image" style="display: none;">
-            <img src="/assets/roof-components/eave.jpg" alt="Roof eave" style="width: 100%; border-radius: 8px;">
+            <img src="/assets/roof-components/eave.jpg?v=20260121" alt="Roof eave" style="width: 100%; border-radius: 8px;">
             <p class="image-caption">The eave is the lower edge of the roof that overhangs the wall</p>
           </div>
         </div>
