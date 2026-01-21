@@ -2361,7 +2361,7 @@ const trainingContent = {
       <h2>🎬 Watch: Example Pitch in Action</h2>
       <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 16px; padding: 25px; margin-bottom: 30px;">
         <p style="color: #94a3b8; font-size: 15px; margin: 0 0 20px 0; text-align: center;">
-          Watch Cassidy deliver the initial pitch. Pay attention to tone, pacing, and how she handles the conversation.
+          Watch Reese deliver the initial pitch. Pay attention to tone, pacing, and how she handles the conversation.
         </p>
         <video
           controls
