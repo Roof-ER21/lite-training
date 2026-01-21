@@ -4,6 +4,3 @@ node_modules
 .env.local
 .DS_Store
 .tmp
-dist
-dist-server
-public/assets/training/videos/
