@@ -2357,6 +2357,25 @@ const trainingContent = {
         </div>
       </div>
 
+      <!-- Example Pitch Video -->
+      <h2>🎬 Watch: Example Pitch in Action</h2>
+      <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 16px; padding: 25px; margin-bottom: 30px;">
+        <p style="color: #94a3b8; font-size: 15px; margin: 0 0 20px 0; text-align: center;">
+          Watch Cassidy deliver the initial pitch. Pay attention to tone, pacing, and how she handles the conversation.
+        </p>
+        <video
+          controls
+          style="width: 100%; border-radius: 12px; max-height: 500px; background: #000;"
+          poster=""
+        >
+          <source src="/assets/training/videos/reeses-pitch-cassidy.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+        <div style="margin-top: 15px; padding: 15px; background: rgba(34, 197, 94, 0.1); border-radius: 10px; border-left: 4px solid #22c55e;">
+          <p style="color: #86efac; font-size: 14px; margin: 0;"><strong>💡 Key Takeaways:</strong> Notice how she introduces herself, explains who Roof-ER is, makes it relatable, and goes for the close naturally.</p>
+        </div>
+      </div>
+
       <!-- Interactive Practice Mode -->
       <h2>Practice Mode</h2>
       <div class="practice-mode-container">
