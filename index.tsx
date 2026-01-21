@@ -2259,7 +2259,7 @@ const trainingContent = {
           <div class="nn-icon">✅</div>
           <div class="nn-number">5</div>
           <h4>Go For The Close</h4>
-          <p class="nn-quote">"Do you mind if I hop up and take a look?"</p>
+          <p class="nn-quote">"Alright! It will take me about 10-15 minutes. I'm gonna take a look around the perimeter of your home, then grab the ladder, and take a look at your roof."</p>
         </div>
       </div>
 
