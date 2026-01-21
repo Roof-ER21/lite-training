@@ -2184,7 +2184,7 @@ const trainingContent = {
             controls
             style="width: 100%; max-width: 800px; border-radius: 4px;"
           >
-            <source src="/assets/training/module5-initial-pitch.mp4" type="video/mp4">
+            <source src="/assets/training/videos/module5-mastering-pitch.mp4" type="video/mp4">
             Your browser does not support the video tag.
           </video>
         </div>
@@ -2224,6 +2224,18 @@ const trainingContent = {
           <div class="progress-bar" id="pitch-progress-bar" style="width: 0%"></div>
         </div>
         <p class="progress-label"><span id="practice-count">0</span>/4 sections practiced</p>
+      </div>
+
+      <!-- Knocking Etiquette Video -->
+      <div class="video-section" style="margin: 30px 0;">
+        <h3 style="color: #1e293b; margin-bottom: 15px;">🚪 Knocking Etiquette with Reese and Agnes</h3>
+        <p style="color: #64748b; margin-bottom: 15px;">Learn the proper techniques for approaching a homeowner's door professionally.</p>
+        <div style="background: #1e293b; border-radius: 12px; padding: 20px; max-width: 800px;">
+          <video controls style="width: 100%; border-radius: 8px;">
+            <source src="/assets/training/videos/knocking-etiquette.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
       </div>
 
       <!-- 5 Non-Negotiables Cards -->
