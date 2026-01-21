@@ -7,4 +7,3 @@ dist
 dist-server
 .tmp
 *.png
-public/assets/training/videos/
