@@ -3519,15 +3519,17 @@ const trainingContent = {
 
         <div class="game-question-area" id="game-question-area">
           <div class="question-card" id="question-card">
-            <div class="question-number">Question <span id="q-num">1</span> of 5</div>
-            <div class="question-text" id="question-text">Loading question...</div>
-            <div class="answer-buttons">
-              <button class="answer-btn" data-answer="3tab" onclick="checkShingleAnswer('3tab')">
-                <span class="btn-icon">📐</span> 3-Tab
-              </button>
-              <button class="answer-btn" data-answer="arch" onclick="checkShingleAnswer('arch')">
-                <span class="btn-icon">🏔️</span> Architectural
-              </button>
+            <div class="question-number">QUESTION <span id="q-num">1</span> OF 5</div>
+            <div class="question-text" id="question-text" style="color: #ffffff; font-size: 1.3rem; font-weight: 600; margin: 20px 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">Loading question...</div>
+            <div class="answer-buttons" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+              <div class="answer-img-btn" data-answer="3tab" onclick="checkShingleAnswer('3tab')" style="cursor: pointer; background: #f8fafc; border-radius: 12px; padding: 15px; border: 3px solid #94a3b8; transition: all 0.3s; text-align: center;">
+                <img src="/assets/shingles/3-tab-shingles.webp" alt="3-Tab Shingles" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 10px;">
+                <p style="margin: 0; font-weight: 700; color: #334155; font-size: 1.1rem;">3-Tab</p>
+              </div>
+              <div class="answer-img-btn" data-answer="arch" onclick="checkShingleAnswer('arch')" style="cursor: pointer; background: #f0fdf4; border-radius: 12px; padding: 15px; border: 3px solid #86efac; transition: all 0.3s; text-align: center;">
+                <img src="/assets/shingles/architectural-shingles.jpg" alt="Architectural Shingles" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 10px;">
+                <p style="margin: 0; font-weight: 700; color: #166534; font-size: 1.1rem;">Architectural</p>
+              </div>
             </div>
             <div class="feedback-area" id="feedback-area" style="display: none;">
               <div class="feedback-icon" id="feedback-icon"></div>
@@ -7784,9 +7786,9 @@ function showShingleQuestion() {
   if (feedbackAreaEl) feedbackAreaEl.style.display = 'none';
 
   // Reset button states
-  document.querySelectorAll('.answer-btn').forEach(btn => {
+  document.querySelectorAll('.answer-btn, .answer-img-btn').forEach(btn => {
     btn.classList.remove('correct', 'incorrect', 'disabled');
-    (btn as HTMLButtonElement).disabled = false;
+    (btn as HTMLElement).style.pointerEvents = 'auto';
   });
 }
 
@@ -7801,8 +7803,8 @@ function showShingleQuestion() {
   const feedbackText = document.getElementById('feedback-text');
 
   // Disable buttons and show states
-  document.querySelectorAll('.answer-btn').forEach(btn => {
-    (btn as HTMLButtonElement).disabled = true;
+  document.querySelectorAll('.answer-btn, .answer-img-btn').forEach(btn => {
+    (btn as HTMLElement).style.pointerEvents = 'none';
     btn.classList.add('disabled');
     if ((btn as HTMLElement).dataset.answer === q.a) {
       btn.classList.add('correct');
