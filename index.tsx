@@ -11129,8 +11129,10 @@ function showLoginScreen(): void {
   loginScreen.innerHTML = `
     <div class="login-container">
       <div class="login-header">
-        <div class="login-logo">🏠</div>
-        <h1>Roof-ER Training Hub</h1>
+        <div class="login-logo">
+          <img src="/assets/logo-shield.png" alt="Roof-ER Logo" style="width: 180px; height: auto;">
+        </div>
+        <h1 style="margin-top: 10px;">TRAINING</h1>
         <p>Welcome to the sales training platform</p>
       </div>
 
