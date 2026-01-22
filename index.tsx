@@ -2477,7 +2477,7 @@ const trainingContent = {
       </div>
 
       <!-- Video Section -->
-      ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module8-damage-id.mp4', 'inspection-process-video', '📹 Complete Inspection Process Walkthrough')}
+      ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module7-inspection-process.mp4', 'inspection-process-video', '📹 Complete Inspection Process Walkthrough')}
 
       <!-- Introduction Card -->
       <div class="intro-highlight-card" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-left: 5px solid #3b82f6; padding: 24px; border-radius: 0 16px 16px 0; margin: 30px 0;">
