@@ -2166,30 +2166,6 @@ const trainingContent = {
     <div class="content-card module-5-redesign">
       <h1>The Initial Pitch</h1>
 
-      <!-- Video Player -->
-      <div class="video-player-container" style="margin: 20px 0; background: #f5f5f5; border-radius: 8px; padding: 20px;">
-        <h3 style="margin-top: 0;">Mastering the Roof-ER Pitch</h3>
-        <div style="position: relative;">
-          <video
-            id="initial-pitch-video"
-            controls
-            style="width: 100%; max-width: 800px; border-radius: 4px;"
-          >
-            <source src="https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module5-mastering-pitch.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-          </video>
-        </div>
-        <div class="video-progress-container" style="margin-top: 12px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <span style="font-size: 14px; color: #666;">Video Progress</span>
-            <span id="initial-pitch-video-progress-text" style="font-size: 14px; font-weight: 600; color: #666;">0%</span>
-          </div>
-          <div class="video-progress-track" style="width: 100%; max-width: 800px; height: 8px; background: #e0e0e0; border-radius: 4px; overflow: hidden;">
-            <div id="initial-pitch-video-progress-bar" class="video-progress-fill" style="width: 0%; height: 100%; background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%); border-radius: 4px; transition: width 0.3s ease;"></div>
-          </div>
-        </div>
-      </div>
-
       <!-- Progress Tracker -->
       <div class="pitch-progress-tracker" id="pitch-progress">
         <h3>Your Practice Progress</h3>
