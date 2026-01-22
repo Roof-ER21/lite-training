@@ -274,7 +274,15 @@ router.get('/analytics', async (req: Request, res: Response) => {
       WHERE completed_at IS NOT NULL
     `);
 
-    // Module completion rates
+    // Valid modules list - must match MODULE_ORDER in frontend
+    const validModules = [
+      'welcome', 'commitment', 'general-knowledge', 'shingle-types-materials',
+      'initial-pitch', 'handling-initial-pitch-objections', 'damage-identification',
+      'inspection-process', 'post-inspection-pitch', 'post-inspection-objections',
+      'filing-claim-closing', 'sales-cycle-job-flow', 'role-play', 'final-exam'
+    ];
+
+    // Module completion rates - only for valid modules
     const moduleStats = await query<{
       module_name: string;
       started: string;
@@ -285,9 +293,10 @@ router.get('/analytics', async (req: Request, res: Response) => {
         COUNT(*) FILTER (WHERE status IN ('in_progress', 'completed')) as started,
         COUNT(*) FILTER (WHERE status = 'completed') as completed
       FROM module_progress
+      WHERE module_name = ANY($1)
       GROUP BY module_name
       ORDER BY module_name
-    `);
+    `, [validModules]);
 
     // Roleplay stats
     const roleplayStats = await queryOne<{
@@ -480,13 +489,21 @@ router.post('/users/:id/reset-progress', async (req: Request, res: Response) => 
 // GET /api/admin/module-analytics - Get detailed time analytics per module
 router.get('/module-analytics', async (req: Request, res: Response) => {
   try {
+    // Valid modules list - must match MODULE_ORDER in frontend
+    const validModules = [
+      'welcome', 'commitment', 'general-knowledge', 'shingle-types-materials',
+      'initial-pitch', 'handling-initial-pitch-objections', 'damage-identification',
+      'inspection-process', 'post-inspection-pitch', 'post-inspection-objections',
+      'filing-claim-closing', 'sales-cycle-job-flow', 'role-play', 'final-exam'
+    ];
+
     // Get all users count for reference
     const totalUsersResult = await queryOne<{ count: string }>(`
       SELECT COUNT(*) as count FROM users WHERE is_manager = false
     `);
     const totalUsers = parseInt(totalUsersResult?.count || '0');
 
-    // Get module time analytics
+    // Get module time analytics - only for valid modules
     const moduleStats = await query<{
       module_name: string;
       users_started: string;
@@ -507,11 +524,12 @@ router.get('/module-analytics', async (req: Request, res: Response) => {
         MAX(time_spent_seconds) FILTER (WHERE status = 'completed') as max_time,
         SUM(time_spent_seconds) as total_time
       FROM module_progress
+      WHERE module_name = ANY($1)
       GROUP BY module_name
       ORDER BY module_name
-    `);
+    `, [validModules]);
 
-    // Get stale users (in_progress but last_accessed > 48 hours ago)
+    // Get stale users (in_progress but last_accessed > 48 hours ago) - only for valid modules
     const staleStats = await query<{
       module_name: string;
       stale_count: string;
@@ -522,8 +540,9 @@ router.get('/module-analytics', async (req: Request, res: Response) => {
       FROM module_progress
       WHERE status = 'in_progress'
         AND last_accessed < NOW() - INTERVAL '48 hours'
+        AND module_name = ANY($1)
       GROUP BY module_name
-    `);
+    `, [validModules]);
 
     // Create lookup for stale counts
     const staleLookup = new Map(staleStats.map(s => [s.module_name, parseInt(s.stale_count)]));
@@ -554,6 +573,14 @@ router.get('/module-analytics', async (req: Request, res: Response) => {
 // GET /api/admin/progress-grid - Get all users with module progress grid
 router.get('/progress-grid', async (req: Request, res: Response) => {
   try {
+    // Valid modules list - must match MODULE_ORDER in frontend
+    const validModules = [
+      'welcome', 'commitment', 'general-knowledge', 'shingle-types-materials',
+      'initial-pitch', 'handling-initial-pitch-objections', 'damage-identification',
+      'inspection-process', 'post-inspection-pitch', 'post-inspection-objections',
+      'filing-claim-closing', 'sales-cycle-job-flow', 'role-play', 'final-exam'
+    ];
+
     const { search } = req.query;
 
     // Get all non-manager users with optional search filter
@@ -578,7 +605,7 @@ router.get('/progress-grid', async (req: Request, res: Response) => {
       registration_date: Date;
     }>(userQuery, params);
 
-    // Get all module progress for all users
+    // Get all module progress for all users - only valid modules
     const allProgress = await query<{
       user_id: string;
       module_name: string;
@@ -591,7 +618,8 @@ router.get('/progress-grid', async (req: Request, res: Response) => {
       SELECT user_id, module_name, status, time_spent_seconds, started_at, completed_at, last_accessed
       FROM module_progress
       WHERE user_id = ANY($1::uuid[])
-    `, [users.map(u => u.id)]);
+        AND module_name = ANY($2)
+    `, [users.map(u => u.id), validModules]);
 
     // Group progress by user
     const progressByUser = new Map<string, typeof allProgress>();
