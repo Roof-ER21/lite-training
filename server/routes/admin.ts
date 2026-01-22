@@ -780,11 +780,12 @@ router.post('/users/:id/unlock-all-modules', async (req: Request, res: Response)
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // List of all modules
+    // List of all modules - must match MODULE_ORDER in frontend index.tsx
     const allModules = [
-      'welcome', 'commitment', 'general-knowledge', 'sales-process', 'storm-types',
-      'qualifying', 'roof-101', 'other-trades', 'insurance', 'damage-identification',
-      'objection-handling', 'inspection', 'role-play', 'resources', 'agnes-quiz', 'final-exam'
+      'welcome', 'commitment', 'general-knowledge', 'shingle-types-materials',
+      'initial-pitch', 'handling-initial-pitch-objections', 'inspection-process',
+      'post-inspection-pitch', 'post-inspection-objections', 'damage-identification',
+      'filing-claim-closing', 'sales-cycle-job-flow', 'role-play', 'final-exam'
     ];
 
     // Unlock all modules
