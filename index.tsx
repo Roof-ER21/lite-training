@@ -11185,10 +11185,9 @@ function showLoginScreen(): void {
     <div class="login-container">
       <div class="login-header">
         <div class="login-logo">
-          <img src="/assets/logo-shield.png" alt="Roof-ER Logo" style="width: 180px; height: auto;">
+          <img src="/assets/logo-shield.png" alt="Roof-ER Logo" style="width: 280px; height: auto;">
         </div>
-        <h1 style="margin-top: 10px;">TRAINING</h1>
-        <p>Welcome to the sales training platform</p>
+        <p style="margin-top: 15px;">Welcome to the sales training platform</p>
       </div>
 
       <form id="login-form" class="login-form">
