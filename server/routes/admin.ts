@@ -783,8 +783,8 @@ router.post('/users/:id/unlock-all-modules', async (req: Request, res: Response)
     // List of all modules - must match MODULE_ORDER in frontend index.tsx
     const allModules = [
       'welcome', 'commitment', 'general-knowledge', 'shingle-types-materials',
-      'initial-pitch', 'handling-initial-pitch-objections', 'inspection-process',
-      'post-inspection-pitch', 'post-inspection-objections', 'damage-identification',
+      'initial-pitch', 'handling-initial-pitch-objections', 'damage-identification',
+      'inspection-process', 'post-inspection-pitch', 'post-inspection-objections',
       'filing-claim-closing', 'sales-cycle-job-flow', 'role-play', 'final-exam'
     ];
 

@@ -12340,11 +12340,12 @@ async function showUserDetail(userId: string): Promise<void> {
 
   title.textContent = `${result.user.name} - Details`;
 
-  // Module order for transcript
+  // Module order for transcript - must match MODULE_ORDER
   const moduleOrder = [
-    'welcome', 'commitment', 'general-knowledge', 'sales-process', 'storm-types',
-    'qualifying', 'roof-101', 'other-trades', 'insurance', 'damage-identification',
-    'objection-handling', 'inspection', 'role-play', 'resources', 'agnes-quiz', 'final-exam'
+    'welcome', 'commitment', 'general-knowledge', 'shingle-types-materials',
+    'initial-pitch', 'handling-initial-pitch-objections', 'damage-identification',
+    'inspection-process', 'post-inspection-pitch', 'post-inspection-objections',
+    'filing-claim-closing', 'sales-cycle-job-flow', 'role-play', 'final-exam'
   ];
 
   // Sort modules by defined order
@@ -12841,11 +12842,12 @@ function renderTimeTracker(data: ModuleTimeAnalytics): void {
   const container = document.getElementById('time-tracker-container');
   if (!container) return;
 
-  // Module order for sorting
+  // Module order for sorting - must match MODULE_ORDER
   const moduleOrder = [
-    'welcome', 'commitment', 'general-knowledge', 'sales-process', 'storm-types',
-    'qualifying', 'roof-101', 'other-trades', 'insurance', 'damage-identification',
-    'objection-handling', 'inspection', 'role-play', 'resources', 'agnes-quiz', 'final-exam'
+    'welcome', 'commitment', 'general-knowledge', 'shingle-types-materials',
+    'initial-pitch', 'handling-initial-pitch-objections', 'damage-identification',
+    'inspection-process', 'post-inspection-pitch', 'post-inspection-objections',
+    'filing-claim-closing', 'sales-cycle-job-flow', 'role-play', 'final-exam'
   ];
 
   // Sort modules by the defined order
@@ -12963,11 +12965,12 @@ function renderProgressGrid(data: ProgressGridData): void {
     return;
   }
 
-  // Module order for grid columns
+  // Module order for grid columns - must match MODULE_ORDER
   const moduleOrder = [
-    'welcome', 'commitment', 'general-knowledge', 'sales-process', 'storm-types',
-    'qualifying', 'roof-101', 'other-trades', 'insurance', 'damage-identification',
-    'objection-handling', 'inspection', 'role-play', 'resources', 'agnes-quiz', 'final-exam'
+    'welcome', 'commitment', 'general-knowledge', 'shingle-types-materials',
+    'initial-pitch', 'handling-initial-pitch-objections', 'damage-identification',
+    'inspection-process', 'post-inspection-pitch', 'post-inspection-objections',
+    'filing-claim-closing', 'sales-cycle-job-flow', 'role-play', 'final-exam'
   ];
 
   // Short names for header
@@ -12975,19 +12978,17 @@ function renderProgressGrid(data: ProgressGridData): void {
     'welcome': '1',
     'commitment': '2',
     'general-knowledge': '3',
-    'sales-process': '4',
-    'storm-types': '5',
-    'qualifying': '6',
-    'roof-101': '7',
-    'other-trades': '8',
-    'insurance': '9',
-    'damage-identification': '10',
-    'objection-handling': '11',
-    'inspection': '12',
+    'shingle-types-materials': '4',
+    'initial-pitch': '5',
+    'handling-initial-pitch-objections': '6',
+    'damage-identification': '7',
+    'inspection-process': '8',
+    'post-inspection-pitch': '9',
+    'post-inspection-objections': '10',
+    'filing-claim-closing': '11',
+    'sales-cycle-job-flow': '12',
     'role-play': '13',
-    'resources': '14',
-    'agnes-quiz': '15',
-    'final-exam': '16'
+    'final-exam': '14'
   };
 
   function getStatusIcon(status: string): string {
