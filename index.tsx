@@ -1952,7 +1952,7 @@ const trainingContent = {
     <div class="content-card">
       <h1>Welcome to Roof-ER!</h1>
 
-      ${renderVideoPlayer('/assets/training/videos/welcome-intro.mp4', 'welcome-video', '📹 Welcome Introduction')}
+      ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/welcome-intro.mp4', 'welcome-video', '📹 Welcome Introduction')}
       <p>My name is Oliver Brown. I founded this company in 2019, not because I have a passion for roofing, but because I saw an opportunity to change the reputation of roofing companies and contractors as a whole. This is an industry that is known for lack of communication, poor workmanship, and straight up deceit. With a little bit of modern thinking, integrity and hard work we've been able to build a strong brand and reputation in a relatively short amount of time.</p>
       <p>We have ambitions of becoming a national brand. To accomplish this we need to continue to add and develop hungry, competitive team members who are dedicated to the big picture but disciplined to execute on a day to day basis.</p>
 
@@ -2044,7 +2044,7 @@ const trainingContent = {
   commitment: `
     <div class="content-card commitment-module">
       <h1>Your Commitment</h1>
-      ${renderVideoPlayer('/assets/training/videos/module2-commitment.mp4', 'commitment-video', '📹 Your Commitment to Excellence')}
+      ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module2-commitment.mp4', 'commitment-video', '📹 Your Commitment to Excellence')}
 
       <!-- Video requirement notice -->
       <div class="commitment-video-notice" id="commitment-video-notice">
@@ -2184,7 +2184,7 @@ const trainingContent = {
             controls
             style="width: 100%; max-width: 800px; border-radius: 4px;"
           >
-            <source src="/assets/training/videos/module5-mastering-pitch.mp4" type="video/mp4">
+            <source src="https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module5-mastering-pitch.mp4" type="video/mp4">
             Your browser does not support the video tag.
           </video>
         </div>
@@ -2232,7 +2232,7 @@ const trainingContent = {
         <p style="color: #64748b; margin-bottom: 15px;">Learn the proper techniques for approaching a homeowner's door professionally.</p>
         <div style="background: #1e293b; border-radius: 12px; padding: 20px; max-width: 800px;">
           <video controls style="width: 100%; border-radius: 8px;">
-            <source src="/assets/training/videos/knocking-etiquette.mp4" type="video/mp4">
+            <source src="https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/knocking-etiquette.mp4" type="video/mp4">
             Your browser does not support the video tag.
           </video>
         </div>
@@ -2380,7 +2380,7 @@ const trainingContent = {
           style="width: 100%; border-radius: 12px; max-height: 500px; background: #000;"
           poster=""
         >
-          <source src="/assets/training/videos/reeses-pitch-cassidy.mp4?v=20260121" type="video/mp4">
+          <source src="https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/reeses-pitch-cassidy.mp4" type="video/mp4">
           Your browser does not support the video tag.
         </video>
         <div style="margin-top: 15px; padding: 15px; background: rgba(34, 197, 94, 0.1); border-radius: 10px; border-left: 4px solid #22c55e;">
@@ -2477,7 +2477,7 @@ const trainingContent = {
       </div>
 
       <!-- Video Section -->
-      ${renderVideoPlayer('/assets/training/videos/module7-inspection-process.mp4', 'inspection-process-video', '📹 Complete Inspection Process Walkthrough')}
+      ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module7-inspection-process.mp4', 'inspection-process-video', '📹 Complete Inspection Process Walkthrough')}
 
       <!-- Introduction Card -->
       <div class="intro-highlight-card" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-left: 5px solid #3b82f6; padding: 24px; border-radius: 0 16px 16px 0; margin: 30px 0;">
@@ -2711,7 +2711,7 @@ const trainingContent = {
           <p style="margin: 10px 0 0 0; opacity: 0.9; font-size: 1.1rem;">Master the art of presenting damage and closing the deal</p>
         </div>
 
-        ${renderVideoPlayer('/assets/training/videos/module9-post-inspection.mp4', 'post-inspection-video', '📹 Mastering the Post-Inspection Pitch')}
+        ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module9-post-inspection.mp4', 'post-inspection-video', '📹 Mastering the Post-Inspection Pitch')}
 
         <!-- Full Script Section with Enhanced TTS -->
         <div class="full-script-section" style="margin: 30px 0;">
@@ -3559,7 +3559,7 @@ const trainingContent = {
   'roofing-damage-id': `
    <div class="content-card">
         <h1>Roofing & Damage Identification</h1>
-        ${renderVideoPlayer('/assets/training/videos/module8-damage-id.mp4?v=20260121', 'damage-id-video', '📹 Identifying Storm Damage')}
+        ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module8-damage-id.mp4', 'damage-id-video', '📹 Identifying Storm Damage')}
 
         <h2>Understanding Storm Damage Types</h2>
 
@@ -4439,7 +4439,7 @@ const trainingContent = {
 trainingContent['general-knowledge'] = `
   <div class="content-card module-3-redesign">
     <h1>General Roofing Knowledge & Terminology</h1>
-    ${renderVideoPlayer('/assets/training/videos/module3-roofing101.mp4', 'roofing101-video', '📹 Roofing 101: Essential Knowledge')}
+    ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module3-roofing101.mp4', 'roofing101-video', '📹 Roofing 101: Essential Knowledge')}
 
     <h2>Essential Roofing Terminology</h2>
     <p class="section-intro">Click on any card to flip and learn the definition!</p>
