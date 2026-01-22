@@ -2476,9 +2476,6 @@ const trainingContent = {
         <p style="margin: 10px 0 0 0; opacity: 0.9; font-size: 1.1rem;">Master the 6-step process that separates professionals from amateurs</p>
       </div>
 
-      <!-- Video Section -->
-      ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module7-inspection-process.mp4', 'inspection-process-video', '📹 Complete Inspection Process Walkthrough')}
-
       <!-- Introduction Card -->
       <div class="intro-highlight-card" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-left: 5px solid #3b82f6; padding: 24px; border-radius: 0 16px 16px 0; margin: 30px 0;">
         <h2 style="margin: 0 0 12px 0; color: #1e40af;">🎯 Why a Systematic Process Matters</h2>
@@ -3559,7 +3556,7 @@ const trainingContent = {
   'roofing-damage-id': `
    <div class="content-card">
         <h1>Roofing & Damage Identification</h1>
-        ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module8-damage-id.mp4', 'damage-id-video', '📹 Identifying Storm Damage')}
+        ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module7-inspection-process.mp4', 'damage-id-video', '📹 Identifying Storm Damage')}
 
         <h2>Understanding Storm Damage Types</h2>
 
