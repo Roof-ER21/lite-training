@@ -1975,9 +1975,6 @@ const trainingContent = {
             <p>In 2019, Oliver founded Roof-ER not out of a passion for roofs, but out of a desire to change the reputation of the roofing industry - an industry often plagued by poor communication, shoddy workmanship, and dishonest practices. Through integrity, modern systems, and relentless hard work, Roof-ER has rapidly built a strong brand and reputation.</p>
             <p>Oliver's vision is clear: to build Roof-ER into a national brand by developing hungry, competitive team members who are dedicated to the big picture but disciplined enough to execute daily. He leads by example, embodying the values of integrity, quality, and simplicity that define Roof-ER.</p>
           </div>
-          <div class="video-placeholder">
-            <p>🎥 Introduction video coming soon</p>
-          </div>
         </div>
 
         <!-- Reese Samala -->
@@ -1995,9 +1992,6 @@ const trainingContent = {
             <p>At Roof-ER, Reese applies these principles to building a sales culture rooted in integrity and results. He believes that sales is about service, not just closing deals. His approach focuses on truly understanding homeowner needs, providing honest assessments, and delivering solutions that restore peace of mind.</p>
             <p>As a first-generation American, Reese embodies the entrepreneurial spirit and work ethic that drives Roof-ER forward. He leads his team with the same dedication and honor that defined his military service, ensuring that every customer interaction reflects Roof-ER's core values.</p>
           </div>
-          <div class="video-placeholder">
-            <p>🎥 Introduction video coming soon</p>
-          </div>
         </div>
 
         <!-- Ford Barsi -->
@@ -2014,9 +2008,6 @@ const trainingContent = {
             <p>His background in hospitality instilled in him a deep appreciation for attention to detail, the value of hard work, and the power of memorable service. In fine dining, every detail matters, and Ford brings that same level of precision to managing Roof-ER's operations.</p>
             <p>Ford's transition from the kitchen to roofing management might seem unusual, but the skills are directly transferable: leading teams under pressure, maintaining high standards, ensuring customer satisfaction, and creating systems that deliver consistent excellence. Just as a great restaurant experience depends on flawless execution across multiple touchpoints, so does a successful roofing project.</p>
             <p>At Roof-ER, Ford oversees daily operations, ensuring that every project runs smoothly from initial inspection to final installation. He maintains the same standards he learned in world-class kitchens: no shortcuts, no excuses, and an unwavering commitment to quality. His leadership ensures that Roof-ER delivers not just a new roof, but an exceptional customer experience.</p>
-          </div>
-          <div class="video-placeholder">
-            <p>🎥 Introduction video coming soon</p>
           </div>
         </div>
       </div>
@@ -2713,14 +2704,10 @@ const trainingContent = {
 
         ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module9-post-inspection.mp4', 'post-inspection-video', '📹 Mastering the Post-Inspection Pitch')}
 
-        <!-- Full Script Section with Enhanced TTS -->
+        <!-- Full Script Section -->
         <div class="full-script-section" style="margin: 30px 0;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <div style="margin-bottom: 20px;">
             <h2 style="margin: 0;">📜 The Complete Post-Inspection Script</h2>
-            <button class="speak-btn-enhanced" onclick="speakFullScript()" style="display: flex; align-items: center; gap: 10px; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: white; border: none; padding: 12px 24px; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 1rem; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4); transition: all 0.3s;">
-              <span style="font-size: 1.5rem;">🔊</span>
-              <span>Listen to Full Script</span>
-            </button>
           </div>
 
           <!-- INTEGRITY Phase -->
@@ -2729,8 +2716,8 @@ const trainingContent = {
               <span style="background: #3b82f6; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold;">PHASE 1</span>
               <h3 style="margin: 0; color: #1e40af;">🤝 INTEGRITY - Opening</h3>
             </div>
-            <div class="script-content" style="background: white; padding: 20px; border-radius: 12px; position: relative;">
-              <button class="speak-section-btn" onclick="speakSection(this)" style="position: absolute; top: 10px; right: 10px; background: #3b82f6; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">🔊 Play</button>
+            ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module9-phase1-intro.mp4', 'phase1-intro-video', '📹 Phase 1: Introduction')}
+            <div class="script-content" style="background: white; padding: 20px; border-radius: 12px; margin-top: 16px;">
               <p style="color: #334155; line-height: 1.8; margin: 0;" data-script-text="true">
                 <em>[Knock on the door]</em><br><br>
                 <strong>"Hey _______, so I have a bunch of photos to show you. First I walked around the perimeter..."</strong><br><br>
@@ -2746,8 +2733,8 @@ const trainingContent = {
               <span style="background: #eab308; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold;">PHASE 2</span>
               <h3 style="margin: 0; color: #a16207;">⭐ QUALITY - Damage Explanation</h3>
             </div>
-            <div class="script-content" style="background: white; padding: 20px; border-radius: 12px; position: relative;">
-              <button class="speak-section-btn" onclick="speakSection(this)" style="position: absolute; top: 10px; right: 10px; background: #eab308; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">🔊 Play</button>
+            ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module9-phase2-hail.mp4', 'phase2-hail-video', '📹 Phase 2: Hail Damage')}
+            <div class="script-content" style="background: white; padding: 20px; border-radius: 12px; margin-top: 16px;">
               <p style="color: #334155; line-height: 1.8; margin: 0;" data-script-text="true">
                 "Here are the photos of the damage to your shingles. <strong>Anything I have circled means it's hail damage</strong> [IF wind damage: and anything I have slashed means it's wind damage]."<br><br>
                 <em>[Remain on a photo of hail damage]</em><br><br>
@@ -2763,8 +2750,8 @@ const trainingContent = {
               <span style="background: #22c55e; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold;">PHASE 3</span>
               <h3 style="margin: 0; color: #15803d;">✨ SIMPLICITY - Summary & Close</h3>
             </div>
-            <div class="script-content" style="background: white; padding: 20px; border-radius: 12px; position: relative;">
-              <button class="speak-section-btn" onclick="speakSection(this)" style="position: absolute; top: 10px; right: 10px; background: #22c55e; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">🔊 Play</button>
+            ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module9-phase3-summary.mp4', 'phase3-summary-video', '📹 Phase 3: Damage Summary & Insurance')}
+            <div class="script-content" style="background: white; padding: 20px; border-radius: 12px; margin-top: 16px;">
               <p style="color: #334155; line-height: 1.8; margin: 0;" data-script-text="true">
                 "As you can see there is quite a bit of damage."<br><br>
                 <em>[If wind damage: "Now here are the wind damaged shingles. You have both shingles that are creased from the wind lifting them up and shingles that have completely been blown off."]</em><br><br>
@@ -2783,8 +2770,8 @@ const trainingContent = {
               <span style="background: #ec4899; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold;">PHASE 4</span>
               <h3 style="margin: 0; color: #be185d;">📋 INTEGRITY - Information Gathering</h3>
             </div>
-            <div class="script-content" style="background: white; padding: 20px; border-radius: 12px; position: relative;">
-              <button class="speak-section-btn" onclick="speakSection(this)" style="position: absolute; top: 10px; right: 10px; background: #ec4899; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">🔊 Play</button>
+            ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module9-phase4-info.mp4', 'phase4-info-video', '📹 Phase 4: Information Gathering')}
+            <div class="script-content" style="background: white; padding: 20px; border-radius: 12px; margin-top: 16px;">
               <p style="color: #334155; line-height: 1.8; margin: 0;" data-script-text="true">
                 <em>[Approach house]</em> "Is there a place we could sit down for 5-10 Minutes?"<br><br>
                 <em>[Build rapport as you get settled]</em><br><br>
