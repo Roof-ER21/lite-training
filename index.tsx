@@ -4192,6 +4192,15 @@ const trainingContent = {
         </div>
       </div>
 
+      <!-- Closing Script Video -->
+      <div style="margin: 30px 0;">
+        <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+          <span style="background: #f3e8ff; padding: 8px 12px; border-radius: 8px;">🎬</span>
+          Closing Script Training
+        </h2>
+        ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/closing-script.mp4', 'closing-script-video', '📹 New Hire Training: Closing Script')}
+      </div>
+
       <!-- Key Documents Section -->
       <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
         <span style="background: #f3e8ff; padding: 8px 12px; border-radius: 8px;">📎</span>
