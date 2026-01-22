@@ -4582,14 +4582,14 @@ trainingContent['general-knowledge'] = `
             <div style="position: relative; display: inline-block; width: 100%;">
               <img src="/assets/roof-components/fascia.jpg?v=20260121" alt="Fascia board" style="width: 100%; border-radius: 8px;">
               <!-- Fascia highlight - beige horizontal board -->
-              <div style="position: absolute; top: 27%; left: 42%; width: 30%; height: 6%; border: 3px solid #f59e0b; border-radius: 4px; background: rgba(245, 158, 11, 0.2);"></div>
-              <div style="position: absolute; top: 19%; left: 75%; background: #f59e0b; color: white; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+              <div style="position: absolute; top: 27%; left: 55%; width: 30%; height: 6%; border: 3px solid #f59e0b; border-radius: 4px; background: rgba(245, 158, 11, 0.2);"></div>
+              <div style="position: absolute; top: 19%; left: 88%; background: #f59e0b; color: white; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
                 FASCIA
                 <div style="position: absolute; bottom: -8px; left: 20px; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid #f59e0b;"></div>
               </div>
               <!-- Soffit highlight - dark ridged underside panel -->
-              <div style="position: absolute; top: 42%; left: 12%; width: 35%; height: 18%; border: 3px solid #f59e0b; border-radius: 4px; background: rgba(245, 158, 11, 0.2);"></div>
-              <div style="position: absolute; top: 35%; left: 2%; background: #f59e0b; color: white; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+              <div style="position: absolute; top: 42%; left: 28%; width: 35%; height: 18%; border: 3px solid #f59e0b; border-radius: 4px; background: rgba(245, 158, 11, 0.2);"></div>
+              <div style="position: absolute; top: 35%; left: 15%; background: #f59e0b; color: white; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
                 SOFFIT
                 <div style="position: absolute; bottom: -8px; right: 15px; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid #f59e0b;"></div>
               </div>
