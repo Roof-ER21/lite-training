@@ -4579,8 +4579,28 @@ trainingContent['general-knowledge'] = `
             <span class="expand-icon">+</span>
           </div>
           <div class="component-image-container" id="fascia-image" style="display: none;">
-            <img src="/assets/roof-components/fascia.jpg?v=20260121" alt="Fascia board" style="width: 100%; border-radius: 8px;">
-            <p class="image-caption">The fascia is the vertical board running along the roof edge - gutters attach here</p>
+            <div style="position: relative; display: inline-block; width: 100%;">
+              <img src="/assets/roof-components/fascia.jpg?v=20260121" alt="Fascia board" style="width: 100%; border-radius: 8px;">
+              <!-- Fascia highlight - horizontal board at top edge -->
+              <div style="position: absolute; top: 28%; left: 35%; width: 35%; height: 8%; border: 3px solid #f59e0b; border-radius: 4px; background: rgba(245, 158, 11, 0.15);"></div>
+              <div style="position: absolute; top: 20%; left: 72%; background: #f59e0b; color: white; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+                FASCIA
+                <div style="position: absolute; bottom: -8px; left: 20px; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid #f59e0b;"></div>
+              </div>
+              <!-- Soffit highlight - underside panels -->
+              <div style="position: absolute; top: 55%; left: 20%; width: 40%; height: 20%; border: 3px solid #3b82f6; border-radius: 4px; background: rgba(59, 130, 246, 0.15);"></div>
+              <div style="position: absolute; top: 48%; left: 5%; background: #3b82f6; color: white; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+                SOFFIT
+                <div style="position: absolute; bottom: -8px; right: 20px; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid #3b82f6;"></div>
+              </div>
+              <!-- Gutter highlight -->
+              <div style="position: absolute; top: 38%; left: 8%; width: 25%; height: 10%; border: 3px solid #22c55e; border-radius: 4px; background: rgba(34, 197, 94, 0.15);"></div>
+              <div style="position: absolute; top: 32%; left: 2%; background: #22c55e; color: white; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+                GUTTER
+                <div style="position: absolute; bottom: -8px; right: 15px; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid #22c55e;"></div>
+              </div>
+            </div>
+            <p class="image-caption">The fascia is the vertical board running along the roof edge - gutters attach here. The soffit is the underside of the roof overhang.</p>
           </div>
 
           <div class="legend-item clickable-component" onclick="toggleComponentImage(this, 'dripedge')">
