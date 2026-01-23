@@ -15148,3 +15148,126 @@ button:disabled {
 [data-theme="dark"] [style*="background:#e"] * {
   color: var(--text-primary) !important;
 }
+
+/* ============================================================== */
+/* === NUCLEAR FIX: FORCE ALL TEXT READABLE IN DARK MODE === */
+/* This overrides ALL inline color styles with maximum specificity */
+/* ============================================================== */
+
+/* Force ALL text in main content to be readable - gray text colors */
+[data-theme="dark"] #main-content [style*="color: #6"],
+[data-theme="dark"] #main-content [style*="color:#6"],
+[data-theme="dark"] #main-content [style*="color: #7"],
+[data-theme="dark"] #main-content [style*="color:#7"],
+[data-theme="dark"] #main-content [style*="color: #8"],
+[data-theme="dark"] #main-content [style*="color:#8"],
+[data-theme="dark"] #main-content [style*="color: #9"],
+[data-theme="dark"] #main-content [style*="color:#9"],
+[data-theme="dark"] #main-content [style*="color: #a"],
+[data-theme="dark"] #main-content [style*="color:#a"],
+[data-theme="dark"] #main-content [style*="color: #b"],
+[data-theme="dark"] #main-content [style*="color:#b"] {
+  color: #e5e7eb !important;
+}
+
+/* NUCLEAR: Override ALL inline styles on common text elements */
+[data-theme="dark"] #main-content h1[style*="color"],
+[data-theme="dark"] #main-content h2[style*="color"],
+[data-theme="dark"] #main-content h3[style*="color"],
+[data-theme="dark"] #main-content h4[style*="color"],
+[data-theme="dark"] #main-content h5[style*="color"],
+[data-theme="dark"] #main-content h6[style*="color"],
+[data-theme="dark"] #main-content p[style*="color"],
+[data-theme="dark"] #main-content span[style*="color"],
+[data-theme="dark"] #main-content li[style*="color"],
+[data-theme="dark"] #main-content label[style*="color"],
+[data-theme="dark"] #main-content div[style*="color"],
+[data-theme="dark"] #main-content strong[style*="color"],
+[data-theme="dark"] #main-content em[style*="color"] {
+  color: #e5e7eb !important;
+}
+
+/* Ensure leader/bio cards have readable text */
+[data-theme="dark"] .leader-card h3,
+[data-theme="dark"] .leader-card h4,
+[data-theme="dark"] .leader-card p,
+[data-theme="dark"] .leader-card span,
+[data-theme="dark"] .bio-content,
+[data-theme="dark"] .bio-content p,
+[data-theme="dark"] .leader-bio,
+[data-theme="dark"] .leader-bio p {
+  color: #e5e7eb !important;
+}
+
+/* Commitment items with yellow backgrounds */
+[data-theme="dark"] [style*="background: #fef"],
+[data-theme="dark"] [style*="background:#fef"],
+[data-theme="dark"] [style*="background: #fff"],
+[data-theme="dark"] [style*="background:#fff"] {
+  background: #1f2937 !important;
+}
+
+[data-theme="dark"] [style*="background: #fef"] *,
+[data-theme="dark"] [style*="background:#fef"] *,
+[data-theme="dark"] [style*="background: #fff"] *,
+[data-theme="dark"] [style*="background:#fff"] * {
+  color: #e5e7eb !important;
+}
+
+/* Commitment statement items */
+[data-theme="dark"] .commitment-statement,
+[data-theme="dark"] .commitment-statement span,
+[data-theme="dark"] .commitment-statement p,
+[data-theme="dark"] .commitment-item,
+[data-theme="dark"] .commitment-item span,
+[data-theme="dark"] .commitment-item p {
+  color: #e5e7eb !important;
+}
+
+/* Roof components section */
+[data-theme="dark"] .component-item h4,
+[data-theme="dark"] .component-item p,
+[data-theme="dark"] .component-button,
+[data-theme="dark"] .component-button span {
+  color: #e5e7eb !important;
+}
+
+/* Shingle section features */
+[data-theme="dark"] .feature-list li,
+[data-theme="dark"] .feature-item,
+[data-theme="dark"] .feature-item span,
+[data-theme="dark"] .feature-item p,
+[data-theme="dark"] .specs-item,
+[data-theme="dark"] .specs-item span,
+[data-theme="dark"] .misconception-item,
+[data-theme="dark"] .misconception-item span {
+  color: #e5e7eb !important;
+}
+
+/* Image captions */
+[data-theme="dark"] .image-caption,
+[data-theme="dark"] figcaption,
+[data-theme="dark"] .caption {
+  color: #9ca3af !important;
+}
+
+/* Module completion checklist */
+[data-theme="dark"] .module-completion-checklist li,
+[data-theme="dark"] .module-completion-checklist span,
+[data-theme="dark"] .completion-item,
+[data-theme="dark"] .completion-item span {
+  color: #e5e7eb !important;
+}
+
+/* Ultimate fallback - any element with inline color in main-content */
+[data-theme="dark"] #main-content *[style*="color:"] {
+  color: #e5e7eb !important;
+}
+
+/* But keep buttons and special elements colored */
+[data-theme="dark"] #main-content button,
+[data-theme="dark"] #main-content .btn,
+[data-theme="dark"] #main-content .primary-btn,
+[data-theme="dark"] #main-content a.btn {
+  color: inherit;
+}
