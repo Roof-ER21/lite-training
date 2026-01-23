@@ -14477,3 +14477,92 @@ button:disabled {
 [data-theme="dark"] i:not(.theme-icon) {
   color: var(--text-primary);
 }
+
+/* === DARK MODE CONTRAST FIXES FOR LIGHT-BACKGROUND SECTIONS === */
+
+/* Values section with cream/yellow background */
+[data-theme="dark"] .values-section,
+[data-theme="dark"] .values-section h3,
+[data-theme="dark"] .values-section p,
+[data-theme="dark"] .values-section li,
+[data-theme="dark"] .values-section strong {
+  color: #1f2937 !important;
+}
+
+/* Anatomy steps and numbered cards with white backgrounds */
+[data-theme="dark"] .anatomy-step,
+[data-theme="dark"] .anatomy-step h4,
+[data-theme="dark"] .anatomy-step p,
+[data-theme="dark"] .shingle-layer,
+[data-theme="dark"] .shingle-layer h4,
+[data-theme="dark"] .shingle-layer p {
+  color: #1f2937 !important;
+}
+
+/* Cards with light/white backgrounds */
+[data-theme="dark"] .flip-card-back,
+[data-theme="dark"] .flip-card-back h4,
+[data-theme="dark"] .flip-card-back p {
+  color: #1f2937 !important;
+}
+
+/* Final exam section */
+[data-theme="dark"] .exam-intro-card,
+[data-theme="dark"] .exam-intro-card h3,
+[data-theme="dark"] .exam-intro-card p,
+[data-theme="dark"] .exam-intro-card li,
+[data-theme="dark"] .exam-format-list,
+[data-theme="dark"] .exam-format-list li {
+  color: #1f2937 !important;
+}
+
+/* Quiz and exam containers with light backgrounds */
+[data-theme="dark"] [style*="background: #f"] h3,
+[data-theme="dark"] [style*="background: #f"] p,
+[data-theme="dark"] [style*="background: #f"] li,
+[data-theme="dark"] [style*="background: white"] h3,
+[data-theme="dark"] [style*="background: white"] p,
+[data-theme="dark"] [style*="background: white"] li,
+[data-theme="dark"] [style*="background:#f"] h3,
+[data-theme="dark"] [style*="background:#f"] p,
+[data-theme="dark"] [style*="background:#f"] li {
+  color: #1f2937 !important;
+}
+
+/* Any light-colored containers */
+[data-theme="dark"] .light-bg-card,
+[data-theme="dark"] .light-bg-card * {
+  color: #1f2937 !important;
+}
+
+/* General content in light sections - force dark text */
+[data-theme="dark"] [style*="background: linear-gradient(135deg, #fef9c3"],
+[data-theme="dark"] [style*="background: linear-gradient(135deg, #fef9c3"] *,
+[data-theme="dark"] [style*="background: linear-gradient(135deg, #fffbeb"],
+[data-theme="dark"] [style*="background: linear-gradient(135deg, #fffbeb"] * {
+  color: #1f2937 !important;
+}
+
+/* Step cards and info boxes */
+[data-theme="dark"] .step-card,
+[data-theme="dark"] .step-card h4,
+[data-theme="dark"] .step-card p,
+[data-theme="dark"] .step-content,
+[data-theme="dark"] .step-content h4,
+[data-theme="dark"] .step-content p {
+  color: #1f2937 !important;
+}
+
+/* Objection cards */
+[data-theme="dark"] .objection-step,
+[data-theme="dark"] .objection-step h3,
+[data-theme="dark"] .objection-step p,
+[data-theme="dark"] .step-content {
+  color: #1f2937 !important;
+}
+
+/* Module cards with light backgrounds */
+[data-theme="dark"] .module-card[style*="background: #f"],
+[data-theme="dark"] .module-card[style*="background: #f"] * {
+  color: #1f2937 !important;
+}
