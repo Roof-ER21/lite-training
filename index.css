@@ -15187,16 +15187,117 @@ button:disabled {
   color: #e5e7eb !important;
 }
 
+/* ============================================================== */
+/* === DARK MODE BACKGROUNDS FOR ALL LIGHT CARDS/SECTIONS === */
+/* ============================================================== */
+
+/* Leader/team cards */
+[data-theme="dark"] .leader-card,
+[data-theme="dark"] .term-card,
+[data-theme="dark"] .shingle-type {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .leader-highlight,
+[data-theme="dark"] .leader-bio-full {
+  background: #111827 !important;
+  border-color: #374151 !important;
+}
+
 /* Ensure leader/bio cards have readable text */
 [data-theme="dark"] .leader-card h3,
 [data-theme="dark"] .leader-card h4,
 [data-theme="dark"] .leader-card p,
 [data-theme="dark"] .leader-card span,
+[data-theme="dark"] .leader-title,
+[data-theme="dark"] .leader-highlight,
+[data-theme="dark"] .leader-highlight p,
 [data-theme="dark"] .bio-content,
 [data-theme="dark"] .bio-content p,
 [data-theme="dark"] .leader-bio,
-[data-theme="dark"] .leader-bio p {
+[data-theme="dark"] .leader-bio p,
+[data-theme="dark"] .leader-bio-full,
+[data-theme="dark"] .leader-bio-full p {
   color: #e5e7eb !important;
+}
+
+/* Shingle/spec sections */
+[data-theme="dark"] .shingle-specs,
+[data-theme="dark"] .spec-group,
+[data-theme="dark"] .shingle-content {
+  background: #1f2937 !important;
+}
+
+[data-theme="dark"] .shingle-specs h4,
+[data-theme="dark"] .shingle-specs p,
+[data-theme="dark"] .shingle-specs li,
+[data-theme="dark"] .shingle-specs span,
+[data-theme="dark"] .shingle-specs strong,
+[data-theme="dark"] .spec-group h4,
+[data-theme="dark"] .spec-group p,
+[data-theme="dark"] .spec-group li,
+[data-theme="dark"] .identification-list li,
+[data-theme="dark"] .identification-list strong,
+[data-theme="dark"] .check-icon,
+[data-theme="dark"] .x-icon {
+  color: #e5e7eb !important;
+}
+
+/* Tech specs boxes */
+[data-theme="dark"] .tech-specs,
+[data-theme="dark"] .specs-grid,
+[data-theme="dark"] .spec-item {
+  background: #111827 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .spec-item span,
+[data-theme="dark"] .spec-item p,
+[data-theme="dark"] .spec-label,
+[data-theme="dark"] .spec-value {
+  color: #e5e7eb !important;
+}
+
+/* Misconceptions section */
+[data-theme="dark"] .misconceptions-list,
+[data-theme="dark"] .misconception-item {
+  background: #1f2937 !important;
+}
+
+[data-theme="dark"] .misconceptions-list li,
+[data-theme="dark"] .misconception-item span,
+[data-theme="dark"] .misconception-item p {
+  color: #e5e7eb !important;
+}
+
+/* Roof components legend */
+[data-theme="dark"] .roof-parts-legend,
+[data-theme="dark"] .legend-grid,
+[data-theme="dark"] .legend-item {
+  background: #1f2937 !important;
+}
+
+[data-theme="dark"] .roof-parts-legend h4,
+[data-theme="dark"] .roof-parts-legend p,
+[data-theme="dark"] .legend-item span,
+[data-theme="dark"] .clickable-component,
+[data-theme="dark"] .clickable-component span {
+  color: #e5e7eb !important;
+}
+
+/* Content card general backgrounds */
+[data-theme="dark"] .content-card {
+  background: #1f2937 !important;
+}
+
+/* All section cards and info boxes */
+[data-theme="dark"] .info-card,
+[data-theme="dark"] .section-card,
+[data-theme="dark"] .feature-card,
+[data-theme="dark"] .highlight-box {
+  background: #111827 !important;
+  border-color: #374151 !important;
 }
 
 /* Commitment items with yellow backgrounds */
@@ -15214,14 +15315,51 @@ button:disabled {
   color: #e5e7eb !important;
 }
 
-/* Commitment statement items */
+/* Commitment section backgrounds */
+[data-theme="dark"] .commitment-item {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .commitment-item.commitment-item-final {
+  background: #1f2937 !important;
+  border-color: #f59e0b !important;
+}
+
+[data-theme="dark"] .commitment-item.completed {
+  background: #064e3b !important;
+  border-color: #10b981 !important;
+}
+
+[data-theme="dark"] .commitment-item.commitment-item-final.completed {
+  background: #064e3b !important;
+  border-color: #10b981 !important;
+}
+
+[data-theme="dark"] .commitment-initials-section {
+  background: #111827 !important;
+}
+
+/* Commitment statement text */
 [data-theme="dark"] .commitment-statement,
 [data-theme="dark"] .commitment-statement span,
 [data-theme="dark"] .commitment-statement p,
 [data-theme="dark"] .commitment-item,
 [data-theme="dark"] .commitment-item span,
-[data-theme="dark"] .commitment-item p {
+[data-theme="dark"] .commitment-item p,
+[data-theme="dark"] .commitment-text,
+[data-theme="dark"] .commitment-number {
   color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .commitment-item .initial-box {
+  background: #374151 !important;
+  border-color: #4b5563 !important;
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .commitment-item .initial-box::placeholder {
+  color: #9ca3af !important;
 }
 
 /* Roof components section */
@@ -15257,6 +15395,60 @@ button:disabled {
 [data-theme="dark"] .completion-item,
 [data-theme="dark"] .completion-item span {
   color: #e5e7eb !important;
+}
+
+/* Completion requirements section */
+[data-theme="dark"] .completion-requirements {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .completion-requirements .requirements-title,
+[data-theme="dark"] .completion-requirements h4 {
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .completion-requirements .requirement-item.pending {
+  background: #374151 !important;
+  color: #9ca3af !important;
+  border-color: #4b5563 !important;
+}
+
+[data-theme="dark"] .completion-requirements .requirement-item.complete {
+  background: #064e3b !important;
+  color: #10b981 !important;
+  border-color: #065f46 !important;
+}
+
+[data-theme="dark"] .completion-requirements .requirement-item span,
+[data-theme="dark"] .completion-requirements .req-icon {
+  color: inherit !important;
+}
+
+/* Commitment requirements notice */
+[data-theme="dark"] .commitment-requirements-notice {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .commitment-requirements-notice h4 {
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .commitment-requirements-notice .requirement-item.pending {
+  background: #374151 !important;
+  color: #9ca3af !important;
+  border-color: #4b5563 !important;
+}
+
+[data-theme="dark"] .commitment-requirements-notice .requirement-item.complete {
+  background: #064e3b !important;
+  color: #10b981 !important;
+  border-color: #065f46 !important;
+}
+
+[data-theme="dark"] .commitment-requirements-notice .requirement-item span {
+  color: inherit !important;
 }
 
 /* Ultimate fallback - any element with inline color in main-content */
