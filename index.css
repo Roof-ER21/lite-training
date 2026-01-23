@@ -15752,7 +15752,14 @@ button:disabled {
 [data-theme="dark"] .damage-type figcaption,
 [data-theme="dark"] .damage-gallery figcaption,
 [data-theme="dark"] .image-caption {
-  color: #9ca3af !important;
+  background: #1f2937 !important;
+  color: #d1d5db !important;
+}
+
+/* Image captions specifically inside damage items */
+[data-theme="dark"] .damage-image-item .image-caption {
+  background: #1f2937 !important;
+  color: #d1d5db !important;
 }
 
 /* ============================================================== */
@@ -16057,9 +16064,16 @@ button:disabled {
 }
 
 [data-theme="dark"] .practice-mode-btn {
-  background: #1f2937 !important;
-  border-color: #374151 !important;
-  color: #e5e7eb !important;
+  background: #3b82f6 !important;
+  border: 2px solid #60a5fa !important;
+  color: white !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4) !important;
+}
+
+[data-theme="dark"] .practice-mode-btn:hover {
+  background: #2563eb !important;
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5) !important;
 }
 
 [data-theme="dark"] .practice-mode-btn.active {
