@@ -15660,3 +15660,173 @@ button:disabled {
 [data-theme="dark"] .highlight-card * {
   color: #e5e7eb !important;
 }
+
+/* ============================================================== */
+/* === NON-NEGOTIABLES CARDS (5 pitch elements) === */
+/* ============================================================== */
+
+[data-theme="dark"] .nn-card {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .nn-card h4 {
+  color: #f87171 !important;
+}
+
+[data-theme="dark"] .nn-card p,
+[data-theme="dark"] .nn-card span {
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .nn-card p.nn-quote {
+  background: #111827 !important;
+  color: #d1d5db !important;
+  border-color: #ef4444 !important;
+}
+
+/* ============================================================== */
+/* === OBJECTION CARDS (Post-inspection objections) === */
+/* ============================================================== */
+
+[data-theme="dark"] .objection-card {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .objection-card h3 {
+  color: #f87171 !important;
+}
+
+[data-theme="dark"] .objection-card p,
+[data-theme="dark"] .objection-card strong,
+[data-theme="dark"] .objection-card span {
+  color: #e5e7eb !important;
+}
+
+/* ============================================================== */
+/* === DAMAGE TYPE CARDS (Hail/Wind damage info) === */
+/* ============================================================== */
+
+[data-theme="dark"] .damage-type {
+  background: #1f2937 !important;
+  border-color: #3b82f6 !important;
+}
+
+[data-theme="dark"] .damage-type h3,
+[data-theme="dark"] .damage-type h4 {
+  color: #60a5fa !important;
+}
+
+[data-theme="dark"] .damage-type p,
+[data-theme="dark"] .damage-type li,
+[data-theme="dark"] .damage-type span,
+[data-theme="dark"] .damage-type strong {
+  color: #e5e7eb !important;
+}
+
+/* Damage gallery items */
+[data-theme="dark"] .damage-gallery-item,
+[data-theme="dark"] .damage-image-container {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .damage-gallery-item h4,
+[data-theme="dark"] .damage-gallery-item p,
+[data-theme="dark"] .damage-gallery-item li {
+  color: #e5e7eb !important;
+}
+
+/* Image captions in damage sections */
+[data-theme="dark"] .damage-type figcaption,
+[data-theme="dark"] .damage-gallery figcaption,
+[data-theme="dark"] .image-caption {
+  color: #9ca3af !important;
+}
+
+/* ============================================================== */
+/* === INLINE PRACTICE CONTAINERS === */
+/* ============================================================== */
+
+[data-theme="dark"] .inline-practice-container {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .inline-practice-container h4,
+[data-theme="dark"] .inline-practice-container p,
+[data-theme="dark"] .inline-practice-container span {
+  color: #e5e7eb !important;
+}
+
+/* ============================================================== */
+/* === OBJECTION STEPS (Module 6 & 10) === */
+/* ============================================================== */
+
+[data-theme="dark"] .objection-step {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .objection-step h3,
+[data-theme="dark"] .objection-step h4,
+[data-theme="dark"] .objection-step p,
+[data-theme="dark"] .objection-step li,
+[data-theme="dark"] .objection-step span,
+[data-theme="dark"] .objection-step strong {
+  color: #e5e7eb !important;
+}
+
+/* ============================================================== */
+/* === STEP CARDS (General step-by-step content) === */
+/* ============================================================== */
+
+[data-theme="dark"] .step-card {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .step-card h3,
+[data-theme="dark"] .step-card h4,
+[data-theme="dark"] .step-card p,
+[data-theme="dark"] .step-card li,
+[data-theme="dark"] .step-card span,
+[data-theme="dark"] .step-card strong {
+  color: #e5e7eb !important;
+}
+
+/* Step content inner boxes */
+[data-theme="dark"] .step-content {
+  background: #111827 !important;
+}
+
+[data-theme="dark"] .step-content h4,
+[data-theme="dark"] .step-content p,
+[data-theme="dark"] .step-content li {
+  color: #e5e7eb !important;
+}
+
+/* ============================================================== */
+/* === SECTION INTRO TEXT === */
+/* ============================================================== */
+
+[data-theme="dark"] .section-intro {
+  color: #d1d5db !important;
+}
+
+/* ============================================================== */
+/* === CATCH-ALL: Any remaining white background elements === */
+/* ============================================================== */
+
+[data-theme="dark"] #main-content [style*="background: white"],
+[data-theme="dark"] #main-content [style*="background:#fff"],
+[data-theme="dark"] #main-content [style*="background: #fff"] {
+  background: #1f2937 !important;
+}
+
+[data-theme="dark"] #main-content [style*="background: white"] *,
+[data-theme="dark"] #main-content [style*="background:#fff"] *,
+[data-theme="dark"] #main-content [style*="background: #fff"] * {
+  color: #e5e7eb !important;
+}
