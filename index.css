@@ -15327,7 +15327,12 @@ button:disabled {
   background: #1f2937 !important;
 }
 
-[data-theme="dark"] .misconceptions-list li,
+[data-theme="dark"] .misconceptions-list li {
+  background: #374151 !important;
+  color: #e5e7eb !important;
+  border-left: 3px solid #f87171 !important;
+}
+
 [data-theme="dark"] .misconception-item span,
 [data-theme="dark"] .misconception-item p {
   color: #e5e7eb !important;
@@ -15556,9 +15561,14 @@ button:disabled {
 [data-theme="dark"] .manufacturer-card h4,
 [data-theme="dark"] .manufacturer-card p,
 [data-theme="dark"] .manufacturer-card li,
-[data-theme="dark"] .manufacturer-card span,
-[data-theme="dark"] .manufacturer-note {
+[data-theme="dark"] .manufacturer-card span {
   color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .manufacturer-note {
+  background: #374151 !important;
+  color: #fbbf24 !important;
+  border-left: 3px solid #f59e0b !important;
 }
 
 /* Anatomy steps (numbered cards with white backgrounds) */
@@ -18948,6 +18958,12 @@ button:disabled {
 }
 
 [data-theme="dark"] .shingle-header {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .shingle-header h3 {
   color: #e5e7eb !important;
 }
 
@@ -19483,5 +19499,131 @@ button:disabled {
 [data-theme="dark"] #main-content [style*="color:#4b5563"],
 [data-theme="dark"] #main-content [style*="color: #6b7280"],
 [data-theme="dark"] #main-content [style*="color:#6b7280"] {
+  color: #e5e7eb !important;
+}
+
+/* ===========================================================================
+   DARK MODE FIX v33 - Remaining white-background elements
+   =========================================================================== */
+
+/* Inspection step cards - white background needs dark */
+[data-theme="dark"] .inspection-step-card {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .inspection-step-card:hover {
+  border-color: #3b82f6 !important;
+}
+
+[data-theme="dark"] .inspection-step-card.expanded {
+  border-color: #3b82f6 !important;
+}
+
+[data-theme="dark"] .step-card-header {
+  background: transparent !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .step-card-header span {
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .step-card-content {
+  background: transparent !important;
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .step-card-content p {
+  color: #e5e7eb !important;
+}
+
+/* Photo captions with white backgrounds */
+[data-theme="dark"] .photo-caption {
+  background: #1f2937 !important;
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .shingle-photo-container .photo-caption {
+  background: #1f2937 !important;
+  color: #d1d5db !important;
+}
+
+/* Damage gallery image captions */
+[data-theme="dark"] .damage-gallery-item .photo-caption,
+[data-theme="dark"] .damage-image-item .photo-caption {
+  background: #1f2937 !important;
+  color: #d1d5db !important;
+}
+
+/* Script phase cards with light backgrounds */
+[data-theme="dark"] .script-phase {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .script-phase h3,
+[data-theme="dark"] .script-phase h4,
+[data-theme="dark"] .script-phase p {
+  color: #e5e7eb !important;
+}
+
+/* Script content boxes (white) */
+[data-theme="dark"] .script-content {
+  background: #111827 !important;
+  color: #e5e7eb !important;
+}
+
+/* If YES / If NO response branches */
+[data-theme="dark"] .if-yes {
+  background: #064e3b !important;
+  border-color: #10b981 !important;
+}
+
+[data-theme="dark"] .if-yes .branch-label {
+  color: #a7f3d0 !important;
+}
+
+[data-theme="dark"] .if-yes p {
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .if-no {
+  background: #7f1d1d !important;
+  border-color: #f87171 !important;
+}
+
+[data-theme="dark"] .if-no .branch-label {
+  color: #fca5a5 !important;
+}
+
+[data-theme="dark"] .if-no p {
+  color: #e5e7eb !important;
+}
+
+/* Response branch container */
+[data-theme="dark"] .response-branch {
+  background: #1f2937 !important;
+}
+
+/* Storm script card */
+[data-theme="dark"] .storm-script {
+  background: #1f2937 !important;
+  border-color: #92400e !important;
+}
+
+[data-theme="dark"] .storm-script h4,
+[data-theme="dark"] .storm-script p {
+  color: #e5e7eb !important;
+}
+
+/* Any remaining cards with white inline backgrounds */
+[data-theme="dark"] [style*="background: #fff3e0"],
+[data-theme="dark"] [style*="background:#fff3e0"] {
+  background: #374151 !important;
+}
+
+[data-theme="dark"] [style*="background: #fff3e0"] *,
+[data-theme="dark"] [style*="background:#fff3e0"] * {
   color: #e5e7eb !important;
 }
