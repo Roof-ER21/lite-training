@@ -14566,3 +14566,585 @@ button:disabled {
 [data-theme="dark"] .module-card[style*="background: #f"] * {
   color: #1f2937 !important;
 }
+
+/* ============================================================== */
+/* === COMPREHENSIVE DARK MODE CONTRAST FIX v2.0 === */
+/* Fixes ALL light-background sections across all 14 modules */
+/* ============================================================== */
+
+/* --- CRITICAL: Step Components (Used throughout training) --- */
+[data-theme="dark"] .step-checklist {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .step-checklist label,
+[data-theme="dark"] .step-checklist span,
+[data-theme="dark"] .step-checklist p {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .step-pro-tip {
+  background: var(--card-bg) !important;
+  border-color: #3b82f6 !important;
+}
+
+[data-theme="dark"] .step-pro-tip,
+[data-theme="dark"] .step-pro-tip p,
+[data-theme="dark"] .step-pro-tip strong,
+[data-theme="dark"] .step-pro-tip span {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .step-alert {
+  background: var(--card-bg) !important;
+  border-color: #ef4444 !important;
+}
+
+[data-theme="dark"] .step-alert,
+[data-theme="dark"] .step-alert p,
+[data-theme="dark"] .step-alert strong,
+[data-theme="dark"] .step-alert span {
+  color: var(--text-primary) !important;
+}
+
+/* --- Promise/Commitment Sections --- */
+[data-theme="dark"] .promise-section {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .promise-section,
+[data-theme="dark"] .promise-section h3,
+[data-theme="dark"] .promise-section h4,
+[data-theme="dark"] .promise-section p,
+[data-theme="dark"] .promise-section li,
+[data-theme="dark"] .promise-icon,
+[data-theme="dark"] .promise-check {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .commitment-progress-bar {
+  background: var(--border-color) !important;
+}
+
+[data-theme="dark"] .commitment-checklist {
+  background: var(--card-bg) !important;
+}
+
+[data-theme="dark"] .commitment-checklist label,
+[data-theme="dark"] .commitment-checklist span,
+[data-theme="dark"] .commitment-item,
+[data-theme="dark"] .commitment-item p {
+  color: var(--text-primary) !important;
+}
+
+/* --- Photo Strategy Cards --- */
+[data-theme="dark"] .photo-strategy-card {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .photo-strategy-card h4,
+[data-theme="dark"] .photo-strategy-card p,
+[data-theme="dark"] .photo-strategy-card li,
+[data-theme="dark"] .photo-card-number {
+  color: var(--text-primary) !important;
+}
+
+/* --- Script Content & Phase Cards --- */
+[data-theme="dark"] .script-content,
+[data-theme="dark"] .script-content p,
+[data-theme="dark"] .script-content span,
+[data-theme="dark"] .script-content strong {
+  color: #1f2937 !important;
+}
+
+[data-theme="dark"] .script-phase {
+  background: var(--card-bg) !important;
+}
+
+[data-theme="dark"] .script-phase h3,
+[data-theme="dark"] .script-phase h4,
+[data-theme="dark"] .script-phase p,
+[data-theme="dark"] .script-phase span,
+[data-theme="dark"] .script-phase li {
+  color: var(--text-primary) !important;
+}
+
+/* --- Photo Tips Box (Yellow) --- */
+[data-theme="dark"] .photo-tips-box {
+  background: var(--card-bg) !important;
+  border-color: #f59e0b !important;
+}
+
+[data-theme="dark"] .photo-tips-box h3,
+[data-theme="dark"] .photo-tips-box h4,
+[data-theme="dark"] .photo-tips-box p,
+[data-theme="dark"] .photo-tips-box li,
+[data-theme="dark"] .photo-tips-box strong {
+  color: var(--text-primary) !important;
+}
+
+/* --- Key Point Cards (Multiple colors) --- */
+[data-theme="dark"] .key-point-card {
+  background: var(--card-bg) !important;
+}
+
+[data-theme="dark"] .key-point-card h3,
+[data-theme="dark"] .key-point-card h4,
+[data-theme="dark"] .key-point-card p,
+[data-theme="dark"] .key-point-card li,
+[data-theme="dark"] .key-point-card span {
+  color: var(--text-primary) !important;
+}
+
+/* --- Agnes Chat & Practice --- */
+[data-theme="dark"] .agnes-practice-section {
+  background: var(--card-bg) !important;
+  border-color: #8b5cf6 !important;
+}
+
+[data-theme="dark"] .agnes-practice-section h3,
+[data-theme="dark"] .agnes-practice-section p,
+[data-theme="dark"] .agnes-message,
+[data-theme="dark"] .user-message {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .pitch-chat {
+  background: var(--surface-color) !important;
+}
+
+[data-theme="dark"] .pitch-chat-messages,
+[data-theme="dark"] .pitch-chat-messages p,
+[data-theme="dark"] .conversation-message {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] #voice-transcript {
+  background: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+/* --- Damage Cards (Green/Red) --- */
+[data-theme="dark"] .qualifying-damage-card,
+[data-theme="dark"] .non-qualifying-damage-card {
+  background: var(--card-bg) !important;
+}
+
+[data-theme="dark"] .qualifying-damage-card h3,
+[data-theme="dark"] .qualifying-damage-card h4,
+[data-theme="dark"] .qualifying-damage-card p,
+[data-theme="dark"] .qualifying-damage-card li,
+[data-theme="dark"] .non-qualifying-damage-card h3,
+[data-theme="dark"] .non-qualifying-damage-card h4,
+[data-theme="dark"] .non-qualifying-damage-card p,
+[data-theme="dark"] .non-qualifying-damage-card li {
+  color: var(--text-primary) !important;
+}
+
+/* --- Game Containers --- */
+[data-theme="dark"] #damage-matching-game {
+  background: var(--card-bg) !important;
+  border-color: #a855f7 !important;
+}
+
+[data-theme="dark"] #damage-matching-game h3,
+[data-theme="dark"] #damage-matching-game p,
+[data-theme="dark"] .match-item,
+[data-theme="dark"] .seq-item {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .match-feedback,
+[data-theme="dark"] .seq-feedback {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .match-feedback.correct,
+[data-theme="dark"] .seq-feedback.correct {
+  background: var(--card-bg) !important;
+  color: #22c55e !important;
+}
+
+[data-theme="dark"] .match-feedback.incorrect,
+[data-theme="dark"] .seq-feedback.incorrect {
+  background: var(--card-bg) !important;
+  color: #ef4444 !important;
+}
+
+/* --- Shingle Game --- */
+[data-theme="dark"] .shingle-game {
+  background: var(--card-bg) !important;
+}
+
+[data-theme="dark"] .answer-img-btn {
+  background: var(--surface-color) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .answer-img-btn span,
+[data-theme="dark"] .answer-img-btn p {
+  color: var(--text-primary) !important;
+}
+
+/* --- Quiz Elements --- */
+[data-theme="dark"] .quiz-item,
+[data-theme="dark"] .quiz-options li,
+[data-theme="dark"] .quiz-question,
+[data-theme="dark"] .response-option {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .quiz-feedback {
+  background: var(--card-bg) !important;
+}
+
+[data-theme="dark"] .challenge-feedback {
+  background: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+/* --- Sales Cycle Sorter --- */
+[data-theme="dark"] .sales-cycle-feedback {
+  background: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .draggable-item {
+  background: var(--surface-color) !important;
+  color: var(--text-primary) !important;
+}
+
+/* --- Inspection Game --- */
+[data-theme="dark"] .inspection-order-feedback,
+[data-theme="dark"] .inspection-drag-item,
+[data-theme="dark"] .inspection-step-card {
+  background: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+/* --- Inline Practice --- */
+[data-theme="dark"] .inline-practice-container,
+[data-theme="dark"] .mini-conversation-thread {
+  background: var(--card-bg) !important;
+}
+
+[data-theme="dark"] .inline-practice-container p,
+[data-theme="dark"] .mini-conversation-thread p {
+  color: var(--text-primary) !important;
+}
+
+/* --- Filing Quiz Checkboxes --- */
+[data-theme="dark"] .filing-quiz-checkbox {
+  background: var(--card-bg) !important;
+}
+
+[data-theme="dark"] .filing-quiz-checkbox label {
+  color: var(--text-primary) !important;
+}
+
+/* --- Difficulty Buttons --- */
+[data-theme="dark"] .difficulty-btn {
+  background: var(--surface-color) !important;
+  color: var(--text-primary) !important;
+}
+
+/* --- Pitch Step Indicators --- */
+[data-theme="dark"] .pitch-step:not(.active) {
+  background: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+/* ============================================================== */
+/* === UNIVERSAL INLINE GRADIENT OVERRIDES === */
+/* Targets ALL inline-styled light backgrounds for dark mode */
+/* ============================================================== */
+
+/* Yellow/Amber Gradients */
+[data-theme="dark"] [style*="linear-gradient(120deg, #fef3c7"],
+[data-theme="dark"] [style*="linear-gradient(135deg, #fef9c3"],
+[data-theme="dark"] [style*="linear-gradient(135deg, #fefce8"],
+[data-theme="dark"] [style*="linear-gradient(135deg, #fffbeb"],
+[data-theme="dark"] [style*="background: #fef3c7"],
+[data-theme="dark"] [style*="background:#fef3c7"] {
+  background: var(--card-bg) !important;
+}
+
+[data-theme="dark"] [style*="linear-gradient(120deg, #fef3c7"] *,
+[data-theme="dark"] [style*="linear-gradient(135deg, #fef9c3"] *,
+[data-theme="dark"] [style*="linear-gradient(135deg, #fefce8"] *,
+[data-theme="dark"] [style*="linear-gradient(135deg, #fffbeb"] *,
+[data-theme="dark"] [style*="background: #fef3c7"] *,
+[data-theme="dark"] [style*="background:#fef3c7"] * {
+  color: var(--text-primary) !important;
+}
+
+/* Green Gradients */
+[data-theme="dark"] [style*="linear-gradient(135deg, #f0fdf4"],
+[data-theme="dark"] [style*="linear-gradient(135deg, #dcfce7"],
+[data-theme="dark"] [style*="background: #d1fae5"],
+[data-theme="dark"] [style*="background:#d1fae5"] {
+  background: var(--card-bg) !important;
+}
+
+[data-theme="dark"] [style*="linear-gradient(135deg, #f0fdf4"] *,
+[data-theme="dark"] [style*="linear-gradient(135deg, #dcfce7"] *,
+[data-theme="dark"] [style*="background: #d1fae5"] *,
+[data-theme="dark"] [style*="background:#d1fae5"] * {
+  color: var(--text-primary) !important;
+}
+
+/* Blue Gradients */
+[data-theme="dark"] [style*="linear-gradient(135deg, #eff6ff"],
+[data-theme="dark"] [style*="linear-gradient(135deg, #e0f2fe"],
+[data-theme="dark"] [style*="background: #eff6ff"],
+[data-theme="dark"] [style*="background:#eff6ff"] {
+  background: var(--card-bg) !important;
+}
+
+[data-theme="dark"] [style*="linear-gradient(135deg, #eff6ff"] *,
+[data-theme="dark"] [style*="linear-gradient(135deg, #e0f2fe"] *,
+[data-theme="dark"] [style*="background: #eff6ff"] *,
+[data-theme="dark"] [style*="background:#eff6ff"] * {
+  color: var(--text-primary) !important;
+}
+
+/* Pink/Rose Gradients */
+[data-theme="dark"] [style*="linear-gradient(135deg, #fce7f3"],
+[data-theme="dark"] [style*="linear-gradient(135deg, #fef2f2"],
+[data-theme="dark"] [style*="background: #fee2e2"],
+[data-theme="dark"] [style*="background:#fee2e2"] {
+  background: var(--card-bg) !important;
+}
+
+[data-theme="dark"] [style*="linear-gradient(135deg, #fce7f3"] *,
+[data-theme="dark"] [style*="linear-gradient(135deg, #fef2f2"] *,
+[data-theme="dark"] [style*="background: #fee2e2"] *,
+[data-theme="dark"] [style*="background:#fee2e2"] * {
+  color: var(--text-primary) !important;
+}
+
+/* Purple/Lavender Gradients */
+[data-theme="dark"] [style*="linear-gradient(135deg, #f5f3ff"],
+[data-theme="dark"] [style*="linear-gradient(135deg, #f3e8ff"],
+[data-theme="dark"] [style*="linear-gradient(135deg, #faf5ff"],
+[data-theme="dark"] [style*="linear-gradient(135deg, #ede9fe"],
+[data-theme="dark"] [style*="background: #f8f4fc"],
+[data-theme="dark"] [style*="background:#f8f4fc"] {
+  background: var(--card-bg) !important;
+}
+
+[data-theme="dark"] [style*="linear-gradient(135deg, #f5f3ff"] *,
+[data-theme="dark"] [style*="linear-gradient(135deg, #f3e8ff"] *,
+[data-theme="dark"] [style*="linear-gradient(135deg, #faf5ff"] *,
+[data-theme="dark"] [style*="linear-gradient(135deg, #ede9fe"] *,
+[data-theme="dark"] [style*="background: #f8f4fc"] *,
+[data-theme="dark"] [style*="background:#f8f4fc"] * {
+  color: var(--text-primary) !important;
+}
+
+/* Orange Gradients */
+[data-theme="dark"] [style*="linear-gradient(135deg, #fff7ed"],
+[data-theme="dark"] [style*="background: #fed7aa"],
+[data-theme="dark"] [style*="background:#fed7aa"] {
+  background: var(--card-bg) !important;
+}
+
+[data-theme="dark"] [style*="linear-gradient(135deg, #fff7ed"] *,
+[data-theme="dark"] [style*="background: #fed7aa"] *,
+[data-theme="dark"] [style*="background:#fed7aa"] * {
+  color: var(--text-primary) !important;
+}
+
+/* White/Off-white backgrounds */
+[data-theme="dark"] [style*="linear-gradient(180deg, #fafafa"],
+[data-theme="dark"] [style*="background: #f8fafc"],
+[data-theme="dark"] [style*="background:#f8fafc"],
+[data-theme="dark"] [style*="background: #f9fafb"],
+[data-theme="dark"] [style*="background:#f9fafb"],
+[data-theme="dark"] [style*="background: rgba(255,255,255"],
+[data-theme="dark"] [style*="background:rgba(255,255,255"] {
+  background: var(--card-bg) !important;
+}
+
+[data-theme="dark"] [style*="linear-gradient(180deg, #fafafa"] *,
+[data-theme="dark"] [style*="background: #f8fafc"] *,
+[data-theme="dark"] [style*="background:#f8fafc"] *,
+[data-theme="dark"] [style*="background: #f9fafb"] *,
+[data-theme="dark"] [style*="background:#f9fafb"] *,
+[data-theme="dark"] [style*="background: rgba(255,255,255"] *,
+[data-theme="dark"] [style*="background:rgba(255,255,255"] * {
+  color: var(--text-primary) !important;
+}
+
+/* ============================================================== */
+/* === DETAILS/SUMMARY EXPANDABLE SECTIONS === */
+/* ============================================================== */
+
+[data-theme="dark"] details {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] details summary {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] details p,
+[data-theme="dark"] details li,
+[data-theme="dark"] details span {
+  color: var(--text-primary) !important;
+}
+
+/* ============================================================== */
+/* === QUESTION CARDS & EXAM SECTIONS === */
+/* ============================================================== */
+
+[data-theme="dark"] .question-card {
+  background: var(--card-bg) !important;
+}
+
+[data-theme="dark"] .question-card h3,
+[data-theme="dark"] .question-card h4,
+[data-theme="dark"] .question-card p,
+[data-theme="dark"] .question-card label {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .mcq-question,
+[data-theme="dark"] .fib-question,
+[data-theme="dark"] .sa-question,
+[data-theme="dark"] .exam-question {
+  background: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .answer-option,
+[data-theme="dark"] .quiz-option {
+  background: var(--surface-color) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .answer-option:hover,
+[data-theme="dark"] .quiz-option:hover {
+  background: var(--hover-bg) !important;
+}
+
+/* ============================================================== */
+/* === CALLOUT BOXES (White with colored borders) === */
+/* ============================================================== */
+
+[data-theme="dark"] [style*="background: white"][style*="border: 2px solid"],
+[data-theme="dark"] [style*="background:white"][style*="border:"] {
+  background: var(--card-bg) !important;
+}
+
+[data-theme="dark"] [style*="background: white"][style*="border: 2px solid"] *,
+[data-theme="dark"] [style*="background:white"][style*="border:"] * {
+  color: var(--text-primary) !important;
+}
+
+/* ============================================================== */
+/* === SPECIFIC TEXT COLOR OVERRIDES FOR DARK INLINE COLORS === */
+/* ============================================================== */
+
+/* Override inline dark text colors that become invisible in dark mode */
+[data-theme="dark"] [style*="color: #334155"],
+[data-theme="dark"] [style*="color:#334155"],
+[data-theme="dark"] [style*="color: #1e293b"],
+[data-theme="dark"] [style*="color:#1e293b"],
+[data-theme="dark"] [style*="color: #374151"],
+[data-theme="dark"] [style*="color:#374151"],
+[data-theme="dark"] [style*="color: #1e40af"],
+[data-theme="dark"] [style*="color:#1e40af"],
+[data-theme="dark"] [style*="color: #991b1b"],
+[data-theme="dark"] [style*="color:#991b1b"],
+[data-theme="dark"] [style*="color: #065f46"],
+[data-theme="dark"] [style*="color:#065f46"],
+[data-theme="dark"] [style*="color: #78350f"],
+[data-theme="dark"] [style*="color:#78350f"],
+[data-theme="dark"] [style*="color: #92400e"],
+[data-theme="dark"] [style*="color:#92400e"],
+[data-theme="dark"] [style*="color: #64748b"],
+[data-theme="dark"] [style*="color:#64748b"],
+[data-theme="dark"] [style*="color: #475569"],
+[data-theme="dark"] [style*="color:#475569"],
+[data-theme="dark"] [style*="color: #4b5563"],
+[data-theme="dark"] [style*="color:#4b5563"] {
+  color: var(--text-primary) !important;
+}
+
+/* ============================================================== */
+/* === GAME COMPLETION & SUCCESS STATES === */
+/* ============================================================== */
+
+[data-theme="dark"] .game-complete-section {
+  background: var(--card-bg) !important;
+}
+
+[data-theme="dark"] .game-complete-section h3,
+[data-theme="dark"] .game-complete-section p {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .feedback-message {
+  background: var(--card-bg) !important;
+}
+
+[data-theme="dark"] .feedback-message.correct {
+  color: #22c55e !important;
+  border-color: #22c55e !important;
+}
+
+[data-theme="dark"] .feedback-message.incorrect {
+  color: #ef4444 !important;
+  border-color: #ef4444 !important;
+}
+
+/* ============================================================== */
+/* === HOTSPOT QUIZ ELEMENTS === */
+/* ============================================================== */
+
+[data-theme="dark"] .hotspot-marker,
+[data-theme="dark"] .hotspot-zone {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .hotspot-feedback {
+  background: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+/* ============================================================== */
+/* === ENSURE ALL H1-H6, P, LI IN CONTENT AREAS === */
+/* ============================================================== */
+
+[data-theme="dark"] .content-card h1,
+[data-theme="dark"] .content-card h2,
+[data-theme="dark"] .content-card h3,
+[data-theme="dark"] .content-card h4,
+[data-theme="dark"] .content-card h5,
+[data-theme="dark"] .content-card h6,
+[data-theme="dark"] .content-card p,
+[data-theme="dark"] .content-card li,
+[data-theme="dark"] .content-card span:not(.badge):not(.tag),
+[data-theme="dark"] .content-card label {
+  color: var(--text-primary) !important;
+}
+
+/* ============================================================== */
+/* === FINAL CATCH-ALL FOR ANY REMAINING LIGHT BG ELEMENTS === */
+/* ============================================================== */
+
+[data-theme="dark"] [style*="background: #e"],
+[data-theme="dark"] [style*="background:#e"] {
+  background: var(--card-bg) !important;
+}
+
+[data-theme="dark"] [style*="background: #e"] *,
+[data-theme="dark"] [style*="background:#e"] * {
+  color: var(--text-primary) !important;
+}

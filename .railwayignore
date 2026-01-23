@@ -11,3 +11,4 @@ public
 *.tsx
 vite.config.ts
 tsconfig.json
+dist/assets/training/videos
