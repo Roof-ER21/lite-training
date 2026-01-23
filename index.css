@@ -19641,3 +19641,570 @@ button:disabled {
 [data-theme="dark"] [style*="background:#fff3e0"] * {
   color: #e5e7eb !important;
 }
+
+/* ===========================================================================
+   DARK MODE FIX v35 - Module 5 & Module 7 Comprehensive Fixes
+   =========================================================================== */
+
+/* ----------------------------------------------------------------------------
+   MODULE 5 (Initial Pitch) - Video Section Headers with Inline Dark Text
+   ---------------------------------------------------------------------------- */
+
+/* Fix inline dark text colors in video sections */
+[data-theme="dark"] .video-section [style*="color: #1e293b"],
+[data-theme="dark"] .video-section [style*="color:#1e293b"],
+[data-theme="dark"] [style*="color: #1e293b"] {
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .video-section [style*="color: #64748b"],
+[data-theme="dark"] .video-section [style*="color:#64748b"],
+[data-theme="dark"] [style*="color: #64748b"] {
+  color: #9ca3af !important;
+}
+
+[data-theme="dark"] [style*="color: #4a5568"],
+[data-theme="dark"] [style*="color:#4a5568"] {
+  color: #9ca3af !important;
+}
+
+[data-theme="dark"] [style*="color: #334155"],
+[data-theme="dark"] [style*="color:#334155"] {
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] [style*="color: #475569"],
+[data-theme="dark"] [style*="color:#475569"] {
+  color: #9ca3af !important;
+}
+
+/* Storm Reference Opening - Yellow gradient box needs dark treatment */
+[data-theme="dark"] [style*="background: linear-gradient(120deg, #fef3c7"],
+[data-theme="dark"] [style*="background: linear-gradient(120deg,#fef3c7"] {
+  background: linear-gradient(135deg, #78350f 0%, #92400e 100%) !important;
+  border-left-color: #f59e0b !important;
+}
+
+[data-theme="dark"] [style*="background: linear-gradient(120deg, #fef3c7"] *,
+[data-theme="dark"] [style*="background: linear-gradient(120deg,#fef3c7"] * {
+  color: #fef3c7 !important;
+}
+
+/* Intro highlight card - light blue gradient */
+[data-theme="dark"] .intro-highlight-card,
+[data-theme="dark"] [style*="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe"] {
+  background: linear-gradient(135deg, #1e3a5f 0%, #1e40af 100%) !important;
+  border-left-color: #3b82f6 !important;
+}
+
+[data-theme="dark"] .intro-highlight-card h2,
+[data-theme="dark"] .intro-highlight-card p,
+[data-theme="dark"] [style*="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe"] * {
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] [style*="color: #1e40af"],
+[data-theme="dark"] [style*="color:#1e40af"] {
+  color: #93c5fd !important;
+}
+
+/* Fix pitch progress tracker */
+[data-theme="dark"] .pitch-progress-tracker {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .pitch-progress-tracker h3 {
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .progress-item {
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .progress-label {
+  color: #9ca3af !important;
+}
+
+/* Non-negotiables grid cards */
+[data-theme="dark"] .nn-card {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .nn-card h4 {
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .nn-card p,
+[data-theme="dark"] .nn-quote {
+  color: #d1d5db !important;
+}
+
+/* Script cards and headers */
+[data-theme="dark"] .script-card {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .script-header {
+  background: #111827 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .script-label {
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .fill-blank {
+  background: #374151 !important;
+  color: #60a5fa !important;
+  border-color: #3b82f6 !important;
+}
+
+[data-theme="dark"] .script-note {
+  background: #374151 !important;
+  color: #fbbf24 !important;
+}
+
+[data-theme="dark"] .transition-text {
+  color: #60a5fa !important;
+}
+
+/* Practice mode container */
+[data-theme="dark"] .practice-mode-container {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .practice-intro p {
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .practice-active {
+  background: #111827 !important;
+}
+
+[data-theme="dark"] .practice-prompt {
+  background: #1f2937 !important;
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .practice-prompt h4 {
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .practice-prompt p,
+[data-theme="dark"] #practice-prompt-text {
+  color: #d1d5db !important;
+}
+
+[data-theme="dark"] .practice-tips {
+  background: #1f2937 !important;
+}
+
+[data-theme="dark"] .practice-tips h4 {
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .practice-tips li {
+  color: #d1d5db !important;
+}
+
+/* Tips grid cards */
+[data-theme="dark"] .tips-grid {
+  background: transparent !important;
+}
+
+[data-theme="dark"] .tip-card {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .tip-card h4 {
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .tip-card p {
+  color: #d1d5db !important;
+}
+
+/* Key phrases chips */
+[data-theme="dark"] .key-phrases {
+  background: transparent !important;
+}
+
+[data-theme="dark"] .phrase-chip {
+  background: #374151 !important;
+  color: #e5e7eb !important;
+  border-color: #4b5563 !important;
+}
+
+/* Section intro text */
+[data-theme="dark"] .section-intro {
+  color: #9ca3af !important;
+}
+
+/* ----------------------------------------------------------------------------
+   MODULE 7 (Damage Identification) - All Light Gradient Backgrounds
+   ---------------------------------------------------------------------------- */
+
+/* Damage type cards */
+[data-theme="dark"] .damage-type {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .damage-type h3,
+[data-theme="dark"] .damage-type h4 {
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .damage-type p,
+[data-theme="dark"] .damage-type li {
+  color: #d1d5db !important;
+}
+
+/* Damage gallery and image items */
+[data-theme="dark"] .damage-gallery {
+  background: transparent !important;
+}
+
+[data-theme="dark"] .damage-image-item {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .damage-image-item .image-caption {
+  background: #111827 !important;
+  color: #d1d5db !important;
+}
+
+/* Key point callout - light red gradient */
+[data-theme="dark"] .key-point-callout,
+[data-theme="dark"] [style*="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2"] {
+  background: linear-gradient(135deg, #450a0a 0%, #7f1d1d 100%) !important;
+  border-left-color: #ef4444 !important;
+}
+
+[data-theme="dark"] .key-point-callout p,
+[data-theme="dark"] [style*="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2"] p,
+[data-theme="dark"] [style*="color: #991b1b"],
+[data-theme="dark"] [style*="color:#991b1b"] {
+  color: #fca5a5 !important;
+}
+
+/* Shingle comparison cards */
+[data-theme="dark"] .shingle-comparison,
+[data-theme="dark"] .shingle-type {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+/* 3-Tab shingle card - light gray gradient */
+[data-theme="dark"] [style*="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0"] {
+  background: linear-gradient(135deg, #1f2937 0%, #374151 100%) !important;
+  border-color: #4b5563 !important;
+}
+
+[data-theme="dark"] [style*="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0"] h4 {
+  color: #e5e7eb !important;
+}
+
+/* Architectural shingle card - light green gradient */
+[data-theme="dark"] [style*="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7"] {
+  background: linear-gradient(135deg, #064e3b 0%, #065f46 100%) !important;
+  border-color: #10b981 !important;
+}
+
+[data-theme="dark"] [style*="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7"] h4,
+[data-theme="dark"] [style*="color: #166534"],
+[data-theme="dark"] [style*="color:#166534"] {
+  color: #a7f3d0 !important;
+}
+
+/* Yellow info box */
+[data-theme="dark"] [style*="background: #fef3c7"],
+[data-theme="dark"] [style*="background:#fef3c7"] {
+  background: #78350f !important;
+  border-left-color: #f59e0b !important;
+}
+
+[data-theme="dark"] [style*="background: #fef3c7"] p,
+[data-theme="dark"] [style*="background:#fef3c7"] p,
+[data-theme="dark"] [style*="color: #92400e"],
+[data-theme="dark"] [style*="color:#92400e"] {
+  color: #fde68a !important;
+}
+
+/* Green info box */
+[data-theme="dark"] [style*="background: #d1fae5"],
+[data-theme="dark"] [style*="background:#d1fae5"] {
+  background: #064e3b !important;
+  border-left-color: #22c55e !important;
+}
+
+[data-theme="dark"] [style*="background: #d1fae5"] p,
+[data-theme="dark"] [style*="background:#d1fae5"] p,
+[data-theme="dark"] [style*="color: #065f46"],
+[data-theme="dark"] [style*="color:#065f46"] {
+  color: #a7f3d0 !important;
+}
+
+/* Qualifying damage card - light green gradient */
+[data-theme="dark"] .qualifying-damage-card,
+[data-theme="dark"] [style*="border: 3px solid #22c55e"] {
+  background: linear-gradient(135deg, #064e3b 0%, #065f46 100%) !important;
+  border-color: #22c55e !important;
+}
+
+[data-theme="dark"] .qualifying-damage-card h3,
+[data-theme="dark"] [style*="color: #15803d"],
+[data-theme="dark"] [style*="color:#15803d"] {
+  color: #86efac !important;
+}
+
+/* Non-qualifying damage card - light red gradient */
+[data-theme="dark"] .non-qualifying-damage-card,
+[data-theme="dark"] [style*="border: 3px solid #ef4444"] {
+  background: linear-gradient(135deg, #450a0a 0%, #7f1d1d 100%) !important;
+  border-color: #ef4444 !important;
+}
+
+[data-theme="dark"] .non-qualifying-damage-card h3,
+[data-theme="dark"] [style*="color: #b91c1c"],
+[data-theme="dark"] [style*="color:#b91c1c"] {
+  color: #f87171 !important;
+}
+
+/* Inner white boxes in damage cards */
+[data-theme="dark"] .qualifying-items > div,
+[data-theme="dark"] .non-qualifying-items > div,
+[data-theme="dark"] .qualifying-damage-card [style*="background: white"],
+[data-theme="dark"] .non-qualifying-damage-card [style*="background: white"] {
+  background: #1f2937 !important;
+}
+
+[data-theme="dark"] .qualifying-items strong,
+[data-theme="dark"] .non-qualifying-items strong {
+  color: inherit !important;
+}
+
+[data-theme="dark"] .qualifying-items p,
+[data-theme="dark"] .non-qualifying-items p,
+[data-theme="dark"] [style*="color: #374151"],
+[data-theme="dark"] [style*="color:#374151"] {
+  color: #d1d5db !important;
+}
+
+/* Pro tip box - light blue gradient */
+[data-theme="dark"] .pro-tip-box,
+[data-theme="dark"] [style*="border: 2px solid #3b82f6"] {
+  background: linear-gradient(135deg, #1e3a5f 0%, #1e40af 100%) !important;
+  border-color: #3b82f6 !important;
+}
+
+[data-theme="dark"] .pro-tip-box strong,
+[data-theme="dark"] [style*="color: #1d4ed8"],
+[data-theme="dark"] [style*="color:#1d4ed8"] {
+  color: #93c5fd !important;
+}
+
+/* Damage matching game - light purple gradient */
+[data-theme="dark"] #damage-matching-game,
+[data-theme="dark"] [style*="background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff"] {
+  background: linear-gradient(135deg, #2e1065 0%, #4c1d95 100%) !important;
+  border-color: #a855f7 !important;
+}
+
+[data-theme="dark"] #damage-matching-game h3,
+[data-theme="dark"] [style*="color: #7c3aed"],
+[data-theme="dark"] [style*="color:#7c3aed"] {
+  color: #c4b5fd !important;
+}
+
+[data-theme="dark"] #damage-matching-game h4 {
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] #damage-matching-game p {
+  color: #d1d5db !important;
+}
+
+/* Match items with white background */
+[data-theme="dark"] .match-item.description,
+[data-theme="dark"] #damage-descriptions .match-item,
+[data-theme="dark"] #damage-descriptions [style*="background: white"] {
+  background: #1f2937 !important;
+  border-color: #4b5563 !important;
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .match-item.description:hover,
+[data-theme="dark"] #damage-descriptions .match-item:hover {
+  border-color: #8b5cf6 !important;
+  background: #374151 !important;
+}
+
+/* Sequence items */
+[data-theme="dark"] .seq-item,
+[data-theme="dark"] #doc-sequence-items [style*="background: white"] {
+  background: #1f2937 !important;
+  border-color: #4b5563 !important;
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .seq-item:hover,
+[data-theme="dark"] #doc-sequence-items [style*="background: white"]:hover {
+  border-color: #8b5cf6 !important;
+  background: #374151 !important;
+}
+
+[data-theme="dark"] .seq-number,
+[data-theme="dark"] [style*="background: #e5e7eb"] {
+  background: #374151 !important;
+  color: #e5e7eb !important;
+}
+
+/* Game instructions box */
+[data-theme="dark"] #doc-sequence-challenge [style*="background: #fef3c7"] {
+  background: #78350f !important;
+  border-color: #f59e0b !important;
+}
+
+[data-theme="dark"] #doc-sequence-challenge [style*="background: #fef3c7"] p,
+[data-theme="dark"] #doc-sequence-challenge [style*="color: #92400e"] {
+  color: #fde68a !important;
+}
+
+/* Game complete section */
+[data-theme="dark"] #game-complete-section,
+[data-theme="dark"] [style*="background: linear-gradient(135deg, #d1fae5, #a7f3d0"] {
+  background: linear-gradient(135deg, #064e3b 0%, #065f46 100%) !important;
+}
+
+[data-theme="dark"] #game-complete-section h3,
+[data-theme="dark"] [style*="color: #059669"],
+[data-theme="dark"] [style*="color:#059669"] {
+  color: #6ee7b7 !important;
+}
+
+[data-theme="dark"] #game-complete-section p,
+[data-theme="dark"] [style*="color: #047857"],
+[data-theme="dark"] [style*="color:#047857"] {
+  color: #a7f3d0 !important;
+}
+
+/* ----------------------------------------------------------------------------
+   VIDEO PLAYER CONTAINER - Light Background Fix
+   ---------------------------------------------------------------------------- */
+
+[data-theme="dark"] .video-player-container,
+[data-theme="dark"] [style*="background: #f5f5f5"] {
+  background: #1f2937 !important;
+}
+
+[data-theme="dark"] .video-player-container h3 {
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .video-player-container span,
+[data-theme="dark"] .video-player-container [style*="color: #666"],
+[data-theme="dark"] [style*="color: #666"],
+[data-theme="dark"] [style*="color:#666"] {
+  color: #9ca3af !important;
+}
+
+[data-theme="dark"] .video-progress-track,
+[data-theme="dark"] [style*="background: #e0e0e0"] {
+  background: #374151 !important;
+}
+
+/* Completion badge on videos */
+[data-theme="dark"] .completion-badge {
+  background: #22c55e !important;
+  color: white !important;
+}
+
+/* ----------------------------------------------------------------------------
+   INSPECTION MODULE (Module 8) - Additional Fixes
+   ---------------------------------------------------------------------------- */
+
+/* Module header gradient - keep visible but ensure text is readable */
+[data-theme="dark"] .module-header-gradient {
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%) !important;
+}
+
+[data-theme="dark"] .module-header-gradient h1,
+[data-theme="dark"] .module-header-gradient p {
+  color: white !important;
+}
+
+/* Inspection steps grid */
+[data-theme="dark"] .inspection-steps-grid {
+  background: transparent !important;
+}
+
+[data-theme="dark"] .inspection-step-card h3 {
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .step-checklist label {
+  color: #d1d5db !important;
+}
+
+[data-theme="dark"] .step-pro-tip {
+  background: #374151 !important;
+  color: #fbbf24 !important;
+  border-color: #f59e0b !important;
+}
+
+[data-theme="dark"] .step-pro-tip strong {
+  color: #fde68a !important;
+}
+
+/* Expand icon */
+[data-theme="dark"] .expand-icon {
+  color: #9ca3af !important;
+}
+
+/* ----------------------------------------------------------------------------
+   ADDITIONAL INLINE COLOR OVERRIDES
+   ---------------------------------------------------------------------------- */
+
+/* Gray text colors commonly used inline */
+[data-theme="dark"] [style*="color: #6b7280"],
+[data-theme="dark"] [style*="color:#6b7280"] {
+  color: #9ca3af !important;
+}
+
+[data-theme="dark"] [style*="color: #4b5563"],
+[data-theme="dark"] [style*="color:#4b5563"] {
+  color: #d1d5db !important;
+}
+
+/* Sales cycle module header */
+[data-theme="dark"] [style*="background: linear-gradient(135deg, #7c3aed"] {
+  /* Keep purple gradient but ensure it works in dark mode */
+  background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 50%, #a855f7 100%) !important;
+}
+
+/* Quick stats boxes */
+[data-theme="dark"] [style*="background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff"] {
+  background: linear-gradient(135deg, #2e1065 0%, #4c1d95 100%) !important;
+}
+
+[data-theme="dark"] [style*="color: #6b21a8"],
+[data-theme="dark"] [style*="color:#6b21a8"] {
+  color: #d8b4fe !important;
+}
+
+/* Module completion section */
+[data-theme="dark"] .module-completion-section {
+  background: transparent !important;
+}
+
+[data-theme="dark"] .complete-module-btn {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+  color: white !important;
+}
