@@ -12055,7 +12055,7 @@ function updateUserDisplay(): void {
 
   userInfo.className = 'user-info user-card-glass';
   userInfo.innerHTML = `
-    <div class="user-avatar-ring" style="--progress: ${progressPct}%">
+    <div class="user-avatar-ring">
       <div class="user-avatar-inner">${getInitials(user.name)}</div>
     </div>
     <div class="user-details">
@@ -12064,7 +12064,14 @@ function updateUserDisplay(): void {
         ${user.isManager ? '<span class="manager-badge-gradient">Manager</span>' : ''}
       </div>
     </div>
-    <button id="logout-btn" class="logout-btn-glass" title="Log out">↪</button>
+    <button id="logout-btn" class="logout-btn-glass" title="Sign out">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+        <polyline points="16 17 21 12 16 7"></polyline>
+        <line x1="21" y1="12" x2="9" y2="12"></line>
+      </svg>
+      Sign Out
+    </button>
   `;
 
   // Add logout handler

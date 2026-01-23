@@ -357,67 +357,74 @@ body {
 }
 
 /* Glass User Card */
+/* Professional User Card - Clean Modern Design */
 .user-card-glass {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 16px;
-  margin: 15px 12px;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 16px;
+  padding: 20px;
+  margin: 16px 12px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   position: relative;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .user-card-glass::before {
   content: '';
   position: absolute;
-  inset: -1px;
-  border-radius: 13px;
-  padding: 1px;
-  background: linear-gradient(135deg, rgba(217,4,41,0.5) 0%, rgba(255,255,255,0.1) 50%, rgba(217,4,41,0.3) 100%);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask-composite: exclude;
-  pointer-events: none;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(148, 163, 184, 0.4) 50%, transparent 100%);
 }
 
 .user-avatar-ring {
-  width: 44px;
-  height: 44px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  background: conic-gradient(from 0deg, #d90429 0%, #d90429 var(--progress, 65%), rgba(255,255,255,0.1) var(--progress, 65%));
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   padding: 3px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.35);
 }
 
 .user-avatar-inner {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background: linear-gradient(135deg, #2a2a32 0%, #1e1e24 100%);
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 14px;
-  color: white;
+  font-size: 20px;
+  color: #f1f5f9;
+  letter-spacing: 1px;
 }
 
 .user-details {
-  flex: 1;
-  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
 }
 
 .user-name-glass {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
-  color: white;
-  margin-bottom: 4px;
+  color: #f1f5f9;
+  letter-spacing: 0.3px;
 }
 
 .user-meta {
@@ -427,37 +434,44 @@ body {
 }
 
 .manager-badge-gradient {
-  background: linear-gradient(135deg, #d90429 0%, #ff6b6b 100%);
+  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
   color: white;
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-size: 9px;
-  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  box-shadow: 0 2px 8px rgba(217, 4, 41, 0.3);
+  letter-spacing: 1px;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.35);
 }
 
 .logout-btn-glass {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.7);
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
+  background: rgba(71, 85, 105, 0.4);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: #94a3b8;
+  width: 100%;
+  height: 36px;
+  border-radius: 8px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  transition: all 0.2s;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
   flex-shrink: 0;
+  margin-top: 4px;
 }
 
 .logout-btn-glass:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.4);
-  color: white;
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+
+.logout-btn-glass:active {
+  transform: scale(0.98);
 }
 
 /* Hide app container initially when login is shown */
@@ -17660,9 +17674,17 @@ button:disabled {
   color: white !important;
 }
 
+/* Professional user card - already dark themed, minimal overrides needed */
 [data-theme="dark"] .logout-btn-glass {
-  background: rgba(220, 38, 38, 0.2) !important;
-  color: #f87171 !important;
+  background: rgba(71, 85, 105, 0.4) !important;
+  border-color: rgba(148, 163, 184, 0.2) !important;
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .logout-btn-glass:hover {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+  color: #fca5a5 !important;
 }
 
 [data-theme="dark"] .user-login {
@@ -17690,17 +17712,33 @@ button:disabled {
   color: #fbbf24 !important;
 }
 
+/* User card avatar - keep the blue gradient styling */
 [data-theme="dark"] .user-avatar-inner {
-  background: #374151 !important;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+  color: #f1f5f9 !important;
 }
 
 [data-theme="dark"] .user-avatar-ring {
-  border-color: #3b82f6 !important;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
 }
 
 [data-theme="dark"] .user-details {
-  background: #1f2937 !important;
+  background: transparent !important;
   color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .user-card-glass {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%) !important;
+  border-color: rgba(148, 163, 184, 0.15) !important;
+}
+
+[data-theme="dark"] .user-name-glass {
+  color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .manager-badge-gradient {
+  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%) !important;
+  color: white !important;
 }
 
 [data-theme="dark"] .user-info {
