@@ -14480,13 +14480,51 @@ button:disabled {
 
 /* === DARK MODE CONTRAST FIXES FOR LIGHT-BACKGROUND SECTIONS === */
 
-/* Values section with cream/yellow background */
-[data-theme="dark"] .values-section,
+/* ============================================================== */
+/* === VALUES/MISSION SECTION - Yellow BG needs DARK text === */
+/* ============================================================== */
+
+[data-theme="dark"] .values-section {
+  background: #1f2937 !important;
+  border-color: #f59e0b !important;
+}
+
+[data-theme="dark"] .values-section h2,
 [data-theme="dark"] .values-section h3,
+[data-theme="dark"] .values-section h4,
 [data-theme="dark"] .values-section p,
 [data-theme="dark"] .values-section li,
-[data-theme="dark"] .values-section strong {
-  color: #1f2937 !important;
+[data-theme="dark"] .values-section strong,
+[data-theme="dark"] .values-section span {
+  color: #e5e7eb !important;
+}
+
+/* Promise section */
+[data-theme="dark"] .promise-section {
+  background: #1f2937 !important;
+  border-color: #f59e0b !important;
+}
+
+[data-theme="dark"] .promise-section h2,
+[data-theme="dark"] .promise-section h3,
+[data-theme="dark"] .promise-section h4,
+[data-theme="dark"] .promise-section p,
+[data-theme="dark"] .promise-section li,
+[data-theme="dark"] .promise-section strong {
+  color: #e5e7eb !important;
+}
+
+/* Commitment checklist */
+[data-theme="dark"] .commitment-checklist {
+  background: #1f2937 !important;
+  border-color: #f59e0b !important;
+}
+
+[data-theme="dark"] .commitment-checklist h3,
+[data-theme="dark"] .commitment-checklist p,
+[data-theme="dark"] .commitment-checklist li,
+[data-theme="dark"] .commitment-checklist label {
+  color: #e5e7eb !important;
 }
 
 /* Anatomy steps and numbered cards with white backgrounds */
@@ -14499,11 +14537,35 @@ button:disabled {
   color: #1f2937 !important;
 }
 
-/* Cards with light/white backgrounds */
-[data-theme="dark"] .flip-card-back,
+/* ============================================================== */
+/* === FLIP CARDS - CRITICAL FIX === */
+/* Front = light bg needs DARK text, Back = dark bg needs LIGHT text */
+/* ============================================================== */
+
+/* Flip card FRONT (white/light background) - needs DARK text */
+[data-theme="dark"] .flip-card-front {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .flip-card-front h3,
+[data-theme="dark"] .flip-card-front h4,
+[data-theme="dark"] .flip-card-front p,
+[data-theme="dark"] .flip-card-front span,
+[data-theme="dark"] .flip-card-front .flip-hint,
+[data-theme="dark"] .flip-card-front .flip-icon {
+  color: #e5e7eb !important;
+}
+
+/* Keep the red h3 color for flip cards */
+[data-theme="dark"] .flip-card-front h3 {
+  color: #f87171 !important;
+}
+
+/* Flip card BACK (already has dark gradient) - keep light text */
 [data-theme="dark"] .flip-card-back h4,
 [data-theme="dark"] .flip-card-back p {
-  color: #1f2937 !important;
+  color: white !important;
 }
 
 /* Final exam section */
@@ -15462,4 +15524,139 @@ button:disabled {
 [data-theme="dark"] #main-content .primary-btn,
 [data-theme="dark"] #main-content a.btn {
   color: inherit;
+}
+
+/* ============================================================== */
+/* === FINAL DARK MODE FIXES - Remaining light-bg elements === */
+/* ============================================================== */
+
+/* Video notice (yellow box with Step 1 instruction) */
+[data-theme="dark"] .commitment-video-notice {
+  background: #1f2937 !important;
+  border-color: #f59e0b !important;
+}
+
+[data-theme="dark"] .commitment-video-notice .notice-text,
+[data-theme="dark"] .commitment-video-notice .notice-text strong,
+[data-theme="dark"] .commitment-video-notice .video-progress-text {
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .commitment-video-notice.completed {
+  background: #064e3b !important;
+  border-color: #10b981 !important;
+}
+
+/* Manufacturer cards */
+[data-theme="dark"] .manufacturer-card {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .manufacturer-card h4,
+[data-theme="dark"] .manufacturer-card p,
+[data-theme="dark"] .manufacturer-card li,
+[data-theme="dark"] .manufacturer-card span,
+[data-theme="dark"] .manufacturer-note {
+  color: #e5e7eb !important;
+}
+
+/* Anatomy steps (numbered cards with white backgrounds) */
+[data-theme="dark"] .anatomy-step {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .anatomy-step h4,
+[data-theme="dark"] .anatomy-step p,
+[data-theme="dark"] .anatomy-step span,
+[data-theme="dark"] .anatomy-step strong {
+  color: #e5e7eb !important;
+}
+
+/* Shingle layers (numbered cards) */
+[data-theme="dark"] .shingle-layer {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .shingle-layer h4,
+[data-theme="dark"] .shingle-layer p,
+[data-theme="dark"] .shingle-layer span,
+[data-theme="dark"] .shingle-layer strong {
+  color: #e5e7eb !important;
+}
+
+/* Term cards (definition boxes) */
+[data-theme="dark"] .term-card {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .term-card h3,
+[data-theme="dark"] .term-card h4,
+[data-theme="dark"] .term-card p,
+[data-theme="dark"] .term-card span {
+  color: #e5e7eb !important;
+}
+
+/* Shingle type cards */
+[data-theme="dark"] .shingle-type {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .shingle-type h3,
+[data-theme="dark"] .shingle-type h4,
+[data-theme="dark"] .shingle-type p,
+[data-theme="dark"] .shingle-type span,
+[data-theme="dark"] .shingle-type li {
+  color: #e5e7eb !important;
+}
+
+/* Objection flip cards */
+[data-theme="dark"] .objection-flip-card .flip-card-front {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .objection-flip-card .flip-card-front h3,
+[data-theme="dark"] .objection-flip-card .flip-card-front .tap-hint,
+[data-theme="dark"] .objection-flip-card .flip-card-front .objection-icon {
+  color: #e5e7eb !important;
+}
+
+/* Content sections with inline light backgrounds */
+[data-theme="dark"] [style*="background: linear-gradient(135deg, #fff3cd"],
+[data-theme="dark"] [style*="background: linear-gradient(135deg, #ffeaa7"],
+[data-theme="dark"] [style*="background: #fff3cd"] {
+  background: #1f2937 !important;
+}
+
+[data-theme="dark"] [style*="background: linear-gradient(135deg, #fff3cd"] *,
+[data-theme="dark"] [style*="background: linear-gradient(135deg, #ffeaa7"] *,
+[data-theme="dark"] [style*="background: #fff3cd"] * {
+  color: #e5e7eb !important;
+}
+
+/* Commitment initials section (yellow) */
+[data-theme="dark"] .commitment-initials-section {
+  background: #1f2937 !important;
+  border-color: #f59e0b !important;
+}
+
+/* Any remaining white background cards */
+[data-theme="dark"] .info-card,
+[data-theme="dark"] .note-card,
+[data-theme="dark"] .tip-card,
+[data-theme="dark"] .highlight-card {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .info-card *,
+[data-theme="dark"] .note-card *,
+[data-theme="dark"] .tip-card *,
+[data-theme="dark"] .highlight-card * {
+  color: #e5e7eb !important;
 }
