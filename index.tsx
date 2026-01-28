@@ -12747,10 +12747,14 @@ async function loadExamAnswers(userId: string, attemptId: string): Promise<void>
           <div class="answer-list">
             ${mcqAnswers.map(a => `
               <div class="answer-item ${a.isCorrect ? 'correct' : 'incorrect'}">
-                <span class="q-num">Q${a.questionNumber}:</span>
-                <span class="answer-icon">${a.isCorrect ? '✅' : '❌'}</span>
-                <span class="user-ans">${escapeHtml(a.userAnswer || '-')}</span>
-                ${!a.isCorrect && a.correctAnswer ? `<span class="correct-ans">→ ${escapeHtml(a.correctAnswer)}</span>` : ''}
+                <div class="question-text">
+                  <span class="q-num">Q${a.questionNumber}:</span> ${escapeHtml(a.questionText || 'Question not available')}
+                </div>
+                <div class="answer-text">
+                  <span class="answer-icon">${a.isCorrect ? '✅' : '❌'}</span>
+                  <strong>Answer:</strong> <span class="user-ans">${escapeHtml(a.userAnswer || '-')}</span>
+                  ${!a.isCorrect && a.correctAnswer ? `<span class="correct-ans">→ Correct: ${escapeHtml(a.correctAnswer)}</span>` : ''}
+                </div>
               </div>
             `).join('')}
           </div>
@@ -12763,10 +12767,14 @@ async function loadExamAnswers(userId: string, attemptId: string): Promise<void>
           <div class="answer-list">
             ${fibAnswers.map(a => `
               <div class="answer-item ${a.isCorrect ? 'correct' : 'incorrect'}">
-                <span class="q-num">Q${a.questionNumber}:</span>
-                <span class="answer-icon">${a.isCorrect ? '✅' : '❌'}</span>
-                <span class="user-ans">"${escapeHtml(a.userAnswer || '-')}"</span>
-                ${!a.isCorrect && a.correctAnswer ? `<span class="correct-ans">→ "${escapeHtml(a.correctAnswer)}"</span>` : ''}
+                <div class="question-text">
+                  <span class="q-num">Q${a.questionNumber}:</span> ${escapeHtml(a.questionText || 'Question not available')}
+                </div>
+                <div class="answer-text">
+                  <span class="answer-icon">${a.isCorrect ? '✅' : '❌'}</span>
+                  <strong>Answer:</strong> <span class="user-ans">"${escapeHtml(a.userAnswer || '-')}"</span>
+                  ${!a.isCorrect && a.correctAnswer ? `<span class="correct-ans">→ Correct: "${escapeHtml(a.correctAnswer)}"</span>` : ''}
+                </div>
               </div>
             `).join('')}
           </div>
@@ -12783,7 +12791,12 @@ async function loadExamAnswers(userId: string, attemptId: string): Promise<void>
                   <span class="q-num">Q${a.questionNumber}:</span>
                   <span class="points-earned">${a.pointsEarned} pts</span>
                 </div>
-                <div class="sa-answer">${escapeHtml(a.userAnswer || 'No answer provided')}</div>
+                <div class="question-text">
+                  ${escapeHtml(a.questionText || 'Question not available')}
+                </div>
+                <div class="sa-answer">
+                  <strong>Answer:</strong> ${escapeHtml(a.userAnswer || 'No answer provided')}
+                </div>
               </div>
             `).join('')}
           </div>

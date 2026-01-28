@@ -9227,9 +9227,9 @@ button:disabled {
 
 .answer-item {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 8px;
-  padding: 6px 10px;
+  padding: 10px 12px;
   border-radius: 4px;
   font-size: 13px;
 }
@@ -9242,10 +9242,26 @@ button:disabled {
   background: #fee2e2;
 }
 
-.answer-item .q-num {
-  font-weight: 600;
-  color: #374151; /* Darker for better visibility */
-  min-width: 35px;
+.answer-item .question-text {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  color: #1f2937;
+  line-height: 1.5;
+  margin-bottom: 4px;
+}
+
+.answer-item .question-text .q-num {
+  font-weight: 700;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.answer-item .answer-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 4px;
 }
 
 .answer-item .answer-icon {
@@ -9259,6 +9275,7 @@ button:disabled {
 .answer-item .correct-ans {
   color: #059669;
   font-weight: 500;
+  margin-left: 8px;
 }
 
 /* Short answer styling */
@@ -9270,6 +9287,7 @@ button:disabled {
 .sa-item {
   background: #f9fafb !important;
   border: 1px solid #e5e7eb;
+  padding: 12px 14px;
 }
 
 .sa-item.correct {
@@ -9279,8 +9297,15 @@ button:disabled {
 .sa-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   width: 100%;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+}
+
+.sa-header .q-num {
+  font-weight: 700;
+  color: #374151;
+  font-size: 14px;
 }
 
 .points-earned {
@@ -9290,6 +9315,17 @@ button:disabled {
   font-size: 11px;
   font-weight: 600;
   color: #1e40af;
+}
+
+.sa-item .question-text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #1f2937;
+  margin-bottom: 8px;
+  padding: 8px;
+  background: white;
+  border-radius: 4px;
+  border-left: 3px solid #3b82f6;
 }
 
 .sa-answer {
@@ -16424,6 +16460,25 @@ button:disabled {
 
 [data-theme="dark"] .answers-detail {
   background: #1f2937 !important;
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .answer-item .question-text {
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .answer-item .question-text .q-num {
+  color: #d1d5db !important;
+}
+
+[data-theme="dark"] .sa-item .question-text {
+  background: #111827 !important;
+  color: #e5e7eb !important;
+  border-left-color: #3b82f6 !important;
+}
+
+[data-theme="dark"] .sa-answer {
+  background: #111827 !important;
   color: #e5e7eb !important;
 }
 
