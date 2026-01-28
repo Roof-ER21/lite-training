@@ -504,23 +504,27 @@ interface ModuleRequirements {
   needsVideo?: boolean;
   needsQuiz?: boolean;
   needsTime?: number; // seconds
-  needsScroll: boolean;
+  needsScroll?: boolean;
+  needsGame?: boolean;       // NEW
+  needsPractice?: boolean;   // NEW
+  needsChallenge?: boolean;  // NEW
+  needsRoleplay?: boolean;   // NEW
 }
 
 const MODULE_REQUIREMENTS: Record<string, ModuleRequirements> = {
-  'welcome': { needsVideo: true, needsScroll: true },
-  'commitment': { needsScroll: true }, // Special: handled by existing gate logic
-  'general-knowledge': { needsTime: 60, needsScroll: true },
-  'shingle-types-materials': { needsTime: 60, needsScroll: true },
-  'initial-pitch': { needsTime: 60, needsScroll: true },
-  'handling-initial-pitch-objections': { needsTime: 60, needsScroll: true },
+  'welcome': { needsScroll: true },
+  'commitment': { needsScroll: true },
+  'general-knowledge': { needsQuiz: true, needsScroll: true },
+  'shingle-types-materials': { needsGame: true, needsScroll: true },
+  'initial-pitch': { needsPractice: true, needsScroll: true },
+  'handling-initial-pitch-objections': { needsChallenge: true, needsScroll: true },
+  'damage-identification': { needsChallenge: true, needsScroll: true },
   'inspection-process': { needsQuiz: true, needsScroll: true },
-  'post-inspection-pitch': { needsTime: 60, needsScroll: true },
-  'post-inspection-objections': { needsTime: 60, needsScroll: true },
-  'damage-identification': { needsQuiz: true, needsScroll: true },
+  'post-inspection-pitch': { needsRoleplay: true, needsScroll: true },
+  'post-inspection-objections': { needsQuiz: true, needsScroll: true },
   'filing-claim-closing': { needsQuiz: true, needsScroll: true },
-  'sales-cycle-job-flow': { needsTime: 60, needsScroll: true },
-  'role-play': { needsScroll: true }, // Special: unlock when role-play starts
+  'sales-cycle-job-flow': { needsGame: true, needsScroll: true },
+  'role-play': { needsRoleplay: true, needsScroll: true },
   'final-exam': { needsQuiz: true, needsScroll: true },
 };
 
@@ -530,6 +534,10 @@ interface ModuleEngagement {
   timeSpent: number;
   videoWatched: boolean;
   quizPassed: boolean;
+  gameCompleted?: boolean;
+  practiceCompleted?: boolean;
+  challengeCompleted?: boolean;
+  roleplayCompleted?: boolean;
 }
 
 const moduleEngagement: Record<string, ModuleEngagement> = {};
@@ -700,6 +708,58 @@ function markQuizPassed(moduleName: string) {
   checkModuleCompletion(moduleName);
 }
 
+function markGameCompleted(moduleName: string) {
+  const engagement = ensureModuleEngagement(moduleName);
+  engagement.gameCompleted = true;
+  checkModuleCompletion(moduleName);
+  updateRequirementIndicator(moduleName, 'game', true);
+  // Track to admin
+  void apiCall('/progress/activity', {
+    method: 'POST',
+    body: JSON.stringify({ moduleName, activityType: 'game', completed: true }),
+    silent: true
+  } as any);
+}
+
+function markPracticeCompleted(moduleName: string) {
+  const engagement = ensureModuleEngagement(moduleName);
+  engagement.practiceCompleted = true;
+  checkModuleCompletion(moduleName);
+  updateRequirementIndicator(moduleName, 'practice', true);
+  // Track to admin
+  void apiCall('/progress/activity', {
+    method: 'POST',
+    body: JSON.stringify({ moduleName, activityType: 'practice', completed: true }),
+    silent: true
+  } as any);
+}
+
+function markChallengeCompleted(moduleName: string) {
+  const engagement = ensureModuleEngagement(moduleName);
+  engagement.challengeCompleted = true;
+  checkModuleCompletion(moduleName);
+  updateRequirementIndicator(moduleName, 'challenge', true);
+  // Track to admin
+  void apiCall('/progress/activity', {
+    method: 'POST',
+    body: JSON.stringify({ moduleName, activityType: 'challenge', completed: true }),
+    silent: true
+  } as any);
+}
+
+function markRoleplayCompleted(moduleName: string) {
+  const engagement = ensureModuleEngagement(moduleName);
+  engagement.roleplayCompleted = true;
+  checkModuleCompletion(moduleName);
+  updateRequirementIndicator(moduleName, 'roleplay', true);
+  // Track to admin
+  void apiCall('/progress/activity', {
+    method: 'POST',
+    body: JSON.stringify({ moduleName, activityType: 'roleplay', completed: true }),
+    silent: true
+  } as any);
+}
+
 // Check if all requirements are met and show/hide completion button
 function checkModuleCompletion(moduleName: string) {
   const requirements = MODULE_REQUIREMENTS[moduleName];
@@ -726,6 +786,26 @@ function checkModuleCompletion(moduleName: string) {
 
   // Check quiz
   if (requirements.needsQuiz && !engagement.quizPassed) {
+    canComplete = false;
+  }
+
+  // Check game
+  if (requirements.needsGame && !engagement.gameCompleted) {
+    canComplete = false;
+  }
+
+  // Check practice
+  if (requirements.needsPractice && !engagement.practiceCompleted) {
+    canComplete = false;
+  }
+
+  // Check challenge
+  if (requirements.needsChallenge && !engagement.challengeCompleted) {
+    canComplete = false;
+  }
+
+  // Check roleplay
+  if (requirements.needsRoleplay && !engagement.roleplayCompleted) {
     canComplete = false;
   }
 
@@ -2160,6 +2240,12 @@ const trainingContent = {
       </div>
 
       <p class="reference-link">Reference: <a href="#" class="nav-module-link" data-module="welcome" data-scroll-to="mission-values-section">Mission, Values, & Commitment (Module 1)</a></p>
+
+      <div class="module-completion-section" id="module-complete-section" style="display: none;">
+        <button class="complete-module-btn" onclick="completeModule('commitment')">
+          Complete Module & Continue
+        </button>
+      </div>
     </div>
   `,
   'initial-pitch': `
@@ -3517,6 +3603,12 @@ const trainingContent = {
           </p>
         </div>
       </div>
+
+      <div class="module-completion-section" id="module-complete-section" style="display: none;">
+        <button class="complete-module-btn" onclick="completeModule('shingle-types-materials')">
+          Complete Module & Continue
+        </button>
+      </div>
     </div>
   `,
   'roofing-damage-id': `
@@ -4394,8 +4486,14 @@ const trainingContent = {
                 <!-- Dynamically populated -->
             </div>
         </div>
+
+      <div class="module-completion-section" id="module-complete-section" style="display: none;">
+        <button class="complete-module-btn" onclick="completeModule('role-play')">
+          Complete Module & Continue
+        </button>
+      </div>
     </div>
-  
+
   `,
   quiz: `
     <div class="content-card" id="quiz-container">
@@ -5422,6 +5520,8 @@ function updatePracticeProgress() {
         if (completeSection) {
             completeSection.style.display = 'block';
         }
+        // Mark practice mode as completed
+        markPracticeCompleted('initial-pitch');
     }
 }
 
@@ -6691,6 +6791,8 @@ function initSalesCycleSorter() {
             // Show completion section
             const completeSection = document.getElementById('module-complete-section');
             if (completeSection) completeSection.style.display = 'block';
+            // Mark game as completed
+            markGameCompleted('sales-cycle-job-flow');
         } else {
             salesCycleAttempts++;
             let hint = '';
@@ -7259,6 +7361,9 @@ function showChallengeComplete() {
     message = "Keep practicing! Review the flip cards above and try again.";
   }
   if (scoreMessageEl) scoreMessageEl.textContent = message;
+
+  // Mark challenge as completed
+  markChallengeCompleted('handling-initial-pitch-objections');
 }
 
 (window as any).restartObjectionChallenge = function() {
@@ -7864,6 +7969,11 @@ function endShingleGame() {
   }
   if (passingNote) {
     passingNote.style.display = passed ? 'none' : 'block';
+  }
+
+  // Mark game completed if passed
+  if (passed) {
+    markGameCompleted('shingle-types-materials');
   }
 }
 
@@ -9100,6 +9210,8 @@ function showAgnesSessionComplete(xpEarned: number, xpResult: any, streakResult:
 
   // Mark role-play module as complete when a session is finished
   completeModule('role-play');
+  // Mark roleplay activity as completed
+  markRoleplayCompleted('role-play');
 
   const content = modal.querySelector('.modal-content');
   if (content) {
@@ -14337,6 +14449,54 @@ async function gradeFinalExam(root: HTMLElement) {
   const { mcq, fib, sa } = currentExamData;
   const wrongAnswers: WrongAnswer[] = [];
 
+  // Helper function to calculate Levenshtein distance for fuzzy matching
+  function levenshteinDistance(a: string, b: string): number {
+    const matrix: number[][] = [];
+    for (let i = 0; i <= b.length; i++) {
+      matrix[i] = [i];
+    }
+    for (let j = 0; j <= a.length; j++) {
+      matrix[0][j] = j;
+    }
+    for (let i = 1; i <= b.length; i++) {
+      for (let j = 1; j <= a.length; j++) {
+        if (b.charAt(i - 1) === a.charAt(j - 1)) {
+          matrix[i][j] = matrix[i - 1][j - 1];
+        } else {
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j - 1] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j] + 1
+          );
+        }
+      }
+    }
+    return matrix[b.length][a.length];
+  }
+
+  // Helper function for fuzzy matching of fill-in-the-blank answers
+  function isCloseMatch(userAnswer: string, acceptableAnswer: string): boolean {
+    const user = userAnswer.toLowerCase().trim();
+    const acceptable = acceptableAnswer.toLowerCase().trim();
+
+    // Exact match
+    if (user === acceptable) return true;
+
+    // Calculate Levenshtein distance
+    const distance = levenshteinDistance(user, acceptable);
+
+    // Allow 1 typo for short answers, 2 for longer answers
+    const maxDistance = acceptable.length <= 5 ? 1 : 2;
+    if (distance <= maxDistance) return true;
+
+    // Check similarity percentage (for longer answers)
+    const maxLen = Math.max(user.length, acceptable.length);
+    const similarity = 1 - (distance / maxLen);
+    if (similarity >= 0.8) return true;
+
+    return false;
+  }
+
   // Grade MCQ (35 questions, 2 pts each = 70 pts max)
   let mcqCorrect = 0;
   mcq.forEach((q, idx) => {
@@ -14361,7 +14521,7 @@ async function gradeFinalExam(root: HTMLElement) {
   fib.forEach((q, idx) => {
     const input = root.querySelector(`input[name="fib-${idx}"]`) as HTMLInputElement;
     const userAnswer = input?.value?.trim() || '';
-    const isCorrect = q.acceptableAnswers.some(a => a.toLowerCase() === userAnswer.toLowerCase());
+    const isCorrect = q.acceptableAnswers.some(a => isCloseMatch(userAnswer, a));
     if (isCorrect) {
       fibCorrect++;
     } else {
@@ -14498,7 +14658,7 @@ async function gradeFinalExam(root: HTMLElement) {
   const fibAnswerData = fib.map((q, idx) => {
     const input = root.querySelector(`input[name="fib-${idx}"]`) as HTMLInputElement;
     const userAnswer = input?.value?.trim() || '';
-    const isCorrect = q.acceptableAnswers.some(a => a.toLowerCase() === userAnswer.toLowerCase());
+    const isCorrect = q.acceptableAnswers.some(a => isCloseMatch(userAnswer, a));
     return {
       questionId: q.id,
       questionNumber: idx + 1,
