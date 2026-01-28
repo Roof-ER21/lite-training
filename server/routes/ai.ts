@@ -100,8 +100,20 @@ router.post('/score-response', async (req: Request, res: Response) => {
       : '1. Completeness - addresses all key points\n2. Accuracy - information is correct\n3. Professionalism - appropriate tone\n4. Persuasiveness - would be effective';
 
     // Build the AI prompt
-    const systemPrompt = `You are an expert roofing sales trainer evaluating a trainee's response.
-Be fair but thorough in your assessment. Score based on how well the response would work in a real sales situation.
+    const systemPrompt = `You are a generous and encouraging sales trainer scoring exam responses.
+Focus ONLY on whether the trainee understands the core sales concepts.
+DO NOT deduct points for:
+- Grammar mistakes
+- Spelling errors
+- Minor wording differences
+- Missing "nice to have" details
+
+Only deduct points if the response:
+- Completely misses the main concept
+- Contains incorrect information
+- Would harm the sales interaction
+
+Be encouraging and give full credit (2 points) for any response that shows understanding of the key concept, even if worded differently than the sample answer.
 Always return valid JSON only, no markdown formatting.`;
 
     const userPrompt = `Evaluate this trainee's response:
@@ -113,17 +125,19 @@ ${sampleAnswer ? `IDEAL RESPONSE EXAMPLE:\n${sampleAnswer}\n` : ''}
 EVALUATION CRITERIA:
 ${criteriaText}
 
-${rubric?.keywords?.length ? `KEY CONCEPTS TO LOOK FOR:\n${rubric.keywords.join(', ')}\n` : ''}
+${rubric?.keywords?.length ? `KEY CONCEPTS TO LOOK FOR (2 out of ${rubric.keywords.length} is sufficient):\n${rubric.keywords.join(', ')}\n` : ''}
 TRAINEE'S RESPONSE:
 ${userAnswer}
 
-Score from 0 to ${maxPoints} points. Be specific about what was good and what could improve.
+IMPORTANT: Give full credit (${maxPoints}/${maxPoints}) if the response demonstrates understanding of the sales concept, even if grammar/spelling isn't perfect or wording is different from the sample answer. Only use partial credit (${maxPoints / 2}/${maxPoints}) if significant content is missing. Only give 0 if the answer is completely wrong or missing.
+
+Be encouraging and focus on what they got RIGHT. Be specific about what was good and what could improve.
 
 Return JSON only (no markdown):
 {
   "score": <number 0-${maxPoints}, can use decimals like 1.5>,
   "percentage": <0-100>,
-  "feedback": "<1-2 sentence summary of the response quality>",
+  "feedback": "<1-2 sentence summary emphasizing the positive>",
   "strengths": ["<specific strength 1>", "<specific strength 2>"],
   "improvements": ["<specific improvement 1>", "<specific improvement 2>"]
 }`;

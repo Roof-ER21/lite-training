@@ -367,7 +367,7 @@ const FINAL_EXAM_MCQ: MCQQuestion[] = [
 
   // Module 5: Initial Pitch (3 MCQ)
   { id: 'mcq-9', module: 5, question: 'What GAF certification does Roof ER have?', options: ['GAF Certified Contractor', 'GAF Master Elite', 'GAF Preferred Partner', 'GAF Basic Installer'], correctAnswer: 1, explanation: 'Roof ER holds the GAF Master Elite certification, the highest level of GAF contractor certification.' },
-  { id: 'mcq-10', module: 5, question: 'What does hail damage look like on asphalt shingles?', options: ['Straight line cracks', 'Round circular divots', 'Only color fading', 'Curled edges only'], correctAnswer: 1, explanation: 'Hail damage appears as round circular divots on asphalt shingles.' },
+  { id: 'mcq-10', module: 5, question: 'Can flashing be approved in an insurance claim?', options: ['Yes', 'No'], correctAnswer: 0, explanation: 'Yes, flashing can be approved as part of an insurance claim when it shows storm damage.' },
   { id: 'mcq-11', module: 5, question: 'If a homeowner says "Will my rates go up?", what is the best response?', options: ['Yes, they probably will', 'I understand your concern - rates cannot go up and an individual homeowner cannot be penalized for an act of God claim', 'You should not file then', 'I am not sure about insurance rates'], correctAnswer: 1, explanation: 'Following the objection framework, empathize and explain that rates cannot go up for act of God claims - individual homeowners are not penalized.' },
 
   // Module 6: Handling Initial Objections (3 MCQ)
@@ -387,7 +387,7 @@ const FINAL_EXAM_MCQ: MCQQuestion[] = [
 
   // Module 10: Post-Inspection Objections (3 MCQ)
   { id: 'mcq-21', module: 10, question: 'When a homeowner says "My rates will go up," what\'s the best response?', options: ['That\'s probably true', 'Rates increase due to regional claims, not individual claims, and not filing means $20K+ later', 'Don\'t file then', 'I don\'t know about insurance'], correctAnswer: 1, explanation: 'Explain rates increase regionally regardless, and not filing now means huge out-of-pocket costs later.' },
-  { id: 'mcq-22', module: 10, question: 'How do you handle "I need to talk to my spouse"?', options: ['Call them yourself', 'Leave and hope they call back', 'Ask when the spouse will be available and schedule a time to meet together', 'Tell them to convince their spouse'], correctAnswer: 2, explanation: 'Schedule a time to meet when both decision-makers are present.' },
+  { id: 'mcq-22', module: 10, question: 'Should you react defensively when handling objections?', options: ['No', 'Yes'], correctAnswer: 0, explanation: 'No, you should never react defensively when handling objections. Stay calm and professional.' },
   { id: 'mcq-23', module: 10, question: 'What\'s the response to "I don\'t trust insurance claims"?', options: ['You shouldn\'t trust them', 'This is what you PAY insurance for - it\'s your right to file', 'Don\'t file then', 'Insurance is always trustworthy'], correctAnswer: 1, explanation: 'Remind them this is exactly what they pay premiums for - it\'s their right to use it.' },
 
   // Module 7: Damage Identification (3 MCQ)
@@ -444,7 +444,7 @@ const FINAL_EXAM_FIB: FIBQuestion[] = [
 
 const FINAL_EXAM_SA: SAQuestion[] = [
   // Non-negotiable #1 - Who you are
-  { id: 'sa-1', module: 5, prompt: 'Please write the section of your pitch that covers Non-Negotiable #1: Who you are.', keywords: ['name', 'my name is', 'hi', 'hello', 'introduce'], minKeywords: 2, sampleAnswer: 'Hi, my name is [Name].' },
+  { id: 'sa-1', module: 5, prompt: 'Please write the section of your pitch that covers Non-Negotiable #1: Who you are.', keywords: ['name', 'my name is', 'hi', 'hello', 'introduce'], minKeywords: 2, sampleAnswer: 'Hello, how are you? My name is ___.' },
 
   // Non-negotiable #2 - Who we are and what we do
   { id: 'sa-2', module: 5, prompt: 'Please write the section of your pitch that covers Non-Negotiable #2: Who we are and what we do.', keywords: ['Roof ER', 'roofing', 'company', 'insurance', 'claims', 'storm', 'restoration', 'DC area', 'local'], minKeywords: 3, sampleAnswer: 'I\'m with Roof ER. We\'re a local roofing company that specializes in insurance claims and storm restoration in the DC area.' },
@@ -453,19 +453,19 @@ const FINAL_EXAM_SA: SAQuestion[] = [
   { id: 'sa-3', module: 5, prompt: 'Please write the section of your pitch that covers Non-Negotiable #3: Make it relatable.', keywords: ['storm', 'storms', 'neighbors', 'neighborhood', 'area', 'recently', 'helping', 'claims'], minKeywords: 3, sampleAnswer: 'We\'ve had some big storms recently and we\'ve been helping a lot of your neighbors file claims. We\'ve been working all through the neighborhood.' },
 
   // Non-negotiable #4 - What you're there to do
-  { id: 'sa-4', module: 5, prompt: 'Please write the section of your pitch that covers Non-Negotiable #4: What you\'re there to do.', keywords: ['free', 'inspection', '15 minutes', 'damage', 'roof', 'look', 'check'], minKeywords: 3, sampleAnswer: 'I\'m going to offer you a completely free inspection. It only takes about 15 minutes and I\'ll check your roof for any storm damage.' },
+  { id: 'sa-4', module: 5, prompt: 'Please write the section of your pitch that covers Non-Negotiable #4: What you\'re there to do.', keywords: ['free', 'inspection', 'neighborhood', 'damage', 'qualifiable', 'similar', 'conducting'], minKeywords: 2, sampleAnswer: 'While I\'m in the neighborhood, I am conducting a completely free inspection to see if you have similar, qualifiable damage.' },
 
   // Non-negotiable #5 - Go for the close (over close)
   { id: 'sa-5', module: 5, prompt: 'Please write the section of your pitch that covers Non-Negotiable #5: Go for the close (over close).', keywords: ['find', 'damage', 'walk', 'through', 'process', 'don\'t', 'good shape', 'let you know'], minKeywords: 2, sampleAnswer: 'If I find damage, I\'ll walk you through the rest of the process. If I don\'t find damage, I\'ll let you know you\'re in good shape.' },
 
   // After homeowner agrees to inspection
-  { id: 'sa-6', module: 8, prompt: 'After the homeowner agrees to do the inspection right then, what will you tell them?', keywords: ['card', 'business card', 'roof', 'go up', 'look', 'back', 'minute', 'minutes', 'wait', 'inside'], minKeywords: 3, sampleAnswer: 'Great! Let me give you my card. I\'m going to go up on your roof and take a look. It should only take about 15 minutes. You can wait inside and I\'ll come back down to show you what I find.' },
+  { id: 'sa-6', module: 8, prompt: 'After the homeowner agrees to do the inspection right then, what will you tell them?', keywords: ['great', 'minutes', '10', '15', 'walk', 'property', 'collateral', 'damage', 'ladder', 'roof', 'check'], minKeywords: 3, sampleAnswer: 'Great, it\'ll only take me 10-15 minutes. I\'m going to walk around your property to look for collateral damage and then grab my ladder to check out your roof.' },
 
   // After handing card, before inspection
   { id: 'sa-7', module: 8, prompt: 'After you\'ve handed your homeowner your business card, what do you let them know before you conduct the inspection?', keywords: ['look us up', 'online', 'knock', 'finish', 'back', 'done', 'let you know'], minKeywords: 2, sampleAnswer: 'Take a moment to look us up online. I\'ll give you a knock when I finish up.' },
 
   // Order of inspection
-  { id: 'sa-8', module: 8, prompt: 'Please write the order of the inspection (what do you inspect and in what order?).', keywords: ['safety', '360', 'collateral', 'roof', 'shingles', 'overview', 'granules', 'gutters', 'downspouts'], minKeywords: 3, sampleAnswer: 'Safety first, 360 walk for ground collateral, roof collateral damage, shingle inspection, damage overview shots, and granules in gutters/downspouts.' },
+  { id: 'sa-8', module: 8, prompt: 'Please write the order of the inspection (what do you inspect and in what order?).', keywords: ['house number', 'mailbox', 'overview', 'collateral', 'elevations', 'roofs', 'hail', 'wind', 'damage', 'marked up', 'granules', 'gutters', 'downspouts'], minKeywords: 4, sampleAnswer: 'House number/mailbox, overview, collateral damage on elevations, collateral damage on roofs, hail damage on the roof, wind damage on the roof, overview of marked up damage, granules in gutters and downspouts.' },
 
   // Collateral damage explanation
   { id: 'sa-9', module: 9, prompt: 'After you finish the inspection, please write what you would explain to your homeowner about collateral damage.', keywords: ['collateral', 'damage', 'evidence', 'prove', 'hail', 'property', 'find', 'hit'], minKeywords: 3, sampleAnswer: 'This is the damage we need to find to prove that hail hit your property. Collateral damage serves as evidence that a storm event occurred and affected your home.' },
