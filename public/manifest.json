@@ -4,7 +4,7 @@
   "description": "Interactive sales training platform for roofing professionals",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#1a1a2e",
   "theme_color": "#c62828",
   "orientation": "portrait-primary",
   "categories": ["education", "business"],

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#c62828">
+  <title>Offline - Roof-ER Training</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f5f5f5;
+      --text-primary: #212121;
+      --text-secondary: #757575;
+      --accent: #c62828;
+      --accent-hover: #b71c1c;
+      --shadow: rgba(0, 0, 0, 0.1);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-primary: #121212;
+        --bg-secondary: #1e1e1e;
+        --text-primary: #ffffff;
+        --text-secondary: #b0b0b0;
+        --shadow: rgba(0, 0, 0, 0.3);
+      }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      line-height: 1.6;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .container {
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .icon-container {
+      margin-bottom: 32px;
+      position: relative;
+      display: inline-block;
+    }
+
+    .wifi-icon {
+      width: 80px;
+      height: 80px;
+      background: var(--bg-secondary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+      box-shadow: 0 4px 12px var(--shadow);
+      position: relative;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    .wifi-icon svg {
+      width: 40px;
+      height: 40px;
+      stroke: var(--text-secondary);
+      stroke-width: 2;
+      fill: none;
+      position: relative;
+    }
+
+    .slash {
+      position: absolute;
+      width: 2px;
+      height: 60px;
+      background: var(--accent);
+      transform: rotate(-45deg);
+      top: 50%;
+      left: 50%;
+      margin-left: -1px;
+      margin-top: -30px;
+      border-radius: 2px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--text-primary);
+    }
+
+    .subtitle {
+      font-size: 18px;
+      color: var(--accent);
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+
+    p {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+      line-height: 1.5;
+    }
+
+    .button {
+      display: inline-block;
+      background: var(--accent);
+      color: white;
+      padding: 14px 32px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 4px 12px rgba(198, 40, 40, 0.3);
+      transition: all 0.3s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .button:hover,
+    .button:focus {
+      background: var(--accent-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(198, 40, 40, 0.4);
+      outline: none;
+    }
+
+    .button:active {
+      transform: translateY(0);
+    }
+
+    .info-box {
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 32px;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .info-box h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .info-box ul {
+      list-style: none;
+      text-align: left;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .info-box li {
+      padding: 8px 0;
+      padding-left: 24px;
+      position: relative;
+    }
+
+    .info-box li:before {
+      content: "•";
+      color: var(--accent);
+      font-weight: bold;
+      position: absolute;
+      left: 8px;
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 24px;
+      }
+
+      .subtitle {
+        font-size: 16px;
+      }
+
+      p {
+        font-size: 15px;
+      }
+
+      .wifi-icon {
+        width: 70px;
+        height: 70px;
+      }
+
+      .wifi-icon svg {
+        width: 35px;
+        height: 35px;
+      }
+
+      .button {
+        width: 100%;
+        padding: 16px 24px;
+      }
+
+      .info-box {
+        padding: 16px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon-container">
+      <div class="wifi-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+          <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+          <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+          <circle cx="12" cy="20" r="1"></circle>
+        </svg>
+        <div class="slash"></div>
+      </div>
+    </div>
+
+    <h1>You're Offline</h1>
+    <p class="subtitle">Roof-ER Training</p>
+    <p>
+      It looks like you've lost your internet connection.
+      Don't worry, your progress is saved locally and will sync when you're back online.
+    </p>
+
+    <button class="button" onclick="window.location.reload()">
+      Try Again
+    </button>
+
+    <div class="info-box">
+      <h3>While Offline</h3>
+      <ul>
+        <li>Your training progress is preserved</li>
+        <li>Previously loaded content remains available</li>
+        <li>Changes will sync automatically when reconnected</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // Check if back online and auto-reload
+    window.addEventListener('online', function() {
+      setTimeout(function() {
+        window.location.reload();
+      }, 1000);
+    });
+
+    // Prevent button text selection on double-click
+    document.querySelector('.button').addEventListener('mousedown', function(e) {
+      e.preventDefault();
+    });
+  </script>
+</body>
+</html>
