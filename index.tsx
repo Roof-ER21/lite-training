@@ -4325,8 +4325,8 @@ const trainingContent = {
         <!-- Hero Header -->
         <div style="background: radial-gradient(circle at top left, #0ea5e9 0%, #1e3a8a 45%, #0f172a 100%); padding: 42px 30px; text-align: center; color: white;">
             <div style="font-size: 48px; margin-bottom: 15px;">🔍</div>
-            <h1 style="margin: 0 0 10px 0; font-size: 28px; font-weight: 700;">Live Role-Play: Inspection Process</h1>
-            <p style="margin: 0; opacity: 0.9; font-size: 16px;">Voice-only training with live feedback (Module 8)</p>
+            <h1 style="margin: 0 0 10px 0; font-size: 28px; font-weight: 700;">Live Role-Play: The Initial Script</h1>
+            <p style="margin: 0; opacity: 0.9; font-size: 16px;">Voice-only training with live feedback (Module 5)</p>
         </div>
 
         <div style="padding: 30px;">
@@ -4336,14 +4336,14 @@ const trainingContent = {
             <!-- XP Progress Bar -->
             <div id="agnes-xp-bar" class="agnes-xp-bar" style="margin-bottom: 30px;"></div>
 
-            <!-- Live Role-Play (Module 8 only) -->
+            <!-- Live Role-Play (Module 5 - The Initial Script) -->
             <div id="agnes-mode-selector" style="display: block;">
                 <div style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #0284c7 100%); border-radius: 24px; padding: 28px; color: white; margin-bottom: 24px;">
                     <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 18px; flex-wrap: wrap;">
-                        <div style="font-size: 44px;">🔍</div>
+                        <div style="font-size: 44px;">🎯</div>
                         <div>
-                            <div style="font-size: 20px; font-weight: 700;">Live Role-Play: Inspection Process</div>
-                            <div style="font-size: 14px; opacity: 0.9;">Module 8 only • Voice role-play with live feedback</div>
+                            <div style="font-size: 20px; font-weight: 700;">Live Role-Play: The Initial Script</div>
+                            <div style="font-size: 14px; opacity: 0.9;">Module 5 The Initial Script • Voice role-play with live feedback</div>
                         </div>
                         <div style="margin-left: auto; background: rgba(255,255,255,0.18); padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 600;">LIVE</div>
                     </div>
