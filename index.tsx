@@ -852,6 +852,13 @@ function unlockNextModule(currentModule: string) {
       unlocked.push(nextModule);
       localStorage.setItem(STORAGE_KEYS.unlockedModules, JSON.stringify(unlocked));
       updateSidebarLocks();
+
+      // Update database with unlocked module
+      void apiCall('/progress/module', {
+        method: 'POST',
+        body: JSON.stringify({ moduleName: nextModule, action: 'unlock' }),
+        silent: true
+      } as any).catch(() => { /* Silent fail for offline mode */ });
     }
   }
 }
@@ -12625,7 +12632,7 @@ async function showUserDetail(userId: string): Promise<void> {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          'Authorization': `Bearer ${localStorage.getItem(STORAGE_KEYS.sessionToken)}`
         }
       });
       if (response.ok) {
@@ -12654,7 +12661,7 @@ async function showUserDetail(userId: string): Promise<void> {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+            'Authorization': `Bearer ${localStorage.getItem(STORAGE_KEYS.sessionToken)}`
           },
           body: JSON.stringify({ moduleName })
         });
@@ -13866,17 +13873,28 @@ function initQuickQuiz2() {
           `).join('')}
         </div>
         <div class="quiz2-result-actions">
-          <button class="quiz2-btn quiz2-retry">Try Again</button>
+          ${passed
+            ? `<button class="quiz2-btn quiz2-complete" style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);">✓ Complete Module & Continue</button>`
+            : `<button class="quiz2-btn quiz2-retry">Try Again</button>`
+          }
         </div>
       </div>
     `;
 
-    area.querySelector('.quiz2-retry')?.addEventListener('click', () => {
-      currentQuestion = 0;
-      score = 0;
-      answers = new Array(quiz2Questions.length).fill(null);
-      renderQuestion();
-    });
+    if (passed) {
+      // Mark quiz as passed and show completion
+      markQuizPassed('general-knowledge');
+      area.querySelector('.quiz2-complete')?.addEventListener('click', () => {
+        completeModule('general-knowledge');
+      });
+    } else {
+      area.querySelector('.quiz2-retry')?.addEventListener('click', () => {
+        currentQuestion = 0;
+        score = 0;
+        answers = new Array(quiz2Questions.length).fill(null);
+        renderQuestion();
+      });
+    }
   }
 
   startBtn.addEventListener('click', () => {
@@ -15170,13 +15188,25 @@ function initQuickQuiz1() {
       const res = document.getElementById('quiz1Result');
       if (res) {
         if (pass) {
-          res.innerHTML = '<div class="quiz-success">&#10003; Perfect! You know the Roof-ER leadership team, core values, and founding year.</div>';
+          res.innerHTML = `
+            <div class="quiz-success">&#10003; Perfect! You know the Roof-ER leadership team, core values, and founding year.</div>
+            <div style="margin-top: 20px; text-align: center;">
+              <button class="complete-module-btn" onclick="completeModule('welcome')" style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: white; border: none; padding: 16px 32px; border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer;">
+                ✓ Complete Module & Continue
+              </button>
+            </div>
+          `;
+          // Also show the module complete section if it exists
+          const completeSection = document.getElementById('module-complete-section');
+          if (completeSection) {
+            completeSection.style.display = 'block';
+          }
         } else {
           let feedback = '<div class="quiz-error">&#10007; Not quite. ';
           if (q1 !== 'a') feedback += 'Review the leadership team. ';
           if (q2 !== 'b') feedback += 'Check our core values. ';
           if (q3 !== 'c') feedback += 'Roof-ER was founded in 2019. ';
-          feedback += '</div>';
+          feedback += '<br><br><button onclick="location.reload()" style="background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Try Again</button></div>';
           res.innerHTML = feedback;
         }
       }
