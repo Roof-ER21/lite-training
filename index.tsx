@@ -5449,6 +5449,7 @@ function initVideoPlayers() {
     const videoId = videoEl.id;
     const watchedKey = `video-watched-${videoId}`;
     const progressKey = `video-progress-${videoId}`;
+    const maxWatchedKey = `video-max-watched-${videoId}`;
 
     const progressBar = document.getElementById(`${videoId}-progress-bar`);
     const progressText = document.getElementById(`${videoId}-progress-text`);
@@ -5470,8 +5471,50 @@ function initVideoPlayers() {
     const { signal } = abortController;
     registerModuleCleanup(() => abortController.abort());
 
+    // Track max time naturally watched (for skip restriction)
+    let maxTimeWatched = parseFloat(localStorage.getItem(maxWatchedKey) || '0');
+    const alreadyWatched = localStorage.getItem(watchedKey) === 'true';
+
+    // Add skip restriction overlay
+    let skipOverlay: HTMLElement | null = null;
+    if (!alreadyWatched) {
+      skipOverlay = document.createElement('div');
+      skipOverlay.className = 'video-skip-overlay';
+      skipOverlay.style.cssText = 'position: absolute; bottom: 60px; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); padding: 12px; text-align: center; color: white; font-size: 13px; pointer-events: none;';
+      skipOverlay.innerHTML = '<span style="background: rgba(217, 4, 41, 0.9); padding: 6px 12px; border-radius: 4px;">Watch at least 50% to unlock skipping</span>';
+      newVideo.parentElement?.appendChild(skipOverlay);
+    }
+
+    // Prevent skipping ahead until 50% is watched
+    newVideo.addEventListener('seeking', function() {
+      if (!newVideo.duration) return;
+      const wasWatched = localStorage.getItem(watchedKey) === 'true';
+      const halfwayPoint = newVideo.duration * 0.5;
+
+      // Allow skipping if video was previously watched OR if user has naturally watched past 50%
+      if (wasWatched || maxTimeWatched >= halfwayPoint) {
+        return; // Allow seeking
+      }
+
+      // If trying to seek beyond what they've watched, reset to max watched
+      if (newVideo.currentTime > maxTimeWatched + 2) { // +2 for small tolerance
+        newVideo.currentTime = maxTimeWatched;
+        // Show brief warning
+        if (typeof showTip === 'function') {
+          showTip({ icon: '⚠️', title: 'Keep Watching', message: `Please watch at least 50% of the video before skipping. (${Math.round((maxTimeWatched / newVideo.duration) * 100)}% watched)` });
+        }
+      }
+    }, { signal });
+
     newVideo.addEventListener('timeupdate', function() {
       if (!newVideo.duration) return;
+
+      // Update max time watched (only if current time is slightly ahead of max)
+      if (newVideo.currentTime > maxTimeWatched) {
+        maxTimeWatched = newVideo.currentTime;
+        localStorage.setItem(maxWatchedKey, maxTimeWatched.toString());
+      }
+
       const progress = (newVideo.currentTime / newVideo.duration) * 100;
       const progressPct = Math.round(progress);
 
@@ -5480,6 +5523,12 @@ function initVideoPlayers() {
       if (newProgressText) newProgressText.textContent = progressPct + '%';
 
       localStorage.setItem(progressKey, newVideo.currentTime.toString());
+
+      // Remove skip overlay once 50% is reached
+      if (skipOverlay && progress >= 50) {
+        skipOverlay.remove();
+        skipOverlay = null;
+      }
 
       if (progress >= 90 && localStorage.getItem(watchedKey) !== 'true') {
         localStorage.setItem(watchedKey, 'true');
@@ -5519,6 +5568,8 @@ function initVideoPlayers() {
         const savedPct = Math.round((savedTime / newVideo.duration) * 100);
         if (newProgressBar) (newProgressBar as HTMLElement).style.width = savedPct + '%';
         if (newProgressText) newProgressText.textContent = savedPct + '%';
+        // Also restore max watched time
+        maxTimeWatched = Math.max(maxTimeWatched, savedTime);
       }
     }, { signal });
   });
@@ -5612,8 +5663,48 @@ function togglePracticeMode() {
 }
 
 function showNextPrompt() {
-    currentPromptIndex = (currentPromptIndex + 1) % practicePrompts.length;
-    updatePrompt();
+    if (currentPromptIndex < practicePrompts.length - 1) {
+        currentPromptIndex++;
+        updatePrompt();
+    } else {
+        // Show practice complete message
+        const practiceDiv = document.getElementById('practice-mode');
+        if (practiceDiv) {
+            const promptContainer = practiceDiv.querySelector('.practice-prompt-container');
+            if (promptContainer) {
+                promptContainer.innerHTML = `
+                    <div style="text-align: center; padding: 30px;">
+                        <div style="font-size: 48px; margin-bottom: 16px;">🎉</div>
+                        <h3 style="color: #10b981; margin-bottom: 12px;">Practice Complete!</h3>
+                        <p style="color: #666; margin-bottom: 20px;">You've gone through all ${practicePrompts.length} prompts. Great job!</p>
+                        <button onclick="restartPractice()" class="btn-primary" style="padding: 12px 24px;">🔄 Start Over</button>
+                    </div>
+                `;
+            }
+        }
+        // Mark practice as completed
+        if (currentModuleForEngagement) {
+            markPracticeCompleted(currentModuleForEngagement);
+        }
+    }
+}
+
+function restartPractice() {
+    currentPromptIndex = 0;
+    const practiceDiv = document.getElementById('practice-mode');
+    if (practiceDiv) {
+        const promptContainer = practiceDiv.querySelector('.practice-prompt-container');
+        if (promptContainer) {
+            promptContainer.innerHTML = `
+                <div id="practice-prompt" class="practice-prompt">
+                    <p id="practice-prompt-text">${practicePrompts[0]}</p>
+                </div>
+                <div class="prompt-nav">
+                    <button onclick="showNextPrompt()" class="btn-primary">Next Prompt →</button>
+                </div>
+            `;
+        }
+    }
 }
 
 function updatePrompt() {
@@ -6539,7 +6630,7 @@ function selectSeqItem(element: HTMLElement) {
   if (selectedSeqItem === element) {
     // Clicking same item - assign next number
     const numEl = element.querySelector('.seq-number') as HTMLElement;
-    if (numEl && nextAssignNumber <= 7) {
+    if (numEl && nextAssignNumber <= 5) {
       numEl.textContent = String(nextAssignNumber);
       numEl.style.background = '#8b5cf6';
       numEl.style.color = 'white';
@@ -11299,6 +11390,9 @@ function navigateToModule(moduleName: string) {
 // Make functions accessible from onclick handlers in HTML templates
 (window as any).navigateToModule = navigateToModule;
 (window as any).completeModule = completeModule;
+(window as any).renderModule = renderModule;
+(window as any).initFinalExam = initFinalExam;
+(window as any).restartPractice = restartPractice;
 
 // ============================================================================
 // PHOTO MODAL - Simple lightbox for strategy photos
@@ -14568,7 +14662,7 @@ function renderFinalExam(root: HTMLElement) {
 
         <!-- Short Answer Section -->
         <div class="exam-section">
-          <h3>📄 Section 3: Short Answer (5 questions - 2 pts each)</h3>
+          <h3>📄 Section 3: Short Answer (10 questions - 2 pts each)</h3>
           <div class="sa-questions">
             ${sa.map((q, idx) => `
               <div class="exam-question sa-question" data-id="${q.id}">
@@ -14590,6 +14684,44 @@ function renderFinalExam(root: HTMLElement) {
   `;
 
   document.getElementById('submitExam')?.addEventListener('click', async () => {
+    // Validate all questions are answered before submitting
+    const unansweredMCQ: number[] = [];
+    const unansweredFIB: number[] = [];
+    const unansweredSA: number[] = [];
+
+    // Check MCQ questions (35 total)
+    document.querySelectorAll('.mcq-question').forEach((q, idx) => {
+      const selected = q.querySelector('input[type="radio"]:checked');
+      if (!selected) unansweredMCQ.push(idx + 1);
+    });
+
+    // Check Fill in the Blank questions (10 total)
+    document.querySelectorAll('.fib-input').forEach((input, idx) => {
+      if (!(input as HTMLInputElement).value.trim()) unansweredFIB.push(idx + 1);
+    });
+
+    // Check Short Answer questions (10 total)
+    document.querySelectorAll('.sa-input').forEach((textarea, idx) => {
+      if (!(textarea as HTMLTextAreaElement).value.trim()) unansweredSA.push(idx + 1);
+    });
+
+    // Build error message if any unanswered
+    const totalUnanswered = unansweredMCQ.length + unansweredFIB.length + unansweredSA.length;
+    if (totalUnanswered > 0) {
+      let errorMsg = '⚠️ Please answer all questions before submitting.\n\n';
+      if (unansweredMCQ.length > 0) {
+        errorMsg += `📝 Multiple Choice: Questions ${unansweredMCQ.slice(0, 5).join(', ')}${unansweredMCQ.length > 5 ? ` and ${unansweredMCQ.length - 5} more` : ''}\n`;
+      }
+      if (unansweredFIB.length > 0) {
+        errorMsg += `✏️ Fill in the Blank: Questions ${unansweredFIB.join(', ')}\n`;
+      }
+      if (unansweredSA.length > 0) {
+        errorMsg += `📄 Short Answer: Questions ${unansweredSA.join(', ')}\n`;
+      }
+      alert(errorMsg);
+      return;
+    }
+
     if (confirm('Are you sure you want to submit your exam? You cannot change answers after submitting.')) {
       // Show loading state
       const submitBtn = document.getElementById('submitExam') as HTMLButtonElement;
@@ -15126,7 +15258,7 @@ function showExamResults(root: HTMLElement, attempt: ExamAttempt, detailedResult
 // CERTIFICATE GENERATION (Canvas API)
 // ============================================================================
 
-function generateCertificatePDF(userName: string, score: number, dateStr: string) {
+async function generateCertificatePDF(userName: string, score: number, dateStr: string) {
   const canvas = document.createElement('canvas');
   canvas.width = 1056;  // 11" at 96dpi (landscape)
   canvas.height = 816;  // 8.5" at 96dpi
@@ -15158,74 +15290,94 @@ function generateCertificatePDF(userName: string, score: number, dateStr: string
   ctx.fillStyle = '#1a1a2e';
   ctx.font = 'bold 42px Georgia, serif';
   ctx.textAlign = 'center';
-  ctx.fillText('CERTIFICATE OF COMPLETION', canvas.width / 2, 120);
+  ctx.fillText('CERTIFICATE OF COMPLETION', canvas.width / 2, 100);
 
-  // Trophy icon (text-based)
-  ctx.font = '60px Arial';
-  ctx.fillText('🏆', canvas.width / 2, 200);
-
-  // Company name
-  ctx.fillStyle = '#D90429';
-  ctx.font = 'bold 48px Arial, sans-serif';
-  ctx.fillText('ROOF E.R.', canvas.width / 2, 280);
+  // Load and draw shield logo (replaces ROOF E.R. text and trophy)
+  try {
+    const logo = new Image();
+    logo.crossOrigin = 'anonymous';
+    await new Promise<void>((resolve, reject) => {
+      logo.onload = () => resolve();
+      logo.onerror = () => reject(new Error('Failed to load logo'));
+      logo.src = '/assets/logo-shield.png';
+    });
+    // Draw logo centered, height ~150px maintaining aspect ratio
+    const logoHeight = 150;
+    const logoWidth = (logo.width / logo.height) * logoHeight;
+    ctx.drawImage(logo, (canvas.width - logoWidth) / 2, 120, logoWidth, logoHeight);
+  } catch (e) {
+    // Fallback to text if logo fails to load
+    ctx.font = '60px Arial';
+    ctx.fillText('🏆', canvas.width / 2, 180);
+    ctx.fillStyle = '#D90429';
+    ctx.font = 'bold 48px Arial, sans-serif';
+    ctx.fillText('ROOF E.R.', canvas.width / 2, 250);
+  }
 
   // "This certifies that"
   ctx.fillStyle = '#1a1a2e';
   ctx.font = '22px Georgia, serif';
-  ctx.fillText('This certifies that', canvas.width / 2, 340);
+  ctx.fillText('This certifies that', canvas.width / 2, 310);
 
   // User name
   ctx.font = 'bold 44px Georgia, serif';
-  ctx.fillText(userName, canvas.width / 2, 400);
+  ctx.fillText(userName, canvas.width / 2, 370);
 
   // Line under name
   ctx.strokeStyle = '#D90429';
   ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.moveTo(250, 420);
-  ctx.lineTo(canvas.width - 250, 420);
+  ctx.moveTo(250, 390);
+  ctx.lineTo(canvas.width - 250, 390);
   ctx.stroke();
 
   // Certification text
   ctx.font = '20px Georgia, serif';
   ctx.fillStyle = '#1a1a2e';
-  ctx.fillText('has successfully completed the', canvas.width / 2, 470);
+  ctx.fillText('has successfully completed the', canvas.width / 2, 440);
 
   ctx.font = 'bold 26px Georgia, serif';
-  ctx.fillText('Roof E.R. Sales Representative Training Program', canvas.width / 2, 510);
+  ctx.fillText('Roof E.R. Sales Representative Training Program', canvas.width / 2, 480);
 
   ctx.font = '20px Georgia, serif';
-  ctx.fillText('and is hereby certified as a', canvas.width / 2, 550);
+  ctx.fillText('and is hereby certified as a', canvas.width / 2, 520);
 
   // Certification title
   ctx.fillStyle = '#D90429';
   ctx.font = 'bold 32px Georgia, serif';
-  ctx.fillText('Certified Sales Representative', canvas.width / 2, 595);
+  ctx.fillText('Certified Sales Representative', canvas.width / 2, 565);
 
   // Score and date
   ctx.fillStyle = '#666666';
   ctx.font = '16px Arial, sans-serif';
-  ctx.fillText(`Score: ${score}%  |  Date: ${formatExamDate(dateStr)}`, canvas.width / 2, 650);
+  ctx.fillText(`Score: ${score}%  |  Date: ${formatExamDate(dateStr)}`, canvas.width / 2, 620);
 
-  // Signature lines
+  // Signature lines - now 3 signatures
   ctx.fillStyle = '#1a1a2e';
   ctx.font = '14px Arial, sans-serif';
-
-  // Left signature
   ctx.strokeStyle = '#333';
   ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(180, 730);
-  ctx.lineTo(380, 730);
-  ctx.stroke();
-  ctx.fillText('Oliver Brown, CEO', 280, 755);
 
-  // Right signature
+  // Left signature - Oliver Brown
   ctx.beginPath();
-  ctx.moveTo(canvas.width - 380, 730);
-  ctx.lineTo(canvas.width - 180, 730);
+  ctx.moveTo(120, 730);
+  ctx.lineTo(300, 730);
   ctx.stroke();
-  ctx.fillText('Reese Samala, Director of Sales', canvas.width - 280, 755);
+  ctx.fillText('Oliver Brown, CEO', 210, 755);
+
+  // Center signature - Ford Barsi
+  ctx.beginPath();
+  ctx.moveTo(canvas.width / 2 - 90, 730);
+  ctx.lineTo(canvas.width / 2 + 90, 730);
+  ctx.stroke();
+  ctx.fillText('Ford Barsi, General Manager', canvas.width / 2, 755);
+
+  // Right signature - Reese Samala
+  ctx.beginPath();
+  ctx.moveTo(canvas.width - 300, 730);
+  ctx.lineTo(canvas.width - 120, 730);
+  ctx.stroke();
+  ctx.fillText('Reese Samala, Director of Sales', canvas.width - 210, 755);
 
   // Download
   const link = document.createElement('a');
