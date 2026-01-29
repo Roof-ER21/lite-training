@@ -6570,8 +6570,8 @@ function checkDocSequence() {
     }
   });
 
-  if (!allAssigned || currentOrder.length < 7) {
-    showSeqFeedback('Assign all 7 steps first! Click each item to number it.', false);
+  if (!allAssigned || currentOrder.length < 5) {
+    showSeqFeedback('Assign all 5 steps first! Click each item to number it.', false);
     return;
   }
 
@@ -6587,7 +6587,7 @@ function checkDocSequence() {
     }
   });
 
-  // Actually check if the DOM order has items in 1-7 sequence top to bottom
+  // Actually check if the DOM order has items in 1-5 sequence top to bottom
   const orderedItems = Array.from(items);
   let isCorrectSequence = true;
   orderedItems.forEach((item, index) => {
