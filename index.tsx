@@ -271,7 +271,58 @@ async function login(name: string, managerCode?: string): Promise<{ success: boo
   }
 
   saveSession(result.userId, result.name, result.isManager, result.token);
+
+  // Sync progress from server after login
+  await syncProgressFromServer();
+
   return { success: true };
+}
+
+// Sync progress from server to localStorage
+async function syncProgressFromServer(): Promise<void> {
+  try {
+    const progress = await apiCall<{
+      modules: Array<{ name: string; status: string; completedAt?: string }>;
+      gamification?: { totalXP: number; currentStreak: number };
+      commitmentSigned?: boolean;
+    }>('/progress', { silent: true } as any);
+
+    if (!progress) return; // Server unavailable, use local data
+
+    // Sync unlocked/completed modules
+    const unlockedModules: string[] = ['welcome', 'commitment']; // Always unlocked
+    const completedModules: string[] = [];
+
+    for (const mod of progress.modules) {
+      if (mod.status === 'unlocked' || mod.status === 'in_progress' || mod.status === 'completed') {
+        if (!unlockedModules.includes(mod.name)) {
+          unlockedModules.push(mod.name);
+        }
+      }
+      if (mod.status === 'completed') {
+        completedModules.push(mod.name);
+      }
+    }
+
+    // Save to localStorage
+    localStorage.setItem(STORAGE_KEYS.unlockedModules, JSON.stringify(unlockedModules));
+    localStorage.setItem('roof-er.completedModules', JSON.stringify(completedModules));
+
+    // Sync gamification
+    if (progress.gamification) {
+      localStorage.setItem('roof-er.totalXp', progress.gamification.totalXP.toString());
+      localStorage.setItem('roof-er.streak', progress.gamification.currentStreak.toString());
+    }
+
+    // Sync commitment status
+    if (progress.commitmentSigned) {
+      localStorage.setItem(STORAGE_KEYS.commitmentSigned, 'true');
+    }
+
+    console.log('Progress synced from server:', { unlockedModules, completedModules });
+  } catch (error) {
+    console.warn('Failed to sync progress from server:', error);
+  }
 }
 
 // Logout function
@@ -512,20 +563,22 @@ interface ModuleRequirements {
 }
 
 const MODULE_REQUIREMENTS: Record<string, ModuleRequirements> = {
+  // Simple modules - just need to scroll through content
   'welcome': { needsScroll: true },
   'commitment': { needsScroll: true },
-  'general-knowledge': { needsQuiz: true, needsScroll: true },
-  'shingle-types-materials': { needsGame: true, needsScroll: true },
-  'initial-pitch': { needsPractice: true, needsScroll: true },
-  'handling-initial-pitch-objections': { needsChallenge: true, needsScroll: true },
-  'damage-identification': { needsChallenge: true, needsScroll: true },
-  'inspection-process': { needsQuiz: true, needsScroll: true },
-  'post-inspection-pitch': { needsRoleplay: true, needsScroll: true },
-  'post-inspection-objections': { needsQuiz: true, needsScroll: true },
-  'filing-claim-closing': { needsQuiz: true, needsScroll: true },
-  'sales-cycle-job-flow': { needsGame: true, needsScroll: true },
-  'role-play': { needsRoleplay: true, needsScroll: true },
-  'final-exam': { needsQuiz: true, needsScroll: true },
+  // Activity-based modules - completing the activity is sufficient (no scroll required)
+  'general-knowledge': { needsQuiz: true },
+  'shingle-types-materials': { needsGame: true },
+  'initial-pitch': { needsPractice: true },
+  'handling-initial-pitch-objections': { needsChallenge: true },
+  'damage-identification': { needsChallenge: true },
+  'inspection-process': { needsQuiz: true },
+  'post-inspection-pitch': { needsRoleplay: true },
+  'post-inspection-objections': { needsQuiz: true },
+  'filing-claim-closing': { needsQuiz: true },
+  'sales-cycle-job-flow': { needsGame: true },
+  'role-play': { needsRoleplay: true },
+  'final-exam': { needsQuiz: true },
 };
 
 // Engagement state per module
@@ -545,6 +598,53 @@ let currentModuleForEngagement: string | null = null;
 let engagementTimeInterval: number | null = null;
 let moduleStartTime: number | null = null;
 let scrollListener: (() => void) | null = null;
+
+// Storage key for persisting activity completions
+const ACTIVITY_STORAGE_KEY = 'roof-er.moduleActivities';
+
+// Save activity completions to localStorage
+function saveActivityCompletions(): void {
+  const activities: Record<string, Partial<ModuleEngagement>> = {};
+  for (const [moduleName, engagement] of Object.entries(moduleEngagement)) {
+    activities[moduleName] = {
+      quizPassed: engagement.quizPassed,
+      gameCompleted: engagement.gameCompleted,
+      practiceCompleted: engagement.practiceCompleted,
+      challengeCompleted: engagement.challengeCompleted,
+      roleplayCompleted: engagement.roleplayCompleted,
+    };
+  }
+  localStorage.setItem(ACTIVITY_STORAGE_KEY, JSON.stringify(activities));
+}
+
+// Load activity completions from localStorage
+function loadActivityCompletions(): void {
+  const stored = localStorage.getItem(ACTIVITY_STORAGE_KEY);
+  if (stored) {
+    try {
+      const activities = JSON.parse(stored);
+      for (const [moduleName, data] of Object.entries(activities)) {
+        if (!moduleEngagement[moduleName]) {
+          moduleEngagement[moduleName] = {
+            scrolledToBottom: false,
+            timeSpent: 0,
+            videoWatched: false,
+            quizPassed: false,
+          };
+        }
+        const engagement = moduleEngagement[moduleName];
+        const activityData = data as Partial<ModuleEngagement>;
+        if (activityData.quizPassed) engagement.quizPassed = true;
+        if (activityData.gameCompleted) engagement.gameCompleted = true;
+        if (activityData.practiceCompleted) engagement.practiceCompleted = true;
+        if (activityData.challengeCompleted) engagement.challengeCompleted = true;
+        if (activityData.roleplayCompleted) engagement.roleplayCompleted = true;
+      }
+    } catch (e) {
+      console.warn('Failed to load activity completions:', e);
+    }
+  }
+}
 
 // Lazy initialization helper for moduleEngagement - ensures module exists before access
 function ensureModuleEngagement(moduleName: string): ModuleEngagement {
@@ -583,7 +683,7 @@ function initModuleEngagement(moduleName: string) {
 
   currentModuleForEngagement = moduleName;
 
-  // Initialize or restore engagement state
+  // Initialize engagement state (fresh start for scroll and time)
   if (!moduleEngagement[moduleName]) {
     moduleEngagement[moduleName] = {
       scrolledToBottom: false,
@@ -591,6 +691,29 @@ function initModuleEngagement(moduleName: string) {
       videoWatched: false,
       quizPassed: false,
     };
+  } else {
+    // Reset scroll and time tracking for this visit, but keep activity completions
+    moduleEngagement[moduleName].scrolledToBottom = false;
+    moduleEngagement[moduleName].timeSpent = 0;
+  }
+
+  // Restore saved activity completions from localStorage for this module
+  const stored = localStorage.getItem(ACTIVITY_STORAGE_KEY);
+  if (stored) {
+    try {
+      const activities = JSON.parse(stored);
+      const savedData = activities[moduleName];
+      if (savedData) {
+        const engagement = moduleEngagement[moduleName];
+        if (savedData.quizPassed) engagement.quizPassed = true;
+        if (savedData.gameCompleted) engagement.gameCompleted = true;
+        if (savedData.practiceCompleted) engagement.practiceCompleted = true;
+        if (savedData.challengeCompleted) engagement.challengeCompleted = true;
+        if (savedData.roleplayCompleted) engagement.roleplayCompleted = true;
+      }
+    } catch (e) {
+      console.warn('Failed to restore activity for module:', moduleName, e);
+    }
   }
 
   // Check if video was already watched (from localStorage)
@@ -705,7 +828,14 @@ function markQuizPassed(moduleName: string) {
   const engagement = ensureModuleEngagement(moduleName);
   engagement.quizPassed = true;
   updateRequirementIndicator(moduleName, 'quiz', true);
+  saveActivityCompletions(); // Persist to localStorage
   checkModuleCompletion(moduleName);
+  // Track to server
+  void apiCall('/progress/activity', {
+    method: 'POST',
+    body: JSON.stringify({ moduleName, activityType: 'quiz', completed: true }),
+    silent: true
+  } as any);
 }
 
 function markGameCompleted(moduleName: string) {
@@ -713,7 +843,8 @@ function markGameCompleted(moduleName: string) {
   engagement.gameCompleted = true;
   checkModuleCompletion(moduleName);
   updateRequirementIndicator(moduleName, 'game', true);
-  // Track to admin
+  saveActivityCompletions(); // Persist to localStorage
+  // Track to server
   void apiCall('/progress/activity', {
     method: 'POST',
     body: JSON.stringify({ moduleName, activityType: 'game', completed: true }),
@@ -726,7 +857,8 @@ function markPracticeCompleted(moduleName: string) {
   engagement.practiceCompleted = true;
   checkModuleCompletion(moduleName);
   updateRequirementIndicator(moduleName, 'practice', true);
-  // Track to admin
+  saveActivityCompletions(); // Persist to localStorage
+  // Track to server
   void apiCall('/progress/activity', {
     method: 'POST',
     body: JSON.stringify({ moduleName, activityType: 'practice', completed: true }),
@@ -739,7 +871,8 @@ function markChallengeCompleted(moduleName: string) {
   engagement.challengeCompleted = true;
   checkModuleCompletion(moduleName);
   updateRequirementIndicator(moduleName, 'challenge', true);
-  // Track to admin
+  saveActivityCompletions(); // Persist to localStorage
+  // Track to server
   void apiCall('/progress/activity', {
     method: 'POST',
     body: JSON.stringify({ moduleName, activityType: 'challenge', completed: true }),
@@ -752,7 +885,8 @@ function markRoleplayCompleted(moduleName: string) {
   engagement.roleplayCompleted = true;
   checkModuleCompletion(moduleName);
   updateRequirementIndicator(moduleName, 'roleplay', true);
-  // Track to admin
+  saveActivityCompletions(); // Persist to localStorage
+  // Track to server
   void apiCall('/progress/activity', {
     method: 'POST',
     body: JSON.stringify({ moduleName, activityType: 'roleplay', completed: true }),
@@ -5521,13 +5655,9 @@ function updatePracticeProgress() {
         countEl.textContent = String(count);
     }
 
-    // Show completion if all practiced
+    // Mark practice complete when all 4 scripts are practiced
+    // checkModuleCompletion() will handle showing the completion button
     if (count === 4) {
-        const completeSection = document.getElementById('module-complete-section');
-        if (completeSection) {
-            completeSection.style.display = 'block';
-        }
-        // Mark practice mode as completed
         markPracticeCompleted('initial-pitch');
     }
 }
@@ -13252,6 +13382,9 @@ function formatModuleName(name: string): string {
 function initializeApp(): void {
   currentUser = getCurrentUser();
 
+  // Load saved activity completions from localStorage
+  loadActivityCompletions();
+
   if (sidebar) {
     sidebar.addEventListener('click', handleNavigation);
   }
@@ -13284,6 +13417,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Validate session with server (if available)
     const isValid = await validateSession();
     if (isValid) {
+      // Sync progress from server (for returning users)
+      await syncProgressFromServer();
       hideLoginScreen();
       initializeApp();
     } else {

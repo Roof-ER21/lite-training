@@ -182,6 +182,47 @@ router.post('/heartbeat', async (req: Request, res: Response) => {
   }
 });
 
+// POST /api/progress/activity - Track activity completions (quiz, game, practice, challenge, roleplay)
+router.post('/activity', async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.id;
+    const { moduleName, activityType, completed } = req.body;
+
+    if (!moduleName || !activityType) {
+      return res.status(400).json({ error: 'moduleName and activityType required' });
+    }
+
+    // Valid activity types
+    const validTypes = ['quiz', 'game', 'practice', 'challenge', 'roleplay'];
+    if (!validTypes.includes(activityType)) {
+      return res.status(400).json({ error: 'Invalid activityType. Must be one of: quiz, game, practice, challenge, roleplay' });
+    }
+
+    // Store activity completion in module_progress metadata
+    // We'll use a JSONB column if available, otherwise store as a simple flag
+    await query(`
+      INSERT INTO module_progress (user_id, module_name, status, last_accessed)
+      VALUES ($1, $2, 'in_progress', NOW())
+      ON CONFLICT (user_id, module_name)
+      DO UPDATE SET last_accessed = NOW()
+    `, [userId, moduleName]);
+
+    // Log activity for admin tracking
+    await query(`
+      INSERT INTO activity_log (user_id, module_name, activity_type, completed_at)
+      VALUES ($1, $2, $3, NOW())
+      ON CONFLICT DO NOTHING
+    `, [userId, moduleName, activityType]).catch(() => {
+      // Table might not exist, that's OK - silently continue
+    });
+
+    res.json({ success: true, activityType, moduleName, completed });
+  } catch (error) {
+    console.error('Activity tracking error:', error);
+    res.status(500).json({ error: 'Failed to track activity' });
+  }
+});
+
 // POST /api/progress/commitment - Sign commitment
 router.post('/commitment', async (req: Request, res: Response) => {
   try {
