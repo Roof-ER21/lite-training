@@ -4,11 +4,7 @@ node_modules
 .env.local
 .DS_Store
 .tmp
-src
-server
-public
-*.ts
-*.tsx
-vite.config.ts
-tsconfig.json
-dist/assets/training/videos
+dist
+dist-server
+dist-ssr
+public/assets/training/videos
