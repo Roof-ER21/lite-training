@@ -304,8 +304,12 @@ async function syncProgressFromServer(): Promise<void> {
       }
     }
 
-    // Save to localStorage
-    localStorage.setItem(STORAGE_KEYS.unlockedModules, JSON.stringify(unlockedModules));
+    // Merge server + local unlocked modules (never lose local progress)
+    const localUnlocked = getUnlockedModules();
+    const mergedUnlocked = Array.from(new Set([...unlockedModules, ...localUnlocked]));
+
+    // Save merged state to localStorage
+    localStorage.setItem(STORAGE_KEYS.unlockedModules, JSON.stringify(mergedUnlocked));
     localStorage.setItem('roof-er.completedModules', JSON.stringify(completedModules));
 
     // Sync gamification
@@ -319,7 +323,10 @@ async function syncProgressFromServer(): Promise<void> {
       localStorage.setItem(STORAGE_KEYS.commitmentSigned, 'true');
     }
 
-    console.log('Progress synced from server:', { unlockedModules, completedModules });
+    // Refresh sidebar to reflect merged state
+    updateSidebarLocks();
+
+    console.log('Progress synced from server:', { serverUnlocked: unlockedModules, localUnlocked, mergedUnlocked, completedModules });
   } catch (error) {
     console.warn('Failed to sync progress from server:', error);
   }
@@ -987,12 +994,21 @@ function unlockNextModule(currentModule: string) {
       localStorage.setItem(STORAGE_KEYS.unlockedModules, JSON.stringify(unlocked));
       updateSidebarLocks();
 
-      // Update database with unlocked module
-      void apiCall('/progress/module', {
+      // Update database with unlocked module (server also auto-unlocks on complete, this is a backup)
+      apiCall('/progress/module', {
         method: 'POST',
         body: JSON.stringify({ moduleName: nextModule, action: 'unlock' }),
         silent: true
-      } as any).catch(() => { /* Silent fail for offline mode */ });
+      } as any).then((response: any) => {
+        // Sync with server's authoritative unlocked list
+        if (response?.unlockedModules) {
+          const serverUnlocked = response.unlockedModules;
+          const localUnlocked = getUnlockedModules();
+          const merged = Array.from(new Set([...localUnlocked, ...serverUnlocked]));
+          localStorage.setItem(STORAGE_KEYS.unlockedModules, JSON.stringify(merged));
+          updateSidebarLocks();
+        }
+      }).catch(() => { /* Offline mode - localStorage already updated */ });
     }
   }
 }
@@ -11259,12 +11275,21 @@ function completeModule(moduleName: string) {
     }
   }
 
-  // Track module completion via API (silent - don't spam console, handle offline gracefully)
-  void apiCall('/progress/module', {
+  // Track module completion via API - server also auto-unlocks the next module
+  apiCall('/progress/module', {
     method: 'POST',
     body: JSON.stringify({ moduleName, action: 'complete' }),
     silent: true
-  } as any).catch(() => { /* Silent fail for offline mode */ });
+  } as any).then((response: any) => {
+    // Sync with server's authoritative unlocked list
+    if (response?.unlockedModules) {
+      const serverUnlocked = response.unlockedModules;
+      const localUnlocked = getUnlockedModules();
+      const merged = Array.from(new Set([...localUnlocked, ...serverUnlocked]));
+      localStorage.setItem(STORAGE_KEYS.unlockedModules, JSON.stringify(merged));
+      updateSidebarLocks();
+    }
+  }).catch(() => { /* Offline mode - localStorage already updated */ });
 
   // Trigger confetti celebration
   triggerConfetti('module');
@@ -11384,6 +11409,8 @@ function navigateToModule(moduleName: string) {
     // Scroll to top of content
     const mainContent = document.getElementById('main-content');
     if (mainContent) mainContent.scrollTop = 0;
+    // Refresh sidebar lock states to reflect any recent unlocks
+    updateSidebarLocks();
   }
 }
 

@@ -104,6 +104,14 @@ router.get('/', async (req: Request, res: Response) => {
   }
 });
 
+// Module order - must match MODULE_ORDER in frontend index.tsx
+const MODULE_ORDER = [
+  'welcome', 'commitment', 'general-knowledge', 'shingle-types-materials',
+  'initial-pitch', 'handling-initial-pitch-objections', 'damage-identification',
+  'inspection-process', 'post-inspection-pitch', 'post-inspection-objections',
+  'filing-claim-closing', 'sales-cycle-job-flow', 'role-play', 'final-exam'
+];
+
 // POST /api/progress/module - Update module progress
 router.post('/module', async (req: Request, res: Response) => {
   try {
@@ -121,11 +129,12 @@ router.post('/module', async (req: Request, res: Response) => {
         VALUES ($1, $2, $3, NOW(), NOW())
         ON CONFLICT (user_id, module_name)
         DO UPDATE SET
-          status = CASE WHEN module_progress.status = 'locked' THEN $3 ELSE module_progress.status END,
+          status = CASE WHEN module_progress.status IN ('locked') THEN $3 ELSE module_progress.status END,
           started_at = COALESCE(module_progress.started_at, NOW()),
           last_accessed = NOW()
       `, [userId, moduleName, action === 'start' ? 'in_progress' : 'unlocked']);
     } else if (action === 'complete') {
+      // Mark current module as completed
       await query(`
         INSERT INTO module_progress (user_id, module_name, status, completed_at, last_accessed)
         VALUES ($1, $2, 'completed', NOW(), NOW())
@@ -135,6 +144,21 @@ router.post('/module', async (req: Request, res: Response) => {
           completed_at = COALESCE(module_progress.completed_at, NOW()),
           last_accessed = NOW()
       `, [userId, moduleName]);
+
+      // Auto-unlock the next module in sequence (server-side guarantee)
+      const currentIndex = MODULE_ORDER.indexOf(moduleName);
+      if (currentIndex >= 0 && currentIndex < MODULE_ORDER.length - 1) {
+        const nextModule = MODULE_ORDER[currentIndex + 1];
+        await query(`
+          INSERT INTO module_progress (user_id, module_name, status, last_accessed)
+          VALUES ($1, $2, 'unlocked', NOW())
+          ON CONFLICT (user_id, module_name)
+          DO UPDATE SET
+            status = CASE WHEN module_progress.status = 'locked' THEN 'unlocked' ELSE module_progress.status END,
+            last_accessed = NOW()
+        `, [userId, nextModule]);
+        console.log(`Auto-unlocked next module '${nextModule}' for user ${userId} after completing '${moduleName}'`);
+      }
     } else if (action === 'update' && typeof timeSpent === 'number') {
       await query(`
         UPDATE module_progress
