@@ -124,6 +124,16 @@ CREATE TABLE IF NOT EXISTS user_gamification (
     unlocked_difficulties TEXT[] DEFAULT '{}'
 );
 
+-- Activity log for tracking quiz/game/practice/challenge/roleplay completions
+CREATE TABLE IF NOT EXISTS activity_log (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    module_name VARCHAR(50) NOT NULL,
+    activity_type VARCHAR(20) NOT NULL,
+    completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, module_name, activity_type)
+);
+
 -- Create indexes for performance
 CREATE INDEX IF NOT EXISTS idx_users_name ON users(name);
 CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token);
@@ -133,3 +143,4 @@ CREATE INDEX IF NOT EXISTS idx_exam_attempts_user ON exam_attempts(user_id);
 CREATE INDEX IF NOT EXISTS idx_exam_answers_attempt ON exam_answers(attempt_id);
 CREATE INDEX IF NOT EXISTS idx_roleplay_sessions_user ON roleplay_sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_login_history_user ON login_history(user_id);
+CREATE INDEX IF NOT EXISTS idx_activity_log_user ON activity_log(user_id);

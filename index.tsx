@@ -6791,8 +6791,8 @@ function checkGameComplete() {
     if (completeSection) completeSection.style.display = 'block';
     if (moduleComplete) moduleComplete.style.display = 'block';
 
-    // Mark quiz as passed
-    markQuizPassed('damage-identification');
+    // Mark challenge as completed (Module 7 requires needsChallenge, not needsQuiz)
+    markChallengeCompleted('damage-identification');
   }
 }
 
@@ -8678,8 +8678,8 @@ function completeQuiz(quizState) {
     quizCompleteMsg.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  // Mark quiz as passed in engagement state
-  markQuizPassed('damage-identification');
+  // Mark challenge as completed in engagement state (Module 7 requires needsChallenge)
+  markChallengeCompleted('damage-identification');
 
   // Mark the damage identification module as complete
   completeModule('damage-identification');
