@@ -12902,13 +12902,13 @@ async function showUserDetail(userId: string): Promise<void> {
   // Add individual module unlock handlers
   body.querySelectorAll('.btn-unlock-module').forEach(btn => {
     btn.addEventListener('click', async (e) => {
-      const button = e.target as HTMLElement;
-      const userId = button.dataset.userId;
+      const button = (e.currentTarget || btn) as HTMLButtonElement;
+      const moduleUserId = button.dataset.userId;
       const moduleName = button.dataset.module;
-      if (!userId || !moduleName) return;
+      if (!moduleUserId || !moduleName) return;
 
       try {
-        const response = await fetch(`/api/admin/users/${userId}/unlock-module`, {
+        const response = await fetch(`/api/admin/users/${moduleUserId}/unlock-module`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -12919,7 +12919,7 @@ async function showUserDetail(userId: string): Promise<void> {
         if (response.ok) {
           button.innerHTML = '✓';
           button.classList.add('unlocked');
-          (button as HTMLButtonElement).disabled = true;
+          button.disabled = true;
         } else {
           const error = await response.json();
           alert('Failed to unlock: ' + (error.error || 'Unknown error'));
@@ -12934,7 +12934,7 @@ async function showUserDetail(userId: string): Promise<void> {
   // Add View Answers handlers
   body.querySelectorAll('.btn-view-answers').forEach(btn => {
     btn.addEventListener('click', async (e) => {
-      const button = e.target as HTMLElement;
+      const button = (e.currentTarget || btn) as HTMLElement;
       const attemptId = button.dataset.attemptId;
       const userId = button.dataset.userId;
       if (attemptId && userId) {
