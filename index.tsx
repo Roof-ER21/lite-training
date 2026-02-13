@@ -306,11 +306,25 @@ async function syncProgressFromServer(): Promise<void> {
 
     // Merge server + local unlocked modules (never lose local progress)
     const localUnlocked = getUnlockedModules();
+    const localCompleted = JSON.parse(localStorage.getItem('roof-er.completedModules') || '[]');
+    const allCompleted = Array.from(new Set([...completedModules, ...localCompleted]));
     const mergedUnlocked = Array.from(new Set([...unlockedModules, ...localUnlocked]));
+
+    // Defensive: ensure completed modules always have their next module unlocked
+    for (const completed of allCompleted) {
+      const idx = MODULE_ORDER.indexOf(completed);
+      if (idx >= 0 && idx < MODULE_ORDER.length - 1) {
+        const next = MODULE_ORDER[idx + 1];
+        if (!mergedUnlocked.includes(next)) {
+          mergedUnlocked.push(next);
+          console.log(`Defensive unlock: ${next} (after completed ${completed})`);
+        }
+      }
+    }
 
     // Save merged state to localStorage
     localStorage.setItem(STORAGE_KEYS.unlockedModules, JSON.stringify(mergedUnlocked));
-    localStorage.setItem('roof-er.completedModules', JSON.stringify(completedModules));
+    localStorage.setItem('roof-er.completedModules', JSON.stringify(allCompleted));
 
     // Sync gamification
     if (progress.gamification) {
@@ -627,6 +641,7 @@ function saveActivityCompletions(): void {
 // Load activity completions from localStorage
 function loadActivityCompletions(): void {
   const stored = localStorage.getItem(ACTIVITY_STORAGE_KEY);
+  let needsSave = false;
   if (stored) {
     try {
       const activities = JSON.parse(stored);
@@ -646,10 +661,40 @@ function loadActivityCompletions(): void {
         if (activityData.practiceCompleted) engagement.practiceCompleted = true;
         if (activityData.challengeCompleted) engagement.challengeCompleted = true;
         if (activityData.roleplayCompleted) engagement.roleplayCompleted = true;
+
+        // State migration: if quizPassed is true for a module that needs challenge/game/practice,
+        // copy the flag to the correct field (fixes stale data from old markQuizPassed calls)
+        const requirements = MODULE_REQUIREMENTS[moduleName];
+        if (requirements && engagement.quizPassed) {
+          if (requirements.needsChallenge && !engagement.challengeCompleted) {
+            engagement.challengeCompleted = true;
+            needsSave = true;
+            console.log(`Migrated quizPassed→challengeCompleted for ${moduleName}`);
+          }
+          if (requirements.needsGame && !engagement.gameCompleted) {
+            engagement.gameCompleted = true;
+            needsSave = true;
+            console.log(`Migrated quizPassed→gameCompleted for ${moduleName}`);
+          }
+          if (requirements.needsPractice && !engagement.practiceCompleted) {
+            engagement.practiceCompleted = true;
+            needsSave = true;
+            console.log(`Migrated quizPassed→practiceCompleted for ${moduleName}`);
+          }
+          if (requirements.needsRoleplay && !engagement.roleplayCompleted) {
+            engagement.roleplayCompleted = true;
+            needsSave = true;
+            console.log(`Migrated quizPassed→roleplayCompleted for ${moduleName}`);
+          }
+        }
       }
     } catch (e) {
       console.warn('Failed to load activity completions:', e);
     }
+  }
+  // Persist migrated state
+  if (needsSave) {
+    saveActivityCompletions();
   }
 }
 
@@ -5662,7 +5707,9 @@ const practicePrompts = [
 ];
 
 let currentPromptIndex = 0;
-const practicedScripts = new Set<string>();
+const practicedScripts = new Set<string>(
+  JSON.parse(localStorage.getItem('roof-er.practicedScripts') || '[]')
+);
 
 function togglePracticeMode() {
     const practiceDiv = document.getElementById('practice-mode');
@@ -5732,6 +5779,7 @@ function updatePrompt() {
 
 function markPracticed(scriptId: string) {
     practicedScripts.add(scriptId);
+    localStorage.setItem('roof-er.practicedScripts', JSON.stringify([...practicedScripts]));
     updatePracticeProgress();
 
     // Update button
@@ -6522,6 +6570,9 @@ function completeLivePitchPractice() {
   if (practiceEl) practiceEl.style.display = 'none';
   if (completeEl) completeEl.style.display = 'block';
   if (moduleComplete) moduleComplete.style.display = 'block';
+
+  // Mark roleplay as completed so checkModuleCompletion sees it
+  markRoleplayCompleted('post-inspection-pitch');
 
   // Stop any ongoing speech
   if (speechRecognition) speechRecognition.stop();
@@ -10985,6 +11036,16 @@ async function renderModule(moduleName: string) {
       case 'shingle-types-materials':
           initShingleGame();
           break;
+      case 'initial-pitch':
+          // Restore practiced scripts UI from localStorage
+          practicedScripts.forEach(scriptId => {
+            const btn = document.querySelector(`[data-script-id="${scriptId}"] .practice-btn`);
+            if (btn) { btn.textContent = '✓ Practiced!'; btn.classList.add('practiced'); }
+            const progressItem = document.querySelector(`.progress-item[data-script="${scriptId}"]`);
+            if (progressItem) { progressItem.classList.add('completed'); const icon = progressItem.querySelector('.progress-icon'); if (icon) icon.textContent = '✅'; }
+          });
+          updatePracticeProgress();
+          break;
   }
 }
 
@@ -13503,8 +13564,27 @@ function formatModuleName(name: string): string {
 function initializeApp(): void {
   currentUser = getCurrentUser();
 
-  // Load saved activity completions from localStorage
+  // Load saved activity completions from localStorage (includes state migration)
   loadActivityCompletions();
+
+  // Defensive: ensure completed modules always have next module unlocked
+  const completedMods = JSON.parse(localStorage.getItem('roof-er.completedModules') || '[]');
+  const currentUnlocked = getUnlockedModules();
+  let unlockFixed = false;
+  for (const completed of completedMods) {
+    const idx = MODULE_ORDER.indexOf(completed);
+    if (idx >= 0 && idx < MODULE_ORDER.length - 1) {
+      const next = MODULE_ORDER[idx + 1];
+      if (!currentUnlocked.includes(next)) {
+        currentUnlocked.push(next);
+        unlockFixed = true;
+        console.log(`Startup defensive unlock: ${next} (after completed ${completed})`);
+      }
+    }
+  }
+  if (unlockFixed) {
+    localStorage.setItem(STORAGE_KEYS.unlockedModules, JSON.stringify(currentUnlocked));
+  }
 
   if (sidebar) {
     sidebar.addEventListener('click', handleNavigation);
