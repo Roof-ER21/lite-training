@@ -856,7 +856,7 @@ function stopEngagementTracking() {
 }
 
 // Update a requirement indicator
-function updateRequirementIndicator(moduleName: string, type: 'scroll' | 'video' | 'quiz' | 'time', complete: boolean) {
+function updateRequirementIndicator(moduleName: string, type: 'scroll' | 'video' | 'quiz' | 'time' | 'game' | 'challenge' | 'practice' | 'roleplay', complete: boolean) {
   const elementId = `req-${type}`;
   const el = document.getElementById(elementId);
   if (el) {
@@ -1011,6 +1011,10 @@ function checkModuleCompletion(moduleName: string) {
 // Expose engagement functions globally for use in onclick handlers
 (window as any).markVideoWatched = markVideoWatched;
 (window as any).markQuizPassed = markQuizPassed;
+(window as any).markGameCompleted = markGameCompleted;
+(window as any).markChallengeCompleted = markChallengeCompleted;
+(window as any).markPracticeCompleted = markPracticeCompleted;
+(window as any).markRoleplayCompleted = markRoleplayCompleted;
 
 // Check if manager mode is active (either via old toggle or new login system)
 function isManagerMode(): boolean {
