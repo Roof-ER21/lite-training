@@ -9484,6 +9484,10 @@ async function endAgnesSession(saveSession: boolean = true) {
 
     // Show success modal
     showAgnesSessionComplete(xpEarned, xpResult, streakResult);
+  } else if (saveSession && agnesLiveState.currentScore === null) {
+    // Score never arrived (timeout) - still mark roleplay as completed
+    markRoleplayCompleted('role-play');
+    completeModule('role-play');
   } else if (!saveSession) {
     // Track door slam or aborted session in API (with error handling)
     try {
@@ -10355,6 +10359,9 @@ Response (plain text only, no JSON):`;
     showScreen('session-summary');
     const summaryContainer = document.getElementById('session-summary');
     if (!summaryContainer) return;
+
+    // Mark roleplay as completed so the module completion button appears
+    markRoleplayCompleted('role-play');
 
     const scores = sessionState.scores.map(s => s.score);
     const avgScore = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
