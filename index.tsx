@@ -484,16 +484,16 @@ const FINAL_EXAM_MCQ: MCQQuestion[] = [
 
 const FINAL_EXAM_FIB: FIBQuestion[] = [
   // Hail damage presentation
-  { id: 'fib-1', module: 7, question: 'When presenting a hail damage photo to your customer, you should say: "This is exactly what I was looking for. As you can see, it is _____."', acceptableAnswers: ['round', 'Round', 'ROUND'], explanation: 'Hail damage appears as round circular divots on asphalt shingles.' },
+  { id: 'fib-1', module: 7, question: 'When presenting a hail damage photo to your customer, you should say: "This is exactly what I was looking for. As you can see, it is _____."', acceptableAnswers: ['round', 'circular', 'round damage', 'round shaped'], explanation: 'Hail damage appears as round circular divots on asphalt shingles.' },
 
   // Non-negotiable #2
   { id: 'fib-2', module: 5, question: 'Non-negotiable number two states who we are and what we _____.', acceptableAnswers: ['do', 'Do', 'DO'], explanation: 'Non-negotiable #2 covers who we are (Roof ER) and what we do (handle insurance claims and roofing).' },
 
   // Non-negotiable #5 - going for the close
-  { id: 'fib-3', module: 5, question: 'Non-negotiable number five is going for the close. That means you want to secure the _____.', acceptableAnswers: ['inspection', 'Inspection', 'INSPECTION'], explanation: 'Going for the close means securing the inspection appointment.' },
+  { id: 'fib-3', module: 5, question: 'Non-negotiable number five is going for the close. That means you want to secure the _____.', acceptableAnswers: ['inspection', 'inspection appointment', 'appointment', 'the inspection'], explanation: 'Going for the close means securing the inspection appointment.' },
 
   // Talk to spouse objection
-  { id: 'fib-4', module: 6, question: 'If the objection you get at the door is that they need to talk to their spouse, you should let them know that you understand and ask them "_____ are they available?"', acceptableAnswers: ['when', 'When', 'WHEN'], explanation: 'Ask when the spouse will be available so you can schedule a follow-up.' },
+  { id: 'fib-4', module: 6, question: 'If the objection you get at the door is that they need to talk to their spouse, you should let them know that you understand and ask them "_____ are they available?"', acceptableAnswers: ['when', 'when are', 'what time'], explanation: 'Ask when the spouse will be available so you can schedule a follow-up.' },
 
   // Company leadership - GM
   { id: 'fib-5', module: 1, question: 'The general manager of Roof ER is _____ _____.', acceptableAnswers: ['Ford Barsi', 'ford barsi', 'FORD BARSI', 'Ford barsi'], explanation: 'Ford Barsi is the General Manager of Roof ER.' },
@@ -508,10 +508,10 @@ const FINAL_EXAM_FIB: FIBQuestion[] = [
   { id: 'fib-8', module: 7, question: 'Examples of _____ damage are missing tabs and creased shingles.', acceptableAnswers: ['wind', 'Wind', 'WIND'], explanation: 'Wind damage is characterized by missing tabs and creased shingles.' },
 
   // Depreciation holdback
-  { id: 'fib-9', module: 11, question: 'The remaining insurance funds that the insurance company holds until we complete the work are called _____.', acceptableAnswers: ['depreciation', 'Depreciation', 'DEPRECIATION', 'depreciation holdback', 'Depreciation Holdback'], explanation: 'The depreciation holdback is released by the insurance company after the work is completed.' },
+  { id: 'fib-9', module: 11, question: 'The remaining insurance funds that the insurance company holds until we complete the work are called _____.', acceptableAnswers: ['depreciation', 'depreciation holdback', 'holdback', 'the depreciation', 'recoverable depreciation'], explanation: 'The depreciation holdback is released by the insurance company after the work is completed.' },
 
   // Assumptive close
-  { id: 'fib-10', module: 11, question: 'The _____ close means acting as if they\'ve already agreed and moving forward.', acceptableAnswers: ['assumptive', 'Assumptive', 'ASSUMPTIVE'], explanation: 'The assumptive close proceeds as if they\'ve already said yes.' }
+  { id: 'fib-10', module: 11, question: 'The _____ close means acting as if they\'ve already agreed and moving forward.', acceptableAnswers: ['assumptive', 'assumptive close', 'assumed'], explanation: 'The assumptive close proceeds as if they\'ve already said yes.' }
 ];
 
 const FINAL_EXAM_SA: SAQuestion[] = [
@@ -5086,8 +5086,8 @@ trainingContent['post-inspection-objections'] = `
 
       <div class="objection-card">
         <h3>4. "I'll just handle this myself"</h3>
-        <p><strong>Response:</strong> "You absolutely can! But here's what most homeowners don't know: Insurance companies hire adjusters whose job is to minimize payouts. We're your advocate - we know what to look for, what codes require, and how to negotiate. Most DIY claims get 30-40% less coverage."</p>
-        <p><strong>Why it works:</strong> Educates on the hidden challenge and value of professional representation.</p>
+        <p><strong>Response:</strong> "You absolutely can! But here's what most homeowners don't know: the insurance process is designed to minimize payouts. As your representative, we know what to look for, what codes require, and how to negotiate on your behalf. Homeowners who go it alone typically get 30-40% less coverage."</p>
+        <p><strong>Why it works:</strong> Educates on the hidden challenge and value of having a professional rep working for you.</p>
         <button class="practice-agnes-btn" data-scenario="m9-scope-walkthrough">🎭 Practice with Agnes</button>
 
         <!-- Inline Practice Container -->
@@ -5113,8 +5113,8 @@ trainingContent['post-inspection-objections'] = `
 
       <div class="objection-card">
         <h3>5. "I've never filed a claim before"</h3>
-        <p><strong>Response:</strong> "Perfect - I'll walk you through every step. It's actually very simple: 1) We call together (3 minutes), 2) Adjuster comes out (I'll be here), 3) Approved, 4) We schedule install. I've done this 500+ times - you're in good hands."</p>
-        <p><strong>Why it works:</strong> Simplifies the unknown and builds confidence.</p>
+        <p><strong>Response:</strong> "Perfect - I'll walk you through every step. It's actually very simple: 1) We call together (3 minutes), 2) Insurance sends someone out and I'll be right here with you, 3) Once approved, we schedule the install. I've done this 500+ times - you're in good hands."</p>
+        <p><strong>Why it works:</strong> Simplifies the unknown and builds confidence with rep right there for them.</p>
         <button class="practice-agnes-btn" data-scenario="m9-first-time-claim">🎭 Practice with Agnes</button>
 
         <!-- Inline Practice Container -->
@@ -5167,7 +5167,7 @@ trainingContent['post-inspection-objections'] = `
 
       <div class="objection-card">
         <h3>7. "I'm going to wait and see if it gets worse"</h3>
-        <p><strong>Response:</strong> "I totally understand. The downside to waiting is the process slows down - adjuster calendars fill up and the clearest documentation is right after the storm. Filing today just starts the claim; you still control the decision after the adjuster report."</p>
+        <p><strong>Response:</strong> "I totally understand. The downside to waiting is the process slows down - schedules fill up and the clearest documentation is right after the storm. Filing today just starts the claim; you still control every decision. No obligation."</p>
         <p><strong>Why it works:</strong> Urgency without pressure and lowers commitment risk.</p>
         <button class="practice-agnes-btn" data-scenario="m9-wait-and-see">🎭 Practice with Agnes</button>
 
@@ -5208,18 +5208,18 @@ trainingContent['post-inspection-objections'] = `
           <p style="color: #374151; font-size: 14px; margin: 0; font-style: italic;">"We're 3 weeks out on scheduling. If we file today, we can get you on the schedule before winter."</p>
         </div>
 
-        <!-- Adjuster Calendar Card -->
+        <!-- Scheduling Card -->
         <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 16px; padding: 20px; border-left: 4px solid #16a34a;">
           <div style="font-size: 32px; margin-bottom: 10px;">📅</div>
-          <h4 style="color: #166534; margin: 0 0 10px 0; font-size: 16px; font-weight: 600;">Adjuster Calendar</h4>
-          <p style="color: #374151; font-size: 14px; margin: 0; font-style: italic;">"If we file today, we can get the adjuster scheduled sooner and avoid the backlog."</p>
+          <h4 style="color: #166534; margin: 0 0 10px 0; font-size: 16px; font-weight: 600;">Scheduling Priority</h4>
+          <p style="color: #374151; font-size: 14px; margin: 0; font-style: italic;">"If we file today, we can get you on the schedule sooner and avoid the backlog."</p>
         </div>
 
         <!-- Documentation Clarity Card -->
         <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 16px; padding: 20px; border-left: 4px solid #f59e0b;">
           <div style="font-size: 32px; margin-bottom: 10px;">📸</div>
           <h4 style="color: #92400e; margin: 0 0 10px 0; font-size: 16px; font-weight: 600;">Documentation Clarity</h4>
-          <p style="color: #374151; font-size: 14px; margin: 0; font-style: italic;">"The closer we are to the storm, the easier it is to document everything clearly for the adjuster."</p>
+          <p style="color: #374151; font-size: 14px; margin: 0; font-style: italic;">"The closer we are to the storm, the easier it is to document everything clearly for the insurance company."</p>
         </div>
 
         <!-- Project Timeline Card -->
@@ -5330,7 +5330,7 @@ trainingContent['sales-cycle-job-flow'] = trainingContent['sales-cycle'] || `
 trainingContent['final-exam'] = `
   <div class="content-card" id="final-exam">
     <h1>🎯 Final Certification Exam</h1>
-    <p class="module-intro">Complete this exam to become a Certified Roof E.R. Sales Representative. You have 3 attempts to score 80% or higher.</p>
+    <p class="module-intro">Complete this exam to become a Certified Roof E.R. Sales Representative. You have 3 attempts to score 70% or higher.</p>
     <div id="exam-area">
       <!-- Dynamically populated by initFinalExam() -->
     </div>
@@ -14480,7 +14480,7 @@ function showExamStartScreen(root: HTMLElement, state: ExamState) {
           <li><strong>10 Fill-in-the-Blank Questions</strong> (2 points each)</li>
           <li><strong>10 Short Answer Questions</strong> (2 points each)</li>
           <li><strong>Total: 110 points</strong></li>
-          <li><strong>Passing Score: 80% (88 points)</strong></li>
+          <li><strong>Passing Score: 70% (77 points)</strong></li>
         </ul>
       </div>
 
@@ -14691,7 +14691,7 @@ function showCertifiedScreen(root: HTMLElement, state: ExamState) {
   `;
 
   document.getElementById('downloadCert')?.addEventListener('click', () => {
-    generateCertificatePDF(state.userName, passingAttempt?.totalScore || 80, state.certificationDate || new Date().toISOString());
+    generateCertificatePDF(state.userName, passingAttempt?.totalScore || 70, state.certificationDate || new Date().toISOString());
   });
 
   document.getElementById('toggleCertReview')?.addEventListener('click', () => {
@@ -14901,14 +14901,17 @@ async function gradeFinalExam(root: HTMLElement) {
     // Calculate Levenshtein distance
     const distance = levenshteinDistance(user, acceptable);
 
-    // Allow 1 typo for short answers, 2 for longer answers
-    const maxDistance = acceptable.length <= 5 ? 1 : 2;
+    // Allow 1 typo for very short answers (<=4 chars), 2 for medium, 3 for longer
+    const maxDistance = acceptable.length <= 4 ? 1 : acceptable.length <= 8 ? 2 : 3;
     if (distance <= maxDistance) return true;
 
     // Check similarity percentage (for longer answers)
     const maxLen = Math.max(user.length, acceptable.length);
     const similarity = 1 - (distance / maxLen);
-    if (similarity >= 0.8) return true;
+    if (similarity >= 0.7) return true;
+
+    // Check if user answer contains the acceptable answer or vice versa
+    if (user.includes(acceptable) || acceptable.includes(user)) return true;
 
     return false;
   }
@@ -14991,10 +14994,19 @@ async function gradeFinalExam(root: HTMLElement) {
       console.log('AI scoring failed, using fallback:', err);
     }
 
-    // Fallback to keyword scoring
+    // Fallback to keyword scoring (generous - partial/stem matching)
     const answerLower = userAnswer.toLowerCase();
-    const keywordsFound = q.keywords.filter(kw => answerLower.includes(kw.toLowerCase()));
-    const scoreRatio = Math.min(keywordsFound.length / q.minKeywords, 1);
+    const answerWords = answerLower.split(/\s+/);
+    const keywordsFound = q.keywords.filter(kw => {
+      const kwLower = kw.toLowerCase();
+      // Exact substring match
+      if (answerLower.includes(kwLower)) return true;
+      // Stem match: keyword root appears in answer or answer word starts with keyword
+      return answerWords.some(word => word.startsWith(kwLower.slice(0, Math.max(4, kwLower.length - 2))) || kwLower.startsWith(word.slice(0, Math.max(4, word.length - 2))));
+    });
+    // Generous curve: 1 keyword = 50%, 2+ = full credit if minKeywords <= 3
+    const effectiveMin = Math.max(q.minKeywords - 1, 1);
+    const scoreRatio = Math.min(keywordsFound.length / effectiveMin, 1);
     return {
       score: scoreRatio * 2,
       percentage: Math.round(scoreRatio * 100),
@@ -15042,7 +15054,7 @@ async function gradeFinalExam(root: HTMLElement) {
   const saScore = Math.round(saPoints); // 20 pts max
   const rawTotal = mcqScore + fibScore + saScore; // Max 110 points
   const totalScore = Math.round((rawTotal / 110) * 100); // Convert to percentage
-  const passed = totalScore >= 80; // 80%
+  const passed = totalScore >= 70; // 70%
 
   // Save attempt
   const state = getExamState();
@@ -15316,7 +15328,7 @@ function showExamResults(root: HTMLElement, attempt: ExamAttempt, detailedResult
       <div class="exam-results failed">
         <div class="result-badge fail">😔</div>
         <h1>Not Quite There</h1>
-        <h2>Score: ${attempt.totalScore}% (Need 80% to pass)</h2>
+        <h2>Score: ${attempt.totalScore}% (Need 70% to pass)</h2>
 
         <div class="score-display">
           <div class="score-circle failed">
