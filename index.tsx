@@ -1065,6 +1065,7 @@ function unlockNextModule(currentModule: string) {
 // Update sidebar to show locked/unlocked states
 function updateSidebarLocks() {
   const unlocked = getUnlockedModules();
+  const completedModules: string[] = JSON.parse(localStorage.getItem('roof-er.completedModules') || '[]');
   const items = sidebar?.querySelectorAll('li[data-module]');
   const currentModuleName = localStorage.getItem(STORAGE_KEYS.currentModule) || '';
 
@@ -1089,12 +1090,16 @@ function updateSidebarLocks() {
         item.classList.add('current');
       }
 
-      // Check if modules after this one are unlocked (simple heuristic for completion)
-      const moduleIndex = MODULE_ORDER.indexOf(moduleName);
-      if (moduleIndex >= 0) {
-        const nextModule = MODULE_ORDER[moduleIndex + 1];
-        if (nextModule && unlocked.includes(nextModule)) {
-          item.classList.add('completed');
+      // Check if module is completed (either explicitly or via next-module heuristic)
+      if (completedModules.includes(moduleName)) {
+        item.classList.add('completed');
+      } else {
+        const moduleIndex = MODULE_ORDER.indexOf(moduleName);
+        if (moduleIndex >= 0) {
+          const nextModule = MODULE_ORDER[moduleIndex + 1];
+          if (nextModule && unlocked.includes(nextModule)) {
+            item.classList.add('completed');
+          }
         }
       }
     } else {
