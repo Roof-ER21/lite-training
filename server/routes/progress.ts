@@ -148,16 +148,24 @@ router.post('/module', async (req: Request, res: Response) => {
       // Auto-unlock the next module in sequence (server-side guarantee)
       const currentIndex = MODULE_ORDER.indexOf(moduleName);
       if (currentIndex >= 0 && currentIndex < MODULE_ORDER.length - 1) {
-        const nextModule = MODULE_ORDER[currentIndex + 1];
-        await query(`
-          INSERT INTO module_progress (user_id, module_name, status, last_accessed)
-          VALUES ($1, $2, 'unlocked', NOW())
-          ON CONFLICT (user_id, module_name)
-          DO UPDATE SET
-            status = CASE WHEN module_progress.status = 'locked' THEN 'unlocked' ELSE module_progress.status END,
-            last_accessed = NOW()
-        `, [userId, nextModule]);
-        console.log(`Auto-unlocked next module '${nextModule}' for user ${userId} after completing '${moduleName}'`);
+        const modulesToUnlock = [MODULE_ORDER[currentIndex + 1]];
+
+        // Completing sales-cycle-job-flow (module 12) unlocks both role-play AND final-exam
+        if (moduleName === 'sales-cycle-job-flow') {
+          modulesToUnlock.push('final-exam');
+        }
+
+        for (const nextModule of modulesToUnlock) {
+          await query(`
+            INSERT INTO module_progress (user_id, module_name, status, last_accessed)
+            VALUES ($1, $2, 'unlocked', NOW())
+            ON CONFLICT (user_id, module_name)
+            DO UPDATE SET
+              status = CASE WHEN module_progress.status = 'locked' THEN 'unlocked' ELSE module_progress.status END,
+              last_accessed = NOW()
+          `, [userId, nextModule]);
+          console.log(`Auto-unlocked module '${nextModule}' for user ${userId} after completing '${moduleName}'`);
+        }
       }
     } else if (action === 'update' && typeof timeSpent === 'number') {
       await query(`

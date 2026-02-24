@@ -1037,27 +1037,43 @@ function unlockNextModule(currentModule: string) {
   const unlocked = getUnlockedModules();
   const currentIndex = MODULE_ORDER.indexOf(currentModule);
   if (currentIndex >= 0 && currentIndex < MODULE_ORDER.length - 1) {
-    const nextModule = MODULE_ORDER[currentIndex + 1];
-    if (!unlocked.includes(nextModule)) {
-      unlocked.push(nextModule);
+    // Determine which modules to unlock
+    const modulesToUnlock: string[] = [MODULE_ORDER[currentIndex + 1]];
+
+    // Completing sales-cycle-job-flow (module 12) unlocks both role-play AND final-exam
+    if (currentModule === 'sales-cycle-job-flow') {
+      modulesToUnlock.push('final-exam');
+    }
+
+    let changed = false;
+    for (const mod of modulesToUnlock) {
+      if (!unlocked.includes(mod)) {
+        unlocked.push(mod);
+        changed = true;
+      }
+    }
+
+    if (changed) {
       localStorage.setItem(STORAGE_KEYS.unlockedModules, JSON.stringify(unlocked));
       updateSidebarLocks();
 
-      // Update database with unlocked module (server also auto-unlocks on complete, this is a backup)
-      apiCall('/progress/module', {
-        method: 'POST',
-        body: JSON.stringify({ moduleName: nextModule, action: 'unlock' }),
-        silent: true
-      } as any).then((response: any) => {
-        // Sync with server's authoritative unlocked list
-        if (response?.unlockedModules) {
-          const serverUnlocked = response.unlockedModules;
-          const localUnlocked = getUnlockedModules();
-          const merged = Array.from(new Set([...localUnlocked, ...serverUnlocked]));
-          localStorage.setItem(STORAGE_KEYS.unlockedModules, JSON.stringify(merged));
-          updateSidebarLocks();
-        }
-      }).catch(() => { /* Offline mode - localStorage already updated */ });
+      // Update database with unlocked modules (server also auto-unlocks on complete, this is a backup)
+      for (const mod of modulesToUnlock) {
+        apiCall('/progress/module', {
+          method: 'POST',
+          body: JSON.stringify({ moduleName: mod, action: 'unlock' }),
+          silent: true
+        } as any).then((response: any) => {
+          // Sync with server's authoritative unlocked list
+          if (response?.unlockedModules) {
+            const serverUnlocked = response.unlockedModules;
+            const localUnlocked = getUnlockedModules();
+            const merged = Array.from(new Set([...localUnlocked, ...serverUnlocked]));
+            localStorage.setItem(STORAGE_KEYS.unlockedModules, JSON.stringify(merged));
+            updateSidebarLocks();
+          }
+        }).catch(() => { /* Offline mode - localStorage already updated */ });
+      }
     }
   }
 }
