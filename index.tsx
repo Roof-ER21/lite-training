@@ -4145,7 +4145,10 @@ const trainingContent = {
           <!-- Challenge 2: Documentation Sequence -->
           <div id="doc-sequence-challenge" class="game-challenge">
             <h3 style="color: #7c3aed; margin: 0 0 16px 0;">📋 Challenge 2: Documentation Sequence</h3>
-            <p style="color: #6b7280; margin-bottom: 12px;">Select the following in the proper order:</p>
+            <p style="color: #6b7280; margin-bottom: 12px;">Put these documentation steps in the order you'd take them during an inspection:</p>
+            <div style="background: #eff6ff; border: 2px solid #3b82f6; border-radius: 12px; padding: 14px 18px; margin-bottom: 16px;">
+              <p style="color: #1e40af; margin: 0; font-weight: 600; font-size: 14px;">💡 HINT: Remember the photo strategy — start from the <strong>ground level</strong> (elevations), then move <strong>up to the roof</strong>, get <strong>close-ups</strong>, then <strong>overview</strong> shots, and finish with <strong>gutter evidence</strong>.</p>
+            </div>
             <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 12px; padding: 14px 18px; margin-bottom: 20px;">
               <p style="color: #92400e; margin: 0; font-weight: 600; display: flex; align-items: center; gap: 8px;">
                 <span style="font-size: 1.3rem;">👆</span>
@@ -6682,6 +6685,7 @@ let assignedNumbers: number[] = [];
 let nextAssignNumber = 1;
 let challenge1Complete = false;
 let challenge2Complete = false;
+let docSequenceAttempts = 0;
 
 function selectMatchItem(element: HTMLElement) {
   // Clear previous selection
@@ -6798,22 +6802,9 @@ function checkDocSequence() {
     return;
   }
 
-  // Check if order matches position
-  let correct = true;
-  items.forEach((item, index) => {
-    const expectedOrder = parseInt(item.getAttribute('data-order') || '0');
-    const numEl = item.querySelector('.seq-number') as HTMLElement;
-    const assignedOrder = parseInt(numEl?.textContent || '0');
-
-    if (assignedOrder !== expectedOrder) {
-      correct = false;
-    }
-  });
-
-  // Actually check if the DOM order has items in 1-5 sequence top to bottom
-  const orderedItems = Array.from(items);
+  // Check if assigned numbers match each item's data-order
   let isCorrectSequence = true;
-  orderedItems.forEach((item, index) => {
+  items.forEach((item) => {
     const numEl = item.querySelector('.seq-number') as HTMLElement;
     const num = parseInt(numEl?.textContent || '0');
     const correctOrder = parseInt(item.getAttribute('data-order') || '0');
@@ -6834,7 +6825,33 @@ function checkDocSequence() {
 
     checkGameComplete();
   } else {
-    showSeqFeedback('Not quite right. Review the sequence and try again!', false);
+    docSequenceAttempts++;
+
+    if (docSequenceAttempts === 1) {
+      showSeqFeedback('Not quite right. Remember: start from the GROUND (elevations), then go UP to the roof. Try again!', false);
+    } else if (docSequenceAttempts === 2) {
+      showSeqFeedback('Close! The order follows your inspection walk: 1) Elevation collateral → 2) Roof collateral → 3) Close-ups → 4) Overview markings → 5) Gutters. One more try!', false);
+    } else {
+      // After 3 failed attempts, show the answer and auto-complete
+      showSeqFeedback('Here\'s the correct order — study it and remember for the field!', true);
+      challenge2Complete = true;
+
+      // Show correct answers on each item
+      items.forEach(item => {
+        const correctNum = item.getAttribute('data-order') || '?';
+        const numEl = item.querySelector('.seq-number') as HTMLElement;
+        if (numEl) {
+          numEl.textContent = correctNum;
+          numEl.style.background = '#22c55e';
+          numEl.style.color = 'white';
+        }
+        (item as HTMLElement).style.background = '#d1fae5';
+        (item as HTMLElement).style.border = '2px solid #22c55e';
+        item.classList.add('placed');
+      });
+
+      checkGameComplete();
+    }
   }
 }
 
@@ -6842,6 +6859,7 @@ function resetDocSequence() {
   nextAssignNumber = 1;
   assignedNumbers = [];
   selectedSeqItem = null;
+  // Keep docSequenceAttempts — don't reset so hints progress
 
   document.querySelectorAll('.seq-item').forEach(item => {
     item.classList.remove('placed');
@@ -6923,6 +6941,7 @@ function initDamageMatchingGame() {
   nextAssignNumber = 1;
   assignedNumbers = [];
   selectedSeqItem = null;
+  docSequenceAttempts = 0;
 
   // Update match count display
   const countEl = document.getElementById('match-count');
