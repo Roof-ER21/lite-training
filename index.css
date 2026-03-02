@@ -20347,3 +20347,129 @@ button:disabled {
   background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
   color: white !important;
 }
+
+/* ============================================================================
+   MOBILE RESPONSIVE FIXES
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  /* Module 10 urgency cards - stack on mobile */
+  .urgency-cards-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  /* Module 10 empathy framework - stack on mobile */
+  .empathy-flow {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+  .empathy-flow > div {
+    border-radius: 12px !important;
+    min-width: unset !important;
+  }
+  /* Hide the arrows between empathy steps on mobile */
+  .empathy-flow > div > div[style*="position: absolute"][style*="right:"] {
+    display: none !important;
+  }
+
+  /* Objection cards grid - already 1 col on mobile, ensure spacing */
+  .objections-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  .objection-card {
+    padding: 16px !important;
+  }
+
+  /* Quiz answer buttons - full width on mobile */
+  .m10-answer-btn {
+    padding: 12px 14px !important;
+    font-size: 13px !important;
+  }
+
+  /* Module complete button - make it sticky at bottom on mobile for visibility */
+  .module-completion-section {
+    position: sticky;
+    bottom: 0;
+    background: var(--light-bg, #fff);
+    z-index: 50;
+    padding: 16px !important;
+    margin-top: 20px !important;
+    border-top: 2px solid #e5e7eb;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Ensure content doesn't overflow on mobile */
+  .content-card {
+    overflow-x: hidden;
+    word-wrap: break-word;
+  }
+
+  /* Practice/inline roleplay containers */
+  .inline-practice-container {
+    margin: 12px 0 !important;
+  }
+  .mini-response-input {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .mini-actions {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+  .mini-actions button {
+    width: 100% !important;
+  }
+
+  /* Practice Agnes buttons on mobile */
+  .practice-agnes-btn {
+    width: 100% !important;
+    padding: 12px 16px !important;
+    font-size: 14px !important;
+  }
+
+  /* Quiz results on mobile */
+  #m10-quiz-results {
+    padding: 24px 16px !important;
+  }
+
+  /* Exam attempt indicator */
+  .exam-attempt-indicator {
+    display: block !important;
+    margin-left: 0 !important;
+    margin-top: 8px !important;
+  }
+
+  /* Sidebar navigation - make scrollable on mobile */
+  #sidebar .module-list {
+    max-height: 40vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Small phones (iPhone SE, etc) */
+@media (max-width: 480px) {
+  #main-content {
+    padding: 12px !important;
+  }
+
+  .content-card h1 {
+    font-size: 22px !important;
+  }
+  .content-card h2 {
+    font-size: 18px !important;
+  }
+
+  .complete-module-btn {
+    padding: 14px 20px !important;
+    font-size: 15px !important;
+    width: 100% !important;
+  }
+
+  /* Quiz container compact on small phones */
+  #m10-quiz-container {
+    padding: 16px !important;
+  }
+}

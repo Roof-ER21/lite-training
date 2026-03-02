@@ -283,6 +283,10 @@ async function syncProgressFromServer(): Promise<void> {
   try {
     const progress = await apiCall<{
       modules: Array<{ name: string; status: string; completedAt?: string }>;
+      examAttempts: Array<{ id: string; attemptNumber: number; completedAt?: string; mcqScore: number; fibScore: number; saScore: number; totalScore: number; passed: boolean }>;
+      isCertified: boolean;
+      certificationDate?: string;
+      certificationScore?: number;
       gamification?: { totalXP: number; currentStreak: number };
       commitmentSigned?: boolean;
     }>('/progress', { silent: true } as any);
@@ -326,6 +330,35 @@ async function syncProgressFromServer(): Promise<void> {
     localStorage.setItem(STORAGE_KEYS.unlockedModules, JSON.stringify(mergedUnlocked));
     localStorage.setItem('roof-er.completedModules', JSON.stringify(allCompleted));
 
+    // Sync exam attempts and certification status from server (authoritative source)
+    if (progress.examAttempts && progress.examAttempts.length > 0) {
+      const serverAttempts = progress.examAttempts
+        .filter(a => a.totalScore != null) // Only completed attempts
+        .map(a => ({
+          attemptNumber: a.attemptNumber,
+          date: a.completedAt || new Date().toISOString(),
+          mcqScore: a.mcqScore,
+          fibScore: a.fibScore,
+          saScore: a.saScore,
+          totalScore: a.totalScore,
+          passed: a.passed
+        }));
+
+      // Server is authoritative for exam attempts — always use server data if it has more
+      const localAttempts = JSON.parse(localStorage.getItem(STORAGE_KEYS.finalExamHistory) || '[]');
+      if (serverAttempts.length >= localAttempts.length) {
+        localStorage.setItem(STORAGE_KEYS.finalExamHistory, JSON.stringify(serverAttempts));
+      }
+    }
+
+    if (progress.isCertified) {
+      localStorage.setItem(STORAGE_KEYS.certifiedStatus, 'true');
+      if (progress.certificationDate) {
+        localStorage.setItem(STORAGE_KEYS.certificationDate, progress.certificationDate);
+      }
+      updateSidebarCertifiedBadge(true);
+    }
+
     // Sync gamification
     if (progress.gamification) {
       localStorage.setItem('roof-er.totalXp', progress.gamification.totalXP.toString());
@@ -340,7 +373,7 @@ async function syncProgressFromServer(): Promise<void> {
     // Refresh sidebar to reflect merged state
     updateSidebarLocks();
 
-    console.log('Progress synced from server:', { serverUnlocked: unlockedModules, localUnlocked, mergedUnlocked, completedModules });
+    console.log('Progress synced from server:', { serverUnlocked: unlockedModules, localUnlocked, mergedUnlocked, completedModules, examAttempts: progress.examAttempts?.length || 0, certified: progress.isCertified });
   } catch (error) {
     console.warn('Failed to sync progress from server:', error);
   }
@@ -999,8 +1032,15 @@ function checkModuleCompletion(moduleName: string) {
   const section = document.getElementById('module-complete-section');
   if (section) {
     if (canComplete) {
+      const wasHidden = section.style.display === 'none';
       section.style.display = 'block';
       section.classList.add('revealed');
+      // Scroll into view on mobile when newly revealed so users can see the button
+      if (wasHidden) {
+        setTimeout(() => {
+          section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 300);
+      }
     } else {
       section.style.display = 'none';
       section.classList.remove('revealed');
@@ -5221,7 +5261,7 @@ trainingContent['post-inspection-objections'] = `
         Creating Urgency (Without Being Pushy)
       </h2>
 
-      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 35px;">
+      <div class="urgency-cards-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 35px;">
         <!-- Weather Reality Card -->
         <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-radius: 16px; padding: 20px; border-left: 4px solid #3b82f6;">
           <div style="font-size: 32px; margin-bottom: 10px;">🌧️</div>
@@ -5261,7 +5301,7 @@ trainingContent['post-inspection-objections'] = `
       <p style="color: #6b7280; margin-bottom: 20px;">For every objection, use this 4-step framework:</p>
 
       <!-- Visual Flow -->
-      <div style="display: flex; align-items: stretch; gap: 0; margin-bottom: 35px; flex-wrap: wrap;">
+      <div class="empathy-flow" style="display: flex; align-items: stretch; gap: 0; margin-bottom: 35px; flex-wrap: wrap;">
         <!-- Step 1 -->
         <div style="flex: 1; min-width: 150px; background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); padding: 20px; border-radius: 16px 0 0 16px; text-align: center; position: relative;">
           <div style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; margin: 0 auto 12px auto;">1</div>
@@ -7930,9 +7970,8 @@ function initModule10Quiz() {
           titleEl.style.color = '#166534';
         }
         resultsDiv.style.background = 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)';
-        // Show module completion
-        const completeSection = document.getElementById('module-complete-section');
-        if (completeSection) completeSection.style.display = 'block';
+        // Mark quiz as passed in engagement system (this persists state and enables completion)
+        markQuizPassed('post-inspection-objections');
       } else if (percentage >= 60) {
         if (iconEl) iconEl.textContent = '👍';
         if (titleEl) {
@@ -7940,9 +7979,8 @@ function initModule10Quiz() {
           titleEl.style.color = '#ca8a04';
         }
         resultsDiv.style.background = 'linear-gradient(135deg, #fefce8 0%, #fef9c3 100%)';
-        // Still show completion for 60%+
-        const completeSection = document.getElementById('module-complete-section');
-        if (completeSection) completeSection.style.display = 'block';
+        // Mark quiz as passed in engagement system (this persists state and enables completion)
+        markQuizPassed('post-inspection-objections');
       } else {
         if (iconEl) iconEl.textContent = '📚';
         if (titleEl) {
@@ -14449,6 +14487,7 @@ function formatExamDate(dateStr: string): string {
 // ============================================================================
 
 let currentExamData: { mcq: MCQQuestion[], fib: FIBQuestion[], sa: SAQuestion[] } | null = null;
+let examStartTime: number | null = null;
 
 function initFinalExam() {
   const examArea = document.getElementById('exam-area');
@@ -14741,6 +14780,9 @@ async function startExam(root: HTMLElement) {
     return;
   }
 
+  // Record start time for duration tracking
+  examStartTime = Date.now();
+
   // Shuffle questions for this attempt
   currentExamData = {
     mcq: shuffleArray(FINAL_EXAM_MCQ),
@@ -14756,12 +14798,17 @@ function renderFinalExam(root: HTMLElement) {
 
   const { mcq, fib, sa } = currentExamData;
 
+  const examState = getExamState();
+  const attemptNum = examState.attempts.length + 1;
+  const attemptsLeft = Math.max(0, 3 - examState.attempts.length);
+
   root.innerHTML = `
     <div class="exam-container">
       <div class="exam-header">
         <h2>🎯 Final Certification Exam</h2>
         <div class="exam-progress">
-          <span id="exam-progress-text">Answer all 50 questions</span>
+          <span id="exam-progress-text">Answer all 55 questions</span>
+          <span class="exam-attempt-indicator" style="margin-left: 16px; padding: 4px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; background: ${attemptsLeft <= 1 ? 'rgba(239,68,68,0.15); color: #ef4444' : 'rgba(59,130,246,0.15); color: #60a5fa'};">Attempt ${attemptNum} of 3</span>
         </div>
       </div>
 
@@ -15135,8 +15182,8 @@ async function gradeFinalExam(root: HTMLElement) {
     };
   });
 
-  // Calculate time taken (would need exam start time tracking for accurate value)
-  const timeTaken = 0; // Placeholder - could track actual time
+  // Calculate time taken in seconds
+  const timeTaken = examStartTime ? Math.round((Date.now() - examStartTime) / 1000) : 0;
 
   submitExamToAPI(
     currentExamAttemptId,
