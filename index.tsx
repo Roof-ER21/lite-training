@@ -5,11 +5,16 @@
 import { GoogleGenAI, Type, Chat } from '@google/genai';
 import confetti from 'canvas-confetti';
 
-// Resolve API key from injected env. Falls back gracefully if missing.
-const rawApiKey = (process.env.API_KEY as string | undefined) || (process.env.GEMINI_API_KEY as string | undefined);
+// No API key ships to the browser: all Gemini REST calls route through the
+// Express proxy, which attaches the key server-side (server/routes/gemini-proxy.ts).
 let ai: GoogleGenAI | null = null;
-if (rawApiKey && rawApiKey.trim()) {
-  ai = new GoogleGenAI({ apiKey: rawApiKey });
+try {
+  ai = new GoogleGenAI({
+    apiKey: 'server-proxied',
+    httpOptions: { baseUrl: `${window.location.origin}/api/gemini` },
+  });
+} catch (e) {
+  console.error('Failed to initialize AI client:', e);
 }
 
 // Local storage keys and gating
@@ -9270,11 +9275,11 @@ async function initAgnesLiveSession() {
         console.warn('Token endpoint failed:', errorData);
       }
     } catch (tokenErr) {
-      console.warn('Could not fetch ephemeral token, falling back to API key:', tokenErr);
+      console.warn('Could not fetch ephemeral token:', tokenErr);
     }
 
-    // Use ephemeral token if available, otherwise fall back to API key
-    const apiKey = tokenData?.token || rawApiKey;
+    // Live API requires an ephemeral token in the browser — no key fallback.
+    const apiKey = tokenData?.token;
     if (!apiKey) {
       showAgnesError('AI connection not available. Please check server configuration.');
       return;
@@ -10914,7 +10919,7 @@ async function generateQuiz() {
 
   try {
     if (!ai) {
-      quizArea.innerHTML = '<p style="color: red;">Quiz is unavailable: missing API key. Set GEMINI_API_KEY in .env.local and reload.</p>';
+      quizArea.innerHTML = '<p style="color: red;">Quiz is unavailable: AI is not configured on the server.</p>';
       return;
     }
      const trainingSummary = Object.values(trainingContent).join(' '); // Use all content

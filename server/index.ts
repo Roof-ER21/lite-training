@@ -12,6 +12,7 @@ import examRoutes from './routes/exam.js';
 import roleplayRoutes from './routes/roleplay.js';
 import adminRoutes from './routes/admin.js';
 import aiRoutes from './routes/ai.js';
+import geminiProxyRoutes from './routes/gemini-proxy.js';
 import superadminAuthRoutes, { seedInitialAdmin } from './routes/superadmin-auth.js';
 import cmsRoutes from './routes/cms.js';
 import contentRoutes from './routes/content.js';
@@ -21,6 +22,9 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Behind Railway's proxy — needed so req.ip reflects the real client for rate limiting
+app.set('trust proxy', 1);
 
 // Middleware
 app.use(cors());
@@ -50,6 +54,7 @@ app.use('/api/exam', examRoutes);
 app.use('/api/roleplay', roleplayRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/gemini', geminiProxyRoutes);
 app.use('/api/admin-auth', superadminAuthRoutes);
 app.use('/api/cms', cmsRoutes);
 app.use('/api/content', contentRoutes);
