@@ -11667,24 +11667,49 @@ function trackModuleStart(moduleName: string) {
 let activityHeartbeatInterval: number | null = null;
 let currentModuleForTracking: string | null = null;
 
+// "Time Trained" should reflect active study, not a tab left open overnight.
+// We only count a heartbeat interval when the tab is visible AND the user has
+// interacted within IDLE_TIMEOUT. lastActivityAt is bumped by real input.
+const HEARTBEAT_INTERVAL_MS = 30000;
+const IDLE_TIMEOUT_MS = 120000; // 2 min without input = considered idle
+let lastActivityAt = Date.now();
+let activityListenersBound = false;
+
+function bumpActivity() { lastActivityAt = Date.now(); }
+
+function ensureActivityListeners() {
+  if (activityListenersBound) return;
+  ['pointerdown', 'keydown', 'scroll', 'mousemove', 'touchstart'].forEach(evt =>
+    window.addEventListener(evt, bumpActivity, { passive: true })
+  );
+  activityListenersBound = true;
+}
+
 function startActivityTracking(moduleName: string) {
   currentModuleForTracking = moduleName;
+  ensureActivityListeners();
+  lastActivityAt = Date.now(); // opening a module counts as activity
 
   // Clear existing interval
   if (activityHeartbeatInterval) {
     clearInterval(activityHeartbeatInterval);
   }
 
-  // Send heartbeat every 30 seconds (silent - don't spam console, handle offline gracefully)
+  // Send heartbeat every 30s, but only credit the interval if the learner was
+  // actually present for it — skip when the tab is hidden or the user is idle.
   activityHeartbeatInterval = window.setInterval(() => {
-    if (currentModuleForTracking) {
-      void apiCall('/progress/heartbeat', {
-        method: 'POST',
-        body: JSON.stringify({ moduleName: currentModuleForTracking, timeSpent: 30 }),
-        silent: true
-      } as any).catch(() => { /* Silent fail for offline mode */ });
-    }
-  }, 30000);
+    if (!currentModuleForTracking) return;
+
+    const hidden = document.visibilityState === 'hidden';
+    const idle = Date.now() - lastActivityAt > IDLE_TIMEOUT_MS;
+    if (hidden || idle) return; // don't count idle/background time
+
+    void apiCall('/progress/heartbeat', {
+      method: 'POST',
+      body: JSON.stringify({ moduleName: currentModuleForTracking, timeSpent: HEARTBEAT_INTERVAL_MS / 1000 }),
+      silent: true
+    } as any).catch(() => { /* Silent fail for offline mode */ });
+  }, HEARTBEAT_INTERVAL_MS);
 }
 
 function stopActivityTracking() {

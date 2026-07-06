@@ -201,11 +201,18 @@ router.post('/heartbeat', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'moduleName and timeSpent required' });
     }
 
+    // Clamp each heartbeat to the client's interval size. Defense in depth so a
+    // stuck/backgrounded tab or a tampered client can't inflate training time
+    // (this is what produced bogus "60h" totals). The client also suppresses
+    // heartbeats while idle/hidden — this is the server-side backstop.
+    const HEARTBEAT_MAX_SECONDS = 60;
+    const delta = Math.min(Math.max(0, timeSpent), HEARTBEAT_MAX_SECONDS);
+
     await query(`
       UPDATE module_progress
       SET time_spent_seconds = time_spent_seconds + $3, last_accessed = NOW()
       WHERE user_id = $1 AND module_name = $2
-    `, [userId, moduleName, timeSpent]);
+    `, [userId, moduleName, delta]);
 
     res.json({ success: true });
   } catch (error) {

@@ -10239,21 +10239,36 @@ button:disabled {
   align-items: center;
   justify-content: center;
   gap: 12px;
-  padding: 18px 32px;
+  padding: 20px 44px;
   background: linear-gradient(135deg, #c62828 0%, #b71c1c 100%);
   color: white;
   border: none;
   border-radius: 12px;
-  font-size: 1.15rem;
-  font-weight: 600;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(198, 40, 40, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  /* Two-layer shadow: a neutral dark drop so the CTA reads as elevated even
+     without color (the red glow alone disappears in grayscale), plus the red
+     glow for brand punch. This is what makes it the clear primary action. */
+  box-shadow: 0 6px 16px rgba(17, 24, 39, 0.28), 0 4px 20px rgba(198, 40, 40, 0.35);
+  animation: cta-pulse 2.8s ease-in-out infinite;
+}
+
+@keyframes cta-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.025); }
 }
 
 .continue-training-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(198, 40, 40, 0.45);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 10px 24px rgba(17, 24, 39, 0.32), 0 6px 24px rgba(198, 40, 40, 0.45);
+  animation: none; /* settle the pulse once the user is clearly engaging */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .continue-training-btn { animation: none; }
 }
 
 .continue-training-btn svg {

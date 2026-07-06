@@ -76,37 +76,15 @@ function keywordScore(userAnswer: string, keywords: string[], maxPoints: number)
   };
 }
 
-// POST /api/ai/score-response - Score a short answer using AI
-router.post('/score-response', requireAuth, aiLimiter, async (req: Request, res: Response) => {
-  try {
-    const {
-      prompt,
-      userAnswer,
-      sampleAnswer,
-      maxPoints = 2,
-      rubric = {},
-      context = 'training'
-    }: ScoreRequest = req.body;
+// Build the lenient grading prompt shared by every provider.
+function buildScoringPrompt(r: ScoreRequest): { systemPrompt: string; userPrompt: string } {
+  const { prompt, userAnswer, sampleAnswer, maxPoints = 2, rubric = {} } = r;
 
-    // Validate required fields
-    if (!prompt || !userAnswer) {
-      return res.status(400).json({ error: 'prompt and userAnswer are required' });
-    }
+  const criteriaText = rubric?.criteria?.length
+    ? rubric.criteria.map((c, i) => `${i + 1}. ${c}`).join('\n')
+    : '1. Completeness - addresses all key points\n2. Accuracy - information is correct\n3. Professionalism - appropriate tone\n4. Persuasiveness - would be effective';
 
-    // If OpenAI is not configured, fall back to keyword scoring
-    if (!isOpenAIConfigured()) {
-      console.log('OpenAI not configured, using keyword fallback');
-      const keywords = rubric?.keywords || [];
-      return res.json(keywordScore(userAnswer, keywords, maxPoints));
-    }
-
-    // Build criteria string
-    const criteriaText = rubric?.criteria?.length
-      ? rubric.criteria.map((c, i) => `${i + 1}. ${c}`).join('\n')
-      : '1. Completeness - addresses all key points\n2. Accuracy - information is correct\n3. Professionalism - appropriate tone\n4. Persuasiveness - would be effective';
-
-    // Build the AI prompt
-    const systemPrompt = `You are a generous and encouraging sales trainer scoring exam responses.
+  const systemPrompt = `You are a generous and encouraging sales trainer scoring exam responses.
 Focus ONLY on whether the trainee understands the core sales concepts.
 DO NOT deduct points for:
 - Grammar mistakes
@@ -119,10 +97,10 @@ Only deduct points if the response:
 - Contains incorrect information
 - Would harm the sales interaction
 
-Be encouraging and give full credit (2 points) for any response that shows understanding of the key concept, even if worded differently than the sample answer.
+Be encouraging and give full credit (2 points) for any response that shows understanding of the key concept, even if worded differently than the sample answer. Judge the MEANING of the answer, not whether it contains specific keywords.
 Always return valid JSON only, no markdown formatting.`;
 
-    const userPrompt = `Evaluate this trainee's response:
+  const userPrompt = `Evaluate this trainee's response:
 
 QUESTION/SCENARIO:
 ${prompt}
@@ -131,7 +109,7 @@ ${sampleAnswer ? `IDEAL RESPONSE EXAMPLE:\n${sampleAnswer}\n` : ''}
 EVALUATION CRITERIA:
 ${criteriaText}
 
-${rubric?.keywords?.length ? `KEY CONCEPTS TO LOOK FOR (2 out of ${rubric.keywords.length} is sufficient):\n${rubric.keywords.join(', ')}\n` : ''}
+${rubric?.keywords?.length ? `KEY CONCEPTS TO LOOK FOR (2 out of ${rubric.keywords.length} is sufficient — these are concepts, NOT required exact words):\n${rubric.keywords.join(', ')}\n` : ''}
 TRAINEE'S RESPONSE:
 ${userAnswer}
 
@@ -148,77 +126,104 @@ Return JSON only (no markdown):
   "improvements": ["<specific improvement 1>", "<specific improvement 2>"]
 }`;
 
-    // Call OpenAI API (openai is guaranteed non-null here due to isOpenAIConfigured check)
-    const completion = await openai!.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt }
-      ],
-      temperature: 0.3, // Lower temp for more consistent scoring
-      max_tokens: 500,
-      response_format: { type: 'json_object' }
-    });
+  return { systemPrompt, userPrompt };
+}
 
-    const responseText = completion.choices[0]?.message?.content || '';
+// Score via Gemini (primary — its key is the one that's funded in prod).
+async function scoreWithGemini(r: ScoreRequest): Promise<any> {
+  if (!geminiClient) throw new Error('Gemini not configured');
+  const { systemPrompt, userPrompt } = buildScoringPrompt(r);
+  const resp = await geminiClient.models.generateContent({
+    model: 'gemini-2.5-flash',
+    contents: userPrompt,
+    config: {
+      systemInstruction: systemPrompt,
+      temperature: 0.3,
+      responseMimeType: 'application/json',
+    },
+  });
+  return JSON.parse(resp.text || '');
+}
 
-    // Parse the JSON response
-    let aiResult: any;
-    try {
-      aiResult = JSON.parse(responseText);
-    } catch (parseError) {
-      console.error('Failed to parse AI response:', responseText);
-      // Fall back to keyword scoring
-      const keywords = rubric?.keywords || [];
-      return res.json(keywordScore(userAnswer, keywords, maxPoints));
-    }
+// Score via OpenAI (fallback if Gemini is down/unfunded).
+async function scoreWithOpenAI(r: ScoreRequest): Promise<any> {
+  if (!openai) throw new Error('OpenAI not configured');
+  const { systemPrompt, userPrompt } = buildScoringPrompt(r);
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt },
+    ],
+    temperature: 0.3,
+    max_tokens: 500,
+    response_format: { type: 'json_object' },
+  });
+  return JSON.parse(completion.choices[0]?.message?.content || '');
+}
 
-    // Validate and normalize the response
-    const score = Math.min(Math.max(Number(aiResult.score) || 0, 0), maxPoints);
-    const percentage = Math.min(Math.max(Number(aiResult.percentage) || Math.round((score / maxPoints) * 100), 0), 100);
+// POST /api/ai/score-response - Score a short answer using AI
+router.post('/score-response', requireAuth, aiLimiter, async (req: Request, res: Response) => {
+  const { userAnswer, maxPoints = 2, rubric = {} }: ScoreRequest = req.body;
+  const keywords = rubric?.keywords || [];
 
-    const response: ScoreResponse = {
-      score,
-      percentage,
-      feedback: aiResult.feedback || 'Response evaluated.',
-      strengths: Array.isArray(aiResult.strengths) ? aiResult.strengths : [],
-      improvements: Array.isArray(aiResult.improvements) ? aiResult.improvements : [],
-      aiScored: true
-    };
-
-    // If keywords were provided, check which were hit (for display purposes)
-    if (rubric?.keywords?.length) {
-      const answerLower = userAnswer.toLowerCase();
-      response.keyPointsHit = rubric.keywords.filter(kw => answerLower.includes(kw.toLowerCase()));
-      response.keyPointsMissed = rubric.keywords.filter(kw => !answerLower.includes(kw.toLowerCase()));
-    }
-
-    res.json(response);
-
-  } catch (error: any) {
-    console.error('AI scoring error:', error);
-
-    // Fall back to keyword scoring on any error
-    const { rubric = {}, maxPoints = 2, userAnswer = '' } = req.body;
-    const keywords = rubric?.keywords || [];
-
-    if (keywords.length > 0 && userAnswer) {
-      return res.json(keywordScore(userAnswer, keywords, maxPoints));
-    }
-
-    res.status(500).json({
-      error: 'AI scoring failed',
-      details: error?.message || 'Unknown error'
-    });
+  // Validate required fields
+  if (!req.body.prompt || !userAnswer) {
+    return res.status(400).json({ error: 'prompt and userAnswer are required' });
   }
+
+  // Try each configured AI provider in order. The keyword matcher is a LAST
+  // resort only — it grades by literal string presence, so a well-worded answer
+  // that avoids the exact keywords scores 0. That was silently happening to
+  // everyone while OpenAI was over quota; Gemini (funded) is now primary.
+  const providers: Array<{ name: string; run: () => Promise<any> }> = [];
+  if (geminiClient) providers.push({ name: 'gemini', run: () => scoreWithGemini(req.body) });
+  if (openai) providers.push({ name: 'openai', run: () => scoreWithOpenAI(req.body) });
+
+  for (const provider of providers) {
+    try {
+      const aiResult = await provider.run();
+
+      const score = Math.min(Math.max(Number(aiResult.score) || 0, 0), maxPoints);
+      const percentage = Math.min(Math.max(Number(aiResult.percentage) || Math.round((score / maxPoints) * 100), 0), 100);
+
+      const response: ScoreResponse = {
+        score,
+        percentage,
+        feedback: aiResult.feedback || 'Response evaluated.',
+        strengths: Array.isArray(aiResult.strengths) ? aiResult.strengths : [],
+        improvements: Array.isArray(aiResult.improvements) ? aiResult.improvements : [],
+        aiScored: true,
+      };
+
+      // Keyword hit/miss is display-only context; the score itself is the AI's.
+      if (keywords.length) {
+        const answerLower = userAnswer.toLowerCase();
+        response.keyPointsHit = keywords.filter(kw => answerLower.includes(kw.toLowerCase()));
+        response.keyPointsMissed = keywords.filter(kw => !answerLower.includes(kw.toLowerCase()));
+      }
+
+      return res.json(response);
+    } catch (error: any) {
+      console.error(`AI scoring via ${provider.name} failed:`, error?.message || error);
+      // try the next provider
+    }
+  }
+
+  // Every AI provider failed (or none configured) — fall back to keyword scoring.
+  console.warn('All AI scoring providers failed; using keyword fallback');
+  return res.json(keywordScore(userAnswer, keywords, maxPoints));
 });
 
-// GET /api/ai/status - Check if AI is configured
+// GET /api/ai/status - Check if AI scoring is available
 router.get('/status', (req: Request, res: Response) => {
+  // AI grading works if EITHER provider is configured (Gemini is primary).
   res.json({
-    configured: isOpenAIConfigured(),
+    aiScoringEnabled: !!geminiApiKey || isOpenAIConfigured(),
+    primaryProvider: geminiApiKey ? 'gemini' : (isOpenAIConfigured() ? 'openai' : 'none'),
     geminiConfigured: !!geminiApiKey,
-    model: 'gpt-4o-mini'
+    openaiConfigured: isOpenAIConfigured(),
+    model: geminiApiKey ? 'gemini-2.5-flash' : 'gpt-4o-mini'
   });
 });
 
