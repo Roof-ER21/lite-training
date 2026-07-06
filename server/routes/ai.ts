@@ -1,8 +1,14 @@
 import { Router, Request, Response } from 'express';
 import OpenAI from 'openai';
 import { GoogleGenAI, Modality } from '@google/genai';
+import { requireAuth } from '../middleware/auth.js';
+import { rateLimit } from '../middleware/rate-limit.js';
 
 const router = Router();
+
+// These endpoints spend real OpenAI/Gemini quota — logged-in users only,
+// and capped per IP so a single client can't burn through credits.
+const aiLimiter = rateLimit({ windowMs: 60_000, max: 30, name: 'ai' });
 
 // Initialize Google GenAI client for ephemeral tokens
 const geminiApiKey = process.env.GEMINI_API_KEY;
@@ -71,7 +77,7 @@ function keywordScore(userAnswer: string, keywords: string[], maxPoints: number)
 }
 
 // POST /api/ai/score-response - Score a short answer using AI
-router.post('/score-response', async (req: Request, res: Response) => {
+router.post('/score-response', requireAuth, aiLimiter, async (req: Request, res: Response) => {
   try {
     const {
       prompt,
@@ -217,7 +223,7 @@ router.get('/status', (req: Request, res: Response) => {
 });
 
 // POST /api/ai/tts - Text-to-Speech using Gemini's high-quality voices (Kore, Aoede, etc.)
-router.post('/tts', async (req: Request, res: Response) => {
+router.post('/tts', requireAuth, aiLimiter, async (req: Request, res: Response) => {
   try {
     const { text, voice = 'Kore' } = req.body;
 
@@ -282,7 +288,7 @@ router.post('/tts', async (req: Request, res: Response) => {
 });
 
 // POST /api/ai/gemini-token - Generate ephemeral token for Gemini Live API
-router.post('/gemini-token', async (req: Request, res: Response) => {
+router.post('/gemini-token', requireAuth, aiLimiter, async (req: Request, res: Response) => {
   try {
     if (!geminiClient || !geminiApiKey) {
       return res.status(503).json({

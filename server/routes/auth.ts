@@ -1,12 +1,20 @@
 import { Router, Request, Response } from 'express';
 import { query, queryOne } from '../db/connection.js';
 import { requireAuth } from '../middleware/auth.js';
+import { rateLimit } from '../middleware/rate-limit.js';
 import crypto from 'crypto';
 
 const router = Router();
 
-// Manager code from environment (defaults to roofer2024)
-const MANAGER_CODE = process.env.MANAGER_CODE || 'roofer2024';
+// Manager code comes from the environment only — no hardcoded fallback in a
+// public-ish repo. If unset, nobody can self-upgrade to manager via code.
+const MANAGER_CODE = process.env.MANAGER_CODE || null;
+if (!MANAGER_CODE) {
+  console.warn('MANAGER_CODE not set — manager self-upgrade via code is disabled');
+}
+
+// Slow down manager-code guessing / name enumeration
+const loginLimiter = rateLimit({ windowMs: 60_000, max: 10, name: 'login' });
 
 // Generate session token
 function generateToken(): string {
@@ -14,7 +22,7 @@ function generateToken(): string {
 }
 
 // POST /api/auth/login - Login or register user
-router.post('/login', async (req: Request, res: Response) => {
+router.post('/login', loginLimiter, async (req: Request, res: Response) => {
   try {
     const { name, managerCode } = req.body;
 
@@ -23,7 +31,7 @@ router.post('/login', async (req: Request, res: Response) => {
     }
 
     const trimmedName = name.trim();
-    const isManager = managerCode === MANAGER_CODE;
+    const isManager = !!MANAGER_CODE && managerCode === MANAGER_CODE;
 
     // Check if user exists
     let user = await queryOne<{ id: string; name: string; is_manager: boolean }>(`
@@ -94,13 +102,9 @@ router.post('/login', async (req: Request, res: Response) => {
       token
     });
   } catch (error: any) {
+    // Log the detail server-side; never echo internals back to the client
     console.error('Login error:', error);
-    // Return more details in development/for debugging
-    res.status(500).json({
-      error: 'Login failed',
-      details: error?.message || 'Unknown error',
-      code: error?.code
-    });
+    res.status(500).json({ error: 'Login failed' });
   }
 });
 

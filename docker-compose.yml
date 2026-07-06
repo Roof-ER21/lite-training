@@ -1,0 +1,88 @@
+# lite-training-24 — self-hosted copy of Lite Training. Fresh Postgres; the app
+# auto-creates its schema on boot (initDatabase), so no setup service needed.
+# Never touches Railway prod. Same backup + auto-heal pattern as CC24.
+name: lite-training-24
+
+services:
+  db:
+    image: postgres:17
+    container_name: lt24-db
+    environment:
+      POSTGRES_USER: lt24
+      POSTGRES_PASSWORD: lt24_local_pw
+      POSTGRES_DB: lt24
+    volumes:
+      - lt24-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lt24 -d lt24"]
+      interval: 5s
+      timeout: 5s
+      retries: 40
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: lite-training-24:latest
+    container_name: lt24-app
+    labels:
+      autoheal: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      DATABASE_URL: postgres://lt24:lt24_local_pw@db:5432/lt24
+      DATABASE_SSL: "false"
+      ADMIN_PASSWORD: RoofER2025!
+    ports:
+      - "5224:3000"
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\" || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+  backup:
+    image: postgres:17
+    container_name: lt24-backup
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: lt24_local_pw
+    volumes:
+      - backups:/backups
+    entrypoint: ["bash", "-c"]
+    command:
+      - |
+        echo "[lt24-backup] started $$(date)" >> /backups/backup.log
+        while true; do
+          ts=$$(date +%F-%H%M)
+          if pg_dump -Fc -h db -U lt24 lt24 > /backups/lt24-$$ts.dump 2>>/backups/backup.log; then
+            echo "$$(date) ok lt24-$$ts.dump" >> /backups/backup.log
+          else
+            echo "$$(date) FAILED lt24-$$ts.dump" >> /backups/backup.log
+          fi
+          ls -1t /backups/lt24-*.dump 2>/dev/null | tail -n +15 | xargs -r rm -f
+          sleep 86400
+        done
+    restart: unless-stopped
+
+  autoheal:
+    image: willfarrell/autoheal
+    container_name: lt24-autoheal
+    environment:
+      AUTOHEAL_CONTAINER_LABEL: autoheal
+      AUTOHEAL_INTERVAL: "30"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+
+volumes:
+  lt24-pgdata:
+  backups:

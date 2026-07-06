@@ -144,6 +144,12 @@ interface User {
 
 let currentUser: User | null = null;
 
+// Auth header for raw fetch() calls that don't go through apiCall
+function sessionAuthHeader(): Record<string, string> {
+  const token = localStorage.getItem(STORAGE_KEYS.sessionToken);
+  return token ? { 'Authorization': `Bearer ${token}` } : {};
+}
+
 // API call helper with auth token
 async function apiCall<T>(endpoint: string, options?: RequestInit & { silent?: boolean }): Promise<T | null> {
   const silent = (options as any)?.silent;
@@ -6014,7 +6020,7 @@ async function speakWithGemini(text: string, preferFemale: boolean = false): Pro
 
     const response = await fetch('/api/ai/tts', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...sessionAuthHeader() },
       body: JSON.stringify({ text, voice })
     });
 
@@ -9264,7 +9270,7 @@ async function initAgnesLiveSession() {
     try {
       const tokenResponse = await fetch('/api/ai/gemini-token', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...sessionAuthHeader() },
         body: JSON.stringify({ systemInstruction })
       });
       if (tokenResponse.ok) {
@@ -15060,7 +15066,7 @@ async function gradeFinalExam(root: HTMLElement) {
       // Try AI scoring first
       const response = await fetch('/api/ai/score-response', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...sessionAuthHeader() },
         body: JSON.stringify({
           prompt: q.prompt,
           userAnswer,

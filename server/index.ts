@@ -1,6 +1,5 @@
 import 'dotenv/config';
 import express from 'express';
-import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { initDatabase, isDatabaseAvailable } from './db/connection.js';
@@ -26,9 +25,21 @@ const PORT = process.env.PORT || 3000;
 // Behind Railway's proxy — needed so req.ip reflects the real client for rate limiting
 app.set('trust proxy', 1);
 
-// Middleware
-app.use(cors());
+// No CORS middleware on purpose: the frontend is served by this same server
+// (and the Vite dev server proxies /api), so cross-origin API use is never
+// legitimate — browsers enforcing same-origin is the protection.
 app.use(express.json({ limit: '5mb' }));  // Increased for CMS content seeding
+
+// Baseline security headers (CSP omitted — the app uses inline handlers)
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  if (process.env.NODE_ENV === 'production') {
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  }
+  next();
+});
 
 // Request logging in development
 if (process.env.NODE_ENV !== 'production') {

@@ -10,7 +10,8 @@ if (databaseUrl) {
   console.log('DATABASE_URL is configured, connecting to PostgreSQL...');
   pool = new Pool({
     connectionString: databaseUrl,
-    ssl: { rejectUnauthorized: false } // Railway requires SSL
+    // self-host: DATABASE_SSL=false for a local Postgres that doesn't speak SSL
+    ssl: process.env.DATABASE_SSL === 'false' ? false : { rejectUnauthorized: false }
   });
 
   // Test connection on startup

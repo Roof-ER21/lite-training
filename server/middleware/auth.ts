@@ -25,9 +25,13 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
 
     const token = authHeader.split(' ')[1];
 
-    // Handle offline tokens when database isn't available
+    // Offline tokens are a degraded-mode escape hatch, valid ONLY while the
+    // database is actually down — otherwise they'd be a free impersonation
+    // vector (anyone could send "offline-<uuid>" and act as that user).
     if (token.startsWith('offline-')) {
-      // Accept offline tokens - extract user ID from token
+      if (isDatabaseAvailable()) {
+        return res.status(401).json({ error: 'Invalid token' });
+      }
       const userId = token.replace('offline-', '');
       req.user = {
         id: userId,
@@ -108,14 +112,17 @@ export async function optionalAuth(req: Request, res: Response, next: NextFuncti
 
     const token = authHeader.split(' ')[1];
 
-    // Handle offline tokens
+    // Offline tokens only count while the database is actually down
+    // (same rule as requireAuth — otherwise they allow impersonation).
     if (token.startsWith('offline-')) {
-      const userId = token.replace('offline-', '');
-      req.user = {
-        id: userId,
-        name: 'Offline User',
-        isManager: false
-      };
+      if (!isDatabaseAvailable()) {
+        const userId = token.replace('offline-', '');
+        req.user = {
+          id: userId,
+          name: 'Offline User',
+          isManager: false
+        };
+      }
       return next();
     }
 

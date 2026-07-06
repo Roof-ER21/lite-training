@@ -3,13 +3,16 @@ import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 import { query, queryOne } from '../db/connection.js';
 import { requireSuperAdmin, logAdminAction } from '../middleware/superadmin.js';
+import { rateLimit } from '../middleware/rate-limit.js';
 
 const router = Router();
 
 const BCRYPT_ROUNDS = 12;
 const SESSION_DURATION_HOURS = 8;
 const DEFAULT_ADMIN_USERNAME = 'monmon';
-const DEFAULT_ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'RoofER2025!';
+
+// Superadmin login is the highest-value target — keep guesses slow
+const adminLoginLimiter = rateLimit({ windowMs: 60_000, max: 5, name: 'admin-login' });
 
 // Seed initial admin if none exists
 export async function seedInitialAdmin(): Promise<void> {
@@ -17,8 +20,14 @@ export async function seedInitialAdmin(): Promise<void> {
     const existingAdmin = await queryOne(`SELECT id FROM super_admins LIMIT 1`);
 
     if (!existingAdmin) {
+      // No hardcoded default password — seeding requires ADMIN_PASSWORD to be
+      // set explicitly, otherwise a fresh deploy ships a guessable admin.
+      if (!process.env.ADMIN_PASSWORD) {
+        console.error('No super admin exists and ADMIN_PASSWORD is not set — skipping seed. Set ADMIN_PASSWORD and restart to create the initial admin.');
+        return;
+      }
       console.log('No super admin found, creating initial admin...');
-      const passwordHash = await bcrypt.hash(DEFAULT_ADMIN_PASSWORD, BCRYPT_ROUNDS);
+      const passwordHash = await bcrypt.hash(process.env.ADMIN_PASSWORD, BCRYPT_ROUNDS);
 
       await query(`
         INSERT INTO super_admins (username, password_hash, display_name)
@@ -26,7 +35,6 @@ export async function seedInitialAdmin(): Promise<void> {
       `, [DEFAULT_ADMIN_USERNAME, passwordHash, 'Super Admin']);
 
       console.log(`Initial super admin created: ${DEFAULT_ADMIN_USERNAME}`);
-      console.log('IMPORTANT: Change the default password via ADMIN_PASSWORD environment variable!');
     }
   } catch (error) {
     console.error('Failed to seed initial admin:', error);
@@ -34,7 +42,7 @@ export async function seedInitialAdmin(): Promise<void> {
 }
 
 // POST /api/admin-auth/login - Super admin login
-router.post('/login', async (req: Request, res: Response) => {
+router.post('/login', adminLoginLimiter, async (req: Request, res: Response) => {
   try {
     const { username, password } = req.body;
 
