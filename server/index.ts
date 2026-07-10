@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import { captureToGlitchTip } from './lib/glitchtip.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { initDatabase, isDatabaseAvailable } from './db/connection.js';
@@ -91,7 +92,18 @@ app.get('*', (req, res) => {
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error('Server error:', err);
+  captureToGlitchTip({ endpoint: `${req.method} ${req.path}`, message: String(err?.message || err), stack: err?.stack });
   res.status(500).json({ error: 'Internal server error' });
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught exception:', error);
+  captureToGlitchTip({ endpoint: 'process.uncaughtException', message: String(error?.message || error), stack: error?.stack, level: 'fatal' });
+});
+
+process.on('unhandledRejection', (error) => {
+  console.error('Unhandled rejection:', error);
+  captureToGlitchTip({ endpoint: 'process.unhandledRejection', message: String((error as Error)?.message || error), stack: (error as Error)?.stack });
 });
 
 // Start server
