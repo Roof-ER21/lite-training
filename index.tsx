@@ -483,7 +483,7 @@ const FINAL_EXAM_MCQ: MCQQuestion[] = [
 
   // Module 5: Initial Pitch (3 MCQ)
   { id: 'mcq-9', module: 5, question: 'What GAF certification does Roof ER have?', options: ['GAF Certified Contractor', 'GAF Master Elite', 'GAF Preferred Partner', 'GAF Basic Installer'], correctAnswer: 1, explanation: 'Roof ER holds the GAF Master Elite certification, the highest level of GAF contractor certification.' },
-  { id: 'mcq-10', module: 5, question: 'What does hail damage look like on asphalt shingles?', options: ['Round circular divots', 'Straight line cracks', 'Only color fading', 'Curled edges only'], correctAnswer: 0, explanation: 'Hail damage appears as round circular divots on asphalt shingles.' },
+  { id: 'mcq-10', module: 4, question: 'Which statement best describes a 3-tab shingle?', options: ['A single-layer shingle with a flat, uniform brick-like pattern', 'A multi-layer laminated shingle with a dimensional look', 'A metal panel system used on commercial roofs', 'A premium designer shingle'], correctAnswer: 0, explanation: '3-tab shingles are single-layer with a flat, brick-like pattern. Most 3-tab lines are discontinued, which is why finding them often triggers full replacement.' },
   { id: 'mcq-11', module: 5, question: 'If a homeowner says "Will my rates go up?", what is the best response?', options: ['Yes, they probably will', 'I understand your concern - rates cannot go up and an individual homeowner cannot be penalized for an act of God claim', 'You should not file then', 'I am not sure about insurance rates'], correctAnswer: 1, explanation: 'Following the objection framework, empathize and explain that rates cannot go up for act of God claims - individual homeowners are not penalized.' },
 
   // Module 6: Handling Initial Objections (3 MCQ)
@@ -2386,7 +2386,21 @@ const trainingContent = {
         </ul>
 
         <h3>What Sets Us Apart</h3>
-        <p>We are a <strong>top 1% roofing company in the nation</strong>, holding <strong>GAF Master Elite</strong> certification - the highest level of GAF contractor certification - along with <strong>GAF President's Club</strong> status. Be proud of that. You earned your spot here.</p>
+        <div class="awards-banner" style="background: linear-gradient(135deg, #1f2937 0%, #374151 100%); border-radius: 16px; padding: 24px; margin-top: 12px; border: 1px solid #d4a017;">
+          <p style="color: #f9fafb; margin: 0 0 16px 0; font-size: 15px; line-height: 1.7;">We are a <strong style="color: #fbbf24;">top 1% roofing company in the nation</strong>. Be proud of that. You earned your spot here.</p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
+            <div style="background: rgba(251, 191, 36, 0.1); border: 1px solid #d4a017; border-radius: 12px; padding: 16px; text-align: center;">
+              <div style="font-size: 30px; margin-bottom: 6px;">🏆</div>
+              <div style="color: #fbbf24; font-weight: 700; font-size: 16px;">GAF Master Elite</div>
+              <div style="color: #d1d5db; font-size: 13px; margin-top: 4px;">The highest level of GAF contractor certification - earned by fewer than 2% of roofing contractors</div>
+            </div>
+            <div style="background: rgba(251, 191, 36, 0.1); border: 1px solid #d4a017; border-radius: 12px; padding: 16px; text-align: center;">
+              <div style="font-size: 30px; margin-bottom: 6px;">🥇</div>
+              <div style="color: #fbbf24; font-weight: 700; font-size: 16px;">GAF President's Club</div>
+              <div style="color: #d1d5db; font-size: 13px; margin-top: 4px;">GAF's most prestigious annual award, reserved for the very best Master Elite contractors</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="module-completion-section" id="module-complete-section" style="display: none;">
@@ -4299,7 +4313,6 @@ const trainingContent = {
                   <li><strong>ACV (Actual Cash Value):</strong> The homeowner's first payment from insurance</li>
                   <li><strong>Depreciation:</strong> The portion the insurance company holds on to until the work is completed - it ensures the customer actually does the work</li>
                   <li><strong>Deductible:</strong> The customer's portion of the claim - like a copay</li>
-                  <li><strong>Squares:</strong> How we measure a roof. A typical roof is about 20 squares, which is equivalent to 2,000 square feet</li>
                 </ul>
               </div>
             </div>
@@ -14877,7 +14890,7 @@ function renderFinalExam(root: HTMLElement) {
             ${sa.map((q, idx) => `
               <div class="exam-question sa-question" data-id="${q.id}">
                 <p class="question-text"><strong>${idx + 1}.</strong> ${q.prompt}</p>
-                <textarea name="sa-${idx}" class="sa-input" rows="4" placeholder="Write your answer..."></textarea>
+                <textarea name="sa-${idx}" class="sa-input" rows="10" style="min-height: 220px;" placeholder="Write your answer..."></textarea>
               </div>
             `).join('')}
           </div>
