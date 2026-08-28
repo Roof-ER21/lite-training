@@ -468,8 +468,8 @@ interface ExamDetailedResults {
 
 const FINAL_EXAM_MCQ: MCQQuestion[] = [
   // Module 1: Company Basics (2 MCQ)
-  { id: 'mcq-1', module: 1, question: 'Who is the CEO and founder of Roof E.R.?', options: ['Oliver Brown', 'Reese Samala', 'Ford Barsi', 'John Smith'], correctAnswer: 0, explanation: 'Oliver Brown founded Roof E.R. in 2019.' },
-  { id: 'mcq-2', module: 1, question: 'What year was Roof E.R. founded?', options: ['2015', '2019', '2017', '2021'], correctAnswer: 1, explanation: 'Roof E.R. was founded in 2019.' },
+  { id: 'mcq-1', module: 1, question: 'Who is the CEO and founder of Roof E.R.?', options: ['Oliver Brown', 'Reese Samala', 'Ford Barsi', 'John Smith'], correctAnswer: 0, explanation: 'Oliver Brown founded Roof E.R. in 2018.' },
+  { id: 'mcq-2', module: 1, question: 'What year was Roof E.R. founded?', options: ['2015', '2018', '2017', '2021'], correctAnswer: 1, explanation: 'Roof E.R. was founded in 2018.' },
 
   // Module 2: Commitment & Core Values (3 MCQ)
   { id: 'mcq-3', module: 2, question: 'What is Roof E.R.\'s primary mission?', options: ['Hold fiduciary responsibility to customers', 'Maximize profits', 'Sell the most roofs', 'Beat competitors'], correctAnswer: 0, explanation: 'Our mission is to hold fiduciary responsibility to customers - their interests come first.' },
@@ -492,19 +492,19 @@ const FINAL_EXAM_MCQ: MCQQuestion[] = [
   { id: 'mcq-14', module: 6, question: 'What\'s the best response to "I don\'t have time right now"?', options: ['Leave your card and hope they call', 'Insist on doing it now', 'I completely understand - if you only have five minutes, that\'s all it\'s going to take me', 'Say you\'ll come back another day'], correctAnswer: 2, explanation: 'Acknowledge their concern while reassuring them it only takes a few minutes - this keeps the opportunity alive without being pushy.' },
 
   // Module 8: Inspection Process (3 MCQ)
-  { id: 'mcq-15', module: 8, question: 'Which of the following is NOT important to inspect during your initial inspection for storm damage?', options: ['Shingles and gutters', 'Damage to wood fences and concrete structures', 'Flashing and downspouts', 'Vents and valleys'], correctAnswer: 1, explanation: 'Wood fences and concrete are not part of the roof inspection - focus on shingles, gutters, flashing, downspouts, vents, and valleys.' },
+  { id: 'mcq-15', module: 8, question: 'Which of the following is NOT important to inspect during your initial inspection for storm damage?', options: ['Shingles and gutters', 'Signs of mold inside the home', 'Flashing and downspouts', 'Vents and valleys'], correctAnswer: 1, explanation: 'Mold is long-term neglect, not storm damage - showing it to an adjuster can get a claim denied as negligence rather than a single occurrence. Document anything a storm could have hit: shingles, gutters, flashing, downspouts, vents, valleys, and collateral like fences and soft metals.' },
   { id: 'mcq-16', module: 8, question: 'What is the first step to overcoming an objection?', options: ['React positively', 'Argue with the homeowner', 'Walk away', 'Offer a discount'], correctAnswer: 0, explanation: 'The first step to overcoming an objection is to react positively - stay calm and empathize.' },
   { id: 'mcq-17', module: 8, question: 'What is an appropriate response to the objection "I\'ll think about it"?', options: ['Leave your card and hope they call', 'Ask what specifically they need to think about to address their concern', 'Apply heavy pressure to sign now', 'Tell them they are making a mistake'], correctAnswer: 1, explanation: 'Ask what specifically they need to think about - this helps uncover and address their real concern.' },
 
   // Module 9: Post-Inspection Pitch (3 MCQ)
   { id: 'mcq-18', module: 9, question: 'What is the best response to "I don\'t have time right now" during post-inspection?', options: ['I completely understand - you can go back and finish what you\'re doing, I\'ll go ahead and run up and do that inspection', 'Leave and never return', 'Tell them you\'ll only take 2 minutes', 'Ask them to call you later'], correctAnswer: 0, explanation: 'Let them know they can continue their activities while you do the inspection - this respects their time while keeping the opportunity.' },
   { id: 'mcq-19', module: 9, question: 'Which of the following is an example of wind damage on a roof?', options: ['Round circular divots', 'Missing tabs', 'Granule loss in a circle', 'Soft spots'], correctAnswer: 1, explanation: 'Missing tabs are a sign of wind damage on a roof.' },
-  { id: 'mcq-20', module: 9, question: 'What is the name of the form the customer signs that protects them by saying we only do work if we get them fully approved through their insurance?', options: ['Work Order Agreement', 'Contingency Agreement', 'Insurance Form', 'Payment Contract'], correctAnswer: 1, explanation: 'The Contingency Agreement protects the customer - we only do the work if they get fully approved by insurance.' },
+  { id: 'mcq-20', module: 9, question: 'What is the name of the form the customer signs that protects them by saying we only do work if we get them fully approved through their insurance?', options: ['Work Order Agreement', 'Contingency Agreement', 'Project Agreement', 'Payment Contract'], correctAnswer: 1, explanation: 'The Contingency Agreement protects the customer - we only do the work if they get fully approved by insurance.' },
 
   // Module 10: Post-Inspection Objections (3 MCQ)
   { id: 'mcq-21', module: 10, question: 'When a homeowner says "My rates will go up," what\'s the best response?', options: ['Rates increase due to regional claims, not individual claims, and not filing means $20K+ later', 'That\'s probably true', 'Don\'t file then', 'I don\'t know about insurance'], correctAnswer: 0, explanation: 'Explain rates increase regionally regardless, and not filing now means huge out-of-pocket costs later.' },
   { id: 'mcq-22', module: 10, question: 'How do you handle "I need to talk to my spouse"?', options: ['Call them yourself', 'Leave and hope they call back', 'Ask when the spouse will be available and schedule a time to meet together', 'Tell them to convince their spouse'], correctAnswer: 2, explanation: 'Schedule a time to meet when both decision-makers are present.' },
-  { id: 'mcq-23', module: 10, question: 'What\'s the response to "I don\'t trust insurance claims"?', options: ['You shouldn\'t trust them', 'Don\'t file then', 'Insurance is always trustworthy', 'This is what you PAY insurance for - it\'s your right to file'], correctAnswer: 3, explanation: 'Remind them this is exactly what they pay premiums for - it\'s their right to use it.' },
+  { id: 'mcq-23', module: 10, question: 'What\'s the response to "I don\'t trust insurance claims"?', options: ['Offer to do the work at a cash discount instead', 'Don\'t file then', 'Insurance is always trustworthy', 'This is what you PAY insurance for - it\'s your right to file'], correctAnswer: 3, explanation: 'Remind them this is exactly what they pay premiums for - it\'s their right to use it.' },
 
   // Module 7: Damage Identification (3 MCQ)
   { id: 'mcq-24', module: 7, question: 'What does hail damage look like on asphalt shingles?', options: ['Straight cracks', 'Only missing shingles', 'Round bruises with granule loss and soft spots', 'Color changes only'], correctAnswer: 2, explanation: 'Hail causes round bruises with granule loss and creates soft spots when pressed.' },
@@ -512,7 +512,7 @@ const FINAL_EXAM_MCQ: MCQQuestion[] = [
   { id: 'mcq-26', module: 7, question: 'What is the first step in the Empathy Framework when handling objections?', options: ['Educate them on the process', 'Offer a solution right away', 'Acknowledge their concern', 'Ask for the sale'], correctAnswer: 2, explanation: 'The first step in the Empathy Framework is to acknowledge their concern - show you understand before educating.' },
 
   // Module 11: Filing the Claim & Contingency + Claim Authorization Script
-  { id: 'mcq-27', module: 11, question: 'When is the best time for your customer to file a claim?', options: ['Within a week', 'After getting other estimates', 'After the adjuster visits', 'Same day - immediately'], correctAnswer: 3, explanation: 'File the claim the same day, immediately after finding damage - timing is critical for insurance claims.' },
+  { id: 'mcq-27', module: 11, question: 'Once a homeowner agrees to let you do an inspection, when is the best time for them to file the claim?', options: ['Within a week', 'After getting other estimates', 'After the adjuster visits', 'Same day - immediately'], correctAnswer: 3, explanation: 'File the claim the same day, immediately after finding damage - timing is critical for insurance claims.' },
   { id: 'mcq-28', module: 11, question: 'Can flashing be approved in an insurance claim?', options: ['Yes', 'No'], correctAnswer: 0, explanation: 'Yes, flashing can be approved as part of an insurance claim when it shows storm damage.' },
   { id: 'mcq-29', module: 11, question: 'Who typically meets with the insurance adjuster at the property?', options: ['Only the homeowner', 'The neighbor', 'No one - it\'s done remotely', 'The Roof E.R. representative'], correctAnswer: 3, explanation: 'A Roof E.R. representative meets the adjuster to ensure all damage is properly documented.' },
 
@@ -521,9 +521,12 @@ const FINAL_EXAM_MCQ: MCQQuestion[] = [
   { id: 'mcq-32', module: 11, question: 'What should you do immediately after getting a signature?', options: ['Leave quickly', 'Set clear next-step expectations and timeline', 'Ask for referrals only', 'Nothing - job is done'], correctAnswer: 1, explanation: 'Set clear expectations: what happens next, when they\'ll hear from you, timeline for process.' },
 
   // Module 12: Sales Cycle & Job Flow (3 MCQ)
-  { id: 'mcq-33', module: 12, question: 'What are the 5 phases of the Roof E.R. sales cycle?', options: ['Call, Sell, Install, Bill, Collect', 'Knock, Pitch, Sign, Build, Done', 'Advertise, Estimate, Contract, Build, Invoice', 'Generating New Business, Adjuster Meeting, Project Meeting, Installation, Final Payment'], correctAnswer: 3, explanation: 'The 5 phases are: Generating New Business → Adjuster Meeting → Project Meeting → Installation → Final Payment.' },
+  { id: 'mcq-33', module: 12, question: 'Which of the following outlines the life cycle of your job?', options: ['Call, Sell, Install, Bill, Collect', 'Knock, Pitch, Sign, Build, Done', 'Advertise, Estimate, Contract, Build, Invoice', 'Generating New Business, Adjuster Meeting, Project Meeting, Installation, Final Payment'], correctAnswer: 3, explanation: 'The life cycle of a job: Generating New Business → Adjuster Meeting → Project Meeting → Installation → Final Payment.' },
   { id: 'mcq-34', module: 12, question: 'How long does the total Roof E.R. sales cycle typically take from start to finish?', options: ['1-2 weeks', '3-4 weeks', '9-16 weeks', '6-12 months'], correctAnswer: 2, explanation: 'The complete sales cycle from initial knock to final payment typically takes 9-16 weeks.' },
-  { id: 'mcq-35', module: 12, question: 'What are the main stages of the Roof E.R. sales cycle?', options: ['Call, Sell, Install', 'Email, Quote, Invoice', 'Advertise, Estimate, Build', 'Knock, Inspect, File claim, Meet adjuster, Install, Collect'], correctAnswer: 3, explanation: 'Full cycle: Door knock → Inspection → File claim → Adjuster meeting → Installation → Collection.' }
+  { id: 'mcq-35', module: 4, question: 'What structure is typically nailed into the eaves of a roof?', options: ['Ridge vent', 'Gutters', 'Step flashing', 'Power attic vent'], correctAnswer: 1, explanation: 'Gutters are nailed into the eaves - the lower edge of the roof where water runs off.' },
+
+  // Module 9: Purpose of the pitch
+  { id: 'mcq-36', module: 9, question: 'What is the purpose of the post-inspection pitch?', options: ['To get the homeowner approved for a new roof', 'To solve the homeowner\'s deductible concerns', 'To convince the homeowner, with the photos you show them, to file a claim', 'To collect the first payment'], correctAnswer: 2, explanation: 'Every script has a purpose. The post-inspection pitch has one goal: use the damage photos to convince the homeowner to file the claim - not to solve deductible or payment questions.' }
 ];
 
 const FINAL_EXAM_FIB: FIBQuestion[] = [
@@ -536,8 +539,8 @@ const FINAL_EXAM_FIB: FIBQuestion[] = [
   // Non-negotiable #5 - going for the close
   { id: 'fib-3', module: 5, question: 'Non-negotiable number five is going for the close. That means you want to secure the _____.', acceptableAnswers: ['inspection', 'inspection appointment', 'appointment', 'the inspection'], explanation: 'Going for the close means securing the inspection appointment.' },
 
-  // Talk to spouse objection
-  { id: 'fib-4', module: 6, question: 'If the objection you get at the door is that they need to talk to their spouse, you should let them know that you understand and ask them "_____ are they available?"', acceptableAnswers: ['when', 'when are', 'what time'], explanation: 'Ask when the spouse will be available so you can schedule a follow-up.' },
+  // No money objection
+  { id: 'fib-4', module: 6, question: 'If the objection you get at the door is "I don\'t have any money right now," you should respond: "I completely understand - I\'m glad I\'m here today, because our inspection is completely _____."', acceptableAnswers: ['free', 'Free', 'FREE', 'free of charge', '100% free', 'completely free'], explanation: 'The inspection costs the homeowner nothing - "free" removes the money objection entirely.' },
 
   // Company leadership - GM
   { id: 'fib-5', module: 1, question: 'The general manager of Roof ER is _____ _____.', acceptableAnswers: ['Ford Barsi', 'ford barsi', 'FORD BARSI', 'Ford barsi'], explanation: 'Ford Barsi is the General Manager of Roof ER.' },
@@ -2311,7 +2314,7 @@ const trainingContent = {
       <h1>Welcome to Roof-ER!</h1>
 
       ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/welcome-intro.mp4', 'welcome-video', '📹 Welcome Introduction')}
-      <p>My name is Oliver Brown. I founded this company in 2019, not because I have a passion for roofing, but because I saw an opportunity to change the reputation of roofing companies and contractors as a whole. This is an industry that is known for lack of communication, poor workmanship, and straight up deceit. With a little bit of modern thinking, integrity and hard work we've been able to build a strong brand and reputation in a relatively short amount of time.</p>
+      <p>My name is Oliver Brown. I founded this company in 2018, not because I have a passion for roofing, but because I saw an opportunity to change the reputation of roofing companies and contractors as a whole. This is an industry that is known for lack of communication, poor workmanship, and straight up deceit. With a little bit of modern thinking, integrity and hard work we've been able to build a strong brand and reputation in a relatively short amount of time.</p>
       <p>We have ambitions of becoming a national brand. To accomplish this we need to continue to add and develop hungry, competitive team members who are dedicated to the big picture but disciplined to execute on a day to day basis.</p>
 
       <h2>Steering Our Roofing Revolution</h2>
@@ -2325,12 +2328,12 @@ const trainingContent = {
           </div>
           <h3>Oliver Brown</h3>
           <p class="leader-title">CEO & Founder</p>
-          <p class="leader-highlight">Built Roof-ER from the ground up with hands-on experience and an MBA from Mount St. Mary's University. Founded in 2019 to revolutionize the roofing industry with integrity and modern thinking.</p>
+          <p class="leader-highlight">Built Roof-ER from the ground up with hands-on experience and an MBA from Mount St. Mary's University. Founded in 2018 to revolutionize the roofing industry with integrity and modern thinking.</p>
           <button class="bio-toggle-btn" data-bio="oliver-bio">My Bio</button>
           <div id="oliver-bio" class="leader-bio-full" style="display: none;">
             <p>Oliver Brown's journey in the roofing industry began quite literally on the ground, spending a summer loading shingles onto rooftops under the hot sun. That hands-on experience ignited a passion for the trade and laid the foundation for what would become Roof-ER: a company built on grit, growth, and doing things the right way.</p>
             <p>A two-time graduate of Mount St. Mary's University, Oliver earned his B.S. in Business Marketing in 2013 and an MBA in 2015. His education, combined with real-world roofing experience, gave him a unique perspective on how to build a company that blends professionalism with performance.</p>
-            <p>In 2019, Oliver founded Roof-ER not out of a passion for roofs, but out of a desire to change the reputation of the roofing industry - an industry often plagued by poor communication, shoddy workmanship, and dishonest practices. Through integrity, modern systems, and relentless hard work, Roof-ER has rapidly built a strong brand and reputation.</p>
+            <p>In 2018, Oliver founded Roof-ER not out of a passion for roofs, but out of a desire to change the reputation of the roofing industry - an industry often plagued by poor communication, shoddy workmanship, and dishonest practices. Through integrity, modern systems, and relentless hard work, Roof-ER has rapidly built a strong brand and reputation.</p>
             <p>Oliver's vision is clear: to build Roof-ER into a national brand by developing hungry, competitive team members who are dedicated to the big picture but disciplined enough to execute daily. He leads by example, embodying the values of integrity, quality, and simplicity that define Roof-ER.</p>
           </div>
         </div>
@@ -2381,6 +2384,9 @@ const trainingContent = {
           <li><strong>Quality:</strong> Never settle for "good enough" - deliver premium workmanship and clear communication</li>
           <li><strong>Simplicity:</strong> Make the process straightforward and stress-free for every customer</li>
         </ul>
+
+        <h3>What Sets Us Apart</h3>
+        <p>We are a <strong>top 1% roofing company in the nation</strong>, holding <strong>GAF Master Elite</strong> certification - the highest level of GAF contractor certification - along with <strong>GAF President's Club</strong> status. Be proud of that. You earned your spot here.</p>
       </div>
 
       <div class="module-completion-section" id="module-complete-section" style="display: none;">
@@ -2393,16 +2399,6 @@ const trainingContent = {
   commitment: `
     <div class="content-card commitment-module">
       <h1>Your Commitment</h1>
-      ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module2-commitment.mp4', 'commitment-video', '📹 Your Commitment to Excellence')}
-
-      <!-- Video requirement notice -->
-      <div class="commitment-video-notice" id="commitment-video-notice">
-        <div class="notice-icon">📹</div>
-        <div class="notice-text">
-          <strong>Step 1:</strong> Please watch the commitment video above before proceeding.
-          <div class="video-progress-text" id="commitment-video-progress">Video progress: 0%</div>
-        </div>
-      </div>
 
       <h2>The Roof-ER Promise</h2>
       <div class="promise-section">
@@ -2420,6 +2416,10 @@ const trainingContent = {
 
       <h2>Your Commitment as a Roof-ER Representative</h2>
       <p>As a member of the Roof-ER team, your commitment to our values and processes is paramount to our collective success.</p>
+
+      <div class="commitment-instructions" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-left: 5px solid #c62828; border-radius: 0 12px 12px 0; padding: 16px 20px; margin-bottom: 18px;">
+        <p style="margin: 0; color: #7f1d1d; font-size: 15px;"><strong>✍️ How to complete this page:</strong> Read each of the 8 commitment statements below, then <strong>type your initials in the "Init." box</strong> next to each one. Once all 8 are initialed, the signature section will appear at the bottom.</p>
+      </div>
 
       <div class="commitment-progress-bar">
         <div class="progress-fill" id="initials-progress-fill" style="width: 0%"></div>
@@ -2505,9 +2505,6 @@ const trainingContent = {
       <div class="commitment-requirements-notice" id="commitment-requirements-notice">
         <h4>To complete this module:</h4>
         <ul>
-          <li id="req-commitment-video" class="requirement-item pending">
-            <span class="req-icon">○</span> Watch the commitment video (90%+)
-          </li>
           <li id="req-commitment-initials" class="requirement-item pending">
             <span class="req-icon">○</span> Initial all 8 commitment statements
           </li>
@@ -2608,6 +2605,9 @@ const trainingContent = {
 
       <!-- Generic Script Section -->
       <h2>The Generic Initial Pitch</h2>
+      <div class="script-purpose-callout" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-left: 5px solid #c62828; border-radius: 0 12px 12px 0; padding: 16px 20px; margin-bottom: 18px;">
+        <p style="margin: 0; color: #7f1d1d; font-size: 15px;"><strong>🎯 Purpose of this script:</strong> to secure the inspection. Nothing else. Every line drives toward the homeowner agreeing to let you inspect - do not jump ahead to deductibles, financing, or approvals.</p>
+      </div>
       <p class="section-intro">This is your go-to script. Practice it until it feels natural!</p>
 
       <div class="script-section">
@@ -2822,7 +2822,7 @@ const trainingContent = {
 
       <div class="inspection-steps-grid" id="inspection-steps-grid">
         <!-- Step 1 -->
-        <div class="inspection-step-card" data-step="1" onclick="toggleStepCard(this)">
+        <div class="inspection-step-card expanded" data-step="1" onclick="toggleStepCard(this)">
           <div class="step-card-header">
             <span class="step-badge" style="background: #ef4444;">1</span>
             <span class="step-icon">🦺</span>
@@ -2840,7 +2840,7 @@ const trainingContent = {
         </div>
 
         <!-- Step 2 -->
-        <div class="inspection-step-card" data-step="2" onclick="toggleStepCard(this)">
+        <div class="inspection-step-card expanded" data-step="2" onclick="toggleStepCard(this)">
           <div class="step-card-header">
             <span class="step-badge" style="background: #f97316;">2</span>
             <span class="step-icon">🔄</span>
@@ -2856,7 +2856,7 @@ const trainingContent = {
         </div>
 
         <!-- Step 3 -->
-        <div class="inspection-step-card" data-step="3" onclick="toggleStepCard(this)">
+        <div class="inspection-step-card expanded" data-step="3" onclick="toggleStepCard(this)">
           <div class="step-card-header">
             <span class="step-badge" style="background: #eab308;">3</span>
             <span class="step-icon">🏠</span>
@@ -2874,7 +2874,7 @@ const trainingContent = {
         </div>
 
         <!-- Step 4 -->
-        <div class="inspection-step-card" data-step="4" onclick="toggleStepCard(this)">
+        <div class="inspection-step-card expanded" data-step="4" onclick="toggleStepCard(this)">
           <div class="step-card-header">
             <span class="step-badge" style="background: #84cc16;">4</span>
             <span class="step-icon">🔍</span>
@@ -2892,7 +2892,7 @@ const trainingContent = {
         </div>
 
         <!-- Step 5 -->
-        <div class="inspection-step-card" data-step="5" onclick="toggleStepCard(this)">
+        <div class="inspection-step-card expanded" data-step="5" onclick="toggleStepCard(this)">
           <div class="step-card-header">
             <span class="step-badge" style="background: #22c55e;">5</span>
             <span class="step-icon">📸</span>
@@ -2908,7 +2908,7 @@ const trainingContent = {
         </div>
 
         <!-- Step 6 -->
-        <div class="inspection-step-card" data-step="6" onclick="toggleStepCard(this)">
+        <div class="inspection-step-card expanded" data-step="6" onclick="toggleStepCard(this)">
           <div class="step-card-header">
             <span class="step-badge" style="background: #14b8a6;">6</span>
             <span class="step-icon">🪣</span>
@@ -3048,6 +3048,10 @@ const trainingContent = {
         <div class="full-script-section" style="margin: 30px 0;">
           <div style="margin-bottom: 20px;">
             <h2 style="margin: 0;">📜 The Complete Post-Inspection Script</h2>
+          </div>
+
+          <div class="script-purpose-callout" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-left: 5px solid #c62828; border-radius: 0 12px 12px 0; padding: 16px 20px; margin-bottom: 20px;">
+            <p style="margin: 0; color: #7f1d1d; font-size: 15px;"><strong>🎯 Purpose of this script:</strong> to convince the homeowner - with the photos you are showing them - to file the claim. Not to get them approved, not to solve the deductible problem. If you find yourself pitching financing or payments here, you have lost the purpose of the pitch.</p>
           </div>
 
           <!-- INTEGRITY Phase -->
@@ -3760,6 +3764,7 @@ const trainingContent = {
             <li><strong>Wind Resistance:</strong> "130 mph rating means your roof survives storms that would destroy 3-tab shingles"</li>
             <li><strong>Layered Build:</strong> "Multiple layers add depth and durability you can see"</li>
             <li><strong>Durability:</strong> "Architectural shingles have multiple layers that provide longer-lasting protection"</li>
+            <li><strong>What We Install:</strong> Customers may ask what product we typically use. We upgrade them to the <strong>GAF Timberline HDZ</strong> - an architectural shingle with a reinforced nailing zone and a strong wind rating</li>
           </ul>
         </div>
 
@@ -4287,6 +4292,16 @@ const trainingContent = {
                 <li>Decision usually within 1-10 business days</li>
                 <li style="color: #16a34a; font-weight: 600;">Goal: Full approval</li>
               </ul>
+              <div style="background: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 12px; padding: 16px 20px; margin-top: 15px;">
+                <h4 style="margin: 0 0 10px 0; color: #7c3aed; font-size: 15px;">🔑 Key Definitions to Understand</h4>
+                <ul style="color: #374151; margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.8;">
+                  <li><strong>RCV (Replacement Cost Value):</strong> The total cost to do the job</li>
+                  <li><strong>ACV (Actual Cash Value):</strong> The homeowner's first payment from insurance</li>
+                  <li><strong>Depreciation:</strong> The portion the insurance company holds on to until the work is completed - it ensures the customer actually does the work</li>
+                  <li><strong>Deductible:</strong> The customer's portion of the claim - like a copay</li>
+                  <li><strong>Squares:</strong> How we measure a roof. A typical roof is about 20 squares, which is equivalent to 2,000 square feet</li>
+                </ul>
+              </div>
             </div>
 
             <!-- Divider: Team Handoff -->
@@ -4497,6 +4512,10 @@ const trainingContent = {
         <span style="background: #f0fdf4; padding: 8px 12px; border-radius: 8px;">✅</span>
         Contingency + Claim Authorization Script
       </h2>
+
+      <div class="script-purpose-callout" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-left: 5px solid #c62828; border-radius: 0 12px 12px 0; padding: 16px 20px; margin-bottom: 20px;">
+        <p style="margin: 0; color: #7f1d1d; font-size: 15px;"><strong>🎯 Purpose of this script:</strong> to get the homeowner to sign the Contingency Agreement and Claim Authorization. Every script has one job - know the purpose before you open your mouth.</p>
+      </div>
 
       <div style="display: grid; gap: 15px; margin-bottom: 35px;">
         <div style="background: white; border: 2px solid #dcfce7; border-radius: 16px; padding: 20px;">
@@ -4923,41 +4942,41 @@ trainingContent['general-knowledge'] = `
         <h4>Key Components to Know:</h4>
         <p style="color: #6b7280; font-size: 0.9rem; margin-bottom: 16px;">Click on any component to see a photo example</p>
         <div class="legend-grid">
-          <div class="legend-item clickable-component" onclick="toggleComponentImage(this, 'ridge')">
+          <div class="legend-item clickable-component expanded" onclick="toggleComponentImage(this, 'ridge')">
             <span class="legend-marker">1</span>
             <div>
               <strong>Ridge/Peak</strong>
               <p>Highest point where slopes meet</p>
             </div>
-            <span class="expand-icon">+</span>
+            <span class="expand-icon">−</span>
           </div>
-          <div class="component-image-container" id="ridge-image" style="display: none;">
+          <div class="component-image-container" id="ridge-image">
             <img src="/assets/roof-components/ridge.jpg?v=20260121" alt="Ridge/Peak of a roof" style="width: 100%; border-radius: 8px;">
             <p class="image-caption">The ridge is the horizontal line at the top where two roof slopes meet</p>
           </div>
 
-          <div class="legend-item clickable-component" onclick="toggleComponentImage(this, 'valley')">
+          <div class="legend-item clickable-component expanded" onclick="toggleComponentImage(this, 'valley')">
             <span class="legend-marker">2</span>
             <div>
               <strong>Valley</strong>
               <p>Where two slopes meet forming a channel</p>
             </div>
-            <span class="expand-icon">+</span>
+            <span class="expand-icon">−</span>
           </div>
-          <div class="component-image-container" id="valley-image" style="display: none;">
+          <div class="component-image-container" id="valley-image">
             <img src="/assets/roof-components/valley.jpg?v=20260121" alt="Roof valley" style="width: 100%; border-radius: 8px;">
             <p class="image-caption">Valleys channel water where two roof planes meet - critical area for leaks</p>
           </div>
 
-          <div class="legend-item clickable-component" onclick="toggleComponentImage(this, 'fascia')">
+          <div class="legend-item clickable-component expanded" onclick="toggleComponentImage(this, 'fascia')">
             <span class="legend-marker">3</span>
             <div>
               <strong>Fascia</strong>
               <p>Board at roof edge, holds gutters</p>
             </div>
-            <span class="expand-icon">+</span>
+            <span class="expand-icon">−</span>
           </div>
-          <div class="component-image-container" id="fascia-image" style="display: none;">
+          <div class="component-image-container" id="fascia-image">
             <div style="position: relative; display: inline-block; width: 100%;">
               <img src="/assets/roof-components/fascia.jpg?v=20260121" alt="Fascia board" style="width: 100%; border-radius: 8px;">
               <!-- Fascia highlight - beige horizontal board -->
@@ -4976,67 +4995,67 @@ trainingContent['general-knowledge'] = `
             <p class="image-caption">The fascia is the vertical board running along the roof edge - gutters attach here. The soffit is the underside of the roof overhang.</p>
           </div>
 
-          <div class="legend-item clickable-component" onclick="toggleComponentImage(this, 'dripedge')">
+          <div class="legend-item clickable-component expanded" onclick="toggleComponentImage(this, 'dripedge')">
             <span class="legend-marker">4</span>
             <div>
               <strong>Drip Edge</strong>
               <p>Metal strip directing water away</p>
             </div>
-            <span class="expand-icon">+</span>
+            <span class="expand-icon">−</span>
           </div>
-          <div class="component-image-container" id="dripedge-image" style="display: none;">
+          <div class="component-image-container" id="dripedge-image">
             <img src="/assets/roof-components/dripedge.jpg?v=20260121" alt="Drip edge" style="width: 100%; border-radius: 8px;">
             <p class="image-caption">Metal flashing installed at roof edges to direct water into gutters</p>
           </div>
 
-          <div class="legend-item clickable-component" onclick="toggleComponentImage(this, 'gutter')">
+          <div class="legend-item clickable-component expanded" onclick="toggleComponentImage(this, 'gutter')">
             <span class="legend-marker">5</span>
             <div>
               <strong>Gutter</strong>
               <p>Channels water off the roof</p>
             </div>
-            <span class="expand-icon">+</span>
+            <span class="expand-icon">−</span>
           </div>
-          <div class="component-image-container" id="gutter-image" style="display: none;">
+          <div class="component-image-container" id="gutter-image">
             <img src="/assets/roof-components/gutter.jpg?v=20260121" alt="Gutter system" style="width: 100%; border-radius: 8px;">
             <p class="image-caption">Gutters collect and channel rainwater away from the foundation</p>
           </div>
 
-          <div class="legend-item clickable-component" onclick="toggleComponentImage(this, 'flashing')">
+          <div class="legend-item clickable-component expanded" onclick="toggleComponentImage(this, 'flashing')">
             <span class="legend-marker">6</span>
             <div>
               <strong>Flashing</strong>
               <p>Waterproofs joints and edges</p>
             </div>
-            <span class="expand-icon">+</span>
+            <span class="expand-icon">−</span>
           </div>
-          <div class="component-image-container" id="flashing-image" style="display: none;">
+          <div class="component-image-container" id="flashing-image">
             <img src="/assets/roof-components/flashing.jpg?v=20260121" alt="Roof flashing" style="width: 100%; border-radius: 8px;">
             <p class="image-caption">Metal pieces that seal joints around chimneys, vents, and roof transitions</p>
           </div>
 
-          <div class="legend-item clickable-component" onclick="toggleComponentImage(this, 'soffit')">
+          <div class="legend-item clickable-component expanded" onclick="toggleComponentImage(this, 'soffit')">
             <span class="legend-marker">7</span>
             <div>
               <strong>Soffit</strong>
               <p>Underside of roof overhang</p>
             </div>
-            <span class="expand-icon">+</span>
+            <span class="expand-icon">−</span>
           </div>
-          <div class="component-image-container" id="soffit-image" style="display: none;">
+          <div class="component-image-container" id="soffit-image">
             <img src="/assets/roof-components/soffit.jpg?v=20260121" alt="Soffit" style="width: 100%; border-radius: 8px;">
             <p class="image-caption">The soffit covers the underside of roof overhangs and provides ventilation</p>
           </div>
 
-          <div class="legend-item clickable-component" onclick="toggleComponentImage(this, 'eave')">
+          <div class="legend-item clickable-component expanded" onclick="toggleComponentImage(this, 'eave')">
             <span class="legend-marker">8</span>
             <div>
               <strong>Eave</strong>
               <p>Lower edge of the roof</p>
             </div>
-            <span class="expand-icon">+</span>
+            <span class="expand-icon">−</span>
           </div>
-          <div class="component-image-container" id="eave-image" style="display: none;">
+          <div class="component-image-container" id="eave-image">
             <img src="/assets/roof-components/eave.jpg?v=20260121" alt="Roof eave" style="width: 100%; border-radius: 8px;">
             <p class="image-caption">The eave is the lower edge of the roof that overhangs the wall</p>
           </div>
@@ -6894,21 +6913,14 @@ function toggleComponentImage(element: HTMLElement, componentId: string) {
   const expandIcon = element.querySelector('.expand-icon');
 
   if (imageContainer) {
+    // Images start visible; clicking toggles just this component
     const isVisible = imageContainer.style.display !== 'none';
 
-    // Close all other open images first
-    document.querySelectorAll('.component-image-container').forEach(container => {
-      (container as HTMLElement).style.display = 'none';
-    });
-    document.querySelectorAll('.expand-icon').forEach(icon => {
-      icon.textContent = '+';
-    });
-    document.querySelectorAll('.clickable-component').forEach(comp => {
-      (comp as HTMLElement).classList.remove('expanded');
-    });
-
-    // Toggle current one
-    if (!isVisible) {
+    if (isVisible) {
+      imageContainer.style.display = 'none';
+      if (expandIcon) expandIcon.textContent = '+';
+      element.classList.remove('expanded');
+    } else {
       imageContainer.style.display = 'block';
       if (expandIcon) expandIcon.textContent = '−';
       element.classList.add('expanded');
@@ -7229,17 +7241,8 @@ function resetSalesCycleGame() {
 
 // --- Module 8: Inspection Step Card Toggle ---
 function toggleStepCard(cardElement: HTMLElement) {
-  const wasExpanded = cardElement.classList.contains('expanded');
-
-  // Close all other cards
-  document.querySelectorAll('.inspection-step-card.expanded').forEach(card => {
-    card.classList.remove('expanded');
-  });
-
-  // Toggle clicked card
-  if (!wasExpanded) {
-    cardElement.classList.add('expanded');
-  }
+  // Cards start expanded; clicking toggles just that card
+  cardElement.classList.toggle('expanded');
 }
 
 // Expose globally
@@ -11271,7 +11274,6 @@ const moduleTips: Record<string, ModuleTip[]> = {
     { id: 'tip-linger', trigger: 'linger', delay: 45000, icon: '⏱️', title: 'Take Your Time', message: 'This module takes about 15-20 minutes. No rush!' },
   ],
   'commitment': [
-    { id: 'tip-commitment-video', trigger: 'scroll', targetSelector: '.video-player-container', icon: '🎬', title: 'Important Video', message: 'Watch this commitment video to understand expectations.' },
     { id: 'tip-commitment-linger', trigger: 'linger', delay: 60000, icon: '💡', title: 'Still Here?', message: 'Take your time understanding the commitment expectations.' },
   ],
   'general-knowledge': [
@@ -13884,15 +13886,11 @@ function initCommitmentGate() {
     return;
   }
 
-  // Check if video was previously watched
-  const videoWatchedKey = 'video-watched-commitment-video';
-  commitmentVideoWatched = localStorage.getItem(videoWatchedKey) === 'true';
+  // Video requirement removed (2026-08-28) - initials + signature are the only gates
+  commitmentVideoWatched = true;
 
   // Initialize state
   commitmentInitialsCount = 0;
-
-  // Set up video progress tracking for commitment video
-  setupCommitmentVideoTracking();
 
   // Set up initial box listeners
   setupInitialBoxListeners();
@@ -13941,35 +13939,6 @@ function setupModuleNavLinks() {
       }
     });
   });
-}
-
-function setupCommitmentVideoTracking() {
-  const videoContainer = document.querySelector('.video-player-container video') as HTMLVideoElement;
-  const progressText = document.getElementById('commitment-video-progress');
-
-  if (videoContainer) {
-    videoContainer.addEventListener('timeupdate', () => {
-      const percent = Math.round((videoContainer.currentTime / videoContainer.duration) * 100);
-      if (progressText) {
-        progressText.textContent = `Video progress: ${percent}%`;
-      }
-      if (percent >= 90 && !commitmentVideoWatched) {
-        commitmentVideoWatched = true;
-        localStorage.setItem('video-watched-commitment-video', 'true');
-        updateCommitmentRequirements();
-      }
-    });
-  }
-
-  // Check if already watched
-  if (commitmentVideoWatched) {
-    const videoNotice = document.getElementById('commitment-video-notice');
-    if (videoNotice) {
-      videoNotice.classList.add('completed');
-      const progressText = document.getElementById('commitment-video-progress');
-      if (progressText) progressText.textContent = 'Video completed ✓';
-    }
-  }
 }
 
 function setupInitialBoxListeners() {
@@ -14591,9 +14560,9 @@ function showExamStartScreen(root: HTMLElement, state: ExamState) {
       <div class="exam-info-panel">
         <h3>📋 Exam Format</h3>
         <ul>
-          <li><strong>35 Multiple Choice Questions</strong> (2 points each)</li>
+          <li><strong>36 Multiple Choice Questions</strong> (2 points each)</li>
           <li><strong>10 Fill-in-the-Blank Questions</strong> (2 points each)</li>
-          <li><strong>10 Short Answer Questions</strong> (2 points each)</li>
+          <li><strong>9 Short Answer Questions</strong> (2 points each)</li>
           <li><strong>Total: 110 points</strong></li>
           <li><strong>Passing Score: 70% (77 points)</strong></li>
         </ul>
@@ -15171,12 +15140,13 @@ async function gradeFinalExam(root: HTMLElement) {
     }
   });
 
-  // Calculate total score (out of 110 points, stored as percentage)
-  const mcqScore = mcqCorrect * 2;      // 70 pts max
-  const fibScore = fibCorrect * 2;      // 20 pts max
-  const saScore = Math.round(saPoints); // 20 pts max
-  const rawTotal = mcqScore + fibScore + saScore; // Max 110 points
-  const totalScore = Math.round((rawTotal / 110) * 100); // Convert to percentage
+  // Calculate total score as a percentage of the actual question pool
+  const mcqScore = mcqCorrect * 2;
+  const fibScore = fibCorrect * 2;
+  const saScore = Math.round(saPoints);
+  const rawTotal = mcqScore + fibScore + saScore;
+  const maxTotal = (mcq.length + fib.length + sa.length) * 2;
+  const totalScore = Math.round((rawTotal / maxTotal) * 100); // Convert to percentage
   const passed = totalScore >= 70; // 70%
 
   // Save attempt
@@ -15724,7 +15694,7 @@ function initQuickQuiz1() {
       const q1 = selectedAnswers['qa1'];
       const q2 = selectedAnswers['qa2'];
       const q3 = selectedAnswers['qa3'];
-      const pass = q1 === 'a' && q2 === 'b' && q3 === 'c';
+      const pass = q1 === 'a' && q2 === 'b' && q3 === 'b';
       const res = document.getElementById('quiz1Result');
       if (res) {
         if (pass) {
@@ -15745,7 +15715,7 @@ function initQuickQuiz1() {
           let feedback = '<div class="quiz-error">&#10007; Not quite. ';
           if (q1 !== 'a') feedback += 'Review the leadership team. ';
           if (q2 !== 'b') feedback += 'Check our core values. ';
-          if (q3 !== 'c') feedback += 'Roof-ER was founded in 2019. ';
+          if (q3 !== 'b') feedback += 'Roof-ER was founded in 2018. ';
           feedback += '<br><br><button onclick="location.reload()" style="background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Try Again</button></div>';
           res.innerHTML = feedback;
         }

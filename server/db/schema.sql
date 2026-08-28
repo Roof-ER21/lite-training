@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS roleplay_scores (
 -- Certification records
 CREATE TABLE IF NOT EXISTS certifications (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    user_id UUID UNIQUE REFERENCES users(id) ON DELETE CASCADE,
     certified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     passing_attempt_id UUID REFERENCES exam_attempts(id),
     certificate_name VARCHAR(255),

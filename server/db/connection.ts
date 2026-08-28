@@ -174,8 +174,10 @@ export async function initDatabase(): Promise<void> {
         -- Certifications
         CREATE TABLE IF NOT EXISTS certifications (
           id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-          user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+          user_id UUID UNIQUE REFERENCES users(id) ON DELETE CASCADE,
           certified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          passing_attempt_id UUID REFERENCES exam_attempts(id),
+          certificate_name VARCHAR(255),
           score INTEGER
         );
 
@@ -227,8 +229,10 @@ export async function initDatabase(): Promise<void> {
 
       CREATE TABLE IF NOT EXISTS certifications (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+        user_id UUID UNIQUE REFERENCES users(id) ON DELETE CASCADE,
         certified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        passing_attempt_id UUID REFERENCES exam_attempts(id),
+        certificate_name VARCHAR(255),
         score INTEGER
       );
 
@@ -248,6 +252,24 @@ export async function initDatabase(): Promise<void> {
       ALTER TABLE exam_answers ADD COLUMN IF NOT EXISTS question_number INTEGER;
       ALTER TABLE exam_answers ADD COLUMN IF NOT EXISTS question_text TEXT;
       ALTER TABLE exam_answers ADD COLUMN IF NOT EXISTS points_earned INTEGER DEFAULT 0;
+
+      -- Certifications fix (2026-08-28): the insert in /api/exam/submit uses
+      -- ON CONFLICT (user_id) and references columns this table was missing,
+      -- so it failed silently and nobody ever showed as Certified in admin.
+      ALTER TABLE certifications ADD COLUMN IF NOT EXISTS passing_attempt_id UUID REFERENCES exam_attempts(id);
+      ALTER TABLE certifications ADD COLUMN IF NOT EXISTS certificate_name VARCHAR(255);
+      DELETE FROM certifications a USING certifications b
+        WHERE a.id > b.id AND a.user_id = b.user_id;
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_certifications_user_unique ON certifications(user_id);
+
+      -- Backfill: certify everyone who already passed the exam but has no record
+      INSERT INTO certifications (user_id, passing_attempt_id, certificate_name, score)
+      SELECT DISTINCT ON (ea.user_id) ea.user_id, ea.id, u.name, ea.total_score
+      FROM exam_attempts ea
+      JOIN users u ON u.id = ea.user_id
+      WHERE ea.passed = true
+        AND NOT EXISTS (SELECT 1 FROM certifications c WHERE c.user_id = ea.user_id)
+      ORDER BY ea.user_id, ea.completed_at ASC NULLS LAST;
 
       -- Create roleplay_scores table if not exists (referenced in reset-progress)
       CREATE TABLE IF NOT EXISTS roleplay_scores (

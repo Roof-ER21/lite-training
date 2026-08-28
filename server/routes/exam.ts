@@ -165,17 +165,23 @@ router.post('/submit', async (req: Request, res: Response) => {
       }
     }
 
-    // If passed, create certification record
+    // If passed, create certification record. This must never fail silently -
+    // a broken insert here is exactly what made admin show "Certified: No"
+    // for every user who had passed the exam.
     if (results.passed) {
-      const user = await queryOne<{ name: string }>(`
-        SELECT name FROM users WHERE id = $1
-      `, [userId]);
+      try {
+        const user = await queryOne<{ name: string }>(`
+          SELECT name FROM users WHERE id = $1
+        `, [userId]);
 
-      await query(`
-        INSERT INTO certifications (user_id, passing_attempt_id, certificate_name, score)
-        VALUES ($1, $2, $3, $4)
-        ON CONFLICT (user_id) DO NOTHING
-      `, [userId, attemptId, user?.name || 'Unknown', results.totalScore]);
+        await query(`
+          INSERT INTO certifications (user_id, passing_attempt_id, certificate_name, score)
+          VALUES ($1, $2, $3, $4)
+          ON CONFLICT (user_id) DO NOTHING
+        `, [userId, attemptId, user?.name || 'Unknown', results.totalScore]);
+      } catch (certError) {
+        console.error('CERTIFICATION INSERT FAILED for user', userId, certError);
+      }
     }
 
     // Get remaining attempts
