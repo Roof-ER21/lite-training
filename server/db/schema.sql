@@ -144,3 +144,48 @@ CREATE INDEX IF NOT EXISTS idx_exam_answers_attempt ON exam_answers(attempt_id);
 CREATE INDEX IF NOT EXISTS idx_roleplay_sessions_user ON roleplay_sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_login_history_user ON login_history(user_id);
 CREATE INDEX IF NOT EXISTS idx_activity_log_user ON activity_log(user_id);
+
+-- ============================================
+-- MCP: personal agent tokens (reads first, 2026-09-08)
+-- ============================================
+-- Documentation copy. The app applies this itself at boot: the inline
+-- `migrations` block in server/db/connection.ts (initDatabase) runs on every
+-- start and is idempotent, so a deploy is the migration. Keep both in step.
+--
+-- sessions.agent_scope is the ceiling. NULL = a normal login session.
+-- 'mcp:read' = a loopback session (server/mcp/loopback.ts) that requireAuth
+-- refuses on any non-GET/HEAD request (server/middleware/auth.ts).
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS agent_scope TEXT;
+
+-- Personal agent tokens: sha256 of the token, never the token.
+CREATE TABLE IF NOT EXISTS mcp_tokens (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    token_hash TEXT NOT NULL UNIQUE,
+    token_hint TEXT NOT NULL,
+    scopes TEXT[] NOT NULL DEFAULT '{}',
+    expires_at TIMESTAMP,
+    last_used_at TIMESTAMP,
+    revoked_at TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_mcp_tokens_user ON mcp_tokens(user_id, created_at DESC);
+
+-- One row per tools/call: argument KEYS only, never values. No FK on purpose.
+CREATE TABLE IF NOT EXISTS mcp_audit_log (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    token_id UUID NOT NULL,
+    request_id TEXT NOT NULL,
+    tool TEXT NOT NULL,
+    area TEXT NOT NULL,
+    access TEXT NOT NULL CHECK (access IN ('read', 'write')),
+    argument_keys TEXT[] NOT NULL DEFAULT '{}',
+    ok BOOLEAN NOT NULL,
+    error TEXT,
+    duration_ms INTEGER NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_mcp_audit_log_token ON mcp_audit_log(token_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_mcp_audit_log_user ON mcp_audit_log(user_id, created_at DESC);

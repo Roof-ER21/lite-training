@@ -1612,6 +1612,236 @@ async function renderLeaderboardSection(container: HTMLElement) {
   loadLeaderboard('weekly');
 }
 
+// ============================================================================
+// CONNECTED AGENTS — personal MCP tokens (read-only)
+// ============================================================================
+//
+// Any MCP client (Genie 21, Claude, ChatGPT, Cursor) connects to /mcp with one
+// of these tokens and acts AS this person: it sees exactly what they can see
+// here, and it cannot change anything. Backed by /api/mcp/tokens (self-scoped
+// to the session). The plaintext token is shown ONCE, right after minting;
+// after that only the last four characters. Rendered on My Page.
+
+interface AgentToken {
+  id: string;
+  name: string;
+  hint: string;
+  scopes: string[];
+  expiresAt: string | null;
+  lastUsedAt: string | null;
+  createdAt: string;
+}
+
+interface AgentArea {
+  area: string;
+  scope: string;
+  label: string;
+  description: string;
+  allowed: boolean;
+}
+
+function formatAgentWhen(iso: string | null): string {
+  if (!iso) return 'never';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return 'unknown';
+  return d.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+}
+
+function formatAgentDay(iso: string | null): string {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+async function copyToClipboard(value: string, button: HTMLButtonElement): Promise<void> {
+  const original = button.textContent;
+  try {
+    await navigator.clipboard.writeText(value);
+    button.textContent = 'Copied';
+    setTimeout(() => { button.textContent = original; }, 1500);
+  } catch {
+    /* clipboard blocked — the value is selectable on screen */
+  }
+}
+
+async function renderConnectedAgentsSection(container: HTMLElement) {
+  // Offline sessions have no server-side identity to mint a token for.
+  const sessionToken = localStorage.getItem(STORAGE_KEYS.sessionToken);
+  if (!sessionToken || sessionToken.startsWith('offline-')) return;
+
+  const section = document.createElement('div');
+  section.className = 'gamification-section agents-section';
+  container.appendChild(section);
+
+  let minted: { name: string; token: string; endpoint: string } | null = null;
+  let mode: 'list' | 'new' = 'list';
+  let error: string | null = null;
+  let confirmRevokeId: string | null = null;
+
+  const load = async () => {
+    const [tokensRes, areasRes] = await Promise.all([
+      apiCall<{ tokens: AgentToken[]; endpoint: string }>('/mcp/tokens', { silent: true } as any),
+      apiCall<{ endpoint: string; areas: AgentArea[] }>('/mcp/tokens/areas', { silent: true } as any),
+    ]);
+    return { tokensRes, areasRes };
+  };
+
+  const render = async () => {
+    const { tokensRes, areasRes } = await load();
+    if (!tokensRes && !areasRes) {
+      section.innerHTML = `
+        <h3>🔌 Connected agents</h3>
+        <p class="agents-muted">Could not load your agent tokens right now.</p>
+      `;
+      return;
+    }
+    const tokens = tokensRes?.tokens ?? [];
+    const endpoint = tokensRes?.endpoint || areasRes?.endpoint || `${window.location.origin}/mcp`;
+    const areas = (areasRes?.areas ?? []).filter(a => a.allowed);
+
+    const mintedBlock = minted ? `
+      <div class="agents-minted">
+        <div class="agents-minted-title">Your new token for “${escapeHtml(minted.name)}”</div>
+        <div class="agents-muted">Copy it now — Lite Training keeps only a fingerprint and will not show it again.</div>
+        <div class="agents-row">
+          <code class="agents-code agents-token">${escapeHtml(minted.token)}</code>
+          <button type="button" class="agents-btn agents-btn-secondary" data-copy="${escapeHtml(minted.token)}">Copy</button>
+        </div>
+        <div class="agents-connect">
+          <div><strong>Connect an agent</strong></div>
+          <div class="agents-row">Endpoint: <code class="agents-code">${escapeHtml(minted.endpoint || endpoint)}</code>
+            <button type="button" class="agents-btn agents-btn-secondary" data-copy="${escapeHtml(minted.endpoint || endpoint)}">Copy</button></div>
+          <div>Header: <code class="agents-code">Authorization: Bearer ${escapeHtml(minted.token)}</code></div>
+          <div class="agents-muted">Works with any MCP client (Genie 21, Claude, ChatGPT, Cursor). Read-only: the agent can look things up, never change them.</div>
+        </div>
+        <button type="button" class="agents-btn agents-btn-secondary" data-action="dismiss-minted">Done, I saved it</button>
+      </div>
+    ` : '';
+
+    const errorBlock = error ? `<div class="agents-error" role="alert">${escapeHtml(error)}</div>` : '';
+
+    const listBlock = `
+      <div class="agents-toolbar">
+        <div class="agents-muted">Endpoint <code class="agents-code">${escapeHtml(endpoint)}</code> · header <code class="agents-code">Authorization: Bearer …</code></div>
+        <button type="button" class="agents-btn" data-action="new">+ New token</button>
+      </div>
+      ${tokens.length === 0
+        ? `<div class="agents-empty">No agents connected yet. Create a token and paste it into your agent.</div>`
+        : `<div class="agents-list">${tokens.map(t => `
+          <div class="agents-item">
+            <div class="agents-item-head">
+              <div class="agents-item-name">${escapeHtml(t.name)} <span class="agents-hint">…${escapeHtml(t.hint)}</span></div>
+              ${confirmRevokeId === t.id ? `
+                <div class="agents-row">
+                  <span class="agents-danger-text">Revoke “${escapeHtml(t.name)}”? Its agent stops working immediately.</span>
+                  <button type="button" class="agents-btn agents-btn-danger" data-action="revoke" data-id="${escapeHtml(t.id)}" data-name="${escapeHtml(t.name)}">Revoke</button>
+                  <button type="button" class="agents-btn agents-btn-secondary" data-action="keep">Keep</button>
+                </div>
+              ` : `
+                <button type="button" class="agents-btn agents-btn-secondary" data-action="confirm-revoke" data-id="${escapeHtml(t.id)}">Revoke</button>
+              `}
+            </div>
+            <div class="agents-scopes">${t.scopes.map(s => `<span class="agents-scope">${escapeHtml(s)}</span>`).join('')}</div>
+            <div class="agents-muted">Created ${formatAgentDay(t.createdAt)} · last used ${formatAgentWhen(t.lastUsedAt)}${t.expiresAt ? ` · expires ${formatAgentDay(t.expiresAt)}` : ' · no expiry'}</div>
+          </div>
+        `).join('')}</div>`}
+    `;
+
+    const newBlock = `
+      <div class="agents-new">
+        <div class="agents-item-name">New agent token</div>
+        <p class="agents-muted">Read-only for now: pick which areas the agent may look at. It will see exactly what you see in Lite Training, and it cannot change anything.</p>
+        <label class="agents-label" for="agent-token-name">Name</label>
+        <input id="agent-token-name" class="agents-input" type="text" maxlength="80" placeholder="e.g. Genie 21, Claude on my laptop" />
+        <div class="agents-label">What it may read</div>
+        ${areas.length === 0
+          ? `<div class="agents-muted">Your role has no areas an agent could read.</div>`
+          : `<div class="agents-areas">${areas.map(a => `
+            <label class="agents-area" for="agent-area-${escapeHtml(a.area)}">
+              <input type="checkbox" id="agent-area-${escapeHtml(a.area)}" value="${escapeHtml(a.scope)}" />
+              <span><span class="agents-area-label">${escapeHtml(a.label)}</span> <span class="agents-hint">${escapeHtml(a.scope)}</span>
+                <div class="agents-muted">${escapeHtml(a.description)}</div></span>
+            </label>
+          `).join('')}</div>
+          <div class="agents-row">
+            <button type="button" class="agents-btn agents-btn-secondary" data-action="select-all">Select all</button>
+            <button type="button" class="agents-btn agents-btn-secondary" data-action="clear">Clear</button>
+          </div>`}
+        <label class="agents-label" for="agent-token-expiry">Expires after (days, optional)</label>
+        <input id="agent-token-expiry" class="agents-input agents-input-short" type="number" min="1" max="365" placeholder="never" />
+        <div class="agents-row agents-actions">
+          <button type="button" class="agents-btn agents-btn-secondary" data-action="cancel">Cancel</button>
+          <button type="button" class="agents-btn" data-action="mint">Create token</button>
+        </div>
+      </div>
+    `;
+
+    section.innerHTML = `
+      <h3>🔌 Connected agents</h3>
+      <p class="agents-muted">Tokens that let an AI agent read Lite Training as you — nothing more than you can already see, and nothing it can change.</p>
+      ${errorBlock}
+      ${mintedBlock}
+      ${mode === 'list' ? listBlock : newBlock}
+    `;
+
+    section.querySelectorAll<HTMLButtonElement>('button[data-copy]').forEach(btn => {
+      btn.addEventListener('click', () => copyToClipboard(btn.dataset.copy || '', btn));
+    });
+    section.querySelectorAll<HTMLButtonElement>('button[data-action]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const action = btn.dataset.action;
+        error = null;
+        if (action === 'dismiss-minted') { minted = null; }
+        else if (action === 'new') { mode = 'new'; }
+        else if (action === 'cancel') { mode = 'list'; }
+        else if (action === 'confirm-revoke') { confirmRevokeId = btn.dataset.id || null; }
+        else if (action === 'keep') { confirmRevokeId = null; }
+        else if (action === 'select-all' || action === 'clear') {
+          section.querySelectorAll<HTMLInputElement>('.agents-area input[type=checkbox]').forEach(cb => { cb.checked = action === 'select-all'; });
+          return;
+        }
+        else if (action === 'revoke') {
+          btn.disabled = true;
+          const id = btn.dataset.id || '';
+          const res = await fetch(`${API_BASE}/mcp/tokens/${encodeURIComponent(id)}`, { method: 'DELETE', headers: sessionAuthHeader() });
+          if (!res.ok) {
+            const json = await res.json().catch(() => null);
+            error = json?.error || `Could not revoke "${btn.dataset.name || 'the token'}".`;
+          }
+          confirmRevokeId = null;
+        }
+        else if (action === 'mint') {
+          const name = (section.querySelector<HTMLInputElement>('#agent-token-name')?.value || '').trim();
+          const scopes = Array.from(section.querySelectorAll<HTMLInputElement>('.agents-area input[type=checkbox]:checked')).map(cb => cb.value);
+          const expiry = (section.querySelector<HTMLInputElement>('#agent-token-expiry')?.value || '').trim();
+          if (!name) { error = 'Give the token a name — usually the agent that will use it.'; await render(); return; }
+          if (scopes.length === 0) { error = 'Pick at least one area the agent may read.'; await render(); return; }
+          btn.disabled = true;
+          const body: Record<string, unknown> = { name, scopes };
+          if (expiry) body.expiresInDays = Number(expiry);
+          const res = await fetch(`${API_BASE}/mcp/tokens`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...sessionAuthHeader() },
+            body: JSON.stringify(body),
+          });
+          const json = await res.json().catch(() => null);
+          if (!res.ok || !json?.token) {
+            error = json?.error || 'Could not create the token. Try again.';
+            await render();
+            return;
+          }
+          minted = { name: json.name, token: json.token, endpoint: json.endpoint };
+          mode = 'list';
+        }
+        await render();
+      });
+    });
+  };
+
+  await render();
+}
+
 // Render daily review section
 async function renderDailyReviewSection(container: HTMLElement) {
   const review = await apiCall<{ cards: Array<{ id: string; questionText: string; correctAnswer: string }>; dueCount: number; totalCount: number }>('/progress/review', { silent: true } as any);
@@ -1955,6 +2185,13 @@ async function initMyPage() {
   if (reviewContainer) {
     reviewContainer.innerHTML = '';
     await renderDailyReviewSection(reviewContainer);
+  }
+
+  // Render connected agents (personal MCP tokens)
+  const agentsContainer = document.getElementById('dashboard-agents');
+  if (agentsContainer) {
+    agentsContainer.innerHTML = '';
+    await renderConnectedAgentsSection(agentsContainer);
   }
 }
 
@@ -2306,6 +2543,11 @@ const trainingContent = {
       <!-- Daily Review -->
       <div class="dashboard-review" id="dashboard-review">
         <!-- Daily review section will be rendered here -->
+      </div>
+
+      <!-- Connected agents (personal MCP tokens, read-only) -->
+      <div class="dashboard-agents" id="dashboard-agents">
+        <!-- Connected agents section will be rendered here -->
       </div>
     </div>
   `,

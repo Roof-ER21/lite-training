@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { query, queryOne } from '../db/connection.js';
-import { requireAuth } from '../middleware/auth.js';
+import { requireAuth, MCP_READ_SCOPE } from '../middleware/auth.js';
 import { rateLimit } from '../middleware/rate-limit.js';
 import crypto from 'crypto';
 
@@ -195,14 +195,21 @@ router.post('/validate', async (req: Request, res: Response) => {
       expires_at: Date;
       name: string;
       is_manager: boolean;
+      agent_scope: string | null;
     }>(`
-      SELECT s.user_id, s.is_active, s.expires_at, u.name, u.is_manager
+      SELECT s.user_id, s.is_active, s.expires_at, s.agent_scope, u.name, u.is_manager
       FROM sessions s
       JOIN users u ON s.user_id = u.id
       WHERE s.token = $1
     `, [token]);
 
     if (!session || !session.is_active) {
+      return res.json({ valid: false });
+    }
+
+    // An MCP loopback session (agent_scope 'mcp:read', server/mcp/loopback.ts)
+    // is never a login: the UI must not adopt it as the person's session.
+    if (session.agent_scope === MCP_READ_SCOPE) {
       return res.json({ valid: false });
     }
 

@@ -16,6 +16,9 @@ import geminiProxyRoutes from './routes/gemini-proxy.js';
 import superadminAuthRoutes, { seedInitialAdmin } from './routes/superadmin-auth.js';
 import cmsRoutes from './routes/cms.js';
 import contentRoutes from './routes/content.js';
+import mcpTokenRoutes from './routes/mcp-tokens.js';
+import { rateLimit } from './middleware/rate-limit.js';
+import { createLiteTrainingMcpServer, mcpRateLimitKey } from './mcp/server.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,6 +28,24 @@ const PORT = process.env.PORT || 3000;
 
 // Behind Railway's proxy — needed so req.ip reflects the real client for rate limiting
 app.set('trust proxy', 1);
+
+// ── /mcp — personal agent tokens act as the person (reads only) ─────────────
+// Mounted BEFORE the app-wide 5mb JSON parser so the 256kb body limit is
+// real. Its own limiter: 120 requests/minute per token, keyed on the sha256
+// of the bearer — not the IP, which would starve every agent behind one
+// office NAT at once. Everything else (401/503, scopes, validation, audit)
+// lives in server/mcp/. Kill switch: MCP_ACCESS_DISABLED=true → 503.
+const mcpLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 120,
+  name: 'mcp',
+  keyFor: mcpRateLimitKey,
+  message: 'Too many requests for this agent token; wait a minute.',
+});
+const liteTrainingMcp = createLiteTrainingMcpServer();
+app.use('/mcp', mcpLimiter, express.json({ limit: '256kb' }), (req: express.Request, res: express.Response) => {
+  void liteTrainingMcp.handler(req, res);
+});
 
 // No CORS middleware on purpose: the frontend is served by this same server
 // (and the Vite dev server proxies /api), so cross-origin API use is never
@@ -70,6 +91,8 @@ app.use('/api/gemini', geminiProxyRoutes);
 app.use('/api/admin-auth', superadminAuthRoutes);
 app.use('/api/cms', cmsRoutes);
 app.use('/api/content', contentRoutes);
+// Personal agent tokens for the MCP endpoint (server/mcp/, /mcp is mounted above)
+app.use('/api/mcp/tokens', mcpTokenRoutes);
 
 // Serve static files from the dist directory (built frontend)
 const distPath = path.join(__dirname, '..', 'dist');

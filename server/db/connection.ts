@@ -434,6 +434,57 @@ export async function initDatabase(): Promise<void> {
       );
       CREATE INDEX IF NOT EXISTS idx_cms_scenarios_pack ON cms_roleplay_scenarios(pack_id);
       CREATE INDEX IF NOT EXISTS idx_cms_scenarios_active ON cms_roleplay_scenarios(is_active);
+
+      -- ============================================
+      -- MCP: PERSONAL AGENT TOKENS (reads first, 2026-09-08)
+      -- ============================================
+      -- Any person can mint a token under "Connected agents" on My Page and
+      -- hand it to an MCP client. The client connects to /mcp with
+      -- "Authorization: Bearer <token>" and acts AS that person: every tool
+      -- calls the app's own HTTP routes over loopback with a 5-minute session
+      -- row whose agent_scope is 'mcp:read', so what a tool returns is exactly
+      -- what that person can already see. No new permission model.
+      --
+      -- sessions.agent_scope is the ceiling. NULL = a normal login session.
+      -- 'mcp:read' = a loopback session that requireAuth refuses on any
+      -- non-GET/HEAD request (server/middleware/auth.ts).
+      ALTER TABLE sessions ADD COLUMN IF NOT EXISTS agent_scope TEXT;
+
+      -- mcp_tokens stores the sha256 of the token, never the token. token_hint
+      -- is the last four characters, for the list in the UI. scopes holds
+      -- "<area>:read" strings (server/mcp/areas.ts).
+      CREATE TABLE IF NOT EXISTS mcp_tokens (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        name TEXT NOT NULL,
+        token_hash TEXT NOT NULL UNIQUE,
+        token_hint TEXT NOT NULL,
+        scopes TEXT[] NOT NULL DEFAULT '{}',
+        expires_at TIMESTAMP,
+        last_used_at TIMESTAMP,
+        revoked_at TIMESTAMP,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_mcp_tokens_user ON mcp_tokens(user_id, created_at DESC);
+
+      -- One row per tools/call: argument KEYS only, never values. No FK to
+      -- mcp_tokens on purpose — the trail must outlive a deleted token.
+      CREATE TABLE IF NOT EXISTS mcp_audit_log (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL,
+        token_id UUID NOT NULL,
+        request_id TEXT NOT NULL,
+        tool TEXT NOT NULL,
+        area TEXT NOT NULL,
+        access TEXT NOT NULL CHECK (access IN ('read', 'write')),
+        argument_keys TEXT[] NOT NULL DEFAULT '{}',
+        ok BOOLEAN NOT NULL,
+        error TEXT,
+        duration_ms INTEGER NOT NULL DEFAULT 0,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_mcp_audit_log_token ON mcp_audit_log(token_id, created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_mcp_audit_log_user ON mcp_audit_log(user_id, created_at DESC);
     `;
 
     await pool.query(migrations);

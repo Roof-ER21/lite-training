@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { query, queryOne, isDatabaseAvailable } from '../db/connection.js';
+import { MCP_READ_SCOPE } from '../mcp/scope.js';
 
 // Extend Express Request type to include user
 declare global {
@@ -10,8 +11,38 @@ declare global {
         name: string;
         isManager: boolean;
       };
+      /** sessions.agent_scope of the session behind req.user — null for a normal login. */
+      agentScope?: string | null;
     }
   }
+}
+
+// ─── Read-only agent sessions (MCP) ───────────────────────────────────────────
+//
+// An MCP tool never queries the database; it calls the app's own routes over
+// loopback with a 5-minute session row whose `agent_scope` is 'mcp:read'
+// (server/mcp/loopback.ts). That value is the ceiling: such a session is
+// refused on any request that is not GET/HEAD — here in requireAuth (every
+// authenticated route in this app goes through it) — and /api/auth/validate
+// never accepts it as a login. This app has no sliding renewal to switch off.
+
+export { MCP_READ_SCOPE };
+
+type SessionLike = { agent_scope?: string | null } | null | undefined;
+
+export function isReadOnlyAgentSession(session: SessionLike): boolean {
+  return session?.agent_scope === MCP_READ_SCOPE;
+}
+
+/**
+ * Refuse a write attempted through a read-only agent session. Returns true when
+ * the response has been sent (the caller must stop).
+ */
+export function refuseReadOnlyAgentWrite(session: SessionLike, req: Request, res: Response): boolean {
+  if (!isReadOnlyAgentSession(session)) return false;
+  if (req.method === 'GET' || req.method === 'HEAD') return false;
+  res.status(403).json({ error: 'Read-only agent token.' });
+  return true;
 }
 
 // Validate session token and attach user to request
@@ -53,8 +84,9 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
       is_manager: boolean;
       is_active: boolean;
       expires_at: Date;
+      agent_scope: string | null;
     }>(`
-      SELECT s.user_id, s.is_active, s.expires_at, u.name, u.is_manager
+      SELECT s.user_id, s.is_active, s.expires_at, s.agent_scope, u.name, u.is_manager
       FROM sessions s
       JOIN users u ON s.user_id = u.id
       WHERE s.token = $1
@@ -74,12 +106,17 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
       return res.status(401).json({ error: 'Session expired' });
     }
 
+    // A read-only agent session (MCP loopback) reads as the person and nothing
+    // else. Routes still apply their own authorization to req.user below.
+    if (refuseReadOnlyAgentWrite(session, req, res)) return;
+
     // Attach user to request
     req.user = {
       id: session.user_id,
       name: session.name,
       isManager: session.is_manager
     };
+    req.agentScope = session.agent_scope ?? null;
 
     next();
   } catch (error) {
@@ -136,19 +173,23 @@ export async function optionalAuth(req: Request, res: Response, next: NextFuncti
       name: string;
       is_manager: boolean;
       is_active: boolean;
+      agent_scope: string | null;
     }>(`
-      SELECT s.user_id, s.is_active, u.name, u.is_manager
+      SELECT s.user_id, s.is_active, s.agent_scope, u.name, u.is_manager
       FROM sessions s
       JOIN users u ON s.user_id = u.id
       WHERE s.token = $1 AND s.is_active = true
     `, [token]);
 
     if (session) {
+      // Same ceiling as requireAuth: an agent session never writes.
+      if (refuseReadOnlyAgentWrite(session, req, res)) return;
       req.user = {
         id: session.user_id,
         name: session.name,
         isManager: session.is_manager
       };
+      req.agentScope = session.agent_scope ?? null;
     }
 
     next();
