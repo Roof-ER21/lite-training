@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import { setStaticCacheHeaders } from './lib/static-cache.js';
 import { captureToGlitchTip } from './lib/glitchtip.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -16,6 +17,7 @@ import geminiProxyRoutes from './routes/gemini-proxy.js';
 import superadminAuthRoutes, { seedInitialAdmin } from './routes/superadmin-auth.js';
 import cmsRoutes from './routes/cms.js';
 import contentRoutes from './routes/content.js';
+import coachingRoutes from './routes/coaching.js';
 import mcpTokenRoutes from './routes/mcp-tokens.js';
 import { rateLimit } from './middleware/rate-limit.js';
 import { createLiteTrainingMcpServer, mcpRateLimitKey } from './mcp/server.js';
@@ -91,17 +93,18 @@ app.use('/api/gemini', geminiProxyRoutes);
 app.use('/api/admin-auth', superadminAuthRoutes);
 app.use('/api/cms', cmsRoutes);
 app.use('/api/content', contentRoutes);
+app.use('/api/coaching', coachingRoutes);
 // Personal agent tokens for the MCP endpoint (server/mcp/, /mcp is mounted above)
 app.use('/api/mcp/tokens', mcpTokenRoutes);
 
 // Serve static files from the dist directory (built frontend)
 const distPath = path.join(__dirname, '..', 'dist');
-app.use(express.static(distPath));
+app.use(express.static(distPath, { setHeaders: setStaticCacheHeaders }));
 
 // Serve static assets
 const publicPath = path.join(__dirname, '..', 'public');
-app.use('/assets', express.static(path.join(publicPath, 'assets')));
-app.use(express.static(publicPath));
+app.use('/assets', express.static(path.join(publicPath, 'assets'), { setHeaders: setStaticCacheHeaders }));
+app.use(express.static(publicPath, { setHeaders: setStaticCacheHeaders }));
 
 // SPA fallback - serve index.html for all non-API routes
 app.get('*', (req, res) => {
@@ -109,7 +112,7 @@ app.get('*', (req, res) => {
   if (req.path.startsWith('/api')) {
     return res.status(404).json({ error: 'Not found' });
   }
-  res.sendFile(path.join(distPath, 'index.html'));
+  res.sendFile(path.join(distPath, 'index.html'), { headers: { 'Cache-Control': 'no-cache' } });
 });
 
 // Error handling middleware

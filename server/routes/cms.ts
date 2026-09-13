@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
-import { query, queryOne } from '../db/connection.js';
+import { query, queryOne, pool } from '../db/connection.js';
+import { createLessonDraft, publishLessonDraft } from '../lib/lesson-versions.js';
 import { requireSuperAdmin, logAdminAction } from '../middleware/superadmin.js';
 
 const router = Router();
@@ -202,17 +203,8 @@ router.post('/modules/:id/content', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'HTML content required' });
     }
 
-    // Get latest version number
-    const latest = await queryOne<{ version: number }>(`
-      SELECT MAX(version) as version FROM cms_module_content WHERE module_id = $1
-    `, [id]);
-
-    const newVersion = (latest?.version || 0) + 1;
-
-    await query(`
-      INSERT INTO cms_module_content (module_id, version, status, html_content)
-      VALUES ($1, $2, 'draft', $3)
-    `, [id, newVersion, htmlContent]);
+    if (!pool) { res.status(503).json({ error: 'Database unavailable' }); return; }
+    const newVersion = await createLessonDraft(pool, id, htmlContent);
 
     await logAdminAction(req.admin!.id, 'create_draft', 'module_content', id, null, { version: newVersion });
 
@@ -263,19 +255,9 @@ router.post('/modules/:id/publish', async (req: Request, res: Response) => {
     const { id } = req.params;
     const { version } = req.body;
 
-    // Archive current published version
-    await query(`
-      UPDATE cms_module_content
-      SET status = 'archived'
-      WHERE module_id = $1 AND status = 'published'
-    `, [id]);
-
-    // Publish the specified version
-    await query(`
-      UPDATE cms_module_content
-      SET status = 'published', published_at = NOW()
-      WHERE module_id = $1 AND version = $2
-    `, [id, version]);
+    if (!Number.isInteger(version) || version < 1) { res.status(400).json({error:'Choose a saved draft version'}); return; }
+    if (!pool) { res.status(503).json({error:'Database unavailable'}); return; }
+    await publishLessonDraft(pool, id, version);
 
     await logAdminAction(req.admin!.id, 'publish', 'module_content', id, null, { version });
 

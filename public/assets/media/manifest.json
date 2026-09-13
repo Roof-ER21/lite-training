@@ -1,0 +1,86 @@
+{
+  "welcome-intro.mp4": {
+    "poster": "/assets/media/welcome-intro.jpg",
+    "captions": "/assets/media/welcome-intro.vtt",
+    "transcript": "/assets/media/welcome-intro.json",
+    "duration": 112.0,
+    "automatic": true
+  },
+  "knocking-etiquette.mp4": {
+    "poster": "/assets/media/knocking-etiquette.jpg",
+    "captions": "/assets/media/knocking-etiquette.vtt",
+    "transcript": "/assets/media/knocking-etiquette.json",
+    "duration": 24.896,
+    "automatic": true
+  },
+  "reeses-pitch-cassidy.mp4": {
+    "poster": "/assets/media/reeses-pitch-cassidy.jpg",
+    "captions": "/assets/media/reeses-pitch-cassidy.vtt",
+    "transcript": "/assets/media/reeses-pitch-cassidy.json",
+    "duration": 54.805,
+    "automatic": true
+  },
+  "module8-inspection-process.mp4": {
+    "poster": "/assets/media/module8-inspection-process.jpg",
+    "captions": "/assets/media/module8-inspection-process.vtt",
+    "transcript": "/assets/media/module8-inspection-process.json",
+    "duration": 84.76,
+    "automatic": true
+  },
+  "module9-post-inspection.mp4": {
+    "poster": "/assets/media/module9-post-inspection.jpg",
+    "captions": "/assets/media/module9-post-inspection.vtt",
+    "transcript": "/assets/media/module9-post-inspection.json",
+    "duration": 434.213152,
+    "automatic": true
+  },
+  "module9-phase1-intro.mp4": {
+    "poster": "/assets/media/module9-phase1-intro.jpg",
+    "captions": "/assets/media/module9-phase1-intro.vtt",
+    "transcript": "/assets/media/module9-phase1-intro.json",
+    "duration": 16.253991,
+    "automatic": true
+  },
+  "module9-phase2-hail.mp4": {
+    "poster": "/assets/media/module9-phase2-hail.jpg",
+    "captions": "/assets/media/module9-phase2-hail.vtt",
+    "transcript": "/assets/media/module9-phase2-hail.json",
+    "duration": 31.021995,
+    "automatic": true
+  },
+  "module9-phase3-summary.mp4": {
+    "poster": "/assets/media/module9-phase3-summary.jpg",
+    "captions": "/assets/media/module9-phase3-summary.vtt",
+    "transcript": "/assets/media/module9-phase3-summary.json",
+    "duration": 48.042222,
+    "automatic": true
+  },
+  "module9-phase4-info.mp4": {
+    "poster": "/assets/media/module9-phase4-info.jpg",
+    "captions": "/assets/media/module9-phase4-info.vtt",
+    "transcript": "/assets/media/module9-phase4-info.json",
+    "duration": 12.028005,
+    "automatic": true
+  },
+  "module7-damage-id.mp4": {
+    "poster": "/assets/media/module7-damage-id.jpg",
+    "captions": "/assets/media/module7-damage-id.vtt",
+    "transcript": "/assets/media/module7-damage-id.json",
+    "duration": 382.84,
+    "automatic": true
+  },
+  "closing-script.mp4": {
+    "poster": "/assets/media/closing-script.jpg",
+    "captions": "/assets/media/closing-script.vtt",
+    "transcript": "/assets/media/closing-script.json",
+    "duration": 83.161,
+    "automatic": true
+  },
+  "module3-roofing101.mp4": {
+    "poster": "/assets/media/module3-roofing101.jpg",
+    "captions": "/assets/media/module3-roofing101.vtt",
+    "transcript": "/assets/media/module3-roofing101.json",
+    "duration": 426.968526,
+    "automatic": true
+  }
+}

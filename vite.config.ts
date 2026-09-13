@@ -24,7 +24,7 @@ export default defineConfig(({ mode }) => {
             // Vendor libs change far less often than app code — split them so
             // returning users keep a warm cache across app deploys.
             manualChunks: {
-              vendor: ['@google/genai', 'canvas-confetti'],
+              vendor: ['@google/genai'],
             }
           }
         }

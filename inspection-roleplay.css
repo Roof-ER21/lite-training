@@ -1,0 +1,16 @@
+.inspection-practice { max-width:1000px; }
+.inspection-brief, #inspection-debrief, #inspection-transcript-panel { border-top:1px solid var(--border-color); padding:24px 0; margin-top:24px; }
+#inspection-prompt { font-size:1.3rem; font-weight:600; }
+.inspection-actions { display:flex; flex-wrap:wrap; gap:12px; margin:20px 0; }
+.inspection-actions button { margin:0; }
+#inspection-state { padding:16px; background:var(--hover-bg); }
+#inspection-transcript { max-height:400px; overflow:auto; border:1px solid var(--border-color); padding:16px; }
+#inspection-transcript p { margin:12px 0; }
+#inspection-transcript strong { display:block; font-size:13px; color:var(--text-secondary); }
+.inspection-criterion { border-top:1px solid var(--border-color); padding:20px 0; }
+.inspection-criterion h3 { margin:8px 0; }
+.inspection-criterion blockquote { border-left:2px solid var(--border-color); padding-left:16px; margin:16px 0; }
+.inspection-history { margin-top:24px; border-top:1px solid var(--border-color); padding:20px 0; }
+.inspection-history summary { min-height:44px; cursor:pointer; }
+.inspection-history button { display:block; text-align:left; width:100%; margin:12px 0; white-space:normal; }
+@media(max-width:767px){.inspection-actions { display:grid; grid-template-columns:minmax(0,1fr); } .inspection-actions button { width:100%; } }
