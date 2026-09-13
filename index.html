@@ -2,33 +2,47 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Roof-ER Sales Training Hub</title>
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16.png">
     <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png">
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#c62828">
+    <meta name="theme-color" content="#B60807">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Roof-ER Training">
     <link rel="apple-touch-icon" href="/assets/icon-192.png">
+    <script src="/theme-init.js"></script>
     <link rel="stylesheet" href="/index.css">
+    <link rel="stylesheet" href="/training-ui.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
     <!-- Agnes Role-Play Scenarios - Must load before TypeScript module -->
     <script src="/agnes-scenarios.js"></script>
     <script type="module" src="/index.tsx"></script>
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to lesson</a>
+    <header class="training-topbar">
+      <button id="training-menu" type="button" aria-controls="sidebar" aria-expanded="false">Lessons</button>
+      <a href="#main-content" class="training-wordmark">ROOF<span>-ER</span> <span class="training-product-name">Training</span></a>
+      <span id="training-current-title">Your training</span>
+    </header>
+    <p id="training-offline" role="status" hidden>You’re offline. Saved lessons remain available. AI practice needs a connection.</p>
+    <div id="training-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+    <div id="training-alert" class="sr-only" role="alert" aria-live="assertive" aria-atomic="true"></div>
+    <button id="training-backdrop" type="button" aria-label="Close lessons" tabindex="-1" hidden></button>
     <div class="app-container">
-        <nav id="sidebar">
+        <nav id="sidebar" aria-label="Training navigation">
+            <button id="training-close-menu" type="button">Close lessons</button>
             <div class="sidebar-header">
               <div class="sidebar-logo">
-                <img src="/assets/logo-shield.png" alt="Roof-ER Logo" style="width: 200px; height: auto;">
+                <img src="/assets/logo-shield-200.webp" width="200" height="200" fetchpriority="high" alt="Roof-ER Logo" style="width: 200px; height: auto;">
               </div>
             </div>
+            <div class="training-nav-search"><label for="training-nav-search">Find a lesson</label><input id="training-nav-search" type="search" placeholder="Lesson name" autocomplete="off"></div>
             <ul class="sidebar-nav">
               <li data-module="my-page" class="active dashboard-link">
                 <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
@@ -53,7 +67,7 @@
               <li data-module="final-exam">14. Final Exam / Certification Quiz</li>
             </ul>
         </nav>
-        <main id="main-content">
+        <main id="main-content" tabindex="-1">
             <!-- Content will be dynamically loaded here -->
         </main>
     </div>

@@ -1,9 +1,16 @@
+import { mountInspectionRoleplay } from './inspection-roleplay';
+import { isRoleplayDoorSlam } from './roleplay-signals';
+import { mountLessonEditor } from './lesson-editor';
+import { mountCoaching } from './coaching-ui';
+import { initLearningWorkspace, enhanceLesson, renderFieldLibrary, addPracticeReview } from './learning-workspace';
+import { enhanceTrainingMedia } from './training-media';
+import './learning-workspace.css';
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
 */
 import { GoogleGenAI, Type, Chat } from '@google/genai';
-import confetti from 'canvas-confetti';
+import { initTrainingInterface, enhanceTrainingContent, announceTrainingStatus, closeTrainingDrawer } from './training-ui';
 
 // No API key ships to the browser: all Gemini REST calls route through the
 // Express proxy, which attaches the key server-side (server/routes/gemini-proxy.ts).
@@ -43,16 +50,18 @@ const STORAGE_KEYS = {
 // ============================================================================
 
 type ThemePreference = 'light' | 'dark' | 'system';
+let sessionThemePreference: ThemePreference | null = null;
 
 function getSystemTheme(): 'light' | 'dark' {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
 function getThemePreference(): ThemePreference {
-  const stored = localStorage.getItem(STORAGE_KEYS.themePreference);
-  if (stored === 'light' || stored === 'dark' || stored === 'system') {
-    return stored;
-  }
+  if (sessionThemePreference) return sessionThemePreference;
+  try {
+    const stored = localStorage.getItem(STORAGE_KEYS.themePreference);
+    if (stored === 'light' || stored === 'dark' || stored === 'system') return stored;
+  } catch { /* Use the system preference when storage is unavailable. */ }
   return 'system';
 }
 
@@ -67,8 +76,9 @@ function applyTheme(theme: 'light' | 'dark'): void {
 }
 
 function setThemePreference(preference: ThemePreference): void {
-  localStorage.setItem(STORAGE_KEYS.themePreference, preference);
-  applyTheme(getEffectiveTheme());
+  sessionThemePreference = preference;
+  try { localStorage.setItem(STORAGE_KEYS.themePreference, preference); } catch {}
+  applyTheme(preference === 'system' ? getSystemTheme() : preference);
 }
 
 function toggleTheme(): void {
@@ -78,13 +88,26 @@ function toggleTheme(): void {
 }
 
 function updateThemeToggleUI(theme: 'light' | 'dark'): void {
-  const toggles = document.querySelectorAll('.theme-toggle-btn');
-  toggles.forEach(toggle => {
-    const icon = toggle.querySelector('.theme-icon');
-    const label = toggle.querySelector('.theme-label');
-    if (icon) icon.textContent = theme === 'dark' ? '☀️' : '🌙';
-    if (label) label.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
+  document.querySelectorAll<HTMLSelectElement>('.theme-select').forEach(select => {
+    select.value = getThemePreference();
   });
+}
+
+function createThemeControl(): HTMLDivElement {
+  const container = document.createElement('div');
+  container.className = 'theme-control';
+  const label = document.createElement('label');
+  label.textContent = 'Appearance';
+  const select = document.createElement('select');
+  select.className = 'theme-select';
+  for (const [value, text] of [['system', 'Use device setting'], ['light', 'Light'], ['dark', 'Dark']]) {
+    select.add(new Option(text, value));
+  }
+  select.value = getThemePreference();
+  select.addEventListener('change', () => setThemePreference(select.value as ThemePreference));
+  label.append(select);
+  container.append(label);
+  return container;
 }
 
 function initThemeSystem(): void {
@@ -108,25 +131,13 @@ function injectThemeToggle(): void {
   const mainContent = document.getElementById('main-content');
   if (!mainContent) return;
 
-  const contentCard = mainContent.querySelector('.content-card');
-  if (!contentCard) return;
+  const contentCard = mainContent.querySelector('.content-card') || mainContent;
 
   // Check if toggle already exists (prevent duplicates)
   if (document.getElementById('theme-toggle-container')) return;
 
-  const currentTheme = getEffectiveTheme();
-  const toggleContainer = document.createElement('div');
+  const toggleContainer = createThemeControl();
   toggleContainer.id = 'theme-toggle-container';
-  toggleContainer.style.cssText = 'position: absolute; top: 15px; right: 15px; z-index: 100;';
-  toggleContainer.innerHTML = `
-    <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle theme">
-      <span class="theme-icon">${currentTheme === 'dark' ? '☀️' : '🌙'}</span>
-      <span class="theme-label">${currentTheme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
-    </button>
-  `;
-
-  // Make the content-card position relative for absolute positioning
-  (contentCard as HTMLElement).style.position = 'relative';
   contentCard.prepend(toggleContainer);
 }
 
@@ -355,7 +366,7 @@ async function syncProgressFromServer(): Promise<void> {
           passed: a.passed
         }));
 
-      // Server is authoritative for exam attempts — always use server data if it has more
+      // Server is authoritative for exam attempts ,  always use server data if it has more
       const localAttempts = JSON.parse(localStorage.getItem(STORAGE_KEYS.finalExamHistory) || '[]');
       if (serverAttempts.length >= localAttempts.length) {
         localStorage.setItem(STORAGE_KEYS.finalExamHistory, JSON.stringify(serverAttempts));
@@ -871,10 +882,10 @@ function startEngagementTimeTracking(moduleName: string) {
         const timeEl = document.getElementById('req-time');
         if (timeEl) {
           if (remaining > 0) {
-            timeEl.innerHTML = `<span class="req-icon">&#9711;</span> Read for ${remaining}s more`;
+            timeEl.innerHTML = `<span class="req-icon">&var(--text-primary);</span> Read for ${remaining}s more`;
             timeEl.className = 'requirement-item pending';
           } else {
-            timeEl.innerHTML = `<span class="req-icon">&#10003;</span> Time requirement met`;
+            timeEl.innerHTML = `<span class="req-icon">&var(--text-primary);</span> Time requirement met`;
             timeEl.className = 'requirement-item complete';
           }
         }
@@ -908,7 +919,7 @@ function updateRequirementIndicator(moduleName: string, type: 'scroll' | 'video'
   const el = document.getElementById(elementId);
   if (el) {
     el.className = `requirement-item ${complete ? 'complete' : 'pending'}`;
-    const icon = complete ? '&#10003;' : '&#9711;';
+    const icon = complete ? '&var(--text-primary);' : '&var(--text-primary);';
     const text = el.getAttribute('data-text') || el.textContent || '';
     el.innerHTML = `<span class="req-icon">${icon}</span> ${text.replace(/^[^\s]+\s*/, '')}`;
   }
@@ -1146,7 +1157,7 @@ function updateSidebarLocks() {
     item.classList.remove('locked', 'unlocked', 'completed', 'current');
 
     // My Page and admin-dashboard are never locked
-    if (moduleName === 'my-page' || moduleName === 'admin-dashboard') {
+    if (moduleName === 'my-page' || moduleName === 'admin-dashboard' || moduleName === 'field-library') {
       item.classList.add('unlocked');
       // Add dashboard-link-glass for My Page
       if (moduleName === 'my-page') {
@@ -1329,7 +1340,7 @@ const AGNES_DIFFICULTY_LEVELS: Record<string, { multiplier: number; unlockLevel:
 const AGNES_PERSONAS: Record<string, { name: string; icon: string; description: string }[]> = {
   BEGINNER: [{
     name: 'The Eager Learner',
-    icon: '🌱',
+    icon: '',
     description: `You are a homeowner who WANTS roofing help and guides the rep to success.
 You've been looking for a roofer and are excited someone knocked on your door. You actively help them practice.
 - Enthusiastically engage: "Oh great! I've been meaning to get my roof looked at!"
@@ -1339,7 +1350,7 @@ You've been looking for a roofer and are excited someone knocked on your door. Y
   }],
   ROOKIE: [{
     name: 'The Friendly Neighbor',
-    icon: '🏡',
+    icon: '',
     description: `You are a retired homeowner who enjoys chatting and wants them to succeed.
 - Be warm and welcoming: "Oh hello! How are you today?"
 - Ask gentle questions to help them
@@ -1348,7 +1359,7 @@ You've been looking for a roofer and are excited someone knocked on your door. Y
   }],
   PRO: [{
     name: 'The Busy Parent',
-    icon: '👨‍👩‍👧',
+    icon: '',
     description: `You are making dinner with loud kids in background. Limited time.
 - Show time pressure: "I've only got a few minutes"
 - Interrupt if they ramble
@@ -1357,7 +1368,7 @@ You've been looking for a roofer and are excited someone knocked on your door. Y
   }],
   ELITE: [{
     name: 'The Skeptic',
-    icon: '😠',
+    icon: '',
     description: `You were scammed before. You lost money to a fake roofer. HOSTILE and suspicious.
 - Hostile from first word: "What do you want?"
 - Interrupt constantly
@@ -1366,7 +1377,7 @@ You've been looking for a roofer and are excited someone knocked on your door. Y
   }],
   NIGHTMARE: [{
     name: 'The Lawyer',
-    icon: '⚖️',
+    icon: '',
     description: `You are an actual attorney who knows consumer protection laws.
 - Cite specific laws
 - Record the conversation
@@ -1460,160 +1471,26 @@ function updateAgnesStreak(): { streakIncreased: boolean; newStreak: number; new
 // CELEBRATIONS & CONFETTI
 // ============================================================================
 
-function triggerConfetti(type: 'module' | 'levelup' | 'streak' | 'exam' | 'perfect' = 'module') {
-  const defaults = { origin: { y: 0.7 } };
 
-  switch (type) {
-    case 'levelup':
-      // Big celebration for level up
-      confetti({ ...defaults, particleCount: 150, spread: 100, colors: ['#FFD700', '#FFA500', '#FF6347'] });
-      setTimeout(() => confetti({ ...defaults, particleCount: 100, spread: 120 }), 200);
-      break;
-    case 'streak':
-      // Fire-themed for streaks
-      confetti({ ...defaults, particleCount: 80, spread: 70, colors: ['#FF4500', '#FF6347', '#FFA500', '#FFD700'] });
-      break;
-    case 'exam':
-      // Green/success colors for passing exam
-      confetti({ ...defaults, particleCount: 120, spread: 90, colors: ['#4CAF50', '#8BC34A', '#CDDC39', '#FFD700'] });
-      break;
-    case 'perfect':
-      // Gold star shower for perfect score
-      const duration = 3000;
-      const end = Date.now() + duration;
-      (function frame() {
-        confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#FFD700', '#FFC700', '#FFE700'] });
-        confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#FFD700', '#FFC700', '#FFE700'] });
-        if (Date.now() < end) requestAnimationFrame(frame);
-      })();
-      break;
-    default:
-      // Standard module completion
-      confetti({ ...defaults, particleCount: 80, spread: 70 });
-  }
-}
 
 // Badge notification toast
-function showBadgeToast(badge: { id: string; name: string; icon: string; description: string }) {
-  const toast = document.createElement('div');
-  toast.className = 'badge-toast';
-  toast.innerHTML = `
-    <div class="badge-toast-icon">${badge.icon}</div>
-    <div class="badge-toast-content">
-      <div class="badge-toast-title">Badge Earned!</div>
-      <div class="badge-toast-name">${badge.name}</div>
-      <div class="badge-toast-desc">${badge.description}</div>
-    </div>
-  `;
-  document.body.appendChild(toast);
-  setTimeout(() => toast.classList.add('show'), 100);
-  setTimeout(() => {
-    toast.classList.remove('show');
-    setTimeout(() => toast.remove(), 300);
-  }, 4000);
-}
+
 
 // Check and award badges after actions
-async function checkAndAwardBadges() {
-  const result = await apiCall<{ newBadges: Array<{ id: string; name: string; icon: string; description: string }>; totalBadges: number }>('/progress/badges/check', {
-    method: 'POST',
-    silent: true
-  } as any);
 
-  if (result?.newBadges && result.newBadges.length > 0) {
-    result.newBadges.forEach((badge, idx) => {
-      setTimeout(() => {
-        showBadgeToast(badge);
-        triggerConfetti('levelup');
-      }, idx * 1500);
-    });
-  }
-  return result;
-}
 
 // ============================================================================
 // GAMIFICATION UI COMPONENTS
 // ============================================================================
 
 // Render badges section for welcome/dashboard
-async function renderBadgesSection(container: HTMLElement) {
-  const badges = await apiCall<{ earned: Array<{ id: string; name: string; icon: string; earnedAt: string }>; available: Array<{ id: string; name: string; icon: string; description: string; earned: boolean }> }>('/progress/badges', { silent: true } as any);
 
-  if (!badges) return;
-
-  const section = document.createElement('div');
-  section.className = 'gamification-section badges-section';
-  section.innerHTML = `
-    <h3>🏆 Achievements <span class="badge-count">${badges.earned.length}/${badges.available.length}</span></h3>
-    <div class="badges-grid">
-      ${badges.available.map(b => `
-        <div class="badge-item ${b.earned ? 'earned' : 'locked'}" title="${b.description}">
-          <span class="badge-icon">${b.icon}</span>
-          <span class="badge-name">${b.name}</span>
-        </div>
-      `).join('')}
-    </div>
-  `;
-  container.appendChild(section);
-}
 
 // Render leaderboard section
-async function renderLeaderboardSection(container: HTMLElement) {
-  const section = document.createElement('div');
-  section.className = 'gamification-section leaderboard-section';
-  section.innerHTML = `
-    <h3>📊 Leaderboard</h3>
-    <div class="leaderboard-tabs">
-      <button class="lb-tab active" data-type="weekly">This Week</button>
-      <button class="lb-tab" data-type="alltime">All Time</button>
-      <button class="lb-tab" data-type="streaks">Streaks</button>
-    </div>
-    <div class="leaderboard-content">
-      <div class="loading">Loading...</div>
-    </div>
-  `;
-  container.appendChild(section);
 
-  const loadLeaderboard = async (type: string) => {
-    const content = section.querySelector('.leaderboard-content') as HTMLElement;
-    content.innerHTML = '<div class="loading">Loading...</div>';
-
-    const data = await apiCall<{ leaderboard: Array<{ rank: number; name: string; xp: number; streak: number; isCurrentUser: boolean }>; userRank: number | null }>(`/progress/leaderboard?type=${type}`, { silent: true } as any);
-
-    if (!data || data.leaderboard.length === 0) {
-      content.innerHTML = '<div class="empty-state">No data yet. Start training!</div>';
-      return;
-    }
-
-    content.innerHTML = `
-      <div class="leaderboard-list">
-        ${data.leaderboard.slice(0, 10).map(entry => `
-          <div class="lb-entry ${entry.isCurrentUser ? 'current-user' : ''}">
-            <span class="lb-rank">${entry.rank <= 3 ? ['🥇', '🥈', '🥉'][entry.rank - 1] : '#' + entry.rank}</span>
-            <span class="lb-name">${entry.name}${entry.isCurrentUser ? ' (You)' : ''}</span>
-            <span class="lb-stat">${type === 'streaks' ? entry.streak + '🔥' : entry.xp + ' XP'}</span>
-          </div>
-        `).join('')}
-      </div>
-      ${data.userRank && data.userRank > 10 ? `<div class="your-rank">Your rank: #${data.userRank}</div>` : ''}
-    `;
-  };
-
-  // Tab click handlers
-  section.querySelectorAll('.lb-tab').forEach(tab => {
-    tab.addEventListener('click', (e) => {
-      section.querySelectorAll('.lb-tab').forEach(t => t.classList.remove('active'));
-      (e.target as HTMLElement).classList.add('active');
-      loadLeaderboard((e.target as HTMLElement).dataset.type || 'weekly');
-    });
-  });
-
-  // Load initial data
-  loadLeaderboard('weekly');
-}
 
 // ============================================================================
-// CONNECTED AGENTS — personal MCP tokens (read-only)
+// CONNECTED AGENTS ,  personal MCP tokens (read-only)
 // ============================================================================
 //
 // Any MCP client (Genie 21, Claude, ChatGPT, Cursor) connects to /mcp with one
@@ -1661,7 +1538,7 @@ async function copyToClipboard(value: string, button: HTMLButtonElement): Promis
     button.textContent = 'Copied';
     setTimeout(() => { button.textContent = original; }, 1500);
   } catch {
-    /* clipboard blocked — the value is selectable on screen */
+    /* clipboard blocked ,  the value is selectable on screen */
   }
 }
 
@@ -1691,7 +1568,7 @@ async function renderConnectedAgentsSection(container: HTMLElement) {
     const { tokensRes, areasRes } = await load();
     if (!tokensRes && !areasRes) {
       section.innerHTML = `
-        <h3>🔌 Connected agents</h3>
+        <h3> Connected agents</h3>
         <p class="agents-muted">Could not load your agent tokens right now.</p>
       `;
       return;
@@ -1703,7 +1580,7 @@ async function renderConnectedAgentsSection(container: HTMLElement) {
     const mintedBlock = minted ? `
       <div class="agents-minted">
         <div class="agents-minted-title">Your new token for “${escapeHtml(minted.name)}”</div>
-        <div class="agents-muted">Copy it now — Lite Training keeps only a fingerprint and will not show it again.</div>
+        <div class="agents-muted">Copy it now ,  Lite Training keeps only a fingerprint and will not show it again.</div>
         <div class="agents-row">
           <code class="agents-code agents-token">${escapeHtml(minted.token)}</code>
           <button type="button" class="agents-btn agents-btn-secondary" data-copy="${escapeHtml(minted.token)}">Copy</button>
@@ -1778,8 +1655,8 @@ async function renderConnectedAgentsSection(container: HTMLElement) {
     `;
 
     section.innerHTML = `
-      <h3>🔌 Connected agents</h3>
-      <p class="agents-muted">Tokens that let an AI agent read Lite Training as you — nothing more than you can already see, and nothing it can change.</p>
+      <h3> Connected agents</h3>
+      <p class="agents-muted">Tokens that let an AI agent read Lite Training as you ,  nothing more than you can already see, and nothing it can change.</p>
       ${errorBlock}
       ${mintedBlock}
       ${mode === 'list' ? listBlock : newBlock}
@@ -1815,7 +1692,7 @@ async function renderConnectedAgentsSection(container: HTMLElement) {
           const name = (section.querySelector<HTMLInputElement>('#agent-token-name')?.value || '').trim();
           const scopes = Array.from(section.querySelectorAll<HTMLInputElement>('.agents-area input[type=checkbox]:checked')).map(cb => cb.value);
           const expiry = (section.querySelector<HTMLInputElement>('#agent-token-expiry')?.value || '').trim();
-          if (!name) { error = 'Give the token a name — usually the agent that will use it.'; await render(); return; }
+          if (!name) { error = 'Give the token a name ,  usually the agent that will use it.'; await render(); return; }
           if (scopes.length === 0) { error = 'Pick at least one area the agent may read.'; await render(); return; }
           btn.disabled = true;
           const body: Record<string, unknown> = { name, scopes };
@@ -1851,7 +1728,7 @@ async function renderDailyReviewSection(container: HTMLElement) {
   const section = document.createElement('div');
   section.className = 'gamification-section review-section';
   section.innerHTML = `
-    <h3>📚 Daily Review ${review.dueCount > 0 ? `<span class="review-badge">${review.dueCount} due</span>` : '<span class="review-complete">✓ All caught up!</span>'}</h3>
+    <h3> Practice review ${review.dueCount > 0 ? `<span class="review-badge">${review.dueCount} due</span>` : '<span class="review-complete">✓ All caught up!</span>'}</h3>
     ${review.dueCount > 0 ? `
       <p>You have ${review.dueCount} question${review.dueCount > 1 ? 's' : ''} to review for better retention.</p>
       <button class="start-review-btn" onclick="window.startDailyReview()">Start Review</button>
@@ -1906,14 +1783,13 @@ async function renderDailyReviewSection(container: HTMLElement) {
       overlay.innerHTML = `
         <div class="review-modal">
           <div class="review-complete-screen">
-            <div style="font-size: 48px; margin-bottom: 20px;">🎉</div>
+            <div style="font-size: 48px; margin-bottom: 20px;"></div>
             <h3>Review Complete!</h3>
             <p>You've reviewed all ${cards.length} cards.</p>
             <button onclick="this.closest('.review-modal-overlay').remove()">Close</button>
           </div>
         </div>
       `;
-      triggerConfetti('module');
       return;
     }
     const content = overlay.querySelector('.review-card-content') as HTMLElement;
@@ -1976,8 +1852,6 @@ async function initGamificationUI() {
   // Render sections in parallel
   await Promise.all([
     renderDailyReviewSection(gamificationContainer),
-    renderBadgesSection(gamificationContainer),
-    renderLeaderboardSection(gamificationContainer)
   ]);
 }
 
@@ -2014,184 +1888,47 @@ function getNextTrainingModule(): { module: string; displayName: string } {
 }
 
 // Calculate level from XP
-function calculateLevel(xp: number): { level: number; currentXp: number; nextLevelXp: number } {
-  const XP_PER_LEVEL = 500;
-  const level = Math.floor(xp / XP_PER_LEVEL) + 1;
-  const currentXp = xp % XP_PER_LEVEL;
-  const nextLevelXp = XP_PER_LEVEL;
-  return { level, currentXp, nextLevelXp };
-}
+
 
 // Format time for display
-function formatTrainingTime(minutes: number): string {
-  if (minutes < 60) return `${minutes}m`;
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
-}
+
 
 // Initialize My Page dashboard
 async function initMyPage() {
   const user = getCurrentUser();
-  const userName = user?.name || 'Trainee';
-
-  // Update greeting
-  const greetingEl = document.getElementById('profile-greeting');
-  if (greetingEl) greetingEl.textContent = `Welcome back, ${userName}!`;
-
-  // Fetch stats from API instead of localStorage
-  let completedModulesCount = 0;
-  let totalXp = 0;
-  let streak = 0;
-  let trainingMinutes = 0;
-  let avgScore = 0;
-  let hasExamScores = false;
-
-  try {
-    const progressData = await apiCall<{
-      modules: Array<{ name: string; status: string; timeSpentSeconds: number }>;
-      examAttempts: Array<{ totalScore: number }>;
-      gamification: { totalXP: number; currentStreak: number } | null;
-    }>('/progress', { silent: true });
-
-    if (progressData) {
-      // Count completed modules
-      completedModulesCount = progressData.modules.filter(m => m.status === 'completed').length;
-
-      // Calculate total training time from modules
-      const totalSeconds = progressData.modules.reduce((sum, m) => sum + (m.timeSpentSeconds || 0), 0);
-      trainingMinutes = Math.round(totalSeconds / 60);
-
-      // Get XP and streak from gamification
-      if (progressData.gamification) {
-        totalXp = progressData.gamification.totalXP || 0;
-        streak = progressData.gamification.currentStreak || 0;
-      }
-
-      // Calculate average exam score
-      if (progressData.examAttempts && progressData.examAttempts.length > 0) {
-        const totalScore = progressData.examAttempts.reduce((sum, e) => sum + (e.totalScore || 0), 0);
-        avgScore = Math.round(totalScore / progressData.examAttempts.length);
-        hasExamScores = true;
-      }
-    }
-  } catch (error) {
-    console.log('Could not fetch progress data, using defaults');
+  const greeting = document.getElementById('profile-greeting');
+  if (greeting) greeting.textContent = user ? 'Your training, ' + user.name.split(' ')[0] : 'Your training';
+  const next = getNextTrainingModule();
+  const completed = new Set<string>(JSON.parse(localStorage.getItem('roof-er.completedModules') || '[]'));
+  const unlocked = new Set(getUnlockedModules());
+  const title = document.getElementById('next-lesson-title');
+  if (title) title.textContent = next.displayName;
+  const continueButton = document.getElementById('continue-training-btn');
+  if (continueButton) {
+    continueButton.textContent = completed.size ? 'Continue training' : 'Start training';
+    continueButton.onclick = () => navigateToModule(next.module);
   }
-
-  // Fallback to localStorage if API returned no data
-  if (completedModulesCount === 0) {
-    const localCompleted = JSON.parse(localStorage.getItem('roof-er.completedModules') || '[]');
-    completedModulesCount = localCompleted.length;
-
-    // Also try to get XP and streak from localStorage
-    const localXp = parseInt(localStorage.getItem('roof-er.totalXp') || '0', 10);
-    const localStreak = parseInt(localStorage.getItem('roof-er.streak') || '0', 10);
-    if (localXp > totalXp) totalXp = localXp;
-    if (localStreak > streak) streak = localStreak;
+  const standing = document.getElementById('exam-standing');
+  if (standing) standing.textContent = getExamState().isCertified ? 'Certified' : unlocked.has('final-exam') ? 'Ready for assessment' : 'Complete the lessons to unlock your exam';
+  const path = document.getElementById('learning-path');
+  if (path) {
+    path.innerHTML = MODULE_ORDER.map((id, index) => {
+      const done = completed.has(id);
+      const available = unlocked.has(id);
+      const status = done ? 'Done' : localStorage.getItem(STORAGE_KEYS.currentModule) === id && available ? 'In progress' : 'Not started';
+      return '<li><button type="button" class="lesson-path-row" data-lesson="' + id + '" ' + (available ? '' : 'disabled') + '><span class="lesson-index">' + String(index + 1).padStart(2, '0') + '</span><span class="lesson-name">' + getModuleDisplayName(id) + '</span><span class="lesson-state">' + status + (available ? '' : ' · Locked') + '</span><span aria-hidden="true">' + (done ? '✓' : '→') + '</span></button></li>';
+    }).join('');
+    path.querySelectorAll<HTMLButtonElement>('[data-lesson]').forEach(button => button.addEventListener('click', () => navigateToModule(button.dataset.lesson!)));
   }
-
-  // Calculate level
-  const levelInfo = calculateLevel(totalXp);
-
-  // Update profile section
-  const levelTextEl = document.getElementById('profile-level-text');
-  if (levelTextEl) levelTextEl.textContent = `Level ${levelInfo.level}`;
-
-  const xpTextEl = document.getElementById('profile-xp-text');
-  if (xpTextEl) xpTextEl.textContent = `${totalXp} XP`;
-
-  const xpBarEl = document.getElementById('xp-progress-bar');
-  if (xpBarEl) xpBarEl.style.width = `${(levelInfo.currentXp / levelInfo.nextLevelXp) * 100}%`;
-
-  const xpToNextEl = document.getElementById('xp-to-next');
-  if (xpToNextEl) xpToNextEl.textContent = `${levelInfo.nextLevelXp - levelInfo.currentXp} XP to Level ${levelInfo.level + 1}`;
-
-  // Update stats
-  const modulesEl = document.getElementById('stat-modules');
-  if (modulesEl) modulesEl.textContent = `${completedModulesCount}/${MODULE_ORDER.length}`;
-
-  const streakEl = document.getElementById('stat-streak');
-  if (streakEl) streakEl.textContent = streak.toString();
-
-  const timeEl = document.getElementById('stat-time');
-  if (timeEl) timeEl.textContent = formatTrainingTime(trainingMinutes);
-
-  const avgScoreEl = document.getElementById('stat-avg-score');
-  if (avgScoreEl) avgScoreEl.textContent = hasExamScores ? `${avgScore}%` : '--%';
-
-  const totalXpEl = document.getElementById('stat-total-xp');
-  if (totalXpEl) totalXpEl.textContent = totalXp.toLocaleString();
-
-  // Determine next milestone
-  const milestoneEl = document.getElementById('stat-milestone');
-  if (milestoneEl) {
-    if (completedModulesCount < MODULE_ORDER.length) {
-      const remaining = MODULE_ORDER.length - completedModulesCount;
-      milestoneEl.textContent = `${remaining} modules`;
-    } else {
-      milestoneEl.textContent = 'Complete!';
-    }
-  }
-
-  // Setup continue training button
-  const nextModule = getNextTrainingModule();
-  const continueBtnText = document.getElementById('continue-btn-text');
-  if (continueBtnText) {
-    if (completedModulesCount === 0) {
-      continueBtnText.textContent = 'Start Training';
-    } else if (completedModulesCount >= MODULE_ORDER.length) {
-      continueBtnText.textContent = 'Review Training';
-    } else {
-      continueBtnText.textContent = `Continue - ${nextModule.displayName}`;
-    }
-  }
-
-  const continueBtn = document.getElementById('continue-training-btn');
-  if (continueBtn) {
-    continueBtn.onclick = () => {
-      // Navigate to the next module
-      const sidebar = document.getElementById('sidebar');
-      const targetItem = sidebar?.querySelector(`[data-module="${nextModule.module}"]`) as HTMLElement;
-      if (targetItem) {
-        targetItem.click();
-      }
-    };
-  }
-
-  const startOverBtn = document.getElementById('start-over-btn');
-  if (startOverBtn) {
-    startOverBtn.onclick = () => {
-      const sidebar = document.getElementById('sidebar');
-      const targetItem = sidebar?.querySelector('[data-module="welcome"]') as HTMLElement;
-      if (targetItem) {
-        targetItem.click();
-      }
-    };
-  }
-
-  // Render gamification sections
-  const gamificationContainer = document.getElementById('dashboard-gamification');
-  if (gamificationContainer) {
-    gamificationContainer.innerHTML = '';
-    await Promise.all([
-      renderBadgesSection(gamificationContainer),
-      renderLeaderboardSection(gamificationContainer)
-    ]);
-  }
-
-  // Render daily review
-  const reviewContainer = document.getElementById('dashboard-review');
-  if (reviewContainer) {
-    reviewContainer.innerHTML = '';
-    await renderDailyReviewSection(reviewContainer);
-  }
-
-  // Render connected agents (personal MCP tokens)
-  const agentsContainer = document.getElementById('dashboard-agents');
-  if (agentsContainer) {
-    agentsContainer.innerHTML = '';
-    await renderConnectedAgentsSection(agentsContainer);
+  document.getElementById('dashboard-exam-link')?.addEventListener('click', () => navigateToModule('final-exam'));
+  const examButton = document.getElementById('dashboard-exam-link') as HTMLButtonElement | null;
+  if (examButton) examButton.disabled = !unlocked.has('final-exam');
+  const review = document.getElementById('dashboard-review');
+  if (review) await renderDailyReviewSection(review);
+  const agents = document.getElementById('dashboard-agents');
+  if (agents) {
+    await renderConnectedAgentsSection(agents);
+    if (!agents.textContent?.trim()) agents.textContent = 'Sign in online to connect an agent.';
   }
 }
 
@@ -2458,104 +2195,22 @@ const trainingScriptMap: Record<string, { scripts: string[]; keyPhrases: string[
 // Store all training content in an object
 const trainingContent = {
   'my-page': `
-    <div class="my-page-container">
-      <!-- Profile Header -->
-      <div class="profile-header">
-        <div class="profile-avatar">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-          </svg>
-        </div>
-        <div class="profile-info">
-          <h1 id="profile-greeting">Welcome back!</h1>
-          <div class="profile-level">
-            <span id="profile-level-text">Level 1</span>
-            <span class="xp-separator">•</span>
-            <span id="profile-xp-text">0 XP</span>
-          </div>
-          <div class="xp-progress-container">
-            <div class="xp-progress-bar" id="xp-progress-bar" style="width: 0%"></div>
-          </div>
-          <p class="xp-to-next" id="xp-to-next">0 XP to next level</p>
-        </div>
+    <div class="training-home">
+      <header class="training-heading"><p class="section-label">Roof-ER · Sales training</p><h1 id="profile-greeting">Your training</h1><p>Learn the work. Practice the conversation. Be ready for the field.</p></header>
+      <div class="training-overview">
+        <section class="next-lesson" aria-labelledby="next-lesson-title"><p class="section-label">Pick up where you left off</p><h2 id="next-lesson-title">Welcome & Company Intro</h2><p>Your lessons and practice are saved as you go.</p><button type="button" id="continue-training-btn">Continue training</button></section>
+        <section class="assessment-panel" aria-labelledby="assessment-title"><p class="section-label">Assessment</p><h2 id="assessment-title">Your exam standing</h2><p id="exam-standing">Complete the lessons to unlock your exam</p><button type="button" class="secondary-button" id="dashboard-exam-link">Open final exam</button></section>
       </div>
-
-      <!-- Stats Grid -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon modules-icon">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/></svg>
-          </div>
-          <div class="stat-value" id="stat-modules">0/${MODULE_ORDER.length}</div>
-          <div class="stat-label">Modules Completed</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon streak-icon">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/></svg>
-          </div>
-          <div class="stat-value" id="stat-streak">0</div>
-          <div class="stat-label">Day Streak</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon time-icon">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-          </div>
-          <div class="stat-value" id="stat-time">0m</div>
-          <div class="stat-label">Time Trained</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon score-icon">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
-          </div>
-          <div class="stat-value" id="stat-avg-score">--%</div>
-          <div class="stat-label">Avg Quiz Score</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon xp-icon">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-          </div>
-          <div class="stat-value" id="stat-total-xp">0</div>
-          <div class="stat-label">Total XP</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon milestone-icon">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/></svg>
-          </div>
-          <div class="stat-value" id="stat-milestone">--</div>
-          <div class="stat-label">Next Milestone</div>
-        </div>
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="action-buttons">
-        <button class="continue-training-btn" id="continue-training-btn">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-          <span id="continue-btn-text">Start Training</span>
-        </button>
-        <button class="start-over-btn" id="start-over-btn">Start from Beginning</button>
-      </div>
-
-      <!-- Gamification Section -->
-      <div class="dashboard-gamification" id="dashboard-gamification">
-        <!-- Leaderboard and Badges will be rendered here -->
-      </div>
-
-      <!-- Daily Review -->
-      <div class="dashboard-review" id="dashboard-review">
-        <!-- Daily review section will be rendered here -->
-      </div>
-
-      <!-- Connected agents (personal MCP tokens, read-only) -->
-      <div class="dashboard-agents" id="dashboard-agents">
-        <!-- Connected agents section will be rendered here -->
-      </div>
+      <section class="learning-path-section" aria-labelledby="learning-path-title"><div class="section-heading"><h2 id="learning-path-title">Your learning path</h2><p>From the first conversation to the completed job.</p></div><ol id="learning-path" class="learning-path"></ol></section>
+      <div id="dashboard-review"></div>
+      <details class="connected-agents-disclosure"><summary>Connected agents</summary><div class="dashboard-agents" id="dashboard-agents"></div></details>
     </div>
   `,
   welcome: `
     <div class="content-card">
       <h1>Welcome to Roof-ER!</h1>
 
-      ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/welcome-intro.mp4', 'welcome-video', '📹 Welcome Introduction')}
+      ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/welcome-intro.mp4', 'welcome-video', ' Welcome Introduction')}
       <p>My name is Oliver Brown. I founded this company in 2018, not because I have a passion for roofing, but because I saw an opportunity to change the reputation of roofing companies and contractors as a whole. This is an industry that is known for lack of communication, poor workmanship, and straight up deceit. With a little bit of modern thinking, integrity and hard work we've been able to build a strong brand and reputation in a relatively short amount of time.</p>
       <p>We have ambitions of becoming a national brand. To accomplish this we need to continue to add and develop hungry, competitive team members who are dedicated to the big picture but disciplined to execute on a day to day basis.</p>
 
@@ -2628,18 +2283,18 @@ const trainingContent = {
         </ul>
 
         <h3>What Sets Us Apart</h3>
-        <div class="awards-banner" style="background: linear-gradient(135deg, #1f2937 0%, #374151 100%); border-radius: 16px; padding: 24px; margin-top: 12px; border: 1px solid #d4a017;">
-          <p style="color: #f9fafb; margin: 0 0 16px 0; font-size: 15px; line-height: 1.7;">We are a <strong style="color: #fbbf24;">top 1% roofing company in the nation</strong>. Be proud of that. You earned your spot here.</p>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
-            <div style="background: rgba(251, 191, 36, 0.1); border: 1px solid #d4a017; border-radius: 12px; padding: 16px; text-align: center;">
-              <div style="font-size: 30px; margin-bottom: 6px;">🏆</div>
-              <div style="color: #fbbf24; font-weight: 700; font-size: 16px;">GAF Master Elite</div>
-              <div style="color: #d1d5db; font-size: 13px; margin-top: 4px;">The highest level of GAF contractor certification - earned by fewer than 2% of roofing contractors</div>
+        <div class="awards-banner" style="background: var(--surface-color); border-radius: var(--border-radius); padding: 24px; margin-top: 12px; border: 1px solid var(--border-color);">
+          <p style="color: var(--text-primary); margin: 0 0 16px 0; font-size: 15px; line-height: 1.7;">We are a <strong style="color: var(--text-primary);">top 1% roofing company in the nation</strong>. Be proud of that. You earned your spot here.</p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 14px;">
+            <div style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 16px; text-align: center;">
+              <div style="font-size: 30px; margin-bottom: 6px;"></div>
+              <div style="color: var(--text-primary); font-weight: 700; font-size: 16px;">GAF Master Elite</div>
+              <div style="color: var(--text-primary); font-size: 13px; margin-top: 4px;">The highest level of GAF contractor certification - earned by fewer than 2% of roofing contractors</div>
             </div>
-            <div style="background: rgba(251, 191, 36, 0.1); border: 1px solid #d4a017; border-radius: 12px; padding: 16px; text-align: center;">
-              <div style="font-size: 30px; margin-bottom: 6px;">🥇</div>
-              <div style="color: #fbbf24; font-weight: 700; font-size: 16px;">GAF President's Club</div>
-              <div style="color: #d1d5db; font-size: 13px; margin-top: 4px;">GAF's most prestigious annual award, reserved for the very best Master Elite contractors</div>
+            <div style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 16px; text-align: center;">
+              <div style="font-size: 30px; margin-bottom: 6px;"></div>
+              <div style="color: var(--text-primary); font-weight: 700; font-size: 16px;">GAF President's Club</div>
+              <div style="color: var(--text-primary); font-size: 13px; margin-top: 4px;">GAF's most prestigious annual award, reserved for the very best Master Elite contractors</div>
             </div>
           </div>
         </div>
@@ -2658,7 +2313,7 @@ const trainingContent = {
 
       <h2>The Roof-ER Promise</h2>
       <div class="promise-section">
-        <div class="promise-icon">🤝</div>
+        <div class="promise-icon"></div>
         <p><strong>We promise to:</strong></p>
         <ul>
           <li><span class="promise-check">✓</span> Treat every homeowner's property as if it were our own</li>
@@ -2673,8 +2328,8 @@ const trainingContent = {
       <h2>Your Commitment as a Roof-ER Representative</h2>
       <p>As a member of the Roof-ER team, your commitment to our values and processes is paramount to our collective success.</p>
 
-      <div class="commitment-instructions" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-left: 5px solid #c62828; border-radius: 0 12px 12px 0; padding: 16px 20px; margin-bottom: 18px;">
-        <p style="margin: 0; color: #7f1d1d; font-size: 15px;"><strong>✍️ How to complete this page:</strong> Read each of the 8 commitment statements below, then <strong>type your initials in the "Init." box</strong> next to each one. Once all 8 are initialed, the signature section will appear at the bottom.</p>
+      <div class="commitment-instructions" style="background: var(--surface-color); border-left: 5px solid var(--border-color); border-radius: var(--border-radius); padding: 16px 20px; margin-bottom: 18px;">
+        <p style="margin: 0; color: var(--text-primary); font-size: 15px;"><strong> How to complete this page:</strong> Read each of the 8 commitment statements below, then <strong>type your initials in the "Init." box</strong> next to each one. Once all 8 are initialed, the signature section will appear at the bottom.</p>
       </div>
 
       <div class="commitment-progress-bar">
@@ -2788,34 +2443,32 @@ const trainingContent = {
         <h3>Your Practice Progress</h3>
         <div class="progress-items">
           <div class="progress-item" data-script="intro">
-            <span class="progress-icon">⭕</span>
+            <span class="progress-icon"></span>
             <span>Introduction</span>
           </div>
           <div class="progress-item" data-script="proposal">
-            <span class="progress-icon">⭕</span>
+            <span class="progress-icon"></span>
             <span>Inspection Proposal</span>
           </div>
           <div class="progress-item" data-script="permission">
-            <span class="progress-icon">⭕</span>
+            <span class="progress-icon"></span>
             <span>Securing Permission</span>
           </div>
           <div class="progress-item" data-script="handoff">
-            <span class="progress-icon">⭕</span>
+            <span class="progress-icon"></span>
             <span>Handoff</span>
           </div>
         </div>
-        <div class="progress-bar-container">
-          <div class="progress-bar" id="pitch-progress-bar" style="width: 0%"></div>
-        </div>
+
         <p class="progress-label"><span id="practice-count">0</span>/4 sections practiced</p>
       </div>
 
       <!-- Knocking Etiquette Video -->
       <div class="video-section" style="margin: 30px 0;">
-        <h3 style="color: #1e293b; margin-bottom: 15px;">🚪 Knocking Etiquette with Reese and Agnes</h3>
-        <p style="color: #64748b; margin-bottom: 15px;">Learn the proper techniques for approaching a homeowner's door professionally.</p>
-        <div style="background: #1e293b; border-radius: 12px; padding: 20px; max-width: 800px;">
-          <video controls style="width: 100%; border-radius: 8px;">
+        <h3 style="color: var(--text-primary); margin-bottom: 15px;"> Knocking Etiquette with Reese and Agnes</h3>
+        <p style="color: var(--text-primary); margin-bottom: 15px;">Learn the proper techniques for approaching a homeowner's door professionally.</p>
+        <div style="background: var(--surface-color); border-radius: var(--border-radius); padding: 20px; max-width: 800px;">
+          <video controls style="width: 100%; border-radius: var(--border-radius);">
             <source src="https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/knocking-etiquette.mp4" type="video/mp4">
             Your browser does not support the video tag.
           </video>
@@ -2828,31 +2481,31 @@ const trainingContent = {
 
       <div class="non-negotiables-grid">
         <div class="nn-card" data-nn="1">
-          <div class="nn-icon">👤</div>
+          <div class="nn-icon"></div>
           <div class="nn-number">1</div>
           <h4>Who You Are</h4>
           <p class="nn-quote">"Hi, how are you? My name is _____"</p>
         </div>
         <div class="nn-card" data-nn="2">
-          <div class="nn-icon">🏠</div>
+          <div class="nn-icon"></div>
           <div class="nn-number">2</div>
           <h4>Who We Are</h4>
           <p class="nn-quote">"...with Roof-ER, we're a local roofing company that specializes in helping homeowners get their roof replaced, paid for by their insurance!"</p>
         </div>
         <div class="nn-card" data-nn="3">
-          <div class="nn-icon">🤝</div>
+          <div class="nn-icon"></div>
           <div class="nn-number">3</div>
           <h4>Make It Relatable</h4>
           <p class="nn-quote">"We've had a lot of storms here in [Region]... We're already working with your neighbors."</p>
         </div>
         <div class="nn-card" data-nn="4">
-          <div class="nn-icon">🔍</div>
+          <div class="nn-icon"></div>
           <div class="nn-number">4</div>
           <h4>What You're Doing</h4>
           <p class="nn-quote">"I am conducting a completely free inspection to see if you have similar, qualifiable damage."</p>
         </div>
         <div class="nn-card" data-nn="5">
-          <div class="nn-icon">✅</div>
+          <div class="nn-icon"></div>
           <div class="nn-number">5</div>
           <h4>Go For The Close</h4>
           <p class="nn-quote">"Alright! It will take me about 10-15 minutes. I'm gonna take a look around the perimeter of your home, then grab the ladder, and take a look at your roof."</p>
@@ -2861,8 +2514,8 @@ const trainingContent = {
 
       <!-- Generic Script Section -->
       <h2>The Generic Initial Pitch</h2>
-      <div class="script-purpose-callout" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-left: 5px solid #c62828; border-radius: 0 12px 12px 0; padding: 16px 20px; margin-bottom: 18px;">
-        <p style="margin: 0; color: #7f1d1d; font-size: 15px;"><strong>🎯 Purpose of this script:</strong> to secure the inspection. Nothing else. Every line drives toward the homeowner agreeing to let you inspect - do not jump ahead to deductibles, financing, or approvals.</p>
+      <div class="script-purpose-callout" style="background: var(--surface-color); border-left: 5px solid var(--border-color); border-radius: var(--border-radius); padding: 16px 20px; margin-bottom: 18px;">
+        <p style="margin: 0; color: var(--text-primary); font-size: 15px;"><strong> Purpose of this script:</strong> to secure the inspection. Nothing else. Every line drives toward the homeowner agreeing to let you inspect - do not jump ahead to deductibles, financing, or approvals.</p>
       </div>
       <p class="section-intro">This is your go-to script. Practice it until it feels natural!</p>
 
@@ -2870,7 +2523,7 @@ const trainingContent = {
         <div class="script-card" data-text-source="true" data-script-id="intro">
           <div class="script-header">
             <span class="script-label">Part 1: Introduction</span>
-            <button class="speak-btn" aria-label="Listen to script">🔊</button>
+            <button class="speak-btn" aria-label="Listen to script"></button>
             <button class="practice-btn" onclick="markPracticed('intro')">✓ Mark Practiced</button>
           </div>
           <div class="script-content">
@@ -2883,7 +2536,7 @@ const trainingContent = {
         <div class="script-card" data-text-source="true" data-script-id="proposal">
           <div class="script-header">
             <span class="script-label">Part 2: Inspection Proposal</span>
-            <button class="speak-btn" aria-label="Listen to script">🔊</button>
+            <button class="speak-btn" aria-label="Listen to script"></button>
             <button class="practice-btn" onclick="markPracticed('proposal')">✓ Mark Practiced</button>
           </div>
           <div class="script-content">
@@ -2891,21 +2544,21 @@ const trainingContent = {
             <p>If you do, I'll take a bunch of photos and walk you through the rest of the process.</p>
             <p>If you don't, I wouldn't want to waste your time, I wouldn't want to waste mine!</p>
             <p>I will at least leave giving you peace of mind that you're in good shape."</p>
-            <p class="script-note">⏸️ <strong>Pause here – Wait for them to respond/agree.</strong></p>
+            <p class="script-note"> <strong>Pause here - Wait for them to respond/agree.</strong></p>
           </div>
         </div>
 
         <div class="script-card" data-text-source="true" data-script-id="permission">
           <div class="script-header">
             <span class="script-label">Part 3: Securing Permission</span>
-            <button class="speak-btn" aria-label="Listen to script">🔊</button>
+            <button class="speak-btn" aria-label="Listen to script"></button>
             <button class="practice-btn" onclick="markPracticed('permission')">✓ Mark Practiced</button>
           </div>
           <div class="script-content">
             <p>"Alright! It will take me about 10-15 minutes. I'm gonna take a look around the perimeter of your home, then grab the ladder, and take a look at your roof.</p>
             <p>What was your name again? <span class="fill-blank">[Their name]</span> great to meet you, again I am <span class="fill-blank">[Your name]</span>.</p>
             <p>Oh and by the way do you know who your insurance company is?"</p>
-            <p class="script-note">⏸️ <strong>Wait for their answer</strong></p>
+            <p class="script-note"> <strong>Wait for their answer</strong></p>
             <p>"Great! We work with those guys all the time."</p>
           </div>
         </div>
@@ -2913,7 +2566,7 @@ const trainingContent = {
         <div class="script-card" data-text-source="true" data-script-id="handoff">
           <div class="script-header">
             <span class="script-label">Part 4: Handoff</span>
-            <button class="speak-btn" aria-label="Listen to script">🔊</button>
+            <button class="speak-btn" aria-label="Listen to script"></button>
             <button class="practice-btn" onclick="markPracticed('handoff')">✓ Mark Practiced</button>
           </div>
           <div class="script-content">
@@ -2931,10 +2584,10 @@ const trainingContent = {
         <div class="script-card storm-script" data-text-source="true">
           <div class="script-header">
             <span class="script-label">Storm Reference Opening</span>
-            <button class="speak-btn" aria-label="Listen to script">🔊</button>
+            <button class="speak-btn" aria-label="Listen to script"></button>
           </div>
           <div class="script-content">
-            <p style="font-weight: 700; font-size: 1.1em; background: linear-gradient(120deg, #fef3c7 0%, #fde68a 100%); padding: 12px 16px; border-radius: 8px; border-left: 4px solid #f59e0b;">"Were you home for the storm we had in <span class="fill-blank">[date/description]</span>?"</p>
+            <p style="font-weight: 700; font-size: 1.1em; background: var(--surface-color); padding: 12px 16px; border-radius: var(--border-radius); border-left: 4px solid var(--border-color);">"Were you home for the storm we had in <span class="fill-blank">[date/description]</span>?"</p>
 
             <div class="response-branch">
               <div class="branch if-yes">
@@ -2949,29 +2602,29 @@ const trainingContent = {
               </div>
             </div>
 
-            <p class="transition-text">➡️ <strong>Then continue:</strong></p>
+            <p class="transition-text"> <strong>Then continue:</strong></p>
             <p>"We're working with a lot of your neighbors in the area. We've been able to help them get fully approved through their insurance company to have their roof replaced."</p>
-            <p class="script-note">📌 <strong>Then proceed to Inspection Proposal (Part 2)</strong></p>
+            <p class="script-note"> <strong>Then proceed to Inspection Proposal (Part 2)</strong></p>
           </div>
         </div>
       </div>
 
       <!-- Example Pitch Video -->
-      <h2>🎬 Watch: Example Pitch in Action</h2>
-      <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 16px; padding: 25px; margin-bottom: 30px;">
-        <p style="color: #94a3b8; font-size: 15px; margin: 0 0 20px 0; text-align: center;">
+      <h2> Watch: Example Pitch in Action</h2>
+      <div style="background: var(--surface-color); border-radius: var(--border-radius); padding: 25px; margin-bottom: 30px;">
+        <p style="color: var(--text-primary); font-size: 15px; margin: 0 0 20px 0; text-align: center;">
           Watch Reese deliver the initial pitch. Pay attention to tone, pacing, and how he handles the conversation.
         </p>
         <video
           controls
-          style="width: 100%; border-radius: 12px; max-height: 500px; background: #000;"
+          style="width: 100%; border-radius: var(--border-radius); max-height: 500px; background: var(--surface-color);"
           poster=""
         >
           <source src="https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/reeses-pitch-cassidy.mp4" type="video/mp4">
           Your browser does not support the video tag.
         </video>
-        <div style="margin-top: 15px; padding: 15px; background: rgba(34, 197, 94, 0.1); border-radius: 10px; border-left: 4px solid #22c55e;">
-          <p style="color: #86efac; font-size: 14px; margin: 0;"><strong>💡 Key Takeaways:</strong> Notice how he introduces himself, explains who Roof-ER is, makes it relatable, and goes for the close naturally.</p>
+        <div style="margin-top: 15px; padding: 15px; background: var(--surface-color); border-radius: var(--border-radius); border-left: 4px solid var(--border-color);">
+          <p style="color: var(--text-primary); font-size: 14px; margin: 0;"><strong> Key Takeaways:</strong> Notice how he introduces himself, explains who Roof-ER is, makes it relatable, and goes for the close naturally.</p>
         </div>
       </div>
 
@@ -2980,7 +2633,7 @@ const trainingContent = {
       <div class="practice-mode-container">
         <div class="practice-intro">
           <p>Ready to practice? Click below to enter Practice Mode where you can rehearse your pitch out loud!</p>
-          <button class="practice-mode-btn" onclick="togglePracticeMode()">🎤 Start Practice Mode</button>
+          <button class="practice-mode-btn" onclick="togglePracticeMode()"> Start Practice Mode</button>
         </div>
         <div class="practice-active" id="practice-mode" style="display: none;">
           <div class="practice-prompt">
@@ -3007,32 +2660,32 @@ const trainingContent = {
       <h2>Building Rapport Tips</h2>
       <div class="tips-grid">
         <div class="tip-card">
-          <span class="tip-icon">🪞</span>
+          <span class="tip-icon"></span>
           <h4>Mirror Their Energy</h4>
           <p>Match their enthusiasm or calmness</p>
         </div>
         <div class="tip-card">
-          <span class="tip-icon">🌧️</span>
+          <span class="tip-icon"></span>
           <h4>Ask About Storms</h4>
           <p>Get them talking about past weather events</p>
         </div>
         <div class="tip-card">
-          <span class="tip-icon">🏡</span>
+          <span class="tip-icon"></span>
           <h4>Compliment Authentically</h4>
           <p>Nice yard, landscaping, or home - be genuine</p>
         </div>
         <div class="tip-card">
-          <span class="tip-icon">📛</span>
+          <span class="tip-icon"></span>
           <h4>Use Their Name</h4>
           <p>2-3 times in conversation creates connection</p>
         </div>
         <div class="tip-card">
-          <span class="tip-icon">📖</span>
+          <span class="tip-icon"></span>
           <h4>Share Brief Stories</h4>
           <p>"I helped your neighbor two streets over last week..."</p>
         </div>
         <div class="tip-card">
-          <span class="tip-icon">👔</span>
+          <span class="tip-icon"></span>
           <h4>Be Professional</h4>
           <p>Trusted advisor, not a pushy salesperson</p>
         </div>
@@ -3058,30 +2711,30 @@ const trainingContent = {
    'inspection-process': `
     <div class="content-card inspection-module-redesign">
       <!-- Module Header with Gradient -->
-      <div class="module-header-gradient" style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%); color: white; padding: 30px; margin: -20px -20px 30px -20px; border-radius: 12px 12px 0 0;">
-        <h1 style="margin: 0; color: white;">🔍 The Inspection Process</h1>
+      <div class="module-header-gradient" style="background: var(--surface-color); color: var(--text-primary); padding: 30px; margin: -20px -20px 30px -20px; border-radius: var(--border-radius);">
+        <h1 style="margin: 0; color: var(--text-primary);"> The Inspection Process</h1>
         <p style="margin: 10px 0 0 0; opacity: 0.9; font-size: 1.1rem;">Master the 6-step process that separates professionals from amateurs</p>
       </div>
 
       <!-- Video Section -->
-      ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module8-inspection-process.mp4', 'inspection-process-video', '📹 Complete Inspection Protocol')}
+      ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module8-inspection-process.mp4', 'inspection-process-video', ' Complete Inspection Protocol')}
 
       <!-- Introduction Card -->
-      <div class="intro-highlight-card" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-left: 5px solid #3b82f6; padding: 24px; border-radius: 0 16px 16px 0; margin: 30px 0;">
-        <h2 style="margin: 0 0 12px 0; color: #1e40af;">🎯 Why a Systematic Process Matters</h2>
-        <p style="margin: 0; color: #334155; line-height: 1.7;">A thorough, consistent inspection process ensures you never miss damage, builds trust with homeowners, and creates bulletproof documentation for insurance claims. Follow these 6 steps every time - no shortcuts.</p>
+      <div class="intro-highlight-card" style="background: var(--surface-color); border-left: 5px solid var(--border-color); padding: 24px; border-radius: var(--border-radius); margin: 30px 0;">
+        <h2 style="margin: 0 0 12px 0; color: var(--text-primary);"> Why a Systematic Process Matters</h2>
+        <p style="margin: 0; color: var(--text-primary); line-height: 1.7;">A thorough, consistent inspection process ensures you never miss damage, builds trust with homeowners, and creates bulletproof documentation for insurance claims. Follow these 6 steps every time - no shortcuts.</p>
       </div>
 
       <!-- SECTION 1: Interactive 6-Step Cards -->
-      <h2 style="margin-bottom: 20px;">📋 The 6-Step Inspection Process</h2>
-      <p style="color: #4a5568; margin-bottom: 24px;">Click any step to learn more. Each step builds on the previous one for a complete inspection.</p>
+      <h2 style="margin-bottom: 20px;"> The 6-Step Inspection Process</h2>
+      <p style="color: var(--text-primary); margin-bottom: 24px;">Click any step to learn more. Each step builds on the previous one for a complete inspection.</p>
 
       <div class="inspection-steps-grid" id="inspection-steps-grid">
         <!-- Step 1 -->
         <div class="inspection-step-card expanded" data-step="1" onclick="toggleStepCard(this)">
           <div class="step-card-header">
-            <span class="step-badge" style="background: #ef4444;">1</span>
-            <span class="step-icon">🦺</span>
+            <span class="step-badge" style="background: var(--surface-color);">1</span>
+            <span class="step-icon"></span>
             <h3>Safety First</h3>
             <span class="expand-icon">+</span>
           </div>
@@ -3098,8 +2751,8 @@ const trainingContent = {
         <!-- Step 2 -->
         <div class="inspection-step-card expanded" data-step="2" onclick="toggleStepCard(this)">
           <div class="step-card-header">
-            <span class="step-badge" style="background: #f97316;">2</span>
-            <span class="step-icon">🔄</span>
+            <span class="step-badge" style="background: var(--surface-color);">2</span>
+            <span class="step-icon"></span>
             <h3>360° Ground Walk</h3>
             <span class="expand-icon">+</span>
           </div>
@@ -3114,8 +2767,8 @@ const trainingContent = {
         <!-- Step 3 -->
         <div class="inspection-step-card expanded" data-step="3" onclick="toggleStepCard(this)">
           <div class="step-card-header">
-            <span class="step-badge" style="background: #eab308;">3</span>
-            <span class="step-icon">🏠</span>
+            <span class="step-badge" style="background: var(--surface-color);">3</span>
+            <span class="step-icon"></span>
             <h3>Roof Collateral Damage</h3>
             <span class="expand-icon">+</span>
           </div>
@@ -3132,8 +2785,8 @@ const trainingContent = {
         <!-- Step 4 -->
         <div class="inspection-step-card expanded" data-step="4" onclick="toggleStepCard(this)">
           <div class="step-card-header">
-            <span class="step-badge" style="background: #84cc16;">4</span>
-            <span class="step-icon">🔍</span>
+            <span class="step-badge" style="background: var(--surface-color);">4</span>
+            <span class="step-icon"></span>
             <h3>Shingle Inspection</h3>
             <span class="expand-icon">+</span>
           </div>
@@ -3150,8 +2803,8 @@ const trainingContent = {
         <!-- Step 5 -->
         <div class="inspection-step-card expanded" data-step="5" onclick="toggleStepCard(this)">
           <div class="step-card-header">
-            <span class="step-badge" style="background: #22c55e;">5</span>
-            <span class="step-icon">📸</span>
+            <span class="step-badge" style="background: var(--surface-color);">5</span>
+            <span class="step-icon"></span>
             <h3>Damage Overview</h3>
             <span class="expand-icon">+</span>
           </div>
@@ -3166,8 +2819,8 @@ const trainingContent = {
         <!-- Step 6 -->
         <div class="inspection-step-card expanded" data-step="6" onclick="toggleStepCard(this)">
           <div class="step-card-header">
-            <span class="step-badge" style="background: #14b8a6;">6</span>
-            <span class="step-icon">🪣</span>
+            <span class="step-badge" style="background: var(--surface-color);">6</span>
+            <span class="step-icon"></span>
             <h3>Granules in Gutters & Downspouts</h3>
             <span class="expand-icon">+</span>
           </div>
@@ -3181,8 +2834,8 @@ const trainingContent = {
       </div>
 
       <!-- SECTION 2: Photo Documentation Strategy Cards -->
-      <h2 style="margin: 40px 0 20px 0;">📷 Photo Documentation Strategy</h2>
-      <p style="color: #4a5568; margin-bottom: 24px;">A thorough inspection tells a story. Follow this order to capture all necessary evidence. This process should take 15-20 minutes.</p>
+      <h2 style="margin: 40px 0 20px 0;"> Photo Documentation Strategy</h2>
+      <p style="color: var(--text-primary); margin-bottom: 24px;">A thorough inspection tells a story. Follow this order to capture all necessary evidence. This process should take 15-20 minutes.</p>
 
       <div class="photo-strategy-grid with-images">
         <div class="photo-strategy-card has-image" onclick="openPhotoModal('/assets/photo-strategy/step1-overview.jpg', 'Step 1: Ground Collateral Start', 'Begin your 360 walk. Capture the front of the home plus any visible collateral damage (siding, screens, downspouts, gutters).')">
@@ -3242,48 +2895,48 @@ const trainingContent = {
       </div>
 
       <!-- Key Photo Tips -->
-      <div class="photo-tips-box" style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 12px; padding: 24px; margin: 30px 0;">
-        <h3 style="margin: 0 0 16px 0; color: #92400e;">📸 Key Photo Tips</h3>
-        <ul style="margin: 0; padding-left: 24px; color: #78350f;">
+      <div class="photo-tips-box" style="background: var(--surface-color); border: 2px solid var(--border-color); border-radius: var(--border-radius); padding: 24px; margin: 30px 0;">
+        <h3 style="margin: 0 0 16px 0; color: var(--text-primary);"> Key Photo Tips</h3>
+        <ul style="margin: 0; padding-left: 24px; color: var(--text-primary);">
           <li><strong>Make it look good on camera:</strong> If it doesn't read clearly, retake it.</li>
           <li><strong>Use your phone camera only:</strong> No extra apps or filters.</li>
           <li><strong>Quality over quantity:</strong> 1-2 great damage photos beat 100 mixed shots.</li>
           <li><strong>Group your photos:</strong> Ground collateral → roof collateral → close-up shingles → overall shingles → granules.</li>
           <li><strong>Delete bad shots:</strong> Keep the report clean and confident.</li>
         </ul>
-        <p style="margin: 16px 0 0 0; font-weight: 600; color: #92400e;">💡 Key takeaway: Getting enough clear photos to convince the homeowner is the most important part. Without their belief, you can't file a claim.</p>
+        <p style="margin: 16px 0 0 0; font-weight: 600; color: var(--text-primary);"> Key takeaway: Getting enough clear photos to convince the homeowner is the most important part. Without their belief, you can't file a claim.</p>
       </div>
 
       <!-- SECTION 3: Inspection Ordering Game -->
-      <h2 style="margin: 40px 0 20px 0;">🎮 Test Your Knowledge: Step Ordering Game</h2>
+      <h2 style="margin: 40px 0 20px 0;"> Test Your Knowledge: Step Ordering Game</h2>
       <p class="game-instructions">Drag and drop the inspection steps into the correct order from start to finish. Get them all right to unlock module completion!</p>
 
       <div id="inspection-order-game" class="game-board">
         <div class="game-column">
-          <h4>🔀 Steps (Drag from here)</h4>
+          <h4> Steps (Drag from here)</h4>
           <div id="inspection-items-pool">
-            <div class="inspection-drag-item" draggable="true" data-order="2">🔄 360° Ground Walk</div>
-            <div class="inspection-drag-item" draggable="true" data-order="5">📸 Damage Overview</div>
-            <div class="inspection-drag-item" draggable="true" data-order="1">🦺 Safety First</div>
-            <div class="inspection-drag-item" draggable="true" data-order="4">🔍 Shingle Inspection</div>
-            <div class="inspection-drag-item" draggable="true" data-order="6">🪣 Granules in Gutters</div>
-            <div class="inspection-drag-item" draggable="true" data-order="3">🏠 Roof Collateral Check</div>
+            <div class="inspection-drag-item" draggable="true" data-order="2"> 360° Ground Walk</div>
+            <div class="inspection-drag-item" draggable="true" data-order="5"> Damage Overview</div>
+            <div class="inspection-drag-item" draggable="true" data-order="1"> Safety First</div>
+            <div class="inspection-drag-item" draggable="true" data-order="4"> Shingle Inspection</div>
+            <div class="inspection-drag-item" draggable="true" data-order="6"> Granules in Gutters</div>
+            <div class="inspection-drag-item" draggable="true" data-order="3"> Roof Collateral Check</div>
           </div>
         </div>
         <div class="game-column">
-          <h4>✅ Correct Order (Drop here)</h4>
+          <h4> Correct Order (Drop here)</h4>
           <div id="inspection-sorted-list"></div>
         </div>
       </div>
       <div id="inspection-order-feedback" style="display: none;"></div>
-      <button id="reset-inspection-game" class="reset-game-btn" onclick="resetInspectionGame()" style="display: none; margin-top: 16px;">🔄 Reset & Try Again</button>
+      <button id="reset-inspection-game" class="reset-game-btn" onclick="resetInspectionGame()" style="display: none; margin-top: 16px;"> Reset & Try Again</button>
 
       <!-- Completion Section -->
       <div class="module-completion-section" id="module-complete-section" style="display: none;">
-        <div class="completion-celebration" style="text-align: center; padding: 30px; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); border-radius: 16px; margin-top: 30px;">
-          <span style="font-size: 3rem;">🎉</span>
-          <h3 style="color: #166534; margin: 16px 0;">Excellent Work!</h3>
-          <p style="color: #15803d;">You've mastered the 6-step inspection process. Now you're ready to conduct professional roof inspections!</p>
+        <div class="completion-celebration" style="text-align: center; padding: 30px; background: var(--surface-color); border-radius: var(--border-radius); margin-top: 30px;">
+
+          <h3 style="color: var(--text-primary); margin: 16px 0;">Excellent Work!</h3>
+          <p style="color: var(--text-primary);">You've mastered the 6-step inspection process. Now you're ready to conduct professional roof inspections!</p>
         </div>
         <button class="complete-module-btn" onclick="completeModule('inspection-process')">
           Complete Module & Continue →
@@ -3293,32 +2946,32 @@ const trainingContent = {
   `,
   'post-inspection-pitch': `
     <div class="content-card post-inspection-redesign">
-        <div class="module-header-gradient" style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%); color: white; padding: 30px; margin: -20px -20px 30px -20px; border-radius: 12px 12px 0 0;">
-          <h1 style="margin: 0; color: white;">🎯 Post-Inspection Pitch</h1>
+        <div class="module-header-gradient" style="background: var(--surface-color); color: var(--text-primary); padding: 30px; margin: -20px -20px 30px -20px; border-radius: var(--border-radius);">
+          <h1 style="margin: 0; color: var(--text-primary);"> Post-Inspection Pitch</h1>
           <p style="margin: 10px 0 0 0; opacity: 0.9; font-size: 1.1rem;">Master the art of presenting damage and closing the deal</p>
         </div>
 
-        ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module9-post-inspection.mp4', 'post-inspection-video', '📹 Mastering the Post-Inspection Pitch')}
+        ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module9-post-inspection.mp4', 'post-inspection-video', ' Mastering the Post-Inspection Pitch')}
 
         <!-- Full Script Section -->
         <div class="full-script-section" style="margin: 30px 0;">
           <div style="margin-bottom: 20px;">
-            <h2 style="margin: 0;">📜 The Complete Post-Inspection Script</h2>
+            <h2 style="margin: 0;"> The Complete Post-Inspection Script</h2>
           </div>
 
-          <div class="script-purpose-callout" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-left: 5px solid #c62828; border-radius: 0 12px 12px 0; padding: 16px 20px; margin-bottom: 20px;">
-            <p style="margin: 0; color: #7f1d1d; font-size: 15px;"><strong>🎯 Purpose of this script:</strong> to convince the homeowner - with the photos you are showing them - to file the claim. Not to get them approved, not to solve the deductible problem. If you find yourself pitching financing or payments here, you have lost the purpose of the pitch.</p>
+          <div class="script-purpose-callout" style="background: var(--surface-color); border-left: 5px solid var(--border-color); border-radius: var(--border-radius); padding: 16px 20px; margin-bottom: 20px;">
+            <p style="margin: 0; color: var(--text-primary); font-size: 15px;"><strong> Purpose of this script:</strong> to convince the homeowner - with the photos you are showing them - to file the claim. Not to get them approved, not to solve the deductible problem. If you find yourself pitching financing or payments here, you have lost the purpose of the pitch.</p>
           </div>
 
           <!-- INTEGRITY Phase -->
-          <div class="script-phase" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-left: 5px solid #3b82f6; border-radius: 0 16px 16px 0; padding: 24px; margin-bottom: 20px;">
+          <div class="script-phase" style="background: var(--surface-color); border-left: 5px solid var(--border-color); border-radius: var(--border-radius); padding: 24px; margin-bottom: 20px;">
             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-              <span style="background: #3b82f6; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold;">PHASE 1</span>
-              <h3 style="margin: 0; color: #1e40af;">🤝 INTEGRITY - Opening</h3>
+              <span style="background: var(--surface-color); color: var(--text-primary); padding: 8px 16px; border-radius: var(--border-radius); font-weight: bold;">PHASE 1</span>
+              <h3 style="margin: 0; color: var(--text-primary);"> INTEGRITY - Opening</h3>
             </div>
-            ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module9-phase1-intro.mp4', 'phase1-intro-video', '📹 Phase 1: Introduction')}
-            <div class="script-content" style="background: white; padding: 20px; border-radius: 12px; margin-top: 16px;">
-              <p style="color: #334155; line-height: 1.8; margin: 0;" data-script-text="true">
+            ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module9-phase1-intro.mp4', 'phase1-intro-video', ' Phase 1: Introduction')}
+            <div class="script-content" style="background: var(--surface-color); padding: 20px; border-radius: var(--border-radius); margin-top: 16px;">
+              <p style="color: var(--text-primary); line-height: 1.8; margin: 0;" data-script-text="true">
                 <em>[Knock on the door]</em><br><br>
                 <strong>"Hey _______, so I have a bunch of photos to show you. First I walked around the perimeter..."</strong><br><br>
                 <em>[Show pictures of damage to screens, gutters, downspouts, soft metals]</em><br><br>
@@ -3328,14 +2981,14 @@ const trainingContent = {
           </div>
 
           <!-- QUALITY Phase -->
-          <div class="script-phase" style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border-left: 5px solid #eab308; border-radius: 0 16px 16px 0; padding: 24px; margin-bottom: 20px;">
+          <div class="script-phase" style="background: var(--surface-color); border-left: 5px solid var(--border-color); border-radius: var(--border-radius); padding: 24px; margin-bottom: 20px;">
             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-              <span style="background: #eab308; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold;">PHASE 2</span>
-              <h3 style="margin: 0; color: #a16207;">⭐ QUALITY - Damage Explanation</h3>
+              <span style="background: var(--surface-color); color: var(--text-primary); padding: 8px 16px; border-radius: var(--border-radius); font-weight: bold;">PHASE 2</span>
+              <h3 style="margin: 0; color: var(--text-primary);"> QUALITY - Damage Explanation</h3>
             </div>
-            ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module9-phase2-hail.mp4', 'phase2-hail-video', '📹 Phase 2: Hail Damage')}
-            <div class="script-content" style="background: white; padding: 20px; border-radius: 12px; margin-top: 16px;">
-              <p style="color: #334155; line-height: 1.8; margin: 0;" data-script-text="true">
+            ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module9-phase2-hail.mp4', 'phase2-hail-video', ' Phase 2: Hail Damage')}
+            <div class="script-content" style="background: var(--surface-color); padding: 20px; border-radius: var(--border-radius); margin-top: 16px;">
+              <p style="color: var(--text-primary); line-height: 1.8; margin: 0;" data-script-text="true">
                 "Here are the photos of the damage to your shingles. <strong>Anything I have circled means it's hail damage</strong> [IF wind damage: and anything I have slashed means it's wind damage]."<br><br>
                 <em>[Remain on a photo of hail damage]</em><br><br>
                 "This is exactly what we look for when we're looking for hail damage. If you notice, the divot is <strong>circular in nature</strong>. Even if this damage doesn't look like a big deal, what happens over time, these hail divots fill with water, freeze... when water freezes it <strong>expands and breaks apart the shingle</strong> which will eventually lead to leaks. That is why your insurance company is responsible and your policy covers this type of damage."<br><br>
@@ -3345,14 +2998,14 @@ const trainingContent = {
           </div>
 
           <!-- SIMPLICITY Phase -->
-          <div class="script-phase" style="background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); border-left: 5px solid #22c55e; border-radius: 0 16px 16px 0; padding: 24px; margin-bottom: 20px;">
+          <div class="script-phase" style="background: var(--surface-color); border-left: 5px solid var(--border-color); border-radius: var(--border-radius); padding: 24px; margin-bottom: 20px;">
             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-              <span style="background: #22c55e; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold;">PHASE 3</span>
-              <h3 style="margin: 0; color: #15803d;">✨ SIMPLICITY - Summary & Close</h3>
+              <span style="background: var(--surface-color); color: var(--text-primary); padding: 8px 16px; border-radius: var(--border-radius); font-weight: bold;">PHASE 3</span>
+              <h3 style="margin: 0; color: var(--text-primary);"> SIMPLICITY - Summary & Close</h3>
             </div>
-            ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module9-phase3-summary.mp4', 'phase3-summary-video', '📹 Phase 3: Damage Summary & Insurance')}
-            <div class="script-content" style="background: white; padding: 20px; border-radius: 12px; margin-top: 16px;">
-              <p style="color: #334155; line-height: 1.8; margin: 0;" data-script-text="true">
+            ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module9-phase3-summary.mp4', 'phase3-summary-video', ' Phase 3: Damage Summary & Insurance')}
+            <div class="script-content" style="background: var(--surface-color); padding: 20px; border-radius: var(--border-radius); margin-top: 16px;">
+              <p style="color: var(--text-primary); line-height: 1.8; margin: 0;" data-script-text="true">
                 "As you can see there is quite a bit of damage."<br><br>
                 <em>[If wind damage: "Now here are the wind damaged shingles. You have both shingles that are creased from the wind lifting them up and shingles that have completely been blown off."]</em><br><br>
                 <em>[Show granules in gutters/downspouts]</em><br><br>
@@ -3365,14 +3018,14 @@ const trainingContent = {
           </div>
 
           <!-- Info Gathering Phase -->
-          <div class="script-phase" style="background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); border-left: 5px solid #ec4899; border-radius: 0 16px 16px 0; padding: 24px; margin-bottom: 20px;">
+          <div class="script-phase" style="background: var(--surface-color); border-left: 5px solid var(--border-color); border-radius: var(--border-radius); padding: 24px; margin-bottom: 20px;">
             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-              <span style="background: #ec4899; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold;">PHASE 4</span>
-              <h3 style="margin: 0; color: #be185d;">📋 INTEGRITY - Information Gathering</h3>
+              <span style="background: var(--surface-color); color: var(--text-primary); padding: 8px 16px; border-radius: var(--border-radius); font-weight: bold;">PHASE 4</span>
+              <h3 style="margin: 0; color: var(--text-primary);"> INTEGRITY - Information Gathering</h3>
             </div>
-            ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module9-phase4-info.mp4', 'phase4-info-video', '📹 Phase 4: Information Gathering')}
-            <div class="script-content" style="background: white; padding: 20px; border-radius: 12px; margin-top: 16px;">
-              <p style="color: #334155; line-height: 1.8; margin: 0;" data-script-text="true">
+            ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module9-phase4-info.mp4', 'phase4-info-video', ' Phase 4: Information Gathering')}
+            <div class="script-content" style="background: var(--surface-color); padding: 20px; border-radius: var(--border-radius); margin-top: 16px;">
+              <p style="color: var(--text-primary); line-height: 1.8; margin: 0;" data-script-text="true">
                 <em>[Approach house]</em> "Is there a place we could sit down for 5-10 Minutes?"<br><br>
                 <em>[Build rapport as you get settled]</em><br><br>
                 "Okay, so first I am going to grab some of your basic information for our system."<br><br>
@@ -3386,99 +3039,99 @@ const trainingContent = {
         </div>
 
         <!-- Key Points Cards -->
-        <h2>💡 Critical Points to Remember</h2>
-        <div class="key-points-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin: 20px 0;">
-          <div class="key-point-card" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 2px solid #22c55e; border-radius: 12px; padding: 20px;">
-            <div style="font-size: 2rem; margin-bottom: 10px;">⚖️</div>
-            <h4 style="margin: 0 0 8px 0; color: #15803d;">Matching Law</h4>
-            <p style="margin: 0; color: #334155; font-size: 0.9rem;">Insurance must replace entire roof if >25% damaged (varies by state)</p>
+        <h2> Critical Points to Remember</h2>
+        <div class="key-points-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 16px; margin: 20px 0;">
+          <div class="key-point-card" style="background: var(--surface-color); border: 2px solid var(--border-color); border-radius: var(--border-radius); padding: 20px;">
+            <div style="font-size: 2rem; margin-bottom: 10px;"></div>
+            <h4 style="margin: 0 0 8px 0; color: var(--text-primary);">Matching Law</h4>
+            <p style="margin: 0; color: var(--text-primary); font-size: 0.9rem;">Insurance must replace entire roof if >25% damaged (varies by state)</p>
           </div>
-          <div class="key-point-card" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border: 2px solid #ef4444; border-radius: 12px; padding: 20px;">
-            <div style="font-size: 2rem; margin-bottom: 10px;">⏰</div>
-            <h4 style="margin: 0 0 8px 0; color: #b91c1c;">Urgency</h4>
-            <p style="margin: 0; color: #334155; font-size: 0.9rem;">Statute of limitations is 1-2 years in most states</p>
+          <div class="key-point-card" style="background: var(--surface-color); border: 2px solid var(--border-color); border-radius: var(--border-radius); padding: 20px;">
+            <div style="font-size: 2rem; margin-bottom: 10px;"></div>
+            <h4 style="margin: 0 0 8px 0; color: var(--text-primary);">Urgency</h4>
+            <p style="margin: 0; color: var(--text-primary); font-size: 0.9rem;">Statute of limitations is 1-2 years in most states</p>
           </div>
-          <div class="key-point-card" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 2px solid #3b82f6; border-radius: 12px; padding: 20px;">
-            <div style="font-size: 2rem; margin-bottom: 10px;">💰</div>
-            <h4 style="margin: 0 0 8px 0; color: #1d4ed8;">No Cost</h4>
-            <p style="margin: 0; color: #334155; font-size: 0.9rem;">Free inspection, only pay deductible if approved</p>
+          <div class="key-point-card" style="background: var(--surface-color); border: 2px solid var(--border-color); border-radius: var(--border-radius); padding: 20px;">
+            <div style="font-size: 2rem; margin-bottom: 10px;"></div>
+            <h4 style="margin: 0 0 8px 0; color: var(--text-primary);">No Cost</h4>
+            <p style="margin: 0; color: var(--text-primary); font-size: 0.9rem;">Free inspection, only pay deductible if approved</p>
           </div>
-          <div class="key-point-card" style="background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 20px;">
-            <div style="font-size: 2rem; margin-bottom: 10px;">🏠</div>
-            <h4 style="margin: 0 0 8px 0; color: #b45309;">Home Value</h4>
-            <p style="margin: 0; color: #334155; font-size: 0.9rem;">New roof adds $15-20k to property value</p>
+          <div class="key-point-card" style="background: var(--surface-color); border: 2px solid var(--border-color); border-radius: var(--border-radius); padding: 20px;">
+            <div style="font-size: 2rem; margin-bottom: 10px;"></div>
+            <h4 style="margin: 0 0 8px 0; color: var(--text-primary);">Home Value</h4>
+            <p style="margin: 0; color: var(--text-primary); font-size: 0.9rem;">New roof adds $15-20k to property value</p>
           </div>
         </div>
 
         <!-- Agnes Live Role-Play Practice -->
-        <div class="agnes-practice-section" style="background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); border: 3px solid #8b5cf6; border-radius: 20px; padding: 30px; margin: 30px 0;">
+        <div class="agnes-practice-section" style="background: var(--surface-color); border: 3px solid var(--border-color); border-radius: var(--border-radius); padding: 30px; margin: 30px 0;">
           <div style="text-align: center; margin-bottom: 20px;">
-            <span style="font-size: 3rem;">🎭</span>
-            <h2 style="margin: 10px 0 0 0; color: #6d28d9;">Live Role-Play with Agnes</h2>
-            <p style="color: #7c3aed; margin: 8px 0 0 0;">Practice your post-inspection pitch with our AI homeowner</p>
+
+            <h2 style="margin: 10px 0 0 0; color: var(--text-primary);">Live Role-Play with Agnes</h2>
+            <p style="color: var(--text-primary); margin: 8px 0 0 0;">Practice your post-inspection pitch with our AI homeowner</p>
           </div>
 
           <div id="agnes-pitch-practice" style="display: none;">
             <!-- Phase Progress -->
             <div class="pitch-progress" style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
-              <span class="pitch-step active" data-step="1" style="width: 30px; height: 30px; border-radius: 50%; background: #8b5cf6; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">1</span>
-              <span class="pitch-step" data-step="2" style="width: 30px; height: 30px; border-radius: 50%; background: #e5e7eb; color: #6b7280; display: flex; align-items: center; justify-content: center; font-weight: bold;">2</span>
-              <span class="pitch-step" data-step="3" style="width: 30px; height: 30px; border-radius: 50%; background: #e5e7eb; color: #6b7280; display: flex; align-items: center; justify-content: center; font-weight: bold;">3</span>
-              <span class="pitch-step" data-step="4" style="width: 30px; height: 30px; border-radius: 50%; background: #e5e7eb; color: #6b7280; display: flex; align-items: center; justify-content: center; font-weight: bold;">4</span>
+              <span class="pitch-step active" data-step="1" style="width: 30px; height: 30px; border-radius: 50%; background: var(--surface-color); color: var(--text-primary); display: flex; align-items: center; justify-content: center; font-weight: bold;">1</span>
+              <span class="pitch-step" data-step="2" style="width: 30px; height: 30px; border-radius: 50%; background: var(--surface-color); color: var(--text-primary); display: flex; align-items: center; justify-content: center; font-weight: bold;">2</span>
+              <span class="pitch-step" data-step="3" style="width: 30px; height: 30px; border-radius: 50%; background: var(--surface-color); color: var(--text-primary); display: flex; align-items: center; justify-content: center; font-weight: bold;">3</span>
+              <span class="pitch-step" data-step="4" style="width: 30px; height: 30px; border-radius: 50%; background: var(--surface-color); color: var(--text-primary); display: flex; align-items: center; justify-content: center; font-weight: bold;">4</span>
             </div>
 
             <!-- Current Phase Banner -->
-            <div id="current-phase-banner" style="background: #8b5cf6; color: white; padding: 10px 20px; border-radius: 10px; text-align: center; margin-bottom: 16px;">
+            <div id="current-phase-banner" style="background: var(--surface-color); color: var(--text-primary); padding: 10px 20px; border-radius: var(--border-radius); text-align: center; margin-bottom: 16px;">
               <strong>Phase 1: INTEGRITY - Opening</strong>
             </div>
 
             <!-- Chat Interface -->
-            <div class="pitch-chat" style="background: white; border-radius: 16px; padding: 20px; min-height: 350px; display: flex; flex-direction: column;">
+            <div class="pitch-chat" style="background: var(--surface-color); border-radius: var(--border-radius); padding: 20px; min-height: 350px; display: flex; flex-direction: column;">
               <div id="pitch-chat-messages" style="flex: 1; max-height: 250px; overflow-y: auto; margin-bottom: 16px;">
                 <!-- Messages will be added dynamically -->
               </div>
 
               <!-- Voice Input Area -->
-              <div id="pitch-input-area" style="border-top: 1px solid #e5e7eb; padding-top: 16px;">
-                <p id="pitch-prompt-text" style="color: #7c3aed; font-weight: 500; margin-bottom: 16px; text-align: center;">🎯 Deliver your opening - show the collateral damage photos and explain their importance</p>
+              <div id="pitch-input-area" style="border-top: 1px solid var(--border-color); padding-top: 16px;">
+                <p id="pitch-prompt-text" style="color: var(--text-primary); font-weight: 500; margin-bottom: 16px; text-align: center;"> Deliver your opening - show the collateral damage photos and explain their importance</p>
 
                 <!-- Voice Recording UI -->
                 <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
-                  <div id="voice-status" style="color: #6b7280; font-size: 0.95rem; min-height: 24px;">Press the microphone to speak</div>
+                  <div id="voice-status" style="color: var(--text-primary); font-size: 0.95rem; min-height: 24px;">Press the microphone to speak</div>
 
-                  <button id="voice-record-btn" onclick="toggleVoiceRecording()" style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); border: none; cursor: pointer; box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4); transition: all 0.3s; display: flex; align-items: center; justify-content: center;">
-                    <span style="font-size: 2.5rem;">🎤</span>
+                  <button id="voice-record-btn" onclick="toggleVoiceRecording()" style="width: 80px; height: 80px; border-radius: 50%; background: var(--surface-color); border: none; cursor: pointer; box-shadow: none; transition: all 0.3s; display: flex; align-items: center; justify-content: center;">
+
                   </button>
 
-                  <p id="voice-transcript" style="color: #374151; font-style: italic; text-align: center; min-height: 50px; padding: 10px; background: #f9fafb; border-radius: 10px; width: 100%; display: none;"></p>
+                  <p id="voice-transcript" style="color: var(--text-primary); font-style: italic; text-align: center; min-height: 50px; padding: 10px; background: var(--surface-color); border-radius: var(--border-radius); width: 100%; display: none;"></p>
                 </div>
 
                 <div style="display: flex; gap: 10px; margin-top: 20px; justify-content: center;">
-                  <button onclick="skipPitchPhase()" style="background: #e5e7eb; color: #374151; border: none; padding: 10px 24px; border-radius: 20px; cursor: pointer; font-size: 0.9rem;">Skip Phase →</button>
+                  <button onclick="skipPitchPhase()" style="background: var(--surface-color); color: var(--text-primary); border: none; padding: 10px 24px; border-radius: var(--border-radius); cursor: pointer; font-size: 0.9rem;">Skip Phase →</button>
                 </div>
               </div>
 
               <!-- Loading indicator -->
               <div id="agnes-loading" style="display: none; text-align: center; padding: 20px;">
-                <div style="display: inline-block; animation: spin 1s linear infinite; font-size: 2rem;">🔄</div>
-                <p style="color: #7c3aed; margin-top: 10px;">Agnes is responding...</p>
+                <div style="display: inline-block; animation: spin 1s linear infinite; font-size: 2rem;"></div>
+                <p style="color: var(--text-primary); margin-top: 10px;">Agnes is responding...</p>
               </div>
             </div>
           </div>
 
           <div id="agnes-pitch-start" style="text-align: center;">
-            <p style="color: #6b7280; margin-bottom: 16px;">Practice delivering your post-inspection pitch to Agnes, a friendly homeowner. She'll respond naturally and help you improve!</p>
-            <button onclick="startLivePitchPractice()" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; border: none; padding: 16px 40px; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);">
-              🚀 Start Live Role-Play
+            <p style="color: var(--text-primary); margin-bottom: 16px;">Practice delivering your post-inspection pitch to Agnes, a friendly homeowner. She'll respond naturally and help you improve!</p>
+            <button onclick="startLivePitchPractice()" style="background: var(--surface-color); color: var(--text-primary); border: none; padding: 16px 40px; border-radius: var(--border-radius); cursor: pointer; font-weight: bold; font-size: 1.1rem; box-shadow: none;">
+               Start Live Role-Play
             </button>
           </div>
 
           <div id="agnes-pitch-complete" style="display: none; text-align: center;">
-            <div style="font-size: 4rem;">🎉</div>
-            <h3 style="color: #15803d; margin: 10px 0;">Excellent Work!</h3>
-            <p style="color: #334155;">You've completed all 4 phases of the post-inspection pitch!</p>
-            <p style="color: #6b7280; font-size: 0.9rem; margin-top: 10px;">Agnes was impressed with your presentation skills.</p>
-            <button onclick="resetLivePitchPractice()" style="background: #e5e7eb; color: #374151; border: none; padding: 10px 24px; border-radius: 20px; cursor: pointer; margin-top: 10px;">Practice Again</button>
+            <div style="font-size: 4rem;"></div>
+            <h3 style="color: var(--text-primary); margin: 10px 0;">Excellent Work!</h3>
+            <p style="color: var(--text-primary);">You've completed all 4 phases of the post-inspection pitch!</p>
+            <p style="color: var(--text-primary); font-size: 0.9rem; margin-top: 10px;">Agnes was impressed with your presentation skills.</p>
+            <button onclick="resetLivePitchPractice()" style="background: var(--surface-color); color: var(--text-primary); border: none; padding: 10px 24px; border-radius: var(--border-radius); cursor: pointer; margin-top: 10px;">Practice Again</button>
           </div>
         </div>
 
@@ -3558,124 +3211,122 @@ const trainingContent = {
         <p class="section-intro">Click any card to reveal the best response and why it works.</p>
 
         <div class="interactive-objections-grid">
-          <div class="objection-flip-card" onclick="this.classList.toggle('flipped')">
-            <div class="flip-card-inner">
-              <div class="flip-card-front">
-                <div class="objection-icon">⏰</div>
+          <button type="button" class="objection-flip-card" onclick="this.classList.toggle('flipped')">
+            <span class="flip-card-inner">
+              <span class="flip-card-front">
+                <span class="objection-icon"></span>
                 <h3>"I'm busy right now"</h3>
                 <p class="tap-hint">Tap to see response</p>
-              </div>
-              <div class="flip-card-back">
-                <div class="response-content">
+              </span>
+              <span class="flip-card-back">
+                <span class="response-content">
                   <p class="response-text">"I understand! This will only take 2 minutes from the ground. I can come back at [specific time] if that works better?"</p>
-                  <div class="why-works">
+                  <span class="why-works">
                     <strong>Why it works:</strong> Acknowledges constraint, offers flexibility, gives specific alternatives.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+                  </span>
+                </span>
+              </span>
+            </span>
+          </button>
 
-          <div class="objection-flip-card" onclick="this.classList.toggle('flipped')">
-            <div class="flip-card-inner">
-              <div class="flip-card-front">
-                <div class="objection-icon">🔧</div>
+          <button type="button" class="objection-flip-card" onclick="this.classList.toggle('flipped')">
+            <span class="flip-card-inner">
+              <span class="flip-card-front">
+                <span class="objection-icon"></span>
                 <h3>"We already have a roofer"</h3>
                 <p class="tap-hint">Tap to see response</p>
-              </div>
-              <div class="flip-card-back">
-                <div class="response-content">
-                  <p class="response-text">"Totally. I'm not here to replace them — I just need 15 minutes to check for storm damage and show you what I find. It's free and quick."</p>
-                  <div class="why-works">
+              </span>
+              <span class="flip-card-back">
+                <span class="response-content">
+                  <p class="response-text">"Totally. I'm not here to replace them ,  I just need 15 minutes to check for storm damage and show you what I find. It's free and quick."</p>
+                  <span class="why-works">
                     <strong>Why it works:</strong> Respects their relationship and moves straight to a quick inspection.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+                  </span>
+                </span>
+              </span>
+            </span>
+          </button>
 
-          <div class="objection-flip-card" onclick="this.classList.toggle('flipped')">
-            <div class="flip-card-inner">
-              <div class="flip-card-front">
-                <div class="objection-icon">🏠</div>
+          <button type="button" class="objection-flip-card" onclick="this.classList.toggle('flipped')">
+            <span class="flip-card-inner">
+              <span class="flip-card-front">
+                <span class="objection-icon"></span>
                 <h3>"I don't think I have damage"</h3>
                 <p class="tap-hint">Tap to see response</p>
-              </div>
-              <div class="flip-card-back">
-                <div class="response-content">
+              </span>
+              <span class="flip-card-back">
+                <span class="response-content">
                   <p class="response-text">"You might be right! But I've been on 10 roofs in this neighborhood today, and 8 had damage the owner didn't know about. Let me check - worst case, I give you peace of mind."</p>
-                  <div class="why-works">
+                  <span class="why-works">
                     <strong>Why it works:</strong> Social proof + peace of mind angle. Low risk proposition.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+                  </span>
+                </span>
+              </span>
+            </span>
+          </button>
 
-          <div class="objection-flip-card" onclick="this.classList.toggle('flipped')">
-            <div class="flip-card-inner">
-              <div class="flip-card-front">
-                <div class="objection-icon">🚫</div>
+          <button type="button" class="objection-flip-card" onclick="this.classList.toggle('flipped')">
+            <span class="flip-card-inner">
+              <span class="flip-card-front">
+                <span class="objection-icon"></span>
                 <h3>"Not interested"</h3>
                 <p class="tap-hint">Tap to see response</p>
-              </div>
-              <div class="flip-card-back">
-                <div class="response-content">
+              </span>
+              <span class="flip-card-back">
+                <span class="response-content">
                   <p class="response-text">"I get it, a lot of your neighbors said the same thing at first. Then I showed them photos of hail damage they couldn't see from the ground. If there's nothing, you lose 2 minutes. If there is damage, you save thousands."</p>
-                  <div class="why-works">
+                  <span class="why-works">
                     <strong>Why it works:</strong> Social proof, risk-reversal, high gain vs low investment.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+                  </span>
+                </span>
+              </span>
+            </span>
+          </button>
 
-          <div class="objection-flip-card" onclick="this.classList.toggle('flipped')">
-            <div class="flip-card-inner">
-              <div class="flip-card-front">
-                <div class="objection-icon">💑</div>
+          <button type="button" class="objection-flip-card" onclick="this.classList.toggle('flipped')">
+            <span class="flip-card-inner">
+              <span class="flip-card-front">
+                <span class="objection-icon"></span>
                 <h3>"I need to talk to my spouse"</h3>
                 <p class="tap-hint">Tap to see response</p>
-              </div>
-              <div class="flip-card-back">
-                <div class="response-content">
+              </span>
+              <span class="flip-card-back">
+                <span class="response-content">
                   <p class="response-text">"That's great, the inspection is free and I can leave info for both of you. Or I can wait a few minutes if they'll be home soon. This way you have the facts when you talk."</p>
-                  <div class="why-works">
+                  <span class="why-works">
                     <strong>Why it works:</strong> Respects their process, positions inspection as info-gathering.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+                  </span>
+                </span>
+              </span>
+            </span>
+          </button>
 
-          <div class="objection-flip-card" onclick="this.classList.toggle('flipped')">
-            <div class="flip-card-inner">
-              <div class="flip-card-front">
-                <div class="objection-icon">🤔</div>
+          <button type="button" class="objection-flip-card" onclick="this.classList.toggle('flipped')">
+            <span class="flip-card-inner">
+              <span class="flip-card-front">
+                <span class="objection-icon"></span>
                 <h3>"Let me think about it"</h3>
                 <p class="tap-hint">Tap to see response</p>
-              </div>
-              <div class="flip-card-back">
-                <div class="response-content">
+              </span>
+              <span class="flip-card-back">
+                <span class="response-content">
                   <p class="response-text">"Of course! What specifically would you like to think over? I want to make sure I've answered all your questions before I go."</p>
-                  <div class="why-works">
+                  <span class="why-works">
                     <strong>Why it works:</strong> Uncovers the real objection hidden behind "think about it."
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+                  </span>
+                </span>
+              </span>
+            </span>
+          </button>
         </div>
 
         <!-- Objection Response Challenge Game -->
-        <h2>🎮 Objection Response Challenge</h2>
+        <h2> Objection Response Challenge</h2>
         <p class="game-intro">Test your skills! Pick the best response for each scenario. Score 100% to master objection handling.</p>
 
         <div class="objection-challenge-game" id="objection-challenge-container">
           <div class="challenge-progress">
-            <div class="progress-bar-container">
-              <div class="challenge-progress-bar" id="challenge-progress-bar" style="width: 0%"></div>
-            </div>
+
             <span class="progress-text" id="challenge-progress-text">Question 1 of 5</span>
           </div>
 
@@ -3687,7 +3338,7 @@ const trainingContent = {
 
           <div class="challenge-card" id="challenge-card">
             <div class="scenario-header">
-              <span class="scenario-icon">🏠</span>
+              <span class="scenario-icon"></span>
               <span class="scenario-label">Homeowner says:</span>
             </div>
             <p class="scenario-text" id="scenario-text">"I'm really busy right now, maybe another time."</p>
@@ -3712,7 +3363,7 @@ const trainingContent = {
           </div>
 
           <div class="challenge-complete" id="challenge-complete" style="display: none;">
-            <div class="complete-icon">🏆</div>
+            <div class="complete-icon"></div>
             <h3>Challenge Complete!</h3>
             <p class="final-score">Your Score: <span id="final-score">0</span> / 500</p>
             <p class="score-message" id="score-message"></p>
@@ -3745,9 +3396,9 @@ const trainingContent = {
                  class="shingle-photo"
                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
             <div class="photo-placeholder" style="display: none;">
-              <p>📋 3-Tab Shingle Reference</p>
+              <p> 3-Tab Shingle Reference</p>
               <small>Flat, uniform pattern with 3 distinct rectangular tabs</small>
-              <div style="margin-top: 12px; padding: 12px; background: rgba(255,255,255,0.9); border-radius: 4px;">
+              <div style="margin-top: 12px; padding: 12px; background: var(--surface-color); border-radius: var(--border-radius);">
                 <strong>Key Visual Markers:</strong>
                 <ul style="text-align: left; margin: 8px 0 0 0; padding-left: 20px; font-size: 0.85rem;">
                   <li>Single flat layer - no dimensional depth</li>
@@ -3819,9 +3470,9 @@ const trainingContent = {
                  class="shingle-photo"
                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
             <div class="photo-placeholder" style="display: none;">
-              <p>🏗️ Architectural Shingle Reference</p>
+              <p> Architectural Shingle Reference</p>
               <small>Dimensional, multi-layer construction with varied depth</small>
-              <div style="margin-top: 12px; padding: 12px; background: rgba(255,255,255,0.9); border-radius: 4px;">
+              <div style="margin-top: 12px; padding: 12px; background: var(--surface-color); border-radius: var(--border-radius);">
                 <strong>Key Visual Markers:</strong>
                 <ul style="text-align: left; margin: 8px 0 0 0; padding-left: 20px; font-size: 0.85rem;">
                   <li>Multiple laminated layers creating depth</li>
@@ -3890,25 +3541,25 @@ const trainingContent = {
 
         <div class="visual-markers-grid">
           <div class="marker-card">
-            <div class="marker-icon">👁️</div>
+            <div class="marker-icon"></div>
             <h4>Look from the side</h4>
             <p>3-tab shingles appear completely flat with uniform thickness. Architectural shingles have visible depth variation and shadow lines from multiple layers.</p>
           </div>
 
           <div class="marker-card">
-            <div class="marker-icon">🔍</div>
+            <div class="marker-icon"></div>
             <h4>Check the pattern</h4>
             <p>3-tab has obvious repeating rectangular cutouts creating a grid. Architectural has random, varied tab shapes with no visible pattern repetition.</p>
           </div>
 
           <div class="marker-card">
-            <div class="marker-icon">📏</div>
+            <div class="marker-icon"></div>
             <h4>Feel the weight</h4>
             <p>Architectural shingles are notably heavier (50% more weight per square) due to laminated layers. You can feel this when lifting a bundle.</p>
           </div>
 
           <div class="marker-card">
-            <div class="marker-icon">🎨</div>
+            <div class="marker-icon"></div>
             <h4>Observe texture</h4>
             <p>3-tab has consistent granule pattern. Architectural uses varied granule colors and sizes to create dimensional appearance mimicking natural materials.</p>
           </div>
@@ -4051,27 +3702,27 @@ const trainingContent = {
         <h3>Key Takeaways - Memorize These</h3>
         <div class="takeaway-grid">
           <div class="takeaway-item">
-            <span class="takeaway-icon">🎯</span>
+            <span class="takeaway-icon"></span>
             <p><strong>3-Tab = Flat, Grid Pattern, Budget</strong></p>
           </div>
           <div class="takeaway-item">
-            <span class="takeaway-icon">🎯</span>
+            <span class="takeaway-icon"></span>
             <p><strong>Architectural = Dimensional, Random, Premium</strong></p>
           </div>
           <div class="takeaway-item">
-            <span class="takeaway-icon">🎯</span>
+            <span class="takeaway-icon"></span>
             <p><strong>Weight Difference = 50% heavier (architectural)</strong></p>
           </div>
           <div class="takeaway-item">
-            <span class="takeaway-icon">🎯</span>
+            <span class="takeaway-icon"></span>
             <p><strong>Wind Rating = 130 mph vs 70 mph</strong></p>
           </div>
           <div class="takeaway-item">
-            <span class="takeaway-icon">🎯</span>
+            <span class="takeaway-icon"></span>
             <p><strong>Lifespan = 25-30 yrs vs 15-25 yrs</strong></p>
           </div>
           <div class="takeaway-item">
-            <span class="takeaway-icon">🎯</span>
+            <span class="takeaway-icon"></span>
             <p><strong>GAF = Market leader (30% share)</strong></p>
           </div>
         </div>
@@ -4091,7 +3742,7 @@ const trainingContent = {
       <!-- Interactive Shingle Challenge Game -->
       <div class="mini-game-section" id="shingle-game">
         <div class="game-header">
-          <h3>🎮 Shingle Type Challenge</h3>
+          <h3> Shingle Type Challenge</h3>
           <p>Test your knowledge! Identify whether each description matches 3-Tab or Architectural shingles.</p>
         </div>
 
@@ -4108,15 +3759,15 @@ const trainingContent = {
         <div class="game-question-area" id="game-question-area">
           <div class="question-card" id="question-card">
             <div class="question-number">QUESTION <span id="q-num">1</span> OF 5</div>
-            <div class="question-text" id="question-text" style="color: #ffffff; font-size: 1.3rem; font-weight: 600; margin: 20px 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">Loading question...</div>
+            <div class="question-text" id="question-text" style="color: var(--text-primary); font-size: 1.3rem; font-weight: 600; margin: 20px 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">Loading question...</div>
             <div class="answer-buttons" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
-              <div class="answer-img-btn" data-answer="3tab" onclick="checkShingleAnswer('3tab')" style="cursor: pointer; background: #f8fafc; border-radius: 12px; padding: 15px; border: 3px solid #94a3b8; transition: all 0.3s; text-align: center;">
-                <img src="/assets/shingles/3-tab-shingles.webp" alt="3-Tab Shingles" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 10px;">
-                <p style="margin: 0; font-weight: 700; color: #334155; font-size: 1.1rem;">3-Tab</p>
+              <div class="answer-img-btn" data-answer="3tab" onclick="checkShingleAnswer('3tab')" style="cursor: pointer; background: var(--surface-color); border-radius: var(--border-radius); padding: 15px; border: 3px solid var(--border-color); transition: all 0.3s; text-align: center;">
+                <img src="/assets/shingles/3-tab-shingles.webp" alt="3-Tab Shingles" style="width: 100%; height: 120px; object-fit: cover; border-radius: var(--border-radius); margin-bottom: 10px;">
+                <p style="margin: 0; font-weight: 700; color: var(--text-primary); font-size: 1.1rem;">3-Tab</p>
               </div>
-              <div class="answer-img-btn" data-answer="arch" onclick="checkShingleAnswer('arch')" style="cursor: pointer; background: #f0fdf4; border-radius: 12px; padding: 15px; border: 3px solid #86efac; transition: all 0.3s; text-align: center;">
-                <img src="/assets/shingles/architectural-shingles.jpg" alt="Architectural Shingles" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 10px;">
-                <p style="margin: 0; font-weight: 700; color: #166534; font-size: 1.1rem;">Architectural</p>
+              <div class="answer-img-btn" data-answer="arch" onclick="checkShingleAnswer('arch')" style="cursor: pointer; background: var(--surface-color); border-radius: var(--border-radius); padding: 15px; border: 3px solid var(--border-color); transition: all 0.3s; text-align: center;">
+                <img src="/assets/shingles/architectural-shingles.jpg" alt="Architectural Shingles" style="width: 100%; height: 120px; object-fit: cover; border-radius: var(--border-radius); margin-bottom: 10px;">
+                <p style="margin: 0; font-weight: 700; color: var(--text-primary); font-size: 1.1rem;">Architectural</p>
               </div>
             </div>
             <div class="feedback-area" id="feedback-area" style="display: none;">
@@ -4127,17 +3778,17 @@ const trainingContent = {
         </div>
 
         <div class="game-complete" id="game-complete" style="display: none;">
-          <div class="complete-icon">🏆</div>
+          <div class="complete-icon"></div>
           <h4>Challenge Complete!</h4>
           <p class="final-score">You scored <span id="final-score">0</span> out of 5</p>
           <p class="score-message" id="score-message"></p>
           <div class="game-complete-actions">
-            <button class="replay-btn" onclick="restartShingleGame()">🔄 Play Again</button>
+            <button class="replay-btn" onclick="restartShingleGame()"> Play Again</button>
             <button class="complete-module-btn" id="shingle-continue-btn" style="display: none;" onclick="completeModule('shingle-types-materials')">
               Continue to Next Module →
             </button>
           </div>
-          <p class="passing-note" id="passing-note" style="display: none; margin-top: 10px; font-size: 0.9em; color: #666;">
+          <p class="passing-note" id="passing-note" style="display: none; margin-top: 10px; font-size: 0.9em; color: var(--text-primary);">
             Score 3 or higher to continue
           </p>
         </div>
@@ -4154,13 +3805,13 @@ const trainingContent = {
    <div class="content-card">
         <h1>Roofing & Damage Identification</h1>
 
-        ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module7-damage-id.mp4', 'damage-id-video', '📹 Damage Identification Training')}
+        ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module7-damage-id.mp4', 'damage-id-video', ' Damage Identification Training')}
 
         <h2>Understanding Storm Damage Types</h2>
 
         <div class="damage-types">
           <div class="damage-type">
-            <h3>🌨️ Hail Damage</h3>
+            <h3> Hail Damage</h3>
 
             <!-- Hail Damage Image Gallery -->
             <div class="damage-gallery">
@@ -4196,7 +3847,7 @@ const trainingContent = {
           </div>
 
           <div class="damage-type">
-            <h3>💨 Wind Damage</h3>
+            <h3> Wind Damage</h3>
 
             <!-- Image Gallery with Local Images -->
             <div class="damage-gallery">
@@ -4233,7 +3884,7 @@ const trainingContent = {
 
           <!-- Collateral Damage Card -->
           <div class="damage-type">
-            <h3>🎯 Collateral Damage</h3>
+            <h3> Collateral Damage</h3>
 
             <div class="damage-gallery">
               <div class="damage-image-item">
@@ -4250,8 +3901,8 @@ const trainingContent = {
               </div>
             </div>
 
-            <div class="key-point-callout" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-left: 4px solid #ef4444; padding: 16px 20px; border-radius: 0 8px 8px 0; margin-top: 16px;">
-              <p style="margin: 0; color: #991b1b;"><strong>💡 Key Point:</strong> Collateral damage strengthens your claim! Insurance can't argue "normal wear" when multiple surfaces show obvious impact damage from the same storm.</p>
+            <div class="key-point-callout" style="background: var(--surface-color); border-left: 4px solid var(--border-color); padding: 16px 20px; border-radius: var(--border-radius); margin-top: 16px;">
+              <p style="margin: 0; color: var(--text-primary);"><strong> Key Point:</strong> Collateral damage strengthens your claim! Insurance can't argue "normal wear" when multiple surfaces show obvious impact damage from the same storm.</p>
             </div>
           </div>
         </div>
@@ -4259,211 +3910,211 @@ const trainingContent = {
         <h3>Shingle Types</h3>
         <p>Identifying the type of shingle is crucial for assessing damage and communicating with adjusters.</p>
         <div class="shingle-comparison" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 20px 0;">
-            <div class="shingle-type" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-radius: 16px; padding: 20px; border: 2px solid #94a3b8;">
-                <h4 style="color: #334155; margin: 0 0 16px 0; text-align: center;">📐 3-Tab Shingles</h4>
+            <div class="shingle-type" style="background: var(--surface-color); border-radius: var(--border-radius); padding: 20px; border: 2px solid var(--border-color);">
+                <h4 style="color: var(--text-primary); margin: 0 0 16px 0; text-align: center;"> 3-Tab Shingles</h4>
                 <img src="/assets/shingles/3-tab-shingles.webp"
                      alt="3-Tab Shingles - flat, uniform appearance"
-                     style="width: 100%; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-bottom: 16px;">
-                <div style="background: #fef3c7; padding: 12px; border-radius: 8px; border-left: 4px solid #f59e0b;">
-                  <p style="margin: 0; font-size: 0.9rem; color: #92400e;"><strong>Key Features:</strong> Flat, single-layer, distinct rectangular cutouts, "brick" pattern, lighter weight</p>
+                     style="width: 100%; border-radius: var(--border-radius); box-shadow: none; margin-bottom: 16px;">
+                <div style="background: var(--surface-color); padding: 12px; border-radius: var(--border-radius); border-left: 4px solid var(--border-color);">
+                  <p style="margin: 0; font-size: 0.9rem; color: var(--text-primary);"><strong>Key Features:</strong> Flat, single-layer, distinct rectangular cutouts, "brick" pattern, lighter weight</p>
                 </div>
-                <p style="margin: 12px 0 0 0; color: #475569; font-size: 0.9rem;">Common pre-2005. Most lines now <strong>discontinued</strong> - often triggers full replacement!</p>
+                <p style="margin: 12px 0 0 0; color: var(--text-primary); font-size: 0.9rem;">Common pre-2005. Most lines now <strong>discontinued</strong> - often triggers full replacement!</p>
             </div>
-            <div class="shingle-type" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 16px; padding: 20px; border: 2px solid #86efac;">
-                <h4 style="color: #166534; margin: 0 0 16px 0; text-align: center;">🏔️ Architectural Shingles</h4>
+            <div class="shingle-type" style="background: var(--surface-color); border-radius: var(--border-radius); padding: 20px; border: 2px solid var(--border-color);">
+                <h4 style="color: var(--text-primary); margin: 0 0 16px 0; text-align: center;"> Architectural Shingles</h4>
                 <img src="/assets/shingles/architectural-shingles.jpg"
                      alt="Architectural Shingles - dimensional, layered appearance"
-                     style="width: 100%; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-bottom: 16px;">
-                <div style="background: #d1fae5; padding: 12px; border-radius: 8px; border-left: 4px solid #22c55e;">
-                  <p style="margin: 0; font-size: 0.9rem; color: #065f46;"><strong>Key Features:</strong> Multi-layer laminated, dimensional texture, random pattern, 50% heavier</p>
+                     style="width: 100%; border-radius: var(--border-radius); box-shadow: none; margin-bottom: 16px;">
+                <div style="background: var(--surface-color); padding: 12px; border-radius: var(--border-radius); border-left: 4px solid var(--border-color);">
+                  <p style="margin: 0; font-size: 0.9rem; color: var(--text-primary);"><strong>Key Features:</strong> Multi-layer laminated, dimensional texture, random pattern, 50% heavier</p>
                 </div>
-                <p style="margin: 12px 0 0 0; color: #166534; font-size: 0.9rem;">Industry standard post-2005. <strong>130 mph wind rating</strong> with a thicker laminated profile.</p>
+                <p style="margin: 12px 0 0 0; color: var(--text-primary); font-size: 0.9rem;">Industry standard post-2005. <strong>130 mph wind rating</strong> with a thicker laminated profile.</p>
             </div>
         </div>
         <hr>
-        <h2>⚠️ Storm Damage vs. Non-Storm Damage</h2>
+        <h2> Storm Damage vs. Non-Storm Damage</h2>
         <p>It's vital to differentiate between actual storm damage and other roof issues.</p>
 
         <!-- Storm vs Non-Storm Comparison -->
         <div class="damage-comparison-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 20px;">
 
           <!-- Qualifying Damage -->
-          <div class="qualifying-damage-card" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 3px solid #22c55e; border-radius: 16px; padding: 24px; position: relative;">
-            <div style="position: absolute; top: -14px; left: 20px; background: #22c55e; color: white; padding: 6px 16px; border-radius: 20px; font-weight: bold; font-size: 0.9rem;">
-              ✅ QUALIFYING
+          <div class="qualifying-damage-card" style="background: var(--surface-color); border: 3px solid var(--border-color); border-radius: var(--border-radius); padding: 24px; position: relative;">
+            <div style="position: absolute; top: -14px; left: 20px; background: var(--surface-color); color: var(--text-primary); padding: 6px 16px; border-radius: var(--border-radius); font-weight: bold; font-size: 0.9rem;">
+               QUALIFYING
             </div>
-            <h3 style="color: #15803d; margin-top: 10px;">Storm Damage</h3>
-            <p style="color: #166534; font-style: italic; margin-bottom: 16px;">Covered by insurance - file a claim!</p>
+            <h3 style="color: var(--text-primary); margin-top: 10px;">Storm Damage</h3>
+            <p style="color: var(--text-primary); font-style: italic; margin-bottom: 16px;">Covered by insurance - file a claim!</p>
 
             <div class="qualifying-items" style="display: flex; flex-direction: column; gap: 12px;">
-              <div style="display: flex; align-items: flex-start; gap: 12px; background: white; padding: 12px; border-radius: 8px;">
-                <span style="font-size: 1.5rem;">🌨️</span>
+              <div style="display: flex; align-items: flex-start; gap: 12px; background: var(--surface-color); padding: 12px; border-radius: var(--border-radius);">
+
                 <div>
-                  <strong style="color: #15803d;">Hail Damage</strong>
-                  <p style="margin: 4px 0 0 0; font-size: 0.9rem; color: #374151;">Circular "bruises" or divots, soft/spongy feel, concentrated granule loss</p>
+                  <strong style="color: var(--text-primary);">Hail Damage</strong>
+                  <p style="margin: 4px 0 0 0; font-size: 0.9rem; color: var(--text-primary);">Circular "bruises" or divots, soft/spongy feel, concentrated granule loss</p>
                 </div>
               </div>
-              <div style="display: flex; align-items: flex-start; gap: 12px; background: white; padding: 12px; border-radius: 8px;">
-                <span style="font-size: 1.5rem;">💨</span>
+              <div style="display: flex; align-items: flex-start; gap: 12px; background: var(--surface-color); padding: 12px; border-radius: var(--border-radius);">
+
                 <div>
-                  <strong style="color: #15803d;">Wind Damage</strong>
-                  <p style="margin: 4px 0 0 0; font-size: 0.9rem; color: #374151;">Lifted, creased, or missing shingles from strong winds</p>
+                  <strong style="color: var(--text-primary);">Wind Damage</strong>
+                  <p style="margin: 4px 0 0 0; font-size: 0.9rem; color: var(--text-primary);">Lifted, creased, or missing shingles from strong winds</p>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Non-Qualifying Damage -->
-          <div class="non-qualifying-damage-card" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border: 3px solid #ef4444; border-radius: 16px; padding: 24px; position: relative;">
-            <div style="position: absolute; top: -14px; left: 20px; background: #ef4444; color: white; padding: 6px 16px; border-radius: 20px; font-weight: bold; font-size: 0.9rem;">
-              ❌ NON-QUALIFYING
+          <div class="non-qualifying-damage-card" style="background: var(--surface-color); border: 3px solid var(--border-color); border-radius: var(--border-radius); padding: 24px; position: relative;">
+            <div style="position: absolute; top: -14px; left: 20px; background: var(--surface-color); color: var(--text-primary); padding: 6px 16px; border-radius: var(--border-radius); font-weight: bold; font-size: 0.9rem;">
+               NON-QUALIFYING
             </div>
-            <h3 style="color: #b91c1c; margin-top: 10px;">Wear & Tear</h3>
-            <p style="color: #991b1b; font-style: italic; margin-bottom: 16px;">Not covered - normal aging issues</p>
+            <h3 style="color: var(--text-primary); margin-top: 10px;">Wear & Tear</h3>
+            <p style="color: var(--text-primary); font-style: italic; margin-bottom: 16px;">Not covered - normal aging issues</p>
 
             <div class="non-qualifying-items" style="display: flex; flex-direction: column; gap: 12px;">
-              <div style="display: flex; align-items: flex-start; gap: 12px; background: white; padding: 12px; border-radius: 8px;">
-                <span style="font-size: 1.5rem;">🫧</span>
+              <div style="display: flex; align-items: flex-start; gap: 12px; background: var(--surface-color); padding: 12px; border-radius: var(--border-radius);">
+
                 <div>
-                  <strong style="color: #b91c1c;">Blistering</strong>
-                  <p style="margin: 4px 0 0 0; font-size: 0.9rem; color: #374151;">Bubbles on surface - manufacturing defect, not storm damage</p>
+                  <strong style="color: var(--text-primary);">Blistering</strong>
+                  <p style="margin: 4px 0 0 0; font-size: 0.9rem; color: var(--text-primary);">Bubbles on surface - manufacturing defect, not storm damage</p>
                 </div>
               </div>
-              <div style="display: flex; align-items: flex-start; gap: 12px; background: white; padding: 12px; border-radius: 8px;">
-                <span style="font-size: 1.5rem;">💔</span>
+              <div style="display: flex; align-items: flex-start; gap: 12px; background: var(--surface-color); padding: 12px; border-radius: var(--border-radius);">
+
                 <div>
-                  <strong style="color: #b91c1c;">Cracking</strong>
-                  <p style="margin: 4px 0 0 0; font-size: 0.9rem; color: #374151;">Straight-line splits from age, UV exposure, thermal cycling</p>
+                  <strong style="color: var(--text-primary);">Cracking</strong>
+                  <p style="margin: 4px 0 0 0; font-size: 0.9rem; color: var(--text-primary);">Straight-line splits from age, UV exposure, thermal cycling</p>
                 </div>
               </div>
-              <div style="display: flex; align-items: flex-start; gap: 12px; background: white; padding: 12px; border-radius: 8px;">
-                <span style="font-size: 1.5rem;">⏳</span>
+              <div style="display: flex; align-items: flex-start; gap: 12px; background: var(--surface-color); padding: 12px; border-radius: var(--border-radius);">
+
                 <div>
-                  <strong style="color: #b91c1c;">General Granule Loss</strong>
-                  <p style="margin: 4px 0 0 0; font-size: 0.9rem; color: #374151;">Even, widespread loss due to age - not concentrated like hail</p>
+                  <strong style="color: var(--text-primary);">General Granule Loss</strong>
+                  <p style="margin: 4px 0 0 0; font-size: 0.9rem; color: var(--text-primary);">Even, widespread loss due to age - not concentrated like hail</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="pro-tip-box" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 2px solid #3b82f6; border-radius: 12px; padding: 20px; margin-top: 24px; display: flex; align-items: flex-start; gap: 16px;">
-          <span style="font-size: 2rem;">💡</span>
+        <div class="pro-tip-box" style="background: var(--surface-color); border: 2px solid var(--border-color); border-radius: var(--border-radius); padding: 20px; margin-top: 24px; display: flex; align-items: flex-start; gap: 16px;">
+
           <div>
-            <strong style="color: #1d4ed8; font-size: 1.1rem;">Pro Tip: How to Tell the Difference</strong>
-            <p style="margin: 8px 0 0 0; color: #1e40af;">Hail damage creates <em>random, circular patterns</em> across the roof. Age-related wear appears <em>uniformly</em> across all shingles. When in doubt, check for matching damage on metal components - insurance can't argue that gutters and vents aged the same day!</p>
+            <strong style="color: var(--text-primary); font-size: 1.1rem;">Pro Tip: How to Tell the Difference</strong>
+            <p style="margin: 8px 0 0 0; color: var(--text-primary);">Hail damage creates <em>random, circular patterns</em> across the roof. Age-related wear appears <em>uniformly</em> across all shingles. When in doubt, check for matching damage on metal components - insurance can't argue that gutters and vents aged the same day!</p>
           </div>
         </div>
 
         <!-- Interactive Matching Game - LAST before completion -->
-        <h2>🎮 Damage Identification Challenge</h2>
+        <h2> Damage Identification Challenge</h2>
         <p>Test your knowledge with these two interactive challenges!</p>
 
-        <div id="damage-matching-game" style="background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%); border-radius: 20px; padding: 24px; margin: 20px 0; border: 3px solid #a855f7;">
+        <div id="damage-matching-game" style="background: var(--surface-color); border-radius: var(--border-radius); padding: 24px; margin: 20px 0; border: 3px solid var(--border-color);">
 
           <!-- Challenge 1: Match Damage Type -->
           <div id="match-damage-challenge" class="game-challenge">
-            <h3 style="color: #7c3aed; margin: 0 0 16px 0;">🎯 Challenge 1: Match the Damage Type</h3>
-            <p style="color: #6b7280; margin-bottom: 20px;">Click on a description, then click the matching damage type!</p>
+            <h3 style="color: var(--text-primary); margin: 0 0 16px 0;"> Challenge 1: Match the Damage Type</h3>
+            <p style="color: var(--text-primary); margin-bottom: 20px;">Click on a description, then click the matching damage type!</p>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
               <!-- Descriptions Column -->
               <div>
-                <h4 style="color: #374151; margin-bottom: 12px;">Descriptions:</h4>
+                <h4 style="color: var(--text-primary); margin-bottom: 12px;">Descriptions:</h4>
                 <div id="damage-descriptions" style="display: flex; flex-direction: column; gap: 10px;">
-                  <div class="match-item description" data-match="hail" onclick="selectMatchItem(this)" style="background: white; padding: 14px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; transition: all 0.2s;">
-                    🌨️ Circular "bruises" with concentrated granule loss, soft/spongy feel
+                  <div class="match-item description" data-match="hail" onclick="selectMatchItem(this)" style="background: var(--surface-color); padding: 14px; border-radius: var(--border-radius); cursor: pointer; border: 2px solid var(--border-color); transition: all 0.2s;">
+                     Circular "bruises" with concentrated granule loss, soft/spongy feel
                   </div>
-                  <div class="match-item description" data-match="wind" onclick="selectMatchItem(this)" style="background: white; padding: 14px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; transition: all 0.2s;">
-                    💨 Lifted, creased, or completely missing shingles
+                  <div class="match-item description" data-match="wind" onclick="selectMatchItem(this)" style="background: var(--surface-color); padding: 14px; border-radius: var(--border-radius); cursor: pointer; border: 2px solid var(--border-color); transition: all 0.2s;">
+                     Lifted, creased, or completely missing shingles
                   </div>
-                  <div class="match-item description" data-match="blistering" onclick="selectMatchItem(this)" style="background: white; padding: 14px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; transition: all 0.2s;">
-                    🫧 Bubbles on surface from manufacturing defect or trapped moisture
+                  <div class="match-item description" data-match="blistering" onclick="selectMatchItem(this)" style="background: var(--surface-color); padding: 14px; border-radius: var(--border-radius); cursor: pointer; border: 2px solid var(--border-color); transition: all 0.2s;">
+                     Bubbles on surface from manufacturing defect or trapped moisture
                   </div>
-                  <div class="match-item description" data-match="cracking" onclick="selectMatchItem(this)" style="background: white; padding: 14px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; transition: all 0.2s;">
-                    💔 Straight-line splits from age, UV exposure, thermal cycling
+                  <div class="match-item description" data-match="cracking" onclick="selectMatchItem(this)" style="background: var(--surface-color); padding: 14px; border-radius: var(--border-radius); cursor: pointer; border: 2px solid var(--border-color); transition: all 0.2s;">
+                     Straight-line splits from age, UV exposure, thermal cycling
                   </div>
                 </div>
               </div>
 
               <!-- Damage Types Column -->
               <div>
-                <h4 style="color: #374151; margin-bottom: 12px;">Damage Types:</h4>
+                <h4 style="color: var(--text-primary); margin-bottom: 12px;">Damage Types:</h4>
                 <div id="damage-types" style="display: flex; flex-direction: column; gap: 10px;">
-                  <div class="match-item type" data-match="wind" onclick="matchDamageType(this)" style="background: #22c55e; color: white; padding: 14px; border-radius: 10px; cursor: pointer; font-weight: bold; text-align: center; transition: all 0.2s;">
-                    ✅ WIND DAMAGE (Qualifying)
+                  <div class="match-item type" data-match="wind" onclick="matchDamageType(this)" style="background: var(--surface-color); color: var(--text-primary); padding: 14px; border-radius: var(--border-radius); cursor: pointer; font-weight: bold; text-align: center; transition: all 0.2s;">
+                     WIND DAMAGE (Qualifying)
                   </div>
-                  <div class="match-item type" data-match="cracking" onclick="matchDamageType(this)" style="background: #ef4444; color: white; padding: 14px; border-radius: 10px; cursor: pointer; font-weight: bold; text-align: center; transition: all 0.2s;">
-                    ❌ CRACKING (Non-Qualifying)
+                  <div class="match-item type" data-match="cracking" onclick="matchDamageType(this)" style="background: var(--surface-color); color: var(--text-primary); padding: 14px; border-radius: var(--border-radius); cursor: pointer; font-weight: bold; text-align: center; transition: all 0.2s;">
+                     CRACKING (Non-Qualifying)
                   </div>
-                  <div class="match-item type" data-match="hail" onclick="matchDamageType(this)" style="background: #22c55e; color: white; padding: 14px; border-radius: 10px; cursor: pointer; font-weight: bold; text-align: center; transition: all 0.2s;">
-                    ✅ HAIL DAMAGE (Qualifying)
+                  <div class="match-item type" data-match="hail" onclick="matchDamageType(this)" style="background: var(--surface-color); color: var(--text-primary); padding: 14px; border-radius: var(--border-radius); cursor: pointer; font-weight: bold; text-align: center; transition: all 0.2s;">
+                     HAIL DAMAGE (Qualifying)
                   </div>
-                  <div class="match-item type" data-match="blistering" onclick="matchDamageType(this)" style="background: #ef4444; color: white; padding: 14px; border-radius: 10px; cursor: pointer; font-weight: bold; text-align: center; transition: all 0.2s;">
-                    ❌ BLISTERING (Non-Qualifying)
+                  <div class="match-item type" data-match="blistering" onclick="matchDamageType(this)" style="background: var(--surface-color); color: var(--text-primary); padding: 14px; border-radius: var(--border-radius); cursor: pointer; font-weight: bold; text-align: center; transition: all 0.2s;">
+                     BLISTERING (Non-Qualifying)
                   </div>
                 </div>
               </div>
             </div>
 
             <div id="match-progress" style="margin-top: 16px; text-align: center;">
-              <p style="color: #7c3aed; font-weight: bold;">Matched: <span id="match-count">0</span> / 4</p>
+              <p style="color: var(--text-primary); font-weight: bold;">Matched: <span id="match-count">0</span> / 4</p>
             </div>
-            <div id="match-feedback" style="display: none; margin-top: 12px; padding: 12px; border-radius: 8px; text-align: center;"></div>
+            <div id="match-feedback" style="display: none; margin-top: 12px; padding: 12px; border-radius: var(--border-radius); text-align: center;"></div>
           </div>
 
-          <hr style="margin: 30px 0; border: none; border-top: 2px dashed #d8b4fe;">
+          <hr style="margin: 30px 0; border: none; border-top: 2px dashed var(--border-color);">
 
           <!-- Challenge 2: Documentation Sequence -->
           <div id="doc-sequence-challenge" class="game-challenge">
-            <h3 style="color: #7c3aed; margin: 0 0 16px 0;">📋 Challenge 2: Documentation Sequence</h3>
-            <p style="color: #6b7280; margin-bottom: 12px;">Put these documentation steps in the order you'd take them during an inspection:</p>
-            <div style="background: #eff6ff; border: 2px solid #3b82f6; border-radius: 12px; padding: 14px 18px; margin-bottom: 16px;">
-              <p style="color: #1e40af; margin: 0; font-weight: 600; font-size: 14px;">💡 HINT: Remember the photo strategy — start from the <strong>ground level</strong> (elevations), then move <strong>up to the roof</strong>, get <strong>close-ups</strong>, then <strong>overview</strong> shots, and finish with <strong>gutter evidence</strong>.</p>
+            <h3 style="color: var(--text-primary); margin: 0 0 16px 0;"> Challenge 2: Documentation Sequence</h3>
+            <p style="color: var(--text-primary); margin-bottom: 12px;">Put these documentation steps in the order you'd take them during an inspection:</p>
+            <div style="background: var(--surface-color); border: 2px solid var(--border-color); border-radius: var(--border-radius); padding: 14px 18px; margin-bottom: 16px;">
+              <p style="color: var(--text-primary); margin: 0; font-weight: 600; font-size: 14px;"> HINT: Remember the photo strategy ,  start from the <strong>ground level</strong> (elevations), then move <strong>up to the roof</strong>, get <strong>close-ups</strong>, then <strong>overview</strong> shots, and finish with <strong>gutter evidence</strong>.</p>
             </div>
-            <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 12px; padding: 14px 18px; margin-bottom: 20px;">
-              <p style="color: #92400e; margin: 0; font-weight: 600; display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 1.3rem;">👆</span>
+            <div style="background: var(--surface-color); border: 2px solid var(--border-color); border-radius: var(--border-radius); padding: 14px 18px; margin-bottom: 20px;">
+              <p style="color: var(--text-primary); margin: 0; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+
                 <span>HOW TO PLAY: Tap a step once to select it (it will glow purple). Then tap it again to assign the next number. Start with step #1!</span>
               </p>
             </div>
 
             <div id="doc-sequence-items" style="display: flex; flex-direction: column; gap: 8px;">
-              <div class="seq-item" data-order="3" onclick="selectSeqItem(this)" style="background: white; padding: 14px 20px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; display: flex; align-items: center; gap: 12px; transition: all 0.2s;">
-                <span class="seq-number" style="background: #e5e7eb; color: #6b7280; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">?</span>
+              <div class="seq-item" data-order="3" onclick="selectSeqItem(this)" style="background: var(--surface-color); padding: 14px 20px; border-radius: var(--border-radius); cursor: pointer; border: 2px solid var(--border-color); display: flex; align-items: center; gap: 12px; transition: all 0.2s;">
+                <span class="seq-number" style="background: var(--surface-color); color: var(--text-primary); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">?</span>
                 <span>Up close hail damage photo</span>
               </div>
-              <div class="seq-item" data-order="5" onclick="selectSeqItem(this)" style="background: white; padding: 14px 20px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; display: flex; align-items: center; gap: 12px; transition: all 0.2s;">
-                <span class="seq-number" style="background: #e5e7eb; color: #6b7280; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">?</span>
+              <div class="seq-item" data-order="5" onclick="selectSeqItem(this)" style="background: var(--surface-color); padding: 14px 20px; border-radius: var(--border-radius); cursor: pointer; border: 2px solid var(--border-color); display: flex; align-items: center; gap: 12px; transition: all 0.2s;">
+                <span class="seq-number" style="background: var(--surface-color); color: var(--text-primary); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">?</span>
                 <span>Granules in the gutters and downspouts</span>
               </div>
-              <div class="seq-item" data-order="1" onclick="selectSeqItem(this)" style="background: white; padding: 14px 20px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; display: flex; align-items: center; gap: 12px; transition: all 0.2s;">
-                <span class="seq-number" style="background: #e5e7eb; color: #6b7280; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">?</span>
+              <div class="seq-item" data-order="1" onclick="selectSeqItem(this)" style="background: var(--surface-color); padding: 14px 20px; border-radius: var(--border-radius); cursor: pointer; border: 2px solid var(--border-color); display: flex; align-items: center; gap: 12px; transition: all 0.2s;">
+                <span class="seq-number" style="background: var(--surface-color); color: var(--text-primary); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">?</span>
                 <span>Photos of collateral damage to the elevations</span>
               </div>
-              <div class="seq-item" data-order="4" onclick="selectSeqItem(this)" style="background: white; padding: 14px 20px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; display: flex; align-items: center; gap: 12px; transition: all 0.2s;">
-                <span class="seq-number" style="background: #e5e7eb; color: #6b7280; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">?</span>
+              <div class="seq-item" data-order="4" onclick="selectSeqItem(this)" style="background: var(--surface-color); padding: 14px 20px; border-radius: var(--border-radius); cursor: pointer; border: 2px solid var(--border-color); display: flex; align-items: center; gap: 12px; transition: all 0.2s;">
+                <span class="seq-number" style="background: var(--surface-color); color: var(--text-primary); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">?</span>
                 <span>Overview of damage markings on roof</span>
               </div>
-              <div class="seq-item" data-order="2" onclick="selectSeqItem(this)" style="background: white; padding: 14px 20px; border-radius: 10px; cursor: pointer; border: 2px solid #e5e7eb; display: flex; align-items: center; gap: 12px; transition: all 0.2s;">
-                <span class="seq-number" style="background: #e5e7eb; color: #6b7280; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">?</span>
+              <div class="seq-item" data-order="2" onclick="selectSeqItem(this)" style="background: var(--surface-color); padding: 14px 20px; border-radius: var(--border-radius); cursor: pointer; border: 2px solid var(--border-color); display: flex; align-items: center; gap: 12px; transition: all 0.2s;">
+                <span class="seq-number" style="background: var(--surface-color); color: var(--text-primary); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">?</span>
                 <span>Photos of collateral damage on the roof</span>
               </div>
             </div>
 
             <div style="margin-top: 16px; display: flex; gap: 12px; justify-content: center;">
-              <button onclick="checkDocSequence()" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; border: none; padding: 12px 28px; border-radius: 25px; cursor: pointer; font-weight: bold; font-size: 1rem;">Check Order ✓</button>
-              <button onclick="resetDocSequence()" style="background: #e5e7eb; color: #374151; border: none; padding: 12px 28px; border-radius: 25px; cursor: pointer; font-weight: bold;">Reset</button>
+              <button onclick="checkDocSequence()" style="background: var(--surface-color); color: var(--text-primary); border: none; padding: 12px 28px; border-radius: var(--border-radius); cursor: pointer; font-weight: bold; font-size: 1rem;">Check Order ✓</button>
+              <button onclick="resetDocSequence()" style="background: var(--surface-color); color: var(--text-primary); border: none; padding: 12px 28px; border-radius: var(--border-radius); cursor: pointer; font-weight: bold;">Reset</button>
             </div>
 
-            <div id="seq-feedback" style="display: none; margin-top: 16px; padding: 16px; border-radius: 12px; text-align: center;"></div>
+            <div id="seq-feedback" style="display: none; margin-top: 16px; padding: 16px; border-radius: var(--border-radius); text-align: center;"></div>
           </div>
 
           <!-- Game Complete -->
-          <div id="game-complete-section" style="display: none; text-align: center; padding: 30px; background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-radius: 16px; margin-top: 20px;">
-            <div style="font-size: 4rem;">🎉</div>
-            <h3 style="color: #059669; margin: 10px 0;">Excellent Work!</h3>
-            <p style="color: #047857;">You've mastered damage identification and documentation sequence!</p>
+          <div id="game-complete-section" style="display: none; text-align: center; padding: 30px; background: var(--surface-color); border-radius: var(--border-radius); margin-top: 20px;">
+            <div style="font-size: 4rem;"></div>
+            <h3 style="color: var(--text-primary); margin: 10px 0;">Excellent Work!</h3>
+            <p style="color: var(--text-primary);">You've mastered damage identification and documentation sequence!</p>
           </div>
         </div>
 
@@ -4475,10 +4126,10 @@ const trainingContent = {
     </div>
   `,
   'sales-cycle': `
-    <div class="content-card" style="background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%); padding: 0; overflow: hidden;">
+    <div class="content-card" style="background: var(--surface-color); padding: 0; overflow: hidden;">
         <!-- Hero Header -->
-        <div style="background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #c084fc 100%); padding: 40px 30px; text-align: center; color: white;">
-          <div style="font-size: 48px; margin-bottom: 15px;">🔄</div>
+        <div style="background: var(--surface-color); padding: 40px 30px; text-align: center; color: var(--text-primary);">
+          <div style="font-size: 48px; margin-bottom: 15px;"></div>
           <h1 style="margin: 0 0 10px 0; font-size: 28px; font-weight: 700;">The Sales Cycle & Job Flow</h1>
           <p style="margin: 0; opacity: 0.9; font-size: 16px;">From first knock to final payment - master the complete process</p>
         </div>
@@ -4486,71 +4137,71 @@ const trainingContent = {
         <div style="padding: 30px;">
           <!-- Quick Stats -->
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;">
-            <div style="background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%); padding: 20px; border-radius: 12px; text-align: center;">
-              <div style="font-size: 28px; font-weight: 700; color: #7c3aed;">5</div>
-              <div style="font-size: 13px; color: #6b21a8;">Key Phases</div>
+            <div style="background: var(--surface-color); padding: 20px; border-radius: var(--border-radius); text-align: center;">
+              <div style="font-size: 28px; font-weight: 700; color: var(--text-primary);">5</div>
+              <div style="font-size: 13px; color: var(--text-primary);">Key Phases</div>
             </div>
-            <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 20px; border-radius: 12px; text-align: center;">
-              <div style="font-size: 28px; font-weight: 700; color: #16a34a;">9-16</div>
-              <div style="font-size: 13px; color: #166534;">Weeks Avg</div>
+            <div style="background: var(--surface-color); padding: 20px; border-radius: var(--border-radius); text-align: center;">
+              <div style="font-size: 28px; font-weight: 700; color: var(--text-primary);">9-16</div>
+              <div style="font-size: 13px; color: var(--text-primary);">Weeks Avg</div>
             </div>
-            <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 20px; border-radius: 12px; text-align: center;">
-              <div style="font-size: 28px; font-weight: 700; color: #2563eb;">12%+</div>
-              <div style="font-size: 13px; color: #1e40af;">Top Commission</div>
+            <div style="background: var(--surface-color); padding: 20px; border-radius: var(--border-radius); text-align: center;">
+              <div style="font-size: 28px; font-weight: 700; color: var(--text-primary);">12%+</div>
+              <div style="font-size: 13px; color: var(--text-primary);">Top Commission</div>
             </div>
           </div>
 
-          <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-            <span style="background: #f3e8ff; padding: 8px 12px; border-radius: 8px;">📋</span>
+          <h2 style="color: var(--text-primary); font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+
             The 5 Phases of the Sales Cycle
           </h2>
 
           <div style="display: grid; gap: 15px; margin-bottom: 35px;">
             <!-- Phase 1 -->
-            <div style="background: white; border: 2px solid #e9d5ff; border-radius: 16px; padding: 20px; border-left: 4px solid #7c3aed;">
+            <div style="background: var(--surface-color); border: 2px solid var(--border-color); border-radius: var(--border-radius); padding: 20px; border-left: 4px solid var(--border-color);">
               <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
-                <div style="background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">1</div>
+                <div style="background: var(--surface-color); color: var(--text-primary); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">1</div>
                 <div>
-                  <h3 style="color: #7c3aed; font-size: 18px; margin: 0;">Generating New Business</h3>
-                  <span style="color: #6b7280; font-size: 13px;">Days 1-3</span>
+                  <h3 style="color: var(--text-primary); font-size: 18px; margin: 0;">Generating New Business</h3>
+                  <span style="color: var(--text-primary); font-size: 13px;">Days 1-3</span>
                 </div>
               </div>
-              <ul style="color: #374151; margin: 0; padding-left: 60px; font-size: 14px; line-height: 1.8;">
+              <ul style="color: var(--text-primary); margin: 0; padding-left: 60px; font-size: 14px; line-height: 1.8;">
                 <li>Knock 70+ doors minimum per day</li>
                 <li>Pin houses & take quick notes</li>
                 <li>Deliver initial pitch & get inspection permission</li>
                 <li>Conduct thorough 15-20 minute inspection</li>
                 <li>Document 20-40 photos of damage</li>
                 <li>File insurance claim with homeowner</li>
-                <li style="color: #16a34a; font-weight: 600;">Goal: Signed contract</li>
+                <li style="color: var(--text-primary); font-weight: 600;">Goal: Signed contract</li>
               </ul>
             </div>
 
             <!-- Divider: Your Responsibility -->
-            <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 12px; padding: 16px 20px; margin: 10px 0; text-align: center; border-left: 4px solid #f59e0b;">
-              <p style="margin: 0; color: #92400e; font-size: 14px; font-weight: 600;">⬆️ Everything above is YOUR doing and control</p>
+            <div style="background: var(--surface-color); border-radius: var(--border-radius); padding: 16px 20px; margin: 10px 0; text-align: center; border-left: 4px solid var(--border-color);">
+              <p style="margin: 0; color: var(--text-primary); font-size: 14px; font-weight: 600;"> Everything above is YOUR doing and control</p>
             </div>
 
             <!-- Phase 2 -->
-            <div style="background: white; border: 2px solid #e9d5ff; border-radius: 16px; padding: 20px; border-left: 4px solid #7c3aed;">
+            <div style="background: var(--surface-color); border: 2px solid var(--border-color); border-radius: var(--border-radius); padding: 20px; border-left: 4px solid var(--border-color);">
               <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
-                <div style="background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">2</div>
+                <div style="background: var(--surface-color); color: var(--text-primary); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">2</div>
                 <div>
-                  <h3 style="color: #7c3aed; font-size: 18px; margin: 0;">Adjuster Meeting</h3>
-                  <span style="color: #6b7280; font-size: 13px;">2-7 days after claim filed</span>
+                  <h3 style="color: var(--text-primary); font-size: 18px; margin: 0;">Adjuster Meeting</h3>
+                  <span style="color: var(--text-primary); font-size: 13px;">2-7 days after claim filed</span>
                 </div>
               </div>
-              <ul style="color: #374151; margin: 0; padding-left: 60px; font-size: 14px; line-height: 1.8;">
+              <ul style="color: var(--text-primary); margin: 0; padding-left: 60px; font-size: 14px; line-height: 1.8;">
                 <li>Insurance assigns adjuster (typically 2-7 days)</li>
                 <li>Meet adjuster on site - <strong>CRITICAL: Be present!</strong></li>
                 <li>Walk through all damage documented</li>
                 <li>Create formal photo report</li>
                 <li>Decision usually within 1-10 business days</li>
-                <li style="color: #16a34a; font-weight: 600;">Goal: Full approval</li>
+                <li style="color: var(--text-primary); font-weight: 600;">Goal: Full approval</li>
               </ul>
-              <div style="background: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 12px; padding: 16px 20px; margin-top: 15px;">
-                <h4 style="margin: 0 0 10px 0; color: #7c3aed; font-size: 15px;">🔑 Key Definitions to Understand</h4>
-                <ul style="color: #374151; margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.8;">
+              <div style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 16px 20px; margin-top: 15px;">
+                <h4 style="margin: 0 0 10px 0; color: var(--text-primary); font-size: 15px;"> Key Definitions to Understand</h4>
+                <ul style="color: var(--text-primary); margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.8;">
                   <li><strong>RCV (Replacement Cost Value):</strong> The total cost to do the job</li>
                   <li><strong>ACV (Actual Cash Value):</strong> The homeowner's first payment from insurance</li>
                   <li><strong>Depreciation:</strong> The portion the insurance company holds on to until the work is completed - it ensures the customer actually does the work</li>
@@ -4560,103 +4211,103 @@ const trainingContent = {
             </div>
 
             <!-- Divider: Team Handoff -->
-            <div style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border-radius: 12px; padding: 16px 20px; margin: 10px 0; text-align: center; border-left: 4px solid #3b82f6;">
-              <p style="margin: 0; color: #1e40af; font-size: 14px; font-weight: 600;">⬇️ The office handles everything below</p>
-              <p style="margin: 5px 0 0 0; color: #3b82f6; font-size: 13px;">We'll discuss this process more in depth later</p>
+            <div style="background: var(--surface-color); border-radius: var(--border-radius); padding: 16px 20px; margin: 10px 0; text-align: center; border-left: 4px solid var(--border-color);">
+              <p style="margin: 0; color: var(--text-primary); font-size: 14px; font-weight: 600;"> The office handles everything below</p>
+              <p style="margin: 5px 0 0 0; color: var(--text-primary); font-size: 13px;">We'll discuss this process more in depth later</p>
             </div>
 
             <!-- Phase 3 -->
-            <div style="background: white; border: 2px solid #e9d5ff; border-radius: 16px; padding: 20px; border-left: 4px solid #7c3aed;">
+            <div style="background: var(--surface-color); border: 2px solid var(--border-color); border-radius: var(--border-radius); padding: 20px; border-left: 4px solid var(--border-color);">
               <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
-                <div style="background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">3</div>
+                <div style="background: var(--surface-color); color: var(--text-primary); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">3</div>
                 <div>
-                  <h3 style="color: #7c3aed; font-size: 18px; margin: 0;">Project Meeting</h3>
-                  <span style="color: #6b7280; font-size: 13px;">Within 1 week of estimate</span>
+                  <h3 style="color: var(--text-primary); font-size: 18px; margin: 0;">Project Meeting</h3>
+                  <span style="color: var(--text-primary); font-size: 13px;">Within 1 week of estimate</span>
                 </div>
               </div>
-              <ul style="color: #374151; margin: 0; padding-left: 60px; font-size: 14px; line-height: 1.8;">
+              <ul style="color: var(--text-primary); margin: 0; padding-left: 60px; font-size: 14px; line-height: 1.8;">
                 <li>Send estimate to office for Project Review</li>
                 <li>Project Coordinator schedules meeting with homeowner</li>
                 <li>Homeowner signs Project Documents</li>
                 <li>Collect Downpayment (ACV payment from insurance)</li>
-                <li style="color: #16a34a; font-weight: 600;">💰 You receive portion of your commission at Downpayment</li>
+                <li style="color: var(--text-primary); font-weight: 600;"> You receive portion of your commission at Downpayment</li>
               </ul>
             </div>
 
             <!-- Phase 4 -->
-            <div style="background: white; border: 2px solid #e9d5ff; border-radius: 16px; padding: 20px; border-left: 4px solid #7c3aed;">
+            <div style="background: var(--surface-color); border: 2px solid var(--border-color); border-radius: var(--border-radius); padding: 20px; border-left: 4px solid var(--border-color);">
               <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
-                <div style="background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">4</div>
+                <div style="background: var(--surface-color); color: var(--text-primary); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">4</div>
                 <div>
-                  <h3 style="color: #7c3aed; font-size: 18px; margin: 0;">Installation</h3>
-                  <span style="color: #6b7280; font-size: 13px;">4-6 weeks from Downpayment</span>
+                  <h3 style="color: var(--text-primary); font-size: 18px; margin: 0;">Installation</h3>
+                  <span style="color: var(--text-primary); font-size: 13px;">4-6 weeks from Downpayment</span>
                 </div>
               </div>
-              <ul style="color: #374151; margin: 0; padding-left: 60px; font-size: 14px; line-height: 1.8;">
+              <ul style="color: var(--text-primary); margin: 0; padding-left: 60px; font-size: 14px; line-height: 1.8;">
                 <li>Crew arrives 7-8am</li>
                 <li>Full tear-off and installation (1-2 days)</li>
                 <li>Quality Check and Wrap Up with homeowner</li>
                 <li>Sign Certificate of Completion</li>
-                <li style="color: #16a34a; font-weight: 600;">Goal: Happy customer & quality install</li>
+                <li style="color: var(--text-primary); font-weight: 600;">Goal: Happy customer & quality install</li>
               </ul>
             </div>
 
             <!-- Phase 5 -->
-            <div style="background: white; border: 2px solid #e9d5ff; border-radius: 16px; padding: 20px; border-left: 4px solid #7c3aed;">
+            <div style="background: var(--surface-color); border: 2px solid var(--border-color); border-radius: var(--border-radius); padding: 20px; border-left: 4px solid var(--border-color);">
               <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
-                <div style="background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">5</div>
+                <div style="background: var(--surface-color); color: var(--text-primary); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">5</div>
                 <div>
-                  <h3 style="color: #7c3aed; font-size: 18px; margin: 0;">Final Payment</h3>
-                  <span style="color: #6b7280; font-size: 13px;">After Certificate of Completion</span>
+                  <h3 style="color: var(--text-primary); font-size: 18px; margin: 0;">Final Payment</h3>
+                  <span style="color: var(--text-primary); font-size: 13px;">After Certificate of Completion</span>
                 </div>
               </div>
-              <ul style="color: #374151; margin: 0; padding-left: 60px; font-size: 14px; line-height: 1.8;">
+              <ul style="color: var(--text-primary); margin: 0; padding-left: 60px; font-size: 14px; line-height: 1.8;">
                 <li>Submit Certificate of Completion to insurance</li>
                 <li>Insurance releases Depreciation funds</li>
                 <li>Homeowner pays Final Payment (Depreciation + Deductible)</li>
                 <li>Request Google review & referrals</li>
-                <li style="color: #16a34a; font-weight: 600;">💰 You receive remaining commission (12%+)</li>
+                <li style="color: var(--text-primary); font-weight: 600;"> You receive remaining commission (12%+)</li>
               </ul>
             </div>
           </div>
 
           <!-- Timeline Summary -->
-          <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-radius: 16px; padding: 25px; margin-bottom: 30px; text-align: center;">
-            <h3 style="color: #1e40af; margin: 0 0 10px 0; font-size: 20px;">⏱️ Total Sales Cycle: 9-16 Weeks</h3>
-            <p style="color: #3b82f6; margin: 0; font-size: 15px;">From initial knock to final payment - stay in regular contact throughout!</p>
+          <div style="background: var(--surface-color); border-radius: var(--border-radius); padding: 25px; margin-bottom: 30px; text-align: center;">
+            <h3 style="color: var(--text-primary); margin: 0 0 10px 0; font-size: 20px;"> Total Sales Cycle: 9-16 Weeks</h3>
+            <p style="color: var(--text-primary); margin: 0; font-size: 15px;">From initial knock to final payment - stay in regular contact throughout!</p>
           </div>
 
-          <h2 style="color: #1f2937; font-size: 22px; margin: 35px 0 20px 0; display: flex; align-items: center; gap: 10px;">
-            <span style="background: #f3e8ff; padding: 8px 12px; border-radius: 8px;">🎮</span>
+          <h2 style="color: var(--text-primary); font-size: 22px; margin: 35px 0 20px 0; display: flex; align-items: center; gap: 10px;">
+
             Sales Cycle Sorter Game
           </h2>
 
-          <div style="background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%); border-radius: 16px; padding: 25px; margin-bottom: 30px;">
-            <p style="color: #6b21a8; font-size: 15px; margin: 0 0 20px 0; text-align: center;">
+          <div style="background: var(--surface-color); border-radius: var(--border-radius); padding: 25px; margin-bottom: 30px;">
+            <p style="color: var(--text-primary); font-size: 15px; margin: 0 0 20px 0; text-align: center;">
               <strong>Test your knowledge!</strong> Drag and drop the 5 sales cycle phases into the correct order.
             </p>
             <div id="sales-cycle-game" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                <div style="background: white; border-radius: 12px; padding: 20px;">
-                    <h4 style="color: #7c3aed; margin: 0 0 15px 0; font-size: 16px; text-align: center;">📦 Phases (Drag from here)</h4>
-                    <div id="items-pool" style="min-height: 200px; background: #faf5ff; border-radius: 8px; padding: 10px; border: 2px dashed #c4b5fd;">
-                        <div class="draggable-item" draggable="true" data-order="2" style="background: white; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; cursor: grab; border: 2px solid #e9d5ff; font-size: 14px; font-weight: 500; color: #1f2937; transition: all 0.2s;">Adjuster Meeting</div>
-                        <div class="draggable-item" draggable="true" data-order="1" style="background: white; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; cursor: grab; border: 2px solid #e9d5ff; font-size: 14px; font-weight: 500; color: #1f2937; transition: all 0.2s;">Generating New Business</div>
-                        <div class="draggable-item" draggable="true" data-order="5" style="background: white; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; cursor: grab; border: 2px solid #e9d5ff; font-size: 14px; font-weight: 500; color: #1f2937; transition: all 0.2s;">Final Payment</div>
-                        <div class="draggable-item" draggable="true" data-order="4" style="background: white; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; cursor: grab; border: 2px solid #e9d5ff; font-size: 14px; font-weight: 500; color: #1f2937; transition: all 0.2s;">Installation</div>
-                        <div class="draggable-item" draggable="true" data-order="3" style="background: white; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; cursor: grab; border: 2px solid #e9d5ff; font-size: 14px; font-weight: 500; color: #1f2937; transition: all 0.2s;">Project Meeting</div>
+                <div style="background: var(--surface-color); border-radius: var(--border-radius); padding: 20px;">
+                    <h4 style="color: var(--text-primary); margin: 0 0 15px 0; font-size: 16px; text-align: center;"> Phases (Drag from here)</h4>
+                    <div id="items-pool" style="min-height: 200px; background: var(--surface-color); border-radius: var(--border-radius); padding: 10px; border: 2px dashed var(--border-color);">
+                        <div class="draggable-item" draggable="true" data-order="2" style="background: var(--surface-color); padding: 12px 16px; margin-bottom: 8px; border-radius: var(--border-radius); cursor: grab; border: 2px solid var(--border-color); font-size: 14px; font-weight: 500; color: var(--text-primary); transition: all 0.2s;">Adjuster Meeting</div>
+                        <div class="draggable-item" draggable="true" data-order="1" style="background: var(--surface-color); padding: 12px 16px; margin-bottom: 8px; border-radius: var(--border-radius); cursor: grab; border: 2px solid var(--border-color); font-size: 14px; font-weight: 500; color: var(--text-primary); transition: all 0.2s;">Generating New Business</div>
+                        <div class="draggable-item" draggable="true" data-order="5" style="background: var(--surface-color); padding: 12px 16px; margin-bottom: 8px; border-radius: var(--border-radius); cursor: grab; border: 2px solid var(--border-color); font-size: 14px; font-weight: 500; color: var(--text-primary); transition: all 0.2s;">Final Payment</div>
+                        <div class="draggable-item" draggable="true" data-order="4" style="background: var(--surface-color); padding: 12px 16px; margin-bottom: 8px; border-radius: var(--border-radius); cursor: grab; border: 2px solid var(--border-color); font-size: 14px; font-weight: 500; color: var(--text-primary); transition: all 0.2s;">Installation</div>
+                        <div class="draggable-item" draggable="true" data-order="3" style="background: var(--surface-color); padding: 12px 16px; margin-bottom: 8px; border-radius: var(--border-radius); cursor: grab; border: 2px solid var(--border-color); font-size: 14px; font-weight: 500; color: var(--text-primary); transition: all 0.2s;">Project Meeting</div>
                     </div>
                 </div>
-                <div style="background: white; border-radius: 12px; padding: 20px;">
-                    <h4 style="color: #16a34a; margin: 0 0 15px 0; font-size: 16px; text-align: center;">✅ Correct Order (Drop here)</h4>
-                    <div id="sorted-list" class="drop-zone-sort" style="min-height: 200px; background: #f0fdf4; border-radius: 8px; padding: 10px; border: 2px dashed #86efac;"></div>
+                <div style="background: var(--surface-color); border-radius: var(--border-radius); padding: 20px;">
+                    <h4 style="color: var(--text-primary); margin: 0 0 15px 0; font-size: 16px; text-align: center;"> Correct Order (Drop here)</h4>
+                    <div id="sorted-list" class="drop-zone-sort" style="min-height: 200px; background: var(--surface-color); border-radius: var(--border-radius); padding: 10px; border: 2px dashed var(--border-color);"></div>
                 </div>
             </div>
-            <div id="sales-cycle-feedback" class="feedback-message" style="display: none; margin-top: 15px; padding: 15px; border-radius: 10px; text-align: center; font-weight: 500;"></div>
+            <div id="sales-cycle-feedback" class="feedback-message" style="display: none; margin-top: 15px; padding: 15px; border-radius: var(--border-radius); text-align: center; font-weight: 500;"></div>
           </div>
 
-          <div class="module-completion-section" id="module-complete-section" style="display: none; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 30px; border-radius: 16px; text-align: center; margin-top: 30px;">
-            <p style="color: #166534; font-size: 16px; margin: 0 0 20px 0; font-weight: 500;">🎉 Ready to continue?</p>
-            <button class="complete-module-btn" onclick="completeModule('sales-cycle-job-flow')" style="padding: 16px 40px; font-size: 16px; font-weight: 600; background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: white; border: none; border-radius: 12px; cursor: pointer; transition: all 0.3s;">
+          <div class="module-completion-section" id="module-complete-section" style="display: none; background: var(--surface-color); padding: 30px; border-radius: var(--border-radius); text-align: center; margin-top: 30px;">
+            <p style="color: var(--text-primary); font-size: 16px; margin: 0 0 20px 0; font-weight: 500;"> Ready to continue?</p>
+            <button class="complete-module-btn" onclick="completeModule('sales-cycle-job-flow')" style="padding: 16px 40px; font-size: 16px; font-weight: 600; background: var(--surface-color); color: var(--text-primary); border: none; border-radius: var(--border-radius); cursor: pointer; transition: all 0.3s;">
               Complete Module & Continue →
             </button>
           </div>
@@ -4664,62 +4315,62 @@ const trainingContent = {
     </div>
   `,
   'claim-closing': `
-  <div class="content-card" style="background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%); padding: 0; overflow: hidden;">
+  <div class="content-card" style="background: var(--surface-color); padding: 0; overflow: hidden;">
     <!-- Hero Header -->
-    <div style="background: linear-gradient(135deg, #0891b2 0%, #06b6d4 50%, #22d3ee 100%); padding: 40px 30px; text-align: center; color: white;">
-      <div style="font-size: 48px; margin-bottom: 15px;">📋</div>
+    <div style="background: var(--surface-color); padding: 40px 30px; text-align: center; color: var(--text-primary);">
+      <div style="font-size: 48px; margin-bottom: 15px;"></div>
       <h1 style="margin: 0 0 10px 0; font-size: 28px; font-weight: 700;">Filing the Claim & Contingency + Claim Authorization Script</h1>
       <p style="margin: 0; opacity: 0.9; font-size: 16px;">Digital-first claim filing, contingency, and claim authorization</p>
     </div>
 
     <div style="padding: 30px;">
       <!-- Lesson Plan: Filing the Claim (Digital First) -->
-      <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
-        <span style="background: #ecfeff; padding: 8px 12px; border-radius: 8px;">🧭</span>
+      <h2 style="color: var(--text-primary); font-size: 22px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+
         Lesson Plan: Filing the Claim (Digital First)
       </h2>
 
-      <div style="background: linear-gradient(135deg, #ecfeff 0%, #cffafe 100%); border-radius: 16px; padding: 18px; margin-bottom: 18px;">
-        <strong style="color: #0f172a;">Priority:</strong>
-        <span style="color: #0f172a;"> We want the homeowner to file the claim digitally (app or website). Phone calls are last resort only.</span>
+      <div style="background: var(--surface-color); border-radius: var(--border-radius); padding: 18px; margin-bottom: 18px;">
+        <strong style="color: var(--text-primary);">Priority:</strong>
+        <span style="color: var(--text-primary);"> We want the homeowner to file the claim digitally (app or website). Phone calls are last resort only.</span>
       </div>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 22px;">
-        <div style="background: white; border: 2px solid #e2e8f0; border-radius: 16px; padding: 18px;">
-          <div style="font-size: 20px; font-weight: 700; color: #0e7490; margin-bottom: 6px;">1) Insurance App</div>
-          <div style="color: #475569; font-size: 14px; line-height: 1.6;">Have the homeowner file through their insurance app on their phone. You guide the steps.</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 16px; margin-bottom: 22px;">
+        <div style="background: var(--surface-color); border: 2px solid var(--border-color); border-radius: var(--border-radius); padding: 18px;">
+          <div style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">1) Insurance App</div>
+          <div style="color: var(--text-primary); font-size: 14px; line-height: 1.6;">Have the homeowner file through their insurance app on their phone. You guide the steps.</div>
         </div>
-        <div style="background: white; border: 2px solid #e2e8f0; border-radius: 16px; padding: 18px;">
-          <div style="font-size: 20px; font-weight: 700; color: #0e7490; margin-bottom: 6px;">2) Website Login</div>
-          <div style="color: #475569; font-size: 14px; line-height: 1.6;">If no app, use the homeowner's website login on their computer to file online.</div>
+        <div style="background: var(--surface-color); border: 2px solid var(--border-color); border-radius: var(--border-radius); padding: 18px;">
+          <div style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">2) Website Login</div>
+          <div style="color: var(--text-primary); font-size: 14px; line-height: 1.6;">If no app, use the homeowner's website login on their computer to file online.</div>
         </div>
-        <div style="background: white; border: 2px solid #e2e8f0; border-radius: 16px; padding: 18px;">
-          <div style="font-size: 20px; font-weight: 700; color: #0e7490; margin-bottom: 6px;">3) Guest Claim</div>
-          <div style="color: #475569; font-size: 14px; line-height: 1.6;">Check the website for a guest filing option. Use it if available.</div>
+        <div style="background: var(--surface-color); border: 2px solid var(--border-color); border-radius: var(--border-radius); padding: 18px;">
+          <div style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">3) Guest Claim</div>
+          <div style="color: var(--text-primary); font-size: 14px; line-height: 1.6;">Check the website for a guest filing option. Use it if available.</div>
         </div>
       </div>
 
-      <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 16px; padding: 16px; margin-bottom: 16px;">
-        <strong style="color: #166534;">Once the claim is filed (any method):</strong>
-        <ul style="color: #14532d; font-size: 14px; line-height: 1.7; margin: 8px 0 0 0; padding-left: 18px;">
+      <div style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 16px; margin-bottom: 16px;">
+        <strong style="color: var(--text-primary);">Once the claim is filed (any method):</strong>
+        <ul style="color: var(--text-primary); font-size: 14px; line-height: 1.7; margin: 8px 0 0 0; padding-left: 18px;">
           <li>Have them read the claim number out loud and write it down.</li>
           <li>Ask if an adjuster is assigned; get name, phone, and email (or when assignment will happen).</li>
         </ul>
       </div>
 
-      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 14px; margin-bottom: 12px;">
-        <strong style="color: #0f172a;">Next steps:</strong>
-        <span style="color: #475569;"> Enter the claim details in the Sales App, move into the contingency + claim authorization agreements, and post in GroupMe when signed.</span>
+      <div style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 14px; margin-bottom: 12px;">
+        <strong style="color: var(--text-primary);">Next steps:</strong>
+        <span style="color: var(--text-primary);"> Enter the claim details in the Sales App, move into the contingency + claim authorization agreements, and post in GroupMe when signed.</span>
       </div>
 
-      <div style="background: #fef3c7; border: 1px solid #fcd34d; border-radius: 10px; padding: 12px 16px; margin-bottom: 18px;">
-        <p style="color: #92400e; font-size: 13px; margin: 0; font-weight: 500;">⚠️ <strong>Note:</strong> If the above claim methods do not work/not available, then proceed to phone call.</p>
+      <div style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 12px 16px; margin-bottom: 18px;">
+        <p style="color: var(--text-primary); font-size: 13px; margin: 0; font-weight: 500;"> <strong>Note:</strong> If the above claim methods do not work/not available, then proceed to phone call.</p>
       </div>
 
-      <details style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 14px; padding: 12px; margin-bottom: 14px;">
-        <summary style="font-weight: 700; color: #9a3412; font-size: 13px; cursor: pointer;">Phone Call (Only if app/website/guest filing fails)</summary>
+      <details style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 12px; margin-bottom: 14px;">
+        <summary style="font-weight: 700; color: var(--text-primary); font-size: 13px; cursor: pointer;">Phone Call (Only if app/website/guest filing fails)</summary>
         <div style="margin-top: 10px;">
-          <ul style="color: #7c2d12; font-size: 12.5px; line-height: 1.6; margin: 0; padding-left: 18px;">
+          <ul style="color: var(--text-primary); font-size: 12.5px; line-height: 1.6; margin: 0; padding-left: 18px;">
             <li>Use the Claim Filing Information Sheet for answers.</li>
             <li>Before ending: claim number out loud + adjuster info.</li>
             <li>If scheduling now (Allstate), offer 3 time windows you can attend.</li>
@@ -4727,135 +4378,135 @@ const trainingContent = {
         </div>
       </details>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 18px;">
-        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px;">
-          <img src="/assets/training/module11/claim-filing-info-sheet.png" alt="Claim Filing Information Sheet slide" style="width: 100%; max-height: 180px; object-fit: contain; border-radius: 12px; display: block;">
-          <div style="text-align: center; color: #6b7280; font-size: 12px; margin-top: 8px;">Claim Filing Information Sheet (phone call only)</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 14px; margin-bottom: 18px;">
+        <div style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 12px;">
+          <img src="/assets/training/module11/claim-filing-info-sheet.png" alt="Claim Filing Information Sheet slide" style="width: 100%; max-height: 180px; object-fit: contain; border-radius: var(--border-radius); display: block;">
+          <div style="text-align: center; color: var(--text-primary); font-size: 12px; margin-top: 8px;">Claim Filing Information Sheet (phone call only)</div>
         </div>
-        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px;">
-          <img src="/assets/training/module11/example-customer-info-sheet.png" alt="Example customer info sheet slide" style="width: 100%; max-height: 180px; object-fit: contain; border-radius: 12px; display: block;">
-          <div style="text-align: center; color: #6b7280; font-size: 12px; margin-top: 8px;">Example Customer Info Sheet</div>
+        <div style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 12px;">
+          <img src="/assets/training/module11/example-customer-info-sheet.png" alt="Example customer info sheet slide" style="width: 100%; max-height: 180px; object-fit: contain; border-radius: var(--border-radius); display: block;">
+          <div style="text-align: center; color: var(--text-primary); font-size: 12px; margin-top: 8px;">Example Customer Info Sheet</div>
         </div>
       </div>
 
-      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; margin-bottom: 20px;">
-        <strong style="color: #0f172a;">Field Translator:</strong>
-        <span style="color: #475569;"> Use it when language support is needed at the door.</span>
+      <div style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 12px; margin-bottom: 20px;">
+        <strong style="color: var(--text-primary);">Field Translator:</strong>
+        <span style="color: var(--text-primary);"> Use it when language support is needed at the door.</span>
       </div>
 
       <!-- Sales App -->
-      <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-        <span style="background: #e0f2fe; padding: 8px 12px; border-radius: 8px;">📱</span>
+      <h2 style="color: var(--text-primary); font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+
         Sales App (iPad Only)
       </h2>
 
-      <div style="background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); border-radius: 16px; padding: 20px; margin-bottom: 15px;">
-        <p style="color: #0f172a; font-size: 14px; margin: 0;">Use the Sales App on your iPad to capture claim details and submit forms.</p>
+      <div style="background: var(--surface-color); border-radius: var(--border-radius); padding: 20px; margin-bottom: 15px;">
+        <p style="color: var(--text-primary); font-size: 14px; margin: 0;">Use the Sales App on your iPad to capture claim details and submit forms.</p>
       </div>
-      <div style="background: #dbeafe; border: 1px solid #93c5fd; border-radius: 10px; padding: 12px 16px; margin-bottom: 12px;">
-        <p style="color: #1e40af; font-size: 13px; margin: 0; font-weight: 500;">📱 <strong>Note:</strong> You will be issued company iPads for field use.</p>
+      <div style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 12px 16px; margin-bottom: 12px;">
+        <p style="color: var(--text-primary); font-size: 13px; margin: 0; font-weight: 500;"> <strong>Note:</strong> You will be issued company iPads for field use.</p>
       </div>
-      <div style="background: #fef3c7; border: 1px solid #fcd34d; border-radius: 10px; padding: 12px 16px; margin-bottom: 35px;">
-        <p style="color: #92400e; font-size: 13px; margin: 0; font-weight: 500;">📝 <strong>Note:</strong> We will go over this in more detail in person.</p>
+      <div style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 12px 16px; margin-bottom: 35px;">
+        <p style="color: var(--text-primary); font-size: 13px; margin: 0; font-weight: 500;"> <strong>Note:</strong> We will go over this in more detail in person.</p>
       </div>
-      <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px; margin-bottom: 35px;">
-        <img src="/assets/training/module11/sales-app-ipad.png" alt="Sales App on iPad slide" style="width: 100%; border-radius: 12px; display: block;">
+      <div style="background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 12px; margin-bottom: 35px;">
+        <img src="/assets/training/module11/sales-app-ipad.png" alt="Sales App on iPad slide" style="width: 100%; border-radius: var(--border-radius); display: block;">
       </div>
 
       <!-- Contingency & Claim Authorization Script -->
-      <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-        <span style="background: #f0fdf4; padding: 8px 12px; border-radius: 8px;">✅</span>
+      <h2 style="color: var(--text-primary); font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+
         Contingency + Claim Authorization Script
       </h2>
 
-      <div class="script-purpose-callout" style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-left: 5px solid #c62828; border-radius: 0 12px 12px 0; padding: 16px 20px; margin-bottom: 20px;">
-        <p style="margin: 0; color: #7f1d1d; font-size: 15px;"><strong>🎯 Purpose of this script:</strong> to get the homeowner to sign the Contingency Agreement and Claim Authorization. Every script has one job - know the purpose before you open your mouth.</p>
+      <div class="script-purpose-callout" style="background: var(--surface-color); border-left: 5px solid var(--border-color); border-radius: var(--border-radius); padding: 16px 20px; margin-bottom: 20px;">
+        <p style="margin: 0; color: var(--text-primary); font-size: 15px;"><strong> Purpose of this script:</strong> to get the homeowner to sign the Contingency Agreement and Claim Authorization. Every script has one job - know the purpose before you open your mouth.</p>
       </div>
 
       <div style="display: grid; gap: 15px; margin-bottom: 35px;">
-        <div style="background: white; border: 2px solid #dcfce7; border-radius: 16px; padding: 20px;">
-          <h3 style="color: #166534; font-size: 16px; margin: 0 0 12px 0;">1) After filing the claim</h3>
-          <p style="color: #374151; font-size: 14px; line-height: 1.7; margin: 0;">"Okay, perfect! Like they said, an adjuster will be reaching out to you in the next 24 to 48 hours to schedule the inspection. The absolute most important part of this process is that I am at this inspection. Insurance companies do not want to pay out. They are trying to mitigate their losses after storms. I am there as your representation to make sure you get a fair shake."</p>
-          <p style="color: #166534; font-size: 13px; margin: 10px 0 0 0; font-style: italic;">Turn the iPad so you and the homeowner can see.</p>
+        <div style="background: var(--surface-color); border: 2px solid var(--border-color); border-radius: var(--border-radius); padding: 20px;">
+          <h3 style="color: var(--text-primary); font-size: 16px; margin: 0 0 12px 0;">1) After filing the claim</h3>
+          <p style="color: var(--text-primary); font-size: 14px; line-height: 1.7; margin: 0;">"Okay, perfect! Like they said, an adjuster will be reaching out to you in the next 24 to 48 hours to schedule the inspection. The absolute most important part of this process is that I am at this inspection. Insurance companies do not want to pay out. They are trying to mitigate their losses after storms. I am there as your representation to make sure you get a fair shake."</p>
+          <p style="color: var(--text-primary); font-size: 13px; margin: 10px 0 0 0; font-style: italic;">Turn the iPad so you and the homeowner can see.</p>
         </div>
 
-        <div style="background: white; border: 2px solid #dbeafe; border-radius: 16px; padding: 20px;">
-          <h3 style="color: #1e40af; font-size: 16px; margin: 0 0 12px 0;">2) Contingency Agreement</h3>
-          <p style="color: #374151; font-size: 14px; line-height: 1.7; margin: 0 0 10px 0;">"This basic agreement backs you as the homeowner by guaranteeing you that your only cost will be your deductible if we get you fully approved. If it is a partial approval or denial, first we will fight and jump through the necessary hoops to turn that into a full approval; but if we are not able to get you fully approved, this contract is null and void and you do not owe us a penny."</p>
-          <p style="color: #374151; font-size: 14px; line-height: 1.7; margin: 0;">"What is in it for us is we just want to get to do the work. This agreement commits you to using us if we hold up our end of the bargain and achieve a full approval."</p>
-          <div style="color: #1e40af; font-size: 13px; margin-top: 10px;">
+        <div style="background: var(--surface-color); border: 2px solid var(--border-color); border-radius: var(--border-radius); padding: 20px;">
+          <h3 style="color: var(--text-primary); font-size: 16px; margin: 0 0 12px 0;">2) Contingency Agreement</h3>
+          <p style="color: var(--text-primary); font-size: 14px; line-height: 1.7; margin: 0 0 10px 0;">"This basic agreement backs you as the homeowner by guaranteeing you that your only cost will be your deductible if we get you fully approved. If it is a partial approval or denial, first we will fight and jump through the necessary hoops to turn that into a full approval; but if we are not able to get you fully approved, this contract is null and void and you do not owe us a penny."</p>
+          <p style="color: var(--text-primary); font-size: 14px; line-height: 1.7; margin: 0;">"What is in it for us is we just want to get to do the work. This agreement commits you to using us if we hold up our end of the bargain and achieve a full approval."</p>
+          <div style="color: var(--text-primary); font-size: 13px; margin-top: 10px;">
             <strong>You sign</strong> • <strong>They sign</strong>
           </div>
         </div>
 
-        <div style="background: white; border: 2px solid #e9d5ff; border-radius: 16px; padding: 20px;">
-          <h3 style="color: #7c3aed; font-size: 16px; margin: 0 0 12px 0;">3) Claim Authorization Form</h3>
-          <p style="color: #374151; font-size: 14px; line-height: 1.7; margin: 0 0 10px 0;">"This next form is our Claim Authorization form. Very simple, it allows us to communicate with your insurance company. I will be here for the inspection and we will also communicate with them through email and phone calls so you do not have to be a middle-man. Of course, I will always keep you looped in with our communication by CCing you in all emails and updating you on any conversations we have."</p>
-          <div style="color: #7c3aed; font-size: 13px;">
+        <div style="background: var(--surface-color); border: 2px solid var(--border-color); border-radius: var(--border-radius); padding: 20px;">
+          <h3 style="color: var(--text-primary); font-size: 16px; margin: 0 0 12px 0;">3) Claim Authorization Form</h3>
+          <p style="color: var(--text-primary); font-size: 14px; line-height: 1.7; margin: 0 0 10px 0;">"This next form is our Claim Authorization form. Very simple, it allows us to communicate with your insurance company. I will be here for the inspection and we will also communicate with them through email and phone calls so you do not have to be a middle-man. Of course, I will always keep you looped in with our communication by CCing you in all emails and updating you on any conversations we have."</p>
+          <div style="color: var(--text-primary); font-size: 13px;">
             <strong>They sign</strong> • Press Submit, enter password "roofer" if it asks.
           </div>
         </div>
 
-        <div style="background: white; border: 2px solid #fee2e2; border-radius: 16px; padding: 20px;">
-          <h3 style="color: #b91c1c; font-size: 16px; margin: 0 0 12px 0;">4) Final handoff</h3>
-          <p style="color: #374151; font-size: 14px; line-height: 1.7; margin: 0;">"Alright, we are all set! Again, the most important part of this process is that I am here when the insurance company comes out. Ideally you can have them call me to schedule that directly. If they call me, great! But, regardless, please get the adjuster information (name, email, phone number) and send that over to me so that I can communicate with them before the inspection. If they insist on scheduling with you, go ahead and pencil in a time and avoid these times and days [provide your schedule]."</p>
-          <p style="color: #b91c1c; font-size: 13px; margin: 10px 0 0 0;">Answer any questions the homeowner may have.</p>
-          <p style="color: #374151; font-size: 14px; margin: 8px 0 0 0;">"Thank you, sir/ma'am. Looking forward to seeing you on the day of inspection. You have my contact information on my card if you need anything else."</p>
+        <div style="background: var(--surface-color); border: 2px solid var(--border-color); border-radius: var(--border-radius); padding: 20px;">
+          <h3 style="color: var(--text-primary); font-size: 16px; margin: 0 0 12px 0;">4) Final handoff</h3>
+          <p style="color: var(--text-primary); font-size: 14px; line-height: 1.7; margin: 0;">"Alright, we are all set! Again, the most important part of this process is that I am here when the insurance company comes out. Ideally you can have them call me to schedule that directly. If they call me, great! But, regardless, please get the adjuster information (name, email, phone number) and send that over to me so that I can communicate with them before the inspection. If they insist on scheduling with you, go ahead and pencil in a time and avoid these times and days [provide your schedule]."</p>
+          <p style="color: var(--text-primary); font-size: 13px; margin: 10px 0 0 0;">Answer any questions the homeowner may have.</p>
+          <p style="color: var(--text-primary); font-size: 14px; margin: 8px 0 0 0;">"Thank you, sir/ma'am. Looking forward to seeing you on the day of inspection. You have my contact information on my card if you need anything else."</p>
         </div>
       </div>
 
       <!-- Closing Script Video -->
       <div style="margin: 30px 0;">
-        <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-          <span style="background: #f3e8ff; padding: 8px 12px; border-radius: 8px;">🎬</span>
+        <h2 style="color: var(--text-primary); font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+
           Closing Script Training
         </h2>
-        ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/closing-script.mp4', 'closing-script-video', '📹 New Hire Training: Closing Script')}
+        ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/closing-script.mp4', 'closing-script-video', ' New Hire Training: Closing Script')}
       </div>
 
       <!-- Key Documents Section -->
-      <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-        <span style="background: #f3e8ff; padding: 8px 12px; border-radius: 8px;">📎</span>
+      <h2 style="color: var(--text-primary); font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+
         View Key Documents
       </h2>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 35px;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 20px; margin-bottom: 35px;">
         <!-- Insurance Claim Agreement (Contingency) PDF - NOW FIRST -->
-        <div style="background: white; border: 2px solid #e9d5ff; border-radius: 16px; padding: 25px; text-align: center;">
-          <div style="font-size: 48px; margin-bottom: 15px;">📋</div>
-          <h3 style="color: #7c3aed; font-size: 18px; margin: 0 0 10px 0;">Insurance Claim Agreement</h3>
-          <p style="color: #6b7280; font-size: 14px; margin: 0 0 15px 0; line-height: 1.5;">The contingency agreement - only cost to homeowner is their deductible if fully approved.</p>
-          <div style="background: #f3e8ff; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
-            <p style="color: #6b21a8; font-size: 13px; margin: 0;"><strong>Key term:</strong> Null and void if not fully approved</p>
+        <div style="background: var(--surface-color); border: 2px solid var(--border-color); border-radius: var(--border-radius); padding: 25px; text-align: center;">
+          <div style="font-size: 48px; margin-bottom: 15px;"></div>
+          <h3 style="color: var(--text-primary); font-size: 18px; margin: 0 0 10px 0;">Insurance Claim Agreement</h3>
+          <p style="color: var(--text-primary); font-size: 14px; margin: 0 0 15px 0; line-height: 1.5;">The contingency agreement - only cost to homeowner is their deductible if fully approved.</p>
+          <div style="background: var(--surface-color); padding: 12px; border-radius: var(--border-radius); margin-bottom: 15px;">
+            <p style="color: var(--text-primary); font-size: 13px; margin: 0;"><strong>Key term:</strong> Null and void if not fully approved</p>
           </div>
-          <a href="/resources/DMV Blank Contingency.pdf" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; padding: 12px 24px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: all 0.3s;">
-            📥 View PDF
+          <a href="/resources/DMV Blank Contingency.pdf" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: var(--surface-color); color: var(--text-primary); padding: 12px 24px; border-radius: var(--border-radius); text-decoration: none; font-weight: 600; transition: all 0.3s;">
+             View PDF
           </a>
         </div>
 
         <!-- Claim Authorization PDF - NOW SECOND -->
-        <div style="background: white; border: 2px solid #e9d5ff; border-radius: 16px; padding: 25px; text-align: center;">
-          <div style="font-size: 48px; margin-bottom: 15px;">📄</div>
-          <h3 style="color: #7c3aed; font-size: 18px; margin: 0 0 10px 0;">Claim Authorization Form</h3>
-          <p style="color: #6b7280; font-size: 14px; margin: 0 0 15px 0; line-height: 1.5;">Authorizes ROOF-ER to communicate with the homeowner's insurance company on their behalf.</p>
-          <div style="background: #f3e8ff; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
-            <p style="color: #6b21a8; font-size: 13px; margin: 0;"><strong>When to use:</strong> After filing the claim</p>
+        <div style="background: var(--surface-color); border: 2px solid var(--border-color); border-radius: var(--border-radius); padding: 25px; text-align: center;">
+          <div style="font-size: 48px; margin-bottom: 15px;"></div>
+          <h3 style="color: var(--text-primary); font-size: 18px; margin: 0 0 10px 0;">Claim Authorization Form</h3>
+          <p style="color: var(--text-primary); font-size: 14px; margin: 0 0 15px 0; line-height: 1.5;">Authorizes ROOF-ER to communicate with the homeowner's insurance company on their behalf.</p>
+          <div style="background: var(--surface-color); padding: 12px; border-radius: var(--border-radius); margin-bottom: 15px;">
+            <p style="color: var(--text-primary); font-size: 13px; margin: 0;"><strong>When to use:</strong> After filing the claim</p>
           </div>
-          <a href="/resources/Claim Authorization Form.pdf" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; padding: 12px 24px; border-radius: 25px; text-decoration: none; font-weight: 600; transition: all 0.3s;">
-            📥 View PDF
+          <a href="/resources/Claim Authorization Form.pdf" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; background: var(--surface-color); color: var(--text-primary); padding: 12px 24px; border-radius: var(--border-radius); text-decoration: none; font-weight: 600; transition: all 0.3s;">
+             View PDF
           </a>
         </div>
       </div>
 
       <!-- End Activity -->
-      <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-        <span style="background: #f0fdf4; padding: 8px 12px; border-radius: 8px;">🎯</span>
+      <h2 style="color: var(--text-primary); font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+
         End Activity: Contingency + Claim Authorization Script Quiz
       </h2>
 
-      <div id="filing-claim-quiz" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 16px; padding: 25px; margin-bottom: 30px;">
-        <p style="color: #166534; font-size: 14px; margin: 0 0 16px 0; font-weight: 500;">Test your knowledge of the Contingency + Claim Authorization Script. Check each item you can confidently explain to a homeowner:</p>
-        <div style="display: grid; gap: 12px; color: #15803d; font-size: 14px;">
+      <div id="filing-claim-quiz" style="background: var(--surface-color); border-radius: var(--border-radius); padding: 25px; margin-bottom: 30px;">
+        <p style="color: var(--text-primary); font-size: 14px; margin: 0 0 16px 0; font-weight: 500;">Test your knowledge of the Contingency + Claim Authorization Script. Check each item you can confidently explain to a homeowner:</p>
+        <div style="display: grid; gap: 12px; color: var(--text-primary); font-size: 14px;">
           <label style="display: flex; align-items: flex-start; gap: 10px;"><input type="checkbox" class="filing-quiz-checkbox" style="margin-top: 3px;"> <span>I can explain what a contingency agreement is and why it protects the homeowner</span></label>
           <label style="display: flex; align-items: flex-start; gap: 10px;"><input type="checkbox" class="filing-quiz-checkbox" style="margin-top: 3px;"> <span>I understand "null and void if not fully approved" and can communicate this clearly</span></label>
           <label style="display: flex; align-items: flex-start; gap: 10px;"><input type="checkbox" class="filing-quiz-checkbox" style="margin-top: 3px;"> <span>I can explain what the Claim Authorization form allows ROOF-ER to do</span></label>
@@ -4863,12 +4514,12 @@ const trainingContent = {
           <label style="display: flex; align-items: flex-start; gap: 10px;"><input type="checkbox" class="filing-quiz-checkbox" style="margin-top: 3px;"> <span>I can recite key parts of the script from memory</span></label>
           <label style="display: flex; align-items: flex-start; gap: 10px;"><input type="checkbox" class="filing-quiz-checkbox" style="margin-top: 3px;"> <span>I understand the homeowner's only cost is their deductible if fully approved</span></label>
         </div>
-        <div id="filing-quiz-feedback" style="display: none; margin-top: 15px; padding: 12px; background: #22c55e; color: white; border-radius: 8px; text-align: center; font-weight: 600;">All items confirmed! You're ready to proceed.</div>
+        <div id="filing-quiz-feedback" style="display: none; margin-top: 15px; padding: 12px; background: var(--surface-color); color: var(--text-primary); border-radius: var(--border-radius); text-align: center; font-weight: 600;">All items confirmed! You're ready to proceed.</div>
       </div>
 
-      <div class="module-completion-section" id="module-complete-section" style="display: none; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 30px; border-radius: 16px; text-align: center; margin-top: 30px;">
-        <p style="color: #166534; font-size: 16px; margin: 0 0 20px 0; font-weight: 500;">🎉 Ready to continue?</p>
-        <button class="complete-module-btn" onclick="completeModule('filing-claim-closing')" style="padding: 16px 40px; font-size: 16px; font-weight: 600; background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: white; border: none; border-radius: 12px; cursor: pointer; transition: all 0.3s;">
+      <div class="module-completion-section" id="module-complete-section" style="display: none; background: var(--surface-color); padding: 30px; border-radius: var(--border-radius); text-align: center; margin-top: 30px;">
+        <p style="color: var(--text-primary); font-size: 16px; margin: 0 0 20px 0; font-weight: 500;"> Ready to continue?</p>
+        <button class="complete-module-btn" onclick="completeModule('filing-claim-closing')" style="padding: 16px 40px; font-size: 16px; font-weight: 600; background: var(--surface-color); color: var(--text-primary); border: none; border-radius: var(--border-radius); cursor: pointer; transition: all 0.3s;">
           Complete Module & Continue →
         </button>
       </div>
@@ -4876,12 +4527,12 @@ const trainingContent = {
   </div>
   `,
   'role-play': `
-    <div class="content-card agnes-roleplay-container" style="background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%); padding: 0; overflow: hidden;">
+    <div class="content-card agnes-roleplay-container" style="background: var(--surface-color); padding: 0; overflow: hidden;">
         <!-- Hero Header -->
-        <div style="background: radial-gradient(circle at top left, #0ea5e9 0%, #1e3a8a 45%, #0f172a 100%); padding: 42px 30px; text-align: center; color: white;">
-            <div style="font-size: 48px; margin-bottom: 15px;">🔍</div>
-            <h1 style="margin: 0 0 10px 0; font-size: 28px; font-weight: 700;">Live Role-Play: The Initial Script</h1>
-            <p style="margin: 0; opacity: 0.9; font-size: 16px;">Voice-only training with live feedback (Module 5)</p>
+        <div style="background: var(--surface-color); padding: 42px 30px; text-align: center; color: var(--text-primary);">
+            <div style="font-size: 48px; margin-bottom: 15px;"></div>
+            <h1 style="margin: 0 0 10px 0; font-size: 28px; font-weight: 700;">Practice the conversation</h1>
+            <p style="margin: 0; opacity: 0.9; font-size: 16px;">Live voice practice with feedback</p>
         </div>
 
         <div style="padding: 30px;">
@@ -4889,44 +4540,19 @@ const trainingContent = {
             <div id="agnes-error" class="agnes-error" style="display: none;"></div>
 
             <!-- XP Progress Bar -->
-            <div id="agnes-xp-bar" class="agnes-xp-bar" style="margin-bottom: 30px;"></div>
+
 
             <!-- Live Role-Play (Module 5 - The Initial Script) -->
             <div id="agnes-mode-selector" style="display: block;">
-                <div style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #0284c7 100%); border-radius: 24px; padding: 28px; color: white; margin-bottom: 24px;">
-                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 18px; flex-wrap: wrap;">
-                        <div style="font-size: 44px;">🎯</div>
-                        <div>
-                            <div style="font-size: 20px; font-weight: 700;">Live Role-Play: The Initial Script</div>
-                            <div style="font-size: 14px; opacity: 0.9;">Module 5 The Initial Script • Voice role-play with live feedback</div>
-                        </div>
-                        <div style="margin-left: auto; background: rgba(255,255,255,0.18); padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 600;">LIVE</div>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
-                        <div style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); border-radius: 14px; padding: 14px;">
-                            <div style="font-weight: 700; margin-bottom: 6px;">You'll practice</div>
-                            <ul style="margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.6;">
-                                <li>Explain the inspection flow</li>
-                                <li>Ask permission to use the ladder</li>
-                                <li>Handle hesitation</li>
-                                <li>Clean post‑inspection handoff</li>
-                            </ul>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); border-radius: 14px; padding: 14px;">
-                            <div style="font-weight: 700; margin-bottom: 6px;">How it works</div>
-                            <ol style="margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.6;">
-                                <li>Start live role‑play</li>
-                                <li>Talk it through with Agnes</li>
-                                <li>End & score your session</li>
-                            </ol>
-                        </div>
-                    </div>
-
-                    <div style="margin-top: 18px; text-align: center;">
-                        <button id="agnes-roleplay-btn" style="padding: 16px 42px; font-size: 16px; font-weight: 700; background: #22c55e; color: #0f172a; border: none; border-radius: 999px; cursor: pointer; transition: all 0.2s;">Start Live Role-Play</button>
-                    </div>
-                </div>
+              <section id="roleplay-brief" class="roleplay-brief" aria-labelledby="roleplay-brief-title">
+                <p class="section-label">Before you begin</p>
+                <h2 id="roleplay-brief-title">Your practice scenario</h2>
+                <p id="roleplay-scenario-prompt"></p>
+                <h3>What to cover</h3>
+                <ul id="roleplay-scenario-points"></ul>
+              </section>
+              <p class="practice-connection-note">You’ll need a microphone and an internet connection. End the conversation when you’re ready for feedback.</p>
+              <button type="button" id="agnes-roleplay-btn" class="primary-action">Start voice practice</button>
             </div>
 
         <!-- Voice UI Screen -->
@@ -4943,23 +4569,23 @@ const trainingContent = {
                 </div>
 
                 <!-- In-Session Difficulty Selector -->
-                <div id="agnes-difficulty-buttons" style="display: flex; gap: 8px; justify-content: center; padding: 12px 0; background: #f8fafc; border-radius: 10px; margin: 10px 0;">
-                    <span style="font-size: 13px; color: #64748b; align-self: center; margin-right: 8px;">Difficulty:</span>
-                    <button class="difficulty-btn active" data-difficulty="easy" style="padding: 8px 20px; border: 2px solid #10b981; background: #10b981; color: white; border-radius: 20px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s;">
-                        😊 Easy
+                <div id="agnes-difficulty-buttons" style="display: flex; gap: 8px; justify-content: center; padding: 12px 0; background: var(--surface-color); border-radius: var(--border-radius); margin: 10px 0;">
+                    <span style="font-size: 13px; color: var(--text-primary); align-self: center; margin-right: 8px;">Difficulty:</span>
+                    <button class="difficulty-btn active" data-difficulty="easy" style="padding: 8px 20px; border: 2px solid var(--border-color); background: var(--surface-color); color: var(--text-primary); border-radius: var(--border-radius); font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s;">
+                         Easy
                     </button>
-                    <button class="difficulty-btn" data-difficulty="medium" style="padding: 8px 20px; border: 2px solid #f59e0b; background: white; color: #f59e0b; border-radius: 20px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s;">
-                        🤔 Medium
+                    <button class="difficulty-btn" data-difficulty="medium" style="padding: 8px 20px; border: 2px solid var(--border-color); background: var(--surface-color); color: var(--text-primary); border-radius: var(--border-radius); font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s;">
+                         Medium
                     </button>
-                    <button class="difficulty-btn" data-difficulty="hard" style="padding: 8px 20px; border: 2px solid #ef4444; background: white; color: #ef4444; border-radius: 20px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s;">
-                        😤 Hard
+                    <button class="difficulty-btn" data-difficulty="hard" style="padding: 8px 20px; border: 2px solid var(--border-color); background: var(--surface-color); color: var(--text-primary); border-radius: var(--border-radius); font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s;">
+                         Hard
                     </button>
                 </div>
 
                 <div class="agnes-controls">
-                    <button id="agnes-mute-btn" class="control-btn">🎤 Mute</button>
-                    <button id="agnes-video-btn" class="control-btn">📹 Hide Video</button>
-                    <button id="agnes-end-session-btn" class="control-btn end-btn">🛑 End & Score</button>
+                    <button id="agnes-mute-btn" class="control-btn"> Mute</button>
+                    <button id="agnes-video-btn" class="control-btn"> Hide Video</button>
+                    <button id="agnes-end-session-btn" class="control-btn end-btn"> End & Score</button>
                 </div>
             </div>
 
@@ -4967,7 +4593,7 @@ const trainingContent = {
                 <div class="agnes-video-section">
                     <video id="agnes-video-preview" autoplay muted playsinline class="video-preview"></video>
                     <div class="agnes-avatar-container">
-                        <div class="agnes-avatar">👩‍💼</div>
+                        <div class="agnes-avatar"></div>
                         <div class="agnes-name">Agnes</div>
                         <div id="agnes-speaking-indicator" class="speaking-indicator">Speaking...</div>
                     </div>
@@ -4977,7 +4603,7 @@ const trainingContent = {
                     <h3>Conversation Transcript</h3>
                     <div id="agnes-transcript" class="agnes-transcript">
                         <div class="transcript-placeholder">
-                            <p>🎤 Start speaking to begin the roleplay...</p>
+                            <p> Start speaking to begin the roleplay...</p>
                             <p class="hint">Try: "Here’s how the inspection works..."</p>
                         </div>
                     </div>
@@ -4987,7 +4613,7 @@ const trainingContent = {
                 <!-- Voice Mode Live Feedback Panel -->
                 <div id="voice-live-feedback" class="voice-live-feedback" style="display: none;">
                     <div class="voice-feedback-header">
-                        <span class="feedback-icon">📊</span>
+                        <span class="feedback-icon"></span>
                         <span>Live Performance</span>
                         <div id="voice-live-score" class="voice-live-score">--</div>
                     </div>
@@ -5007,7 +4633,7 @@ const trainingContent = {
                             <div id="voice-tone-feedback" class="tone-feedback">Start speaking to see tone feedback...</div>
                         </div>
                         <div id="voice-live-tip" class="voice-live-tip" style="display: none;">
-                            <span class="tip-icon">💡</span>
+                            <span class="tip-icon"></span>
                             <span class="tip-text"></span>
                         </div>
                     </div>
@@ -5015,7 +4641,7 @@ const trainingContent = {
             </div>
 
             <div class="agnes-tips">
-                <h4>💡 Tips:</h4>
+                <h4> Tips:</h4>
                 <ul>
                     <li>Explain the inspection process in simple steps</li>
                     <li>Ask permission before using the ladder or taking photos</li>
@@ -5027,7 +4653,7 @@ const trainingContent = {
         <!-- Door Slam Modal -->
         <div id="agnes-door-slam-modal" class="agnes-modal" style="display: none;">
             <div class="modal-content door-slam">
-                <div class="modal-icon">🚪💥</div>
+                <div class="modal-icon"></div>
                 <h2>Door Slammed!</h2>
                 <p>The homeowner shut the door in your face. Session ended with a FAIL.</p>
                 <p class="modal-tip">Tip: Be less pushy, listen to concerns, and don't lie!</p>
@@ -5065,7 +4691,7 @@ const trainingContent = {
 trainingContent['general-knowledge'] = `
   <div class="content-card module-3-redesign">
     <h1>General Roofing Knowledge & Terminology</h1>
-    ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module3-roofing101.mp4', 'roofing101-video', '📹 Roofing 101: Essential Knowledge')}
+    ${renderVideoPlayer('https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/training/videos/module3-roofing101.mp4', 'roofing101-video', ' Roofing 101: Essential Knowledge')}
 
     <h2>Essential Roofing Terminology</h2>
     <p class="section-intro">Click on any card to flip and learn the definition!</p>
@@ -5074,7 +4700,7 @@ trainingContent['general-knowledge'] = `
       <div class="flip-card" onclick="this.classList.toggle('flipped')">
         <div class="flip-card-inner">
           <div class="flip-card-front">
-            <div class="flip-icon">🏔️</div>
+            <div class="flip-icon"></div>
             <h3>Ridge</h3>
             <span class="flip-hint">Click to learn more</span>
           </div>
@@ -5088,7 +4714,7 @@ trainingContent['general-knowledge'] = `
       <div class="flip-card" onclick="this.classList.toggle('flipped')">
         <div class="flip-card-inner">
           <div class="flip-card-front">
-            <div class="flip-icon">🛡️</div>
+            <div class="flip-icon"></div>
             <h3>Underlayment</h3>
             <span class="flip-hint">Click to learn more</span>
           </div>
@@ -5102,7 +4728,7 @@ trainingContent['general-knowledge'] = `
       <div class="flip-card" onclick="this.classList.toggle('flipped')">
         <div class="flip-card-inner">
           <div class="flip-card-front">
-            <div class="flip-icon">⚡</div>
+            <div class="flip-icon"></div>
             <h3>Flashing</h3>
             <span class="flip-hint">Click to learn more</span>
           </div>
@@ -5116,7 +4742,7 @@ trainingContent['general-knowledge'] = `
       <div class="flip-card" onclick="this.classList.toggle('flipped')">
         <div class="flip-card-inner">
           <div class="flip-card-front">
-            <div class="flip-icon">💨</div>
+            <div class="flip-icon"></div>
             <h3>Vents</h3>
             <span class="flip-hint">Click to learn more</span>
           </div>
@@ -5130,7 +4756,7 @@ trainingContent['general-knowledge'] = `
       <div class="flip-card" onclick="this.classList.toggle('flipped')">
         <div class="flip-card-inner">
           <div class="flip-card-front">
-            <div class="flip-icon">🌊</div>
+            <div class="flip-icon"></div>
             <h3>Valley</h3>
             <span class="flip-hint">Click to learn more</span>
           </div>
@@ -5144,7 +4770,7 @@ trainingContent['general-knowledge'] = `
       <div class="flip-card" onclick="this.classList.toggle('flipped')">
         <div class="flip-card-inner">
           <div class="flip-card-front">
-            <div class="flip-icon">💧</div>
+            <div class="flip-icon"></div>
             <h3>Drip Edge</h3>
             <span class="flip-hint">Click to learn more</span>
           </div>
@@ -5158,7 +4784,7 @@ trainingContent['general-knowledge'] = `
       <div class="flip-card" onclick="this.classList.toggle('flipped')">
         <div class="flip-card-inner">
           <div class="flip-card-front">
-            <div class="flip-icon">❄️</div>
+            <div class="flip-icon"></div>
             <h3>Ice & Water Shield</h3>
             <span class="flip-hint">Click to learn more</span>
           </div>
@@ -5172,7 +4798,7 @@ trainingContent['general-knowledge'] = `
       <div class="flip-card" onclick="this.classList.toggle('flipped')">
         <div class="flip-card-inner">
           <div class="flip-card-front">
-            <div class="flip-icon">📐</div>
+            <div class="flip-icon"></div>
             <h3>Fascia</h3>
             <span class="flip-hint">Click to learn more</span>
           </div>
@@ -5195,7 +4821,7 @@ trainingContent['general-knowledge'] = `
 
       <div class="roof-parts-legend">
         <h4>Key Components to Know:</h4>
-        <p style="color: #6b7280; font-size: 0.9rem; margin-bottom: 16px;">Click on any component to see a photo example</p>
+        <p style="color: var(--text-primary); font-size: 0.9rem; margin-bottom: 16px;">Click on any component to see a photo example</p>
         <div class="legend-grid">
           <div class="legend-item clickable-component expanded" onclick="toggleComponentImage(this, 'ridge')">
             <span class="legend-marker">1</span>
@@ -5206,7 +4832,7 @@ trainingContent['general-knowledge'] = `
             <span class="expand-icon">−</span>
           </div>
           <div class="component-image-container" id="ridge-image">
-            <img src="/assets/roof-components/ridge.jpg?v=20260121" alt="Ridge/Peak of a roof" style="width: 100%; border-radius: 8px;">
+            <img src="/assets/roof-components/ridge.jpg?v=20260121" alt="Ridge/Peak of a roof" style="width: 100%; border-radius: var(--border-radius);">
             <p class="image-caption">The ridge is the horizontal line at the top where two roof slopes meet</p>
           </div>
 
@@ -5219,7 +4845,7 @@ trainingContent['general-knowledge'] = `
             <span class="expand-icon">−</span>
           </div>
           <div class="component-image-container" id="valley-image">
-            <img src="/assets/roof-components/valley.jpg?v=20260121" alt="Roof valley" style="width: 100%; border-radius: 8px;">
+            <img src="/assets/roof-components/valley.jpg?v=20260121" alt="Roof valley" style="width: 100%; border-radius: var(--border-radius);">
             <p class="image-caption">Valleys channel water where two roof planes meet - critical area for leaks</p>
           </div>
 
@@ -5233,18 +4859,18 @@ trainingContent['general-knowledge'] = `
           </div>
           <div class="component-image-container" id="fascia-image">
             <div style="position: relative; display: inline-block; width: 100%;">
-              <img src="/assets/roof-components/fascia.jpg?v=20260121" alt="Fascia board" style="width: 100%; border-radius: 8px;">
+              <img src="/assets/roof-components/fascia.jpg?v=20260121" alt="Fascia board" style="width: 100%; border-radius: var(--border-radius);">
               <!-- Fascia highlight - beige horizontal board -->
-              <div style="position: absolute; top: 27%; left: 55%; width: 30%; height: 6%; border: 3px solid #f59e0b; border-radius: 4px; background: rgba(245, 158, 11, 0.2);"></div>
-              <div style="position: absolute; top: 19%; left: 88%; background: #f59e0b; color: white; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+              <div style="position: absolute; top: 27%; left: 55%; width: 30%; height: 6%; border: 3px solid var(--border-color); border-radius: var(--border-radius); background: var(--surface-color);"></div>
+              <div style="position: absolute; top: 19%; left: 88%; background: var(--surface-color); color: var(--text-primary); padding: 6px 12px; border-radius: var(--border-radius); font-weight: bold; font-size: 0.85rem; box-shadow: none;">
                 FASCIA
-                <div style="position: absolute; bottom: -8px; left: 20px; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid #f59e0b;"></div>
+                <div style="position: absolute; bottom: -8px; left: 20px; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid var(--border-color);"></div>
               </div>
               <!-- Soffit highlight - dark ridged underside panel -->
-              <div style="position: absolute; top: 42%; left: 28%; width: 35%; height: 18%; border: 3px solid #f59e0b; border-radius: 4px; background: rgba(245, 158, 11, 0.2);"></div>
-              <div style="position: absolute; top: 35%; left: 15%; background: #f59e0b; color: white; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+              <div style="position: absolute; top: 42%; left: 28%; width: 35%; height: 18%; border: 3px solid var(--border-color); border-radius: var(--border-radius); background: var(--surface-color);"></div>
+              <div style="position: absolute; top: 35%; left: 15%; background: var(--surface-color); color: var(--text-primary); padding: 6px 12px; border-radius: var(--border-radius); font-weight: bold; font-size: 0.85rem; box-shadow: none;">
                 SOFFIT
-                <div style="position: absolute; bottom: -8px; right: 15px; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid #f59e0b;"></div>
+                <div style="position: absolute; bottom: -8px; right: 15px; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid var(--border-color);"></div>
               </div>
             </div>
             <p class="image-caption">The fascia is the vertical board running along the roof edge - gutters attach here. The soffit is the underside of the roof overhang.</p>
@@ -5259,7 +4885,7 @@ trainingContent['general-knowledge'] = `
             <span class="expand-icon">−</span>
           </div>
           <div class="component-image-container" id="dripedge-image">
-            <img src="/assets/roof-components/dripedge.jpg?v=20260121" alt="Drip edge" style="width: 100%; border-radius: 8px;">
+            <img src="/assets/roof-components/dripedge.jpg?v=20260121" alt="Drip edge" style="width: 100%; border-radius: var(--border-radius);">
             <p class="image-caption">Metal flashing installed at roof edges to direct water into gutters</p>
           </div>
 
@@ -5272,7 +4898,7 @@ trainingContent['general-knowledge'] = `
             <span class="expand-icon">−</span>
           </div>
           <div class="component-image-container" id="gutter-image">
-            <img src="/assets/roof-components/gutter.jpg?v=20260121" alt="Gutter system" style="width: 100%; border-radius: 8px;">
+            <img src="/assets/roof-components/gutter.jpg?v=20260121" alt="Gutter system" style="width: 100%; border-radius: var(--border-radius);">
             <p class="image-caption">Gutters collect and channel rainwater away from the foundation</p>
           </div>
 
@@ -5285,7 +4911,7 @@ trainingContent['general-knowledge'] = `
             <span class="expand-icon">−</span>
           </div>
           <div class="component-image-container" id="flashing-image">
-            <img src="/assets/roof-components/flashing.jpg?v=20260121" alt="Roof flashing" style="width: 100%; border-radius: 8px;">
+            <img src="/assets/roof-components/flashing.jpg?v=20260121" alt="Roof flashing" style="width: 100%; border-radius: var(--border-radius);">
             <p class="image-caption">Metal pieces that seal joints around chimneys, vents, and roof transitions</p>
           </div>
 
@@ -5298,7 +4924,7 @@ trainingContent['general-knowledge'] = `
             <span class="expand-icon">−</span>
           </div>
           <div class="component-image-container" id="soffit-image">
-            <img src="/assets/roof-components/soffit.jpg?v=20260121" alt="Soffit" style="width: 100%; border-radius: 8px;">
+            <img src="/assets/roof-components/soffit.jpg?v=20260121" alt="Soffit" style="width: 100%; border-radius: var(--border-radius);">
             <p class="image-caption">The soffit covers the underside of roof overhangs and provides ventilation</p>
           </div>
 
@@ -5311,7 +4937,7 @@ trainingContent['general-knowledge'] = `
             <span class="expand-icon">−</span>
           </div>
           <div class="component-image-container" id="eave-image">
-            <img src="/assets/roof-components/eave.jpg?v=20260121" alt="Roof eave" style="width: 100%; border-radius: 8px;">
+            <img src="/assets/roof-components/eave.jpg?v=20260121" alt="Roof eave" style="width: 100%; border-radius: var(--border-radius);">
             <p class="image-caption">The eave is the lower edge of the roof that overhangs the wall</p>
           </div>
         </div>
@@ -5348,7 +4974,7 @@ trainingContent['handling-initial-pitch-objections'] = trainingContent['objectio
 // 10. Post-Inspection Objections (new)
 trainingContent['post-inspection-objections'] = `
   <div class="content-card">
-    <h1>Post‑Inspection Objections</h1>
+    <h1>Post-Inspection Objections</h1>
 
     <h2>7 Common Post-Inspection Objections</h2>
     <div class="objections-grid">
@@ -5356,7 +4982,7 @@ trainingContent['post-inspection-objections'] = `
         <h3>1. "I don't want to file a claim"</h3>
         <p><strong>Response:</strong> "I understand the concern about rates. But here's the reality: 1) This is what you pay insurance FOR. 2) Rates go up regardless - inflation, area risk. 3) Not filing means $20k out-of-pocket in 2 years when it leaks. Which would you rather pay?"</p>
         <p><strong>Why it works:</strong> Addresses fear directly with facts and reframes the alternative.</p>
-        <button class="practice-agnes-btn" data-scenario="m9-claim-fear">🎭 Practice with Agnes</button>
+        <button class="practice-agnes-btn" data-scenario="m9-claim-fear"> Practice with Agnes</button>
 
         <!-- Inline Practice Container -->
         <div class="inline-practice-container" style="display: none;" data-scenario="m9-claim-fear">
@@ -5369,7 +4995,7 @@ trainingContent['post-inspection-objections'] = `
             </div>
           </div>
           <div class="mini-feedback" style="display: none;">
-            <h4>📊 Key Points Checklist:</h4>
+            <h4> Key Points Checklist:</h4>
             <ul class="key-points-checklist"></ul>
             <div class="mini-actions">
               <button class="try-again-btn">Try Again</button>
@@ -5383,7 +5009,7 @@ trainingContent['post-inspection-objections'] = `
         <h3>2. "My roof is fine"</h3>
         <p><strong>Response:</strong> "It looks fine from the ground! That's what I thought too. But look at these photos - [show granule loss, exposed mat, bruising]. This is like a cavity in a tooth - small now, major problem soon. We fix it now while insurance pays."</p>
         <p><strong>Why it works:</strong> Visual evidence + medical analogy makes it tangible.</p>
-        <button class="practice-agnes-btn" data-scenario="m9-adjuster-pushback">🎭 Practice with Agnes</button>
+        <button class="practice-agnes-btn" data-scenario="m9-adjuster-pushback"> Practice with Agnes</button>
 
         <!-- Inline Practice Container -->
         <div class="inline-practice-container" style="display: none;" data-scenario="m9-adjuster-pushback">
@@ -5396,7 +5022,7 @@ trainingContent['post-inspection-objections'] = `
             </div>
           </div>
           <div class="mini-feedback" style="display: none;">
-            <h4>📊 Key Points Checklist:</h4>
+            <h4> Key Points Checklist:</h4>
             <ul class="key-points-checklist"></ul>
             <div class="mini-actions">
               <button class="try-again-btn">Try Again</button>
@@ -5410,7 +5036,7 @@ trainingContent['post-inspection-objections'] = `
         <h3>3. "I need to talk to my spouse"</h3>
         <p><strong>Response:</strong> "Absolutely! When can you both be available? I'm happy to come back tonight at 7pm to walk through the photos together. Or we can do a 3-way call right now - takes 5 minutes."</p>
         <p><strong>Why it works:</strong> Removes the delay while respecting the need for joint decision.</p>
-        <button class="practice-agnes-btn" data-scenario="m9-spouse-decision">🎭 Practice with Agnes</button>
+        <button class="practice-agnes-btn" data-scenario="m9-spouse-decision"> Practice with Agnes</button>
 
         <!-- Inline Practice Container -->
         <div class="inline-practice-container" style="display: none;" data-scenario="m9-spouse-decision">
@@ -5423,7 +5049,7 @@ trainingContent['post-inspection-objections'] = `
             </div>
           </div>
           <div class="mini-feedback" style="display: none;">
-            <h4>📊 Key Points Checklist:</h4>
+            <h4> Key Points Checklist:</h4>
             <ul class="key-points-checklist"></ul>
             <div class="mini-actions">
               <button class="try-again-btn">Try Again</button>
@@ -5437,7 +5063,7 @@ trainingContent['post-inspection-objections'] = `
         <h3>4. "I'll just handle this myself"</h3>
         <p><strong>Response:</strong> "You absolutely can! But here's what most homeowners don't know: the insurance process is designed to minimize payouts. As your representative, we know what to look for, what codes require, and how to negotiate on your behalf. Homeowners who go it alone typically get 30-40% less coverage."</p>
         <p><strong>Why it works:</strong> Educates on the hidden challenge and value of having a professional rep working for you.</p>
-        <button class="practice-agnes-btn" data-scenario="m9-scope-walkthrough">🎭 Practice with Agnes</button>
+        <button class="practice-agnes-btn" data-scenario="m9-scope-walkthrough"> Practice with Agnes</button>
 
         <!-- Inline Practice Container -->
         <div class="inline-practice-container" style="display: none;" data-scenario="m9-scope-walkthrough">
@@ -5450,7 +5076,7 @@ trainingContent['post-inspection-objections'] = `
             </div>
           </div>
           <div class="mini-feedback" style="display: none;">
-            <h4>📊 Key Points Checklist:</h4>
+            <h4> Key Points Checklist:</h4>
             <ul class="key-points-checklist"></ul>
             <div class="mini-actions">
               <button class="try-again-btn">Try Again</button>
@@ -5464,7 +5090,7 @@ trainingContent['post-inspection-objections'] = `
         <h3>5. "I've never filed a claim before"</h3>
         <p><strong>Response:</strong> "Perfect - I'll walk you through every step. It's actually very simple: 1) We call together (3 minutes), 2) Insurance sends someone out and I'll be right here with you, 3) Once approved, we schedule the install. I've done this 500+ times - you're in good hands."</p>
         <p><strong>Why it works:</strong> Simplifies the unknown and builds confidence with rep right there for them.</p>
-        <button class="practice-agnes-btn" data-scenario="m9-first-time-claim">🎭 Practice with Agnes</button>
+        <button class="practice-agnes-btn" data-scenario="m9-first-time-claim"> Practice with Agnes</button>
 
         <!-- Inline Practice Container -->
         <div class="inline-practice-container" style="display: none;" data-scenario="m9-first-time-claim">
@@ -5477,7 +5103,7 @@ trainingContent['post-inspection-objections'] = `
             </div>
           </div>
           <div class="mini-feedback" style="display: none;">
-            <h4>📊 Key Points Checklist:</h4>
+            <h4> Key Points Checklist:</h4>
             <ul class="key-points-checklist"></ul>
             <div class="mini-actions">
               <button class="try-again-btn">Try Again</button>
@@ -5491,7 +5117,7 @@ trainingContent['post-inspection-objections'] = `
         <h3>6. "What if my claim gets denied?"</h3>
         <p><strong>Response:</strong> "Great question. That's why we have a contingency agreement - if we don't get you fully approved, you owe us NOTHING. The contract is null and void. Zero risk to you."</p>
         <p><strong>Why it works:</strong> Removes financial risk completely.</p>
-        <button class="practice-agnes-btn" data-scenario="m9-denial-fear">🎭 Practice with Agnes</button>
+        <button class="practice-agnes-btn" data-scenario="m9-denial-fear"> Practice with Agnes</button>
 
         <!-- Inline Practice Container -->
         <div class="inline-practice-container" style="display: none;" data-scenario="m9-denial-fear">
@@ -5504,7 +5130,7 @@ trainingContent['post-inspection-objections'] = `
             </div>
           </div>
           <div class="mini-feedback" style="display: none;">
-            <h4>📊 Key Points Checklist:</h4>
+            <h4> Key Points Checklist:</h4>
             <ul class="key-points-checklist"></ul>
             <div class="mini-actions">
               <button class="try-again-btn">Try Again</button>
@@ -5518,7 +5144,7 @@ trainingContent['post-inspection-objections'] = `
         <h3>7. "I'm going to wait and see if it gets worse"</h3>
         <p><strong>Response:</strong> "I totally understand. The downside to waiting is the process slows down - schedules fill up and the clearest documentation is right after the storm. Filing today just starts the claim; you still control every decision. No obligation."</p>
         <p><strong>Why it works:</strong> Urgency without pressure and lowers commitment risk.</p>
-        <button class="practice-agnes-btn" data-scenario="m9-wait-and-see">🎭 Practice with Agnes</button>
+        <button class="practice-agnes-btn" data-scenario="m9-wait-and-see"> Practice with Agnes</button>
 
         <!-- Inline Practice Container -->
         <div class="inline-practice-container" style="display: none;" data-scenario="m9-wait-and-see">
@@ -5531,7 +5157,7 @@ trainingContent['post-inspection-objections'] = `
             </div>
           </div>
           <div class="mini-feedback" style="display: none;">
-            <h4>📊 Key Points Checklist:</h4>
+            <h4> Key Points Checklist:</h4>
             <ul class="key-points-checklist"></ul>
             <div class="mini-actions">
               <button class="try-again-btn">Try Again</button>
@@ -5544,110 +5170,110 @@ trainingContent['post-inspection-objections'] = `
 
     <!-- Enhanced Urgency Section -->
     <div style="margin-top: 40px;">
-      <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-        <span style="background: #fef3c7; padding: 8px 12px; border-radius: 8px;">⚡</span>
+      <h2 style="color: var(--text-primary); font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+
         Creating Urgency (Without Being Pushy)
       </h2>
 
       <div class="urgency-cards-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 35px;">
         <!-- Weather Reality Card -->
-        <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-radius: 16px; padding: 20px; border-left: 4px solid #3b82f6;">
-          <div style="font-size: 32px; margin-bottom: 10px;">🌧️</div>
-          <h4 style="color: #1e40af; margin: 0 0 10px 0; font-size: 16px; font-weight: 600;">Weather Reality</h4>
-          <p style="color: #374151; font-size: 14px; margin: 0; font-style: italic;">"We're 3 weeks out on scheduling. If we file today, we can get you on the schedule before winter."</p>
+        <div style="background: var(--surface-color); border-radius: var(--border-radius); padding: 20px; border-left: 4px solid var(--border-color);">
+          <div style="font-size: 32px; margin-bottom: 10px;"></div>
+          <h4 style="color: var(--text-primary); margin: 0 0 10px 0; font-size: 16px; font-weight: 600;">Weather Reality</h4>
+          <p style="color: var(--text-primary); font-size: 14px; margin: 0; font-style: italic;">"We're 3 weeks out on scheduling. If we file today, we can get you on the schedule before winter."</p>
         </div>
 
         <!-- Scheduling Card -->
-        <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 16px; padding: 20px; border-left: 4px solid #16a34a;">
-          <div style="font-size: 32px; margin-bottom: 10px;">📅</div>
-          <h4 style="color: #166534; margin: 0 0 10px 0; font-size: 16px; font-weight: 600;">Scheduling Priority</h4>
-          <p style="color: #374151; font-size: 14px; margin: 0; font-style: italic;">"If we file today, we can get you on the schedule sooner and avoid the backlog."</p>
+        <div style="background: var(--surface-color); border-radius: var(--border-radius); padding: 20px; border-left: 4px solid var(--border-color);">
+          <div style="font-size: 32px; margin-bottom: 10px;"></div>
+          <h4 style="color: var(--text-primary); margin: 0 0 10px 0; font-size: 16px; font-weight: 600;">Scheduling Priority</h4>
+          <p style="color: var(--text-primary); font-size: 14px; margin: 0; font-style: italic;">"If we file today, we can get you on the schedule sooner and avoid the backlog."</p>
         </div>
 
         <!-- Documentation Clarity Card -->
-        <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 16px; padding: 20px; border-left: 4px solid #f59e0b;">
-          <div style="font-size: 32px; margin-bottom: 10px;">📸</div>
-          <h4 style="color: #92400e; margin: 0 0 10px 0; font-size: 16px; font-weight: 600;">Documentation Clarity</h4>
-          <p style="color: #374151; font-size: 14px; margin: 0; font-style: italic;">"The closer we are to the storm, the easier it is to document everything clearly for the insurance company."</p>
+        <div style="background: var(--surface-color); border-radius: var(--border-radius); padding: 20px; border-left: 4px solid var(--border-color);">
+          <div style="font-size: 32px; margin-bottom: 10px;"></div>
+          <h4 style="color: var(--text-primary); margin: 0 0 10px 0; font-size: 16px; font-weight: 600;">Documentation Clarity</h4>
+          <p style="color: var(--text-primary); font-size: 14px; margin: 0; font-style: italic;">"The closer we are to the storm, the easier it is to document everything clearly for the insurance company."</p>
         </div>
 
         <!-- Project Timeline Card -->
-        <div style="background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); border-radius: 16px; padding: 20px; border-left: 4px solid #db2777;">
-          <div style="font-size: 32px; margin-bottom: 10px;">🛠️</div>
-          <h4 style="color: #9d174d; margin: 0 0 10px 0; font-size: 16px; font-weight: 600;">Project Timeline</h4>
-          <p style="color: #374151; font-size: 14px; margin: 0; font-style: italic;">"Once approved, ordering materials and scheduling crews takes time. Starting now keeps the project moving."</p>
+        <div style="background: var(--surface-color); border-radius: var(--border-radius); padding: 20px; border-left: 4px solid var(--border-color);">
+          <div style="font-size: 32px; margin-bottom: 10px;"></div>
+          <h4 style="color: var(--text-primary); margin: 0 0 10px 0; font-size: 16px; font-weight: 600;">Project Timeline</h4>
+          <p style="color: var(--text-primary); font-size: 14px; margin: 0; font-style: italic;">"Once approved, ordering materials and scheduling crews takes time. Starting now keeps the project moving."</p>
         </div>
       </div>
     </div>
 
     <!-- Enhanced Empathy Framework -->
     <div style="margin-top: 40px;">
-      <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-        <span style="background: #f0fdf4; padding: 8px 12px; border-radius: 8px;">🤝</span>
+      <h2 style="color: var(--text-primary); font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+
         The Empathy Framework
       </h2>
-      <p style="color: #6b7280; margin-bottom: 20px;">For every objection, use this 4-step framework:</p>
+      <p style="color: var(--text-primary); margin-bottom: 20px;">For every objection, use this 4-step framework:</p>
 
       <!-- Visual Flow -->
       <div class="empathy-flow" style="display: flex; align-items: stretch; gap: 0; margin-bottom: 35px; flex-wrap: wrap;">
         <!-- Step 1 -->
-        <div style="flex: 1; min-width: 150px; background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); padding: 20px; border-radius: 16px 0 0 16px; text-align: center; position: relative;">
-          <div style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; margin: 0 auto 12px auto;">1</div>
-          <h4 style="color: #1e40af; margin: 0 0 8px 0; font-size: 15px; font-weight: 600;">Acknowledge</h4>
-          <p style="color: #374151; font-size: 13px; margin: 0; font-style: italic;">"I completely understand..."</p>
-          <div style="position: absolute; right: -15px; top: 50%; transform: translateY(-50%); font-size: 24px; color: #3b82f6; z-index: 10;">→</div>
+        <div style="flex: 1; min-width: 150px; background: var(--surface-color); padding: 20px; border-radius: var(--border-radius); text-align: center; position: relative;">
+          <div style="background: var(--surface-color); color: var(--text-primary); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; margin: 0 auto 12px auto;">1</div>
+          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px; font-weight: 600;">Acknowledge</h4>
+          <p style="color: var(--text-primary); font-size: 13px; margin: 0; font-style: italic;">"I completely understand..."</p>
+          <div style="position: absolute; right: -15px; top: 50%; transform: translateY(-50%); font-size: 24px; color: var(--text-primary); z-index: 10;">→</div>
         </div>
 
         <!-- Step 2 -->
-        <div style="flex: 1; min-width: 150px; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); padding: 20px; text-align: center; position: relative;">
-          <div style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; margin: 0 auto 12px auto;">2</div>
-          <h4 style="color: #166534; margin: 0 0 8px 0; font-size: 15px; font-weight: 600;">Educate</h4>
-          <p style="color: #374151; font-size: 13px; margin: 0; font-style: italic;">"Here's what most people don't know..."</p>
-          <div style="position: absolute; right: -15px; top: 50%; transform: translateY(-50%); font-size: 24px; color: #16a34a; z-index: 10;">→</div>
+        <div style="flex: 1; min-width: 150px; background: var(--surface-color); padding: 20px; text-align: center; position: relative;">
+          <div style="background: var(--surface-color); color: var(--text-primary); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; margin: 0 auto 12px auto;">2</div>
+          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px; font-weight: 600;">Educate</h4>
+          <p style="color: var(--text-primary); font-size: 13px; margin: 0; font-style: italic;">"Here's what most people don't know..."</p>
+          <div style="position: absolute; right: -15px; top: 50%; transform: translateY(-50%); font-size: 24px; color: var(--text-primary); z-index: 10;">→</div>
         </div>
 
         <!-- Step 3 -->
-        <div style="flex: 1; min-width: 150px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 20px; text-align: center; position: relative;">
-          <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; margin: 0 auto 12px auto;">3</div>
-          <h4 style="color: #92400e; margin: 0 0 8px 0; font-size: 15px; font-weight: 600;">Evidence</h4>
-          <p style="color: #374151; font-size: 13px; margin: 0; font-style: italic;">"Let me show you the photos/data..."</p>
-          <div style="position: absolute; right: -15px; top: 50%; transform: translateY(-50%); font-size: 24px; color: #f59e0b; z-index: 10;">→</div>
+        <div style="flex: 1; min-width: 150px; background: var(--surface-color); padding: 20px; text-align: center; position: relative;">
+          <div style="background: var(--surface-color); color: var(--text-primary); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; margin: 0 auto 12px auto;">3</div>
+          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px; font-weight: 600;">Evidence</h4>
+          <p style="color: var(--text-primary); font-size: 13px; margin: 0; font-style: italic;">"Let me show you the photos/data..."</p>
+          <div style="position: absolute; right: -15px; top: 50%; transform: translateY(-50%); font-size: 24px; color: var(--text-primary); z-index: 10;">→</div>
         </div>
 
         <!-- Step 4 -->
-        <div style="flex: 1; min-width: 150px; background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); padding: 20px; border-radius: 0 16px 16px 0; text-align: center;">
-          <div style="background: linear-gradient(135deg, #db2777 0%, #be185d 100%); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; margin: 0 auto 12px auto;">4</div>
-          <h4 style="color: #9d174d; margin: 0 0 8px 0; font-size: 15px; font-weight: 600;">Ask</h4>
-          <p style="color: #374151; font-size: 13px; margin: 0; font-style: italic;">"Does that make sense? Should we move forward?"</p>
+        <div style="flex: 1; min-width: 150px; background: var(--surface-color); padding: 20px; border-radius: var(--border-radius); text-align: center;">
+          <div style="background: var(--surface-color); color: var(--text-primary); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; margin: 0 auto 12px auto;">4</div>
+          <h4 style="color: var(--text-primary); margin: 0 0 8px 0; font-size: 15px; font-weight: 600;">Ask</h4>
+          <p style="color: var(--text-primary); font-size: 13px; margin: 0; font-style: italic;">"Does that make sense? Should we move forward?"</p>
         </div>
       </div>
     </div>
 
     <!-- Module 10 Mini Quiz -->
     <div style="margin-top: 40px;" id="m10-quiz-section">
-      <h2 style="color: #1f2937; font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-        <span style="background: #fef2f2; padding: 8px 12px; border-radius: 8px;">📝</span>
+      <h2 style="color: var(--text-primary); font-size: 22px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+
         Knowledge Check
       </h2>
 
-      <div id="m10-quiz-container" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-radius: 16px; padding: 30px; border: 2px solid #e2e8f0;">
+      <div id="m10-quiz-container" style="background: var(--surface-color); border-radius: var(--border-radius); padding: 30px; border: 2px solid var(--border-color);">
         <!-- Quiz will be populated by JS -->
         <div id="m10-quiz-question" style="margin-bottom: 25px;">
-          <div style="font-size: 14px; color: #6b7280; margin-bottom: 8px;">Question <span id="m10-q-num">1</span> of 5</div>
-          <div id="m10-q-text" style="font-size: 18px; color: #1f2937; font-weight: 600;">Loading...</div>
+          <div style="font-size: 14px; color: var(--text-primary); margin-bottom: 8px;">Question <span id="m10-q-num">1</span> of 5</div>
+          <div id="m10-q-text" style="font-size: 18px; color: var(--text-primary); font-weight: 600;">Loading...</div>
         </div>
         <div id="m10-quiz-answers" style="display: grid; gap: 12px;">
           <!-- Answers populated by JS -->
         </div>
-        <div id="m10-quiz-feedback" style="display: none; margin-top: 20px; padding: 15px; border-radius: 10px;"></div>
+        <div id="m10-quiz-feedback" style="display: none; margin-top: 20px; padding: 15px; border-radius: var(--border-radius);"></div>
       </div>
 
-      <div id="m10-quiz-results" style="display: none; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 16px; padding: 40px; text-align: center; margin-top: 20px;">
-        <div id="m10-results-icon" style="font-size: 64px; margin-bottom: 15px;">🎉</div>
-        <h3 id="m10-results-title" style="color: #166534; font-size: 24px; margin: 0 0 10px 0;">Great job!</h3>
-        <p id="m10-results-text" style="color: #374151; font-size: 18px; margin: 0 0 20px 0;">You got <strong><span id="m10-score">0</span>/5</strong> correct</p>
-        <button id="m10-retry-quiz" style="background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); color: white; border: none; padding: 12px 24px; border-radius: 25px; font-weight: 600; font-size: 14px; cursor: pointer;">
-          🔄 Retake Quiz
+      <div id="m10-quiz-results" style="display: none; background: var(--surface-color); border-radius: var(--border-radius); padding: 40px; text-align: center; margin-top: 20px;">
+        <div id="m10-results-icon" style="font-size: 64px; margin-bottom: 15px;"></div>
+        <h3 id="m10-results-title" style="color: var(--text-primary); font-size: 24px; margin: 0 0 10px 0;">Great job!</h3>
+        <p id="m10-results-text" style="color: var(--text-primary); font-size: 18px; margin: 0 0 20px 0;">You got <strong><span id="m10-score">0</span>/5</strong> correct</p>
+        <button id="m10-retry-quiz" style="background: var(--surface-color); color: var(--text-primary); border: none; padding: 12px 24px; border-radius: var(--border-radius); font-weight: 600; font-size: 14px; cursor: pointer;">
+           Retake Quiz
         </button>
       </div>
     </div>
@@ -5678,7 +5304,7 @@ trainingContent['sales-cycle-job-flow'] = trainingContent['sales-cycle'] || `
 // 14. Final Exam (new)
 trainingContent['final-exam'] = `
   <div class="content-card" id="final-exam">
-    <h1>🎯 Final Certification Exam</h1>
+    <h1> Final Certification Exam</h1>
     <p class="module-intro">Complete this exam to become a Certified Roof E.R. Sales Representative. You have 3 attempts to score 70% or higher.</p>
     <div id="exam-area">
       <!-- Dynamically populated by initFinalExam() -->
@@ -5689,14 +5315,14 @@ trainingContent['final-exam'] = `
 // 17. Admin Dashboard (Manager Only)
 trainingContent['admin-dashboard'] = `
   <div class="content-card" id="admin-dashboard">
-    <h1>📊 Admin Dashboard</h1>
+    <h1> Admin Dashboard</h1>
     <p class="module-intro">Track team progress, view analytics, and manage users.</p>
 
     <div class="admin-tabs">
-      <button class="admin-tab active" data-tab="users">👥 Users</button>
-      <button class="admin-tab" data-tab="analytics">📈 Analytics</button>
-      <button class="admin-tab" data-tab="time-tracker">⏱️ Time Tracker</button>
-      <button class="admin-tab" data-tab="progress-grid">📊 Progress Grid</button>
+      <button class="admin-tab active" data-tab="users"> Users</button>
+      <button class="admin-tab" data-tab="analytics"> Analytics</button>
+      <button class="admin-tab" data-tab="time-tracker"> Time Tracker</button>
+      <button class="admin-tab" data-tab="progress-grid"> Progress Grid</button>
     </div>
 
     <div class="admin-content">
@@ -5704,7 +5330,7 @@ trainingContent['admin-dashboard'] = `
       <div id="admin-users-tab" class="admin-tab-content active">
         <div class="admin-toolbar">
           <input type="text" id="user-search" placeholder="Search users..." class="admin-search">
-          <button id="refresh-users-btn" class="btn-secondary">🔄 Refresh</button>
+          <button id="refresh-users-btn" class="btn-secondary"> Refresh</button>
         </div>
         <div id="users-table-container">
           <p class="loading-text">Loading users...</p>
@@ -5735,14 +5361,14 @@ trainingContent['admin-dashboard'] = `
           <h3>User Progress Grid</h3>
           <div class="progress-grid-toolbar">
             <input type="text" id="progress-grid-search" placeholder="Search by name..." class="admin-search">
-            <button id="refresh-progress-grid-btn" class="btn-secondary">🔄 Refresh</button>
+            <button id="refresh-progress-grid-btn" class="btn-secondary"> Refresh</button>
           </div>
         </div>
         <div class="progress-grid-legend">
-          <span class="legend-item"><span class="status-icon completed">✅</span> Complete</span>
-          <span class="legend-item"><span class="status-icon in-progress">🟡</span> In Progress</span>
-          <span class="legend-item"><span class="status-icon stale">🔴</span> Stale (>48hrs)</span>
-          <span class="legend-item"><span class="status-icon not-started">⬜</span> Not Started</span>
+          <span class="legend-item"><span class="status-icon completed"></span> Complete</span>
+          <span class="legend-item"><span class="status-icon in-progress"></span> In Progress</span>
+          <span class="legend-item"><span class="status-icon stale"></span> Stale (>48hrs)</span>
+          <span class="legend-item"><span class="status-icon not-started"></span> Not Started</span>
         </div>
         <div id="progress-grid-container">
           <p class="loading-text">Loading progress grid...</p>
@@ -5794,7 +5420,7 @@ trainingContent['role-play'] = (trainingContent['role-play'] || '').replace(
         <select id="rp-persona">
           <option value="skeptical">Skeptical</option>
           <option value="busy">Busy</option>
-          <option value="cost">Cost‑Concerned</option>
+          <option value="cost">Cost-Concerned</option>
           <option value="neutral">Neutral</option>
         </select>
       </label>
@@ -5828,28 +5454,26 @@ function renderVideoPlayer(videoSrc: string, videoId: string, title: string) {
   const savedProgress = parseFloat(localStorage.getItem(progressKey) || '0');
 
   return `
-    <div class="video-player-container" style="margin: 20px 0; background: #f5f5f5; border-radius: 8px; padding: 20px;">
+    <div class="video-player-container" style="margin: 20px 0; background: var(--surface-color); border-radius: var(--border-radius); padding: 20px;">
       <h3 style="margin-top: 0;">${title}</h3>
       <div style="position: relative;">
         <video
           id="${videoId}"
           controls
-          style="width: 100%; max-width: 800px; border-radius: 4px;"
+          style="width: 100%; max-width: 800px; border-radius: var(--border-radius);"
           ${savedProgress > 0 ? `data-start="${savedProgress}"` : ''}
         >
           <source src="${videoSrc}" type="video/mp4">
           Your browser does not support the video tag.
         </video>
-        ${isWatched ? '<div class="completion-badge" style="position: absolute; top: 10px; right: 10px; background: #4caf50; color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px;">✓ Completed</div>' : ''}
+        ${isWatched ? '<div class="completion-badge" style="position: absolute; top: 10px; right: 10px; background: var(--surface-color); color: var(--text-primary); padding: 5px 10px; border-radius: var(--border-radius); font-size: 12px;">✓ Completed</div>' : ''}
       </div>
       <div class="video-progress-container" style="margin-top: 12px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-          <span style="font-size: 14px; color: #666;">Video Progress</span>
-          <span id="${videoId}-progress-text" style="font-size: 14px; font-weight: 600; color: ${isWatched ? '#4caf50' : '#666'};">${isWatched ? '100%' : '0%'}</span>
+          <span style="font-size: 14px; color: var(--text-primary);">Video Progress</span>
+          <span id="${videoId}-progress-text" style="font-size: 14px; font-weight: 600; color: var(--text-secondary);">${isWatched ? 'Done' : 'Not started'}</span>
         </div>
-        <div class="video-progress-track" style="width: 100%; max-width: 800px; height: 8px; background: #e0e0e0; border-radius: 4px; overflow: hidden;">
-          <div id="${videoId}-progress-bar" class="video-progress-fill" style="width: ${isWatched ? '100' : '0'}%; height: 100%; background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%); border-radius: 4px; transition: width 0.3s ease;"></div>
-        </div>
+
       </div>
     </div>
   `;
@@ -5894,8 +5518,8 @@ function initVideoPlayers() {
     if (!alreadyWatched) {
       skipOverlay = document.createElement('div');
       skipOverlay.className = 'video-skip-overlay';
-      skipOverlay.style.cssText = 'position: absolute; bottom: 60px; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); padding: 12px; text-align: center; color: white; font-size: 13px; pointer-events: none;';
-      skipOverlay.innerHTML = '<span style="background: rgba(217, 4, 41, 0.9); padding: 6px 12px; border-radius: 4px;">Watch at least 50% to unlock skipping</span>';
+      skipOverlay.style.cssText = 'position: absolute; bottom: 60px; left: 0; right: 0; background: var(--surface-color); padding: 12px; text-align: center; color: var(--text-primary); font-size: 13px; pointer-events: none;';
+      skipOverlay.innerHTML = '<span style="background: var(--surface-color); padding: 6px 12px; border-radius: var(--border-radius);">Watch the first half to unlock seeking</span>';
       newVideo.parentElement?.appendChild(skipOverlay);
     }
 
@@ -5915,7 +5539,7 @@ function initVideoPlayers() {
         newVideo.currentTime = maxTimeWatched;
         // Show brief warning
         if (typeof showTip === 'function') {
-          showTip({ icon: '⚠️', title: 'Keep Watching', message: `Please watch at least 50% of the video before skipping. (${Math.round((maxTimeWatched / newVideo.duration) * 100)}% watched)` });
+          showTip({ icon: '', title: 'Keep Watching', message: 'Watch the first half before seeking ahead.' });
         }
       }
     }, { signal });
@@ -5934,7 +5558,7 @@ function initVideoPlayers() {
 
       // Update progress bar and text
       if (newProgressBar) (newProgressBar as HTMLElement).style.width = progressPct + '%';
-      if (newProgressText) newProgressText.textContent = progressPct + '%';
+      if (newProgressText) newProgressText.textContent = progress >= 90 ? 'Done' : 'In progress';
 
       localStorage.setItem(progressKey, newVideo.currentTime.toString());
 
@@ -5950,21 +5574,21 @@ function initVideoPlayers() {
         // Update progress bar to 100% and change color
         if (newProgressBar) {
           (newProgressBar as HTMLElement).style.width = '100%';
-          (newProgressBar as HTMLElement).style.background = 'linear-gradient(90deg, #4caf50 0%, #2e7d32 100%)';
+          (newProgressBar as HTMLElement).style.background = "var(--hover-bg)";
         }
         if (newProgressText) {
-          newProgressText.textContent = '100%';
-          (newProgressText as HTMLElement).style.color = '#4caf50';
+          newProgressText.textContent = 'Done';
+          (newProgressText as HTMLElement).style.color = "var(--text-primary)";
         }
 
         // Show video complete tip
         if (typeof showTip === 'function') {
-          showTip({ icon: '✅', title: 'Video Complete!', message: 'Great job! Continue reading the content below.' });
+          showTip({ icon: '', title: 'Video Complete!', message: 'Great job! Continue reading the content below.' });
         }
         // Add completion badge dynamically
         const badge = document.createElement('div');
         badge.className = 'completion-badge';
-        badge.style.cssText = 'position: absolute; top: 10px; right: 10px; background: #4caf50; color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px;';
+        badge.style.cssText = 'position: absolute; top: 10px; right: 10px; background: var(--surface-color); color: var(--text-primary); padding: 5px 10px; border-radius: var(--border-radius); font-size: 12px;';
         badge.textContent = '✓ Completed';
         newVideo.parentElement?.appendChild(badge);
 
@@ -5994,7 +5618,7 @@ const synth = window.speechSynthesis;
 let currentUtterance: SpeechSynthesisUtterance | null = null;
 
 function updateSpeakButtonState(btn: HTMLElement, speaking: boolean) {
-    btn.textContent = speaking ? '⏸️' : '🔊';
+    btn.textContent = speaking ? '' : '';
     btn.classList.toggle('speaking', speaking);
 }
 
@@ -6090,10 +5714,10 @@ function showNextPrompt() {
             if (promptContainer) {
                 promptContainer.innerHTML = `
                     <div style="text-align: center; padding: 30px;">
-                        <div style="font-size: 48px; margin-bottom: 16px;">🎉</div>
-                        <h3 style="color: #10b981; margin-bottom: 12px;">Practice Complete!</h3>
-                        <p style="color: #666; margin-bottom: 20px;">You've gone through all ${practicePrompts.length} prompts. Great job!</p>
-                        <button onclick="restartPractice()" class="btn-primary" style="padding: 12px 24px;">🔄 Start Over</button>
+                        <div style="font-size: 48px; margin-bottom: 16px;"></div>
+                        <h3 style="color: var(--text-primary); margin-bottom: 12px;">Practice Complete!</h3>
+                        <p style="color: var(--text-primary); margin-bottom: 20px;">You've gone through all ${practicePrompts.length} prompts. Great job!</p>
+                        <button onclick="restartPractice()" class="btn-primary" style="padding: 12px 24px;"> Start Over</button>
                     </div>
                 `;
             }
@@ -6147,7 +5771,7 @@ function markPracticed(scriptId: string) {
     if (progressItem) {
         progressItem.classList.add('completed');
         const icon = progressItem.querySelector('.progress-icon');
-        if (icon) icon.textContent = '✅';
+        if (icon) icon.textContent = '';
     }
 }
 
@@ -6226,16 +5850,16 @@ function stopAllTTS() {
   // Reset all TTS buttons to their default state
   const fullScriptBtn = document.getElementById('play-full-script-btn');
   if (fullScriptBtn) {
-    fullScriptBtn.innerHTML = '<span style="font-size: 1.5rem;">🔊</span><span>Listen to Full Script</span>';
-    (fullScriptBtn as HTMLElement).style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
+    fullScriptBtn.innerHTML = '<span>Listen to Full Script</span>';
+    (fullScriptBtn as HTMLElement).style.background = "var(--hover-bg)";
   }
 
   // Reset section play buttons
   document.querySelectorAll('.script-phase button').forEach(btn => {
     const el = btn as HTMLElement;
     if (el.innerHTML.includes('Stop')) {
-      el.innerHTML = '🔊 Play';
-      el.style.background = el.getAttribute('data-original-bg') || '#8b5cf6';
+      el.innerHTML = ' Play';
+      el.style.background = el.getAttribute('data-original-bg') || "var(--hover-bg)";
     }
   });
 }
@@ -6335,11 +5959,11 @@ async function speakWithGemini(text: string, preferFemale: boolean = false): Pro
     const btn = document.querySelector('.speak-btn-enhanced') as HTMLElement;
     if (btn) {
       const originalContent = btn.innerHTML;
-      btn.innerHTML = '<span style="font-size: 1.5rem;">⚠️</span><span>Voice Unavailable - Trying Backup...</span>';
-      btn.style.background = '#ef4444';
+      btn.innerHTML = '<span>Voice Unavailable - Trying Backup...</span>';
+      btn.style.background = "var(--hover-bg)";
       setTimeout(() => {
         btn.innerHTML = originalContent;
-        btn.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
+        btn.style.background = "var(--hover-bg)";
       }, 3000);
     }
     // Fall back to browser TTS as last resort
@@ -6366,8 +5990,8 @@ async function speakFullScript() {
   if (isPlayingTTS || synth.speaking) {
     stopAllTTS();
     if (btn) {
-      btn.innerHTML = '<span style="font-size: 1.5rem;">🔊</span><span>Listen to Full Script</span>';
-      btn.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
+      btn.innerHTML = '<span>Listen to Full Script</span>';
+      btn.style.background = "var(--hover-bg)";
     }
     return;
   }
@@ -6392,8 +6016,8 @@ async function speakFullScript() {
   });
 
   if (btn) {
-    btn.innerHTML = '<span style="font-size: 1.5rem;">⏸️</span><span>Stop Playback</span>';
-    btn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+    btn.innerHTML = '<span>Stop Playback</span>';
+    btn.style.background = "var(--hover-bg)";
   }
 
   try {
@@ -6401,8 +6025,8 @@ async function speakFullScript() {
   } finally {
     isPlayingTTS = false;
     if (btn && !ttsCancelled) {
-      btn.innerHTML = '<span style="font-size: 1.5rem;">🔊</span><span>Listen to Full Script</span>';
-      btn.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
+      btn.innerHTML = '<span>Listen to Full Script</span>';
+      btn.style.background = "var(--hover-bg)";
     }
   }
 }
@@ -6424,8 +6048,8 @@ async function speakSection(btn: HTMLElement) {
   // Toggle off if already playing
   if (isPlayingTTS || synth.speaking || currentAudio) {
     stopAllTTS();
-    btn.innerHTML = '🔊 Play';
-    btn.style.background = btn.getAttribute('data-original-bg') || '#8b5cf6';
+    btn.innerHTML = ' Play';
+    btn.style.background = btn.getAttribute('data-original-bg') || "var(--hover-bg)";
     return;
   }
 
@@ -6435,15 +6059,15 @@ async function speakSection(btn: HTMLElement) {
 
   const originalBg = btn.style.background;
   btn.setAttribute('data-original-bg', originalBg);
-  btn.innerHTML = '⏸️ Stop';
-  btn.style.background = '#ef4444';
+  btn.innerHTML = ' Stop';
+  btn.style.background = "var(--hover-bg)";
 
   try {
     await speakText(textToSpeak, false); // Use Kore (male) voice
   } finally {
     isPlayingTTS = false;
     if (!ttsCancelled) {
-      btn.innerHTML = '🔊 Play';
+      btn.innerHTML = ' Play';
       btn.style.background = originalBg;
     }
   }
@@ -6473,14 +6097,14 @@ function updatePitchPracticeStep() {
   stepDots.forEach((dot, index) => {
     const el = dot as HTMLElement;
     if (index < currentPitchStep) {
-      el.style.background = '#22c55e';
-      el.style.color = 'white';
+      el.style.background = "var(--hover-bg)";
+      el.style.color = "var(--text-primary)";
     } else if (index === currentPitchStep) {
-      el.style.background = '#8b5cf6';
-      el.style.color = 'white';
+      el.style.background = "var(--hover-bg)";
+      el.style.color = "var(--text-primary)";
     } else {
-      el.style.background = '#e5e7eb';
-      el.style.color = '#6b7280';
+      el.style.background = "var(--hover-bg)";
+      el.style.color = "var(--text-primary)";
     }
   });
 
@@ -6489,19 +6113,19 @@ function updatePitchPracticeStep() {
   if (chatMessages) {
     const phaseLabel = step.phase;
     chatMessages.innerHTML = `
-      <div style="background: #f5f3ff; border-radius: 12px; padding: 16px; margin-bottom: 12px; border-left: 4px solid #8b5cf6;">
-        <span style="background: #8b5cf6; color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: bold;">${phaseLabel}</span>
-        <p style="margin: 12px 0 0 0; color: #374151; font-style: italic;">${step.userPrompt}</p>
+      <div style="background: var(--surface-color); border-radius: var(--border-radius); padding: 16px; margin-bottom: 12px; border-left: 4px solid var(--border-color);">
+        <span style="background: var(--surface-color); color: var(--text-primary); padding: 4px 12px; border-radius: var(--border-radius); font-size: 0.8rem; font-weight: bold;">${phaseLabel}</span>
+        <p style="margin: 12px 0 0 0; color: var(--text-primary); font-style: italic;">${step.userPrompt}</p>
       </div>
-      <div style="background: #fef3c7; border-radius: 12px; padding: 16px; margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px;">
-        <span style="font-size: 1.5rem;">🧓</span>
+      <div style="background: var(--surface-color); border-radius: var(--border-radius); padding: 16px; margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px;">
+
         <div>
-          <span style="font-weight: bold; color: #92400e;">Agnes:</span>
-          <p style="margin: 8px 0 0 0; color: #78350f;">"${step.agnesResponse}"</p>
+          <span style="font-weight: bold; color: var(--text-primary);">Agnes:</span>
+          <p style="margin: 8px 0 0 0; color: var(--text-primary);">"${step.agnesResponse}"</p>
         </div>
       </div>
-      <div style="background: #d1fae5; border-radius: 10px; padding: 12px; color: #065f46; font-size: 0.9rem;">
-        💡 <strong>Tip:</strong> ${step.tip}
+      <div style="background: var(--surface-color); border-radius: var(--border-radius); padding: 12px; color: var(--text-primary); font-size: 0.9rem;">
+         <strong>Tip:</strong> ${step.tip}
       </div>
     `;
   }
@@ -6511,9 +6135,9 @@ function updatePitchPracticeStep() {
   if (promptEl) {
     const isLast = currentPitchStep === pitchPracticeSteps.length - 1;
     promptEl.innerHTML = `
-      <p style="color: #6b7280; font-style: italic; margin-bottom: 12px;">Your turn: ${step.userPrompt}</p>
-      <button onclick="advancePitchPractice()" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; border: none; padding: 12px 30px; border-radius: 25px; cursor: pointer; font-weight: bold; font-size: 1rem;">
-        ${isLast ? "Complete Practice 🎉" : "I've Delivered This Part ✓"}
+      <p style="color: var(--text-primary); font-style: italic; margin-bottom: 12px;">Your turn: ${step.userPrompt}</p>
+      <button onclick="advancePitchPractice()" style="background: var(--surface-color); color: var(--text-primary); border: none; padding: 12px 30px; border-radius: var(--border-radius); cursor: pointer; font-weight: bold; font-size: 1rem;">
+        ${isLast ? "Complete Practice " : "I've Delivered This Part ✓"}
       </button>
     `;
   }
@@ -6556,28 +6180,28 @@ const pitchPhases = [
   {
     phase: 1,
     name: "INTEGRITY - Opening",
-    prompt: "🎯 Deliver your opening - show the collateral damage photos and explain their importance:",
+    prompt: " Deliver your opening - show the collateral damage photos and explain their importance:",
     agnesOpening: "Hi! Come on in. So, you went up on my roof?",
     keyPoints: ["collateral damage", "evidence", "build the case", "lawyers"]
   },
   {
     phase: 2,
     name: "QUALITY - Damage Explanation",
-    prompt: "🎯 Explain the hail damage and why it matters to the homeowner:",
+    prompt: " Explain the hail damage and why it matters to the homeowner:",
     agnesOpening: "Okay, show me what you found...",
     keyPoints: ["circular", "divot", "freeze", "expand", "leaks", "insurance"]
   },
   {
     phase: 3,
     name: "SIMPLICITY - Summary",
-    prompt: "🎯 Summarize the damage and mention similar approvals in the area:",
+    prompt: " Summarize the damage and mention similar approvals in the area:",
     agnesOpening: "I see those circles you're pointing at. What does that mean for my roof?",
     keyPoints: ["granules", "gutters", "neighbors", "similar", "approvals", "area"]
   },
   {
     phase: 4,
     name: "INTEGRITY - Information Gathering",
-    prompt: "🎯 Transition to gathering their information for the claim:",
+    prompt: " Transition to gathering their information for the claim:",
     agnesOpening: "Wow, I had no idea there was this much damage. So what happens now?",
     keyPoints: ["information", "system", "insurance", "deductible", "claim"]
   }
@@ -6643,12 +6267,12 @@ function startVoiceRecording() {
   const transcript = document.getElementById('voice-transcript') as HTMLElement;
 
   if (btn) {
-    btn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+    btn.style.background = "var(--hover-bg)";
     btn.style.animation = 'pulse 1s infinite';
-    btn.innerHTML = '<span style="font-size: 2.5rem;">🔴</span>';
+    btn.innerHTML = '';
   }
 
-  updateVoiceStatus('🎙️ Listening... Speak now!');
+  updateVoiceStatus(' Listening... Speak now!');
   if (transcript) {
     transcript.style.display = 'block';
     transcript.textContent = '';
@@ -6711,9 +6335,9 @@ function stopVoiceRecording() {
 function resetRecordButton() {
   const btn = document.getElementById('voice-record-btn') as HTMLElement;
   if (btn) {
-    btn.style.background = 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)';
+    btn.style.background = "var(--hover-bg)";
     btn.style.animation = 'none';
-    btn.innerHTML = '<span style="font-size: 2.5rem;">🎤</span>';
+    btn.innerHTML = '';
   }
 }
 
@@ -6744,7 +6368,7 @@ async function processVoiceInput(userMessage: string) {
     if (inputArea) inputArea.style.display = 'block';
 
     // Speak Agnes's response
-    updateVoiceStatus('🧓 Agnes is speaking...');
+    updateVoiceStatus(' Agnes is speaking...');
     await speakAsAgnes(agnesResponse);
 
     // Move to next phase
@@ -6758,7 +6382,7 @@ async function processVoiceInput(userMessage: string) {
       // Show and speak next opening
       setTimeout(async () => {
         addPitchMessage('agnes', nextPhase.agnesOpening);
-        updateVoiceStatus('🧓 Agnes is speaking...');
+        updateVoiceStatus(' Agnes is speaking...');
         await speakAsAgnes(nextPhase.agnesOpening);
         updateVoiceStatus('Your turn! Tap the mic to respond.');
       }, 800);
@@ -6790,7 +6414,7 @@ function startLivePitchPractice() {
   const phase = pitchPhases[currentPitchPhase];
   addPitchMessage('agnes', phase.agnesOpening);
 
-  updateVoiceStatus('🧓 Agnes is speaking...');
+  updateVoiceStatus(' Agnes is speaking...');
   speakAsAgnes(phase.agnesOpening)
     .then(() => updateVoiceStatus('Your turn! Tap the mic to respond.'))
     .catch(() => updateVoiceStatus('Your turn! Tap the mic to respond.')); // Fallback on TTS failure
@@ -6817,14 +6441,14 @@ function updatePitchPhaseUI() {
   stepDots.forEach((dot, index) => {
     const el = dot as HTMLElement;
     if (index < currentPitchPhase) {
-      el.style.background = '#22c55e';
-      el.style.color = 'white';
+      el.style.background = "var(--hover-bg)";
+      el.style.color = "var(--text-primary)";
     } else if (index === currentPitchPhase) {
-      el.style.background = '#8b5cf6';
-      el.style.color = 'white';
+      el.style.background = "var(--hover-bg)";
+      el.style.color = "var(--text-primary)";
     } else {
-      el.style.background = '#e5e7eb';
-      el.style.color = '#6b7280';
+      el.style.background = "var(--hover-bg)";
+      el.style.color = "var(--text-primary)";
     }
   });
 
@@ -6842,13 +6466,13 @@ function addPitchMessage(sender: 'user' | 'agnes', message: string) {
 
   const msgDiv = document.createElement('div');
   msgDiv.style.cssText = sender === 'user'
-    ? 'background: #eff6ff; border-radius: 12px; padding: 12px 16px; margin-bottom: 10px; margin-left: 40px; border-left: 4px solid #3b82f6;'
-    : 'background: #fef3c7; border-radius: 12px; padding: 12px 16px; margin-bottom: 10px; margin-right: 40px; border-left: 4px solid #f59e0b; display: flex; align-items: flex-start; gap: 10px;';
+    ? 'background: var(--surface-color); border-radius: var(--border-radius); padding: 12px 16px; margin-bottom: 10px; margin-left: 40px; border-left: 4px solid var(--border-color);'
+    : 'background: var(--surface-color); border-radius: var(--border-radius); padding: 12px 16px; margin-bottom: 10px; margin-right: 40px; border-left: 4px solid var(--border-color); display: flex; align-items: flex-start; gap: 10px;';
 
   if (sender === 'agnes') {
-    msgDiv.innerHTML = `<span style="font-size: 1.5rem;">🧓</span><div><strong style="color: #92400e;">Agnes:</strong><p style="margin: 6px 0 0 0; color: #78350f;">${message}</p></div>`;
+    msgDiv.innerHTML = `<div><strong style="color: var(--text-primary);">Agnes:</strong><p style="margin: 6px 0 0 0; color: var(--text-primary);">${message}</p></div>`;
   } else {
-    msgDiv.innerHTML = `<strong style="color: #1e40af;">You:</strong><p style="margin: 6px 0 0 0; color: #334155;">${message}</p>`;
+    msgDiv.innerHTML = `<strong style="color: var(--text-primary);">You:</strong><p style="margin: 6px 0 0 0; color: var(--text-primary);">${message}</p>`;
   }
 
   container.appendChild(msgDiv);
@@ -6908,7 +6532,7 @@ function skipPitchPhase() {
     updatePitchPhaseUI();
     const nextPhase = pitchPhases[currentPitchPhase];
     addPitchMessage('agnes', nextPhase.agnesOpening);
-    updateVoiceStatus('🧓 Agnes is speaking...');
+    updateVoiceStatus(' Agnes is speaking...');
     speakAsAgnes(nextPhase.agnesOpening)
       .then(() => updateVoiceStatus('Your turn! Tap the mic to respond.'))
       .catch(() => updateVoiceStatus('Your turn! Tap the mic to respond.')); // Fallback on TTS failure
@@ -6975,12 +6599,12 @@ let docSequenceAttempts = 0;
 function selectMatchItem(element: HTMLElement) {
   // Clear previous selection
   document.querySelectorAll('.match-item.description').forEach(item => {
-    (item as HTMLElement).style.border = '2px solid #e5e7eb';
+    (item as HTMLElement).style.border = '2px solid var(--text-primary)';
     (item as HTMLElement).style.boxShadow = 'none';
   });
 
   // Select this item
-  element.style.border = '3px solid #8b5cf6';
+  element.style.border = '3px solid var(--text-primary)';
   element.style.boxShadow = '0 0 15px rgba(139, 92, 246, 0.4)';
   selectedMatchItem = element;
 }
@@ -6997,8 +6621,8 @@ function matchDamageType(element: HTMLElement) {
   if (selectedMatch === targetMatch) {
     // Correct match!
     matchedCount++;
-    selectedMatchItem.style.background = '#d1fae5';
-    selectedMatchItem.style.border = '2px solid #22c55e';
+    selectedMatchItem.style.background = "var(--hover-bg)";
+    selectedMatchItem.style.border = '2px solid var(--text-primary)';
     selectedMatchItem.style.opacity = '0.7';
     selectedMatchItem.style.pointerEvents = 'none';
 
@@ -7031,8 +6655,8 @@ function showMatchFeedback(message: string, success: boolean) {
   if (feedback) {
     feedback.textContent = message;
     feedback.style.display = 'block';
-    feedback.style.background = success ? '#d1fae5' : '#fee2e2';
-    feedback.style.color = success ? '#065f46' : '#991b1b';
+    feedback.style.background = success ? "var(--hover-bg)" : "var(--hover-bg)";
+    feedback.style.color = success ? "var(--text-primary)" : "var(--text-primary)";
     setTimeout(() => feedback.style.display = 'none', 2000);
   }
 }
@@ -7043,7 +6667,7 @@ function selectSeqItem(element: HTMLElement) {
   // Clear previous selection
   document.querySelectorAll('.seq-item').forEach(item => {
     if (!item.classList.contains('placed')) {
-      (item as HTMLElement).style.border = '2px solid #e5e7eb';
+      (item as HTMLElement).style.border = '2px solid var(--text-primary)';
     }
   });
 
@@ -7053,17 +6677,17 @@ function selectSeqItem(element: HTMLElement) {
     const numEl = element.querySelector('.seq-number') as HTMLElement;
     if (numEl && nextAssignNumber <= 5) {
       numEl.textContent = String(nextAssignNumber);
-      numEl.style.background = '#8b5cf6';
-      numEl.style.color = 'white';
+      numEl.style.background = "var(--hover-bg)";
+      numEl.style.color = "var(--text-primary)";
       element.classList.add('placed');
-      element.style.border = '2px solid #8b5cf6';
+      element.style.border = '2px solid var(--text-primary)';
       assignedNumbers.push(parseInt(element.getAttribute('data-order') || '0'));
       nextAssignNumber++;
       selectedSeqItem = null;
     }
   } else {
     // New selection
-    element.style.border = '3px solid #8b5cf6';
+    element.style.border = '3px solid var(--text-primary)';
     selectedSeqItem = element;
   }
 }
@@ -7104,8 +6728,8 @@ function checkDocSequence() {
 
     // Color all items green
     items.forEach(item => {
-      (item as HTMLElement).style.background = '#d1fae5';
-      (item as HTMLElement).style.border = '2px solid #22c55e';
+      (item as HTMLElement).style.background = "var(--hover-bg)";
+      (item as HTMLElement).style.border = '2px solid var(--text-primary)';
     });
 
     checkGameComplete();
@@ -7118,7 +6742,7 @@ function checkDocSequence() {
       showSeqFeedback('Close! The order follows your inspection walk: 1) Elevation collateral → 2) Roof collateral → 3) Close-ups → 4) Overview markings → 5) Gutters. One more try!', false);
     } else {
       // After 3 failed attempts, show the answer and auto-complete
-      showSeqFeedback('Here\'s the correct order — study it and remember for the field!', true);
+      showSeqFeedback('Here\'s the correct order ,  study it and remember for the field!', true);
       challenge2Complete = true;
 
       // Show correct answers on each item
@@ -7127,11 +6751,11 @@ function checkDocSequence() {
         const numEl = item.querySelector('.seq-number') as HTMLElement;
         if (numEl) {
           numEl.textContent = correctNum;
-          numEl.style.background = '#22c55e';
-          numEl.style.color = 'white';
+          numEl.style.background = "var(--hover-bg)";
+          numEl.style.color = "var(--text-primary)";
         }
-        (item as HTMLElement).style.background = '#d1fae5';
-        (item as HTMLElement).style.border = '2px solid #22c55e';
+        (item as HTMLElement).style.background = "var(--hover-bg)";
+        (item as HTMLElement).style.border = '2px solid var(--text-primary)';
         item.classList.add('placed');
       });
 
@@ -7144,17 +6768,17 @@ function resetDocSequence() {
   nextAssignNumber = 1;
   assignedNumbers = [];
   selectedSeqItem = null;
-  // Keep docSequenceAttempts — don't reset so hints progress
+  // Keep docSequenceAttempts ,  don't reset so hints progress
 
   document.querySelectorAll('.seq-item').forEach(item => {
     item.classList.remove('placed');
-    (item as HTMLElement).style.border = '2px solid #e5e7eb';
-    (item as HTMLElement).style.background = 'white';
+    (item as HTMLElement).style.border = '2px solid var(--text-primary)';
+    (item as HTMLElement).style.background = "var(--hover-bg)";
     const numEl = item.querySelector('.seq-number') as HTMLElement;
     if (numEl) {
       numEl.textContent = '?';
-      numEl.style.background = '#e5e7eb';
-      numEl.style.color = '#6b7280';
+      numEl.style.background = "var(--hover-bg)";
+      numEl.style.color = "var(--text-primary)";
     }
   });
 
@@ -7191,8 +6815,8 @@ function showSeqFeedback(message: string, success: boolean) {
   if (feedback) {
     feedback.textContent = message;
     feedback.style.display = 'block';
-    feedback.style.background = success ? '#d1fae5' : '#fee2e2';
-    feedback.style.color = success ? '#065f46' : '#991b1b';
+    feedback.style.background = success ? "var(--hover-bg)" : "var(--hover-bg)";
+    feedback.style.color = success ? "var(--text-primary)" : "var(--text-primary)";
   }
 }
 
@@ -7209,7 +6833,7 @@ function checkGameComplete() {
 }
 
 function initDamageMatchingGame() {
-  console.log('🎮 Initializing Damage Matching Game...');
+  console.log(' Initializing Damage Matching Game...');
 
   // Reset game state
   matchedCount = 0;
@@ -7225,7 +6849,7 @@ function initDamageMatchingGame() {
   const countEl = document.getElementById('match-count');
   if (countEl) countEl.textContent = '0';
 
-  console.log('✅ Damage Matching Game initialized');
+  console.log(' Damage Matching Game initialized');
 }
 
 // Attach game functions to window
@@ -7442,7 +7066,7 @@ function initSalesCycleSorter() {
 
         if (JSON.stringify(currentOrder) === JSON.stringify(correctOrder)) {
             feedbackEl.innerHTML = `
-                <div style="color: #166534;">✅ Correct! That is the right order.</div>
+                <div style="color: var(--text-primary);"> Correct! That is the right order.</div>
             `;
             feedbackEl.className = 'feedback-message correct';
             // Show completion section
@@ -7454,17 +7078,17 @@ function initSalesCycleSorter() {
             salesCycleAttempts++;
             let hint = '';
             if (salesCycleAttempts === 1) {
-                hint = `<div style="margin-top: 10px; font-size: 13px; color: #6b7280;">💡 <strong>Hint:</strong> Think about what happens FIRST when you meet a homeowner...</div>`;
+                hint = `<div style="margin-top: 10px; font-size: 13px; color: var(--text-primary);"> <strong>Hint:</strong> Think about what happens FIRST when you meet a homeowner...</div>`;
             } else if (salesCycleAttempts === 2) {
-                hint = `<div style="margin-top: 10px; font-size: 13px; color: #6b7280;">💡 <strong>Hint:</strong> The first phase is "<strong>${phaseNames[0]}</strong>" - that's when you're door knocking or getting referrals!</div>`;
+                hint = `<div style="margin-top: 10px; font-size: 13px; color: var(--text-primary);"> <strong>Hint:</strong> The first phase is "<strong>${phaseNames[0]}</strong>" - that's when you're door knocking or getting referrals!</div>`;
             } else {
-                hint = `<div style="margin-top: 10px; font-size: 13px; color: #6b7280;">💡 <strong>Hint:</strong> The correct order is: <strong>1.</strong> ${phaseNames[0]} → <strong>2.</strong> ${phaseNames[1]} → <strong>3.</strong> ${phaseNames[2]} → ...</div>`;
+                hint = `<div style="margin-top: 10px; font-size: 13px; color: var(--text-primary);"> <strong>Hint:</strong> The correct order is: <strong>1.</strong> ${phaseNames[0]} → <strong>2.</strong> ${phaseNames[1]} → <strong>3.</strong> ${phaseNames[2]} → ...</div>`;
             }
             feedbackEl.innerHTML = `
-                <div style="color: #991b1b;">❌ Not quite right. Try again!</div>
+                <div style="color: var(--text-primary);"> Not quite right. Try again!</div>
                 ${hint}
-                <button onclick="resetSalesCycleGame()" style="margin-top: 12px; background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); color: white; border: none; padding: 10px 20px; border-radius: 20px; font-weight: 600; font-size: 14px; cursor: pointer;">
-                    🔄 Reset & Try Again
+                <button onclick="resetSalesCycleGame()" style="margin-top: 12px; background: var(--surface-color); color: var(--text-primary); border: none; padding: 10px 20px; border-radius: var(--border-radius); font-weight: 600; font-size: 14px; cursor: pointer;">
+                     Reset & Try Again
                 </button>
             `;
             feedbackEl.className = 'feedback-message incorrect';
@@ -7750,8 +7374,8 @@ function initInspectionOrderGame() {
       feedbackEl!.textContent = `${items.length}/6 steps placed. Keep going!`;
       feedbackEl!.className = '';
       feedbackEl!.style.display = 'block';
-      feedbackEl!.style.background = '#fef3c7';
-      feedbackEl!.style.color = '#92400e';
+      feedbackEl!.style.background = "var(--hover-bg)";
+      feedbackEl!.style.color = "var(--text-primary)";
       feedbackEl!.style.padding = '16px 20px';
       feedbackEl!.style.borderRadius = '12px';
       feedbackEl!.style.fontWeight = '500';
@@ -7764,21 +7388,20 @@ function initInspectionOrderGame() {
 
     if (JSON.stringify(currentOrder) === JSON.stringify(correctOrder)) {
       // Success!
-      feedbackEl!.innerHTML = '🎉 <strong>Perfect!</strong> You\'ve mastered the inspection process order!';
+      feedbackEl!.innerHTML = ' <strong>Perfect!</strong> You\'ve mastered the inspection process order!';
       feedbackEl!.className = 'correct';
       feedbackEl!.style.display = 'block';
-      feedbackEl!.style.background = 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)';
-      feedbackEl!.style.border = '2px solid #22c55e';
-      feedbackEl!.style.color = '#166534';
+      feedbackEl!.style.background = "var(--hover-bg)";
+      feedbackEl!.style.border = '2px solid var(--text-primary)';
+      feedbackEl!.style.color = "var(--text-primary)";
 
       // Mark all items as correct
       items.forEach(item => {
         (item as HTMLElement).classList.remove('incorrect');
-        (item as HTMLElement).style.background = 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)';
+        (item as HTMLElement).style.background = "var(--hover-bg)";
       });
 
       // Trigger confetti
-      triggerConfetti('module');
 
       // Mark quiz as passed
       markQuizPassed('inspection-process');
@@ -7792,19 +7415,19 @@ function initInspectionOrderGame() {
         const itemEl = item as HTMLElement;
         if (itemEl.dataset.order === correctOrder[index]) {
           itemEl.classList.remove('incorrect');
-          itemEl.style.background = 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)';
+          itemEl.style.background = "var(--hover-bg)";
         } else {
           itemEl.classList.add('incorrect');
-          itemEl.style.background = 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)';
+          itemEl.style.background = "var(--hover-bg)";
         }
       });
 
       feedbackEl!.textContent = 'Not quite right. Items highlighted in red are in the wrong position. Try again!';
       feedbackEl!.className = 'incorrect';
       feedbackEl!.style.display = 'block';
-      feedbackEl!.style.background = 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)';
-      feedbackEl!.style.border = '2px solid #ef4444';
-      feedbackEl!.style.color = '#991b1b';
+      feedbackEl!.style.background = "var(--hover-bg)";
+      feedbackEl!.style.border = '2px solid var(--text-primary)';
+      feedbackEl!.style.color = "var(--text-primary)";
 
       // Show reset button
       if (resetBtn) resetBtn.style.display = 'inline-block';
@@ -7856,7 +7479,7 @@ const objectionChallengeQuestions = [
     scenario: "We already have a roofer we use.",
     options: [
       { text: "Our company is better than whoever you're using.", correct: false, feedback: "Never attack their existing relationships. It makes you look unprofessional." },
-      { text: "Totally. I'm not here to replace them — I just need 15 minutes to check for storm damage and show you what I find. It's free and quick.", correct: true, feedback: "Perfect. You respect their relationship and move straight to a quick inspection." },
+      { text: "Totally. I'm not here to replace them ,  I just need 15 minutes to check for storm damage and show you what I find. It's free and quick.", correct: true, feedback: "Perfect. You respect their relationship and move straight to a quick inspection." },
       { text: "Well, let me know if you change your mind.", correct: false, feedback: "Too passive. You're giving up without offering any value." }
     ]
   },
@@ -7968,7 +7591,7 @@ function renderChallengeQuestion() {
   if (feedbackEl) {
     const feedbackIcon = feedbackEl.querySelector('.feedback-icon');
     const feedbackText = feedbackEl.querySelector('.feedback-text');
-    if (feedbackIcon) feedbackIcon.textContent = isCorrect ? '✅' : '❌';
+    if (feedbackIcon) feedbackIcon.textContent = isCorrect ? '' : '';
     if (feedbackText) feedbackText.textContent = feedback;
     feedbackEl.style.display = 'block';
     feedbackEl.className = `challenge-feedback ${isCorrect ? 'correct' : 'incorrect'}`;
@@ -8000,7 +7623,7 @@ function showChallengeComplete() {
   let message = '';
   const percentage = (challengeState.score / 500) * 100;
   if (percentage === 100) {
-    message = "🌟 Perfect score! You're an objection handling master!";
+    message = " Perfect score! You're an objection handling master!";
   } else if (percentage >= 80) {
     message = "Great job! You've got solid objection handling skills.";
   } else if (percentage >= 60) {
@@ -8021,7 +7644,7 @@ function showChallengeComplete() {
 
 // --- Module 10: Practice with Agnes Buttons ---
 function initModule9RoleplayButtons() {
-  console.log('🎭 Initializing Module 10 inline practice system...');
+  console.log(' Initializing Module 10 inline practice system...');
 
   const practiceButtons = document.querySelectorAll('.practice-agnes-btn');
 
@@ -8083,7 +7706,7 @@ function initModule9RoleplayButtons() {
     });
   });
 
-  console.log(`✅ Initialized ${practiceButtons.length} inline practice sessions`);
+  console.log(` Initialized ${practiceButtons.length} inline practice sessions`);
 
   // Also initialize the Module 10 quiz
   initModule10Quiz();
@@ -8102,7 +7725,7 @@ function initModule10Quiz() {
       question: "Which urgency approach is most effective?",
       answers: [
         { text: "\"Sign today or the price goes up\"", correct: false },
-        { text: "\"Our schedule fills up fast after storms—locking in now ensures priority\"", correct: true },
+        { text: "\"Our schedule fills up fast after storms, locking in now ensures priority\"", correct: true },
         { text: "\"Other companies will take your business\"", correct: false },
         { text: "\"This is a limited time offer\"", correct: false }
       ]
@@ -8166,20 +7789,20 @@ function initModule10Quiz() {
 
     answersEl.innerHTML = shuffled.map((ans, idx) => `
       <button class="m10-answer-btn" data-correct="${ans.correct}" style="
-        background: white;
-        border: 2px solid #e5e7eb;
-        border-radius: 12px;
+        background: var(--surface-color);
+        border: 2px solid var(--border-color);
+        border-radius: var(--border-radius);
         padding: 14px 18px;
         text-align: left;
         font-size: 14px;
-        color: #374151;
+        color: var(--text-primary);
         cursor: pointer;
         transition: all 0.2s;
         display: flex;
         align-items: center;
         gap: 10px;
       ">
-        <span style="background: #f3f4f6; padding: 4px 10px; border-radius: 6px; font-weight: 600; color: #6b7280;">${String.fromCharCode(65 + idx)}</span>
+        <span style="background: var(--surface-color); padding: 4px 10px; border-radius: var(--border-radius); font-weight: 600; color: var(--text-primary);">${String.fromCharCode(65 + idx)}</span>
         <span>${ans.text}</span>
       </button>
     `).join('');
@@ -8205,26 +7828,26 @@ function initModule10Quiz() {
     answersEl?.querySelectorAll('.m10-answer-btn').forEach(b => {
       const el = b as HTMLElement;
       if (el.dataset.correct === 'true') {
-        el.style.background = 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)';
-        el.style.borderColor = '#16a34a';
+        el.style.background = "var(--hover-bg)";
+        el.style.borderColor = "var(--border-color)";
       }
     });
 
     if (isCorrect) {
       correct++;
-      btn.style.background = 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)';
-      btn.style.borderColor = '#16a34a';
+      btn.style.background = "var(--hover-bg)";
+      btn.style.borderColor = "var(--border-color)";
       if (feedbackEl) {
-        feedbackEl.innerHTML = '<div style="color: #166534; font-weight: 600;">✅ Correct!</div>';
-        feedbackEl.style.background = 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)';
+        feedbackEl.innerHTML = '<div style="color: var(--text-primary); font-weight: 600;"> Correct!</div>';
+        feedbackEl.style.background = "var(--hover-bg)";
         feedbackEl.style.display = 'block';
       }
     } else {
-      btn.style.background = 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)';
-      btn.style.borderColor = '#dc2626';
+      btn.style.background = "var(--hover-bg)";
+      btn.style.borderColor = "var(--border-color)";
       if (feedbackEl) {
-        feedbackEl.innerHTML = '<div style="color: #991b1b; font-weight: 600;">❌ Not quite. The correct answer is highlighted.</div>';
-        feedbackEl.style.background = 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)';
+        feedbackEl.innerHTML = '<div style="color: var(--text-primary); font-weight: 600;"> Not quite. The correct answer is highlighted.</div>';
+        feedbackEl.style.background = "var(--hover-bg)";
         feedbackEl.style.display = 'block';
       }
     }
@@ -8252,30 +7875,30 @@ function initModule10Quiz() {
 
       const percentage = (correct / 5) * 100;
       if (percentage >= 80) {
-        if (iconEl) iconEl.textContent = '🎉';
+        if (iconEl) iconEl.textContent = '';
         if (titleEl) {
           titleEl.textContent = 'Great job!';
-          titleEl.style.color = '#166534';
+          titleEl.style.color = "var(--text-primary)";
         }
-        resultsDiv.style.background = 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)';
+        resultsDiv.style.background = "var(--hover-bg)";
         // Mark quiz as passed in engagement system (this persists state and enables completion)
         markQuizPassed('post-inspection-objections');
       } else if (percentage >= 60) {
-        if (iconEl) iconEl.textContent = '👍';
+        if (iconEl) iconEl.textContent = '';
         if (titleEl) {
           titleEl.textContent = 'Good effort!';
-          titleEl.style.color = '#ca8a04';
+          titleEl.style.color = "var(--text-primary)";
         }
-        resultsDiv.style.background = 'linear-gradient(135deg, #fefce8 0%, #fef9c3 100%)';
+        resultsDiv.style.background = "var(--hover-bg)";
         // Mark quiz as passed in engagement system (this persists state and enables completion)
         markQuizPassed('post-inspection-objections');
       } else {
-        if (iconEl) iconEl.textContent = '📚';
+        if (iconEl) iconEl.textContent = '';
         if (titleEl) {
           titleEl.textContent = 'Keep studying!';
-          titleEl.style.color = '#dc2626';
+          titleEl.style.color = "var(--text-primary)";
         }
-        resultsDiv.style.background = 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)';
+        resultsDiv.style.background = "var(--hover-bg)";
       }
     }
   }
@@ -8490,7 +8113,7 @@ let shingleGameState = {
 };
 
 function initShingleGame() {
-  console.log('🎮 Initializing Shingle Type Challenge...');
+  console.log(' Initializing Shingle Type Challenge...');
 
   // Shuffle and pick 5 questions
   shingleGameState.gameQuestions = [...shingleQuestions].sort(() => Math.random() - 0.5).slice(0, 5);
@@ -8562,11 +8185,11 @@ function showShingleQuestion() {
     shingleGameState.score++;
     const scoreEl = document.getElementById('game-score');
     if (scoreEl) scoreEl.textContent = String(shingleGameState.score);
-    if (feedbackIcon) feedbackIcon.textContent = '✅';
+    if (feedbackIcon) feedbackIcon.textContent = '';
     if (feedbackText) feedbackText.innerHTML = '<strong>Correct!</strong> ' + q.explain;
     if (feedbackArea) feedbackArea.className = 'feedback-area correct';
   } else {
-    if (feedbackIcon) feedbackIcon.textContent = '❌';
+    if (feedbackIcon) feedbackIcon.textContent = '';
     if (feedbackText) feedbackText.innerHTML = '<strong>Not quite!</strong> ' + q.explain;
     if (feedbackArea) feedbackArea.className = 'feedback-area incorrect';
   }
@@ -8599,7 +8222,7 @@ function endShingleGame() {
 
   if (msgEl) {
     if (shingleGameState.score === 5) {
-      msgEl.textContent = "🌟 Perfect! You're a shingle expert ready for the field!";
+      msgEl.textContent = " Perfect! You're a shingle expert ready for the field!";
     } else if (shingleGameState.score >= 4) {
       msgEl.textContent = "Great job! You've got a solid grasp of shingle types.";
     } else if (shingleGameState.score >= 3) {
@@ -8629,7 +8252,7 @@ function endShingleGame() {
 
 // --- Module 7: Damage Identification Hotspot Quiz ---
 function initDamageHotspotQuiz() {
-  console.log('🎯 Initializing Damage Hotspot Quiz...');
+  console.log(' Initializing Damage Hotspot Quiz...');
 
   // Wait for images to be in DOM (module content may still be rendering)
   setTimeout(() => {
@@ -8654,15 +8277,15 @@ function initDamageHotspotQuiz() {
 
     // Initialize all quiz images
     const quizImages = document.querySelectorAll('.clickable-quiz-image');
-    console.log(`🔍 Found ${quizImages.length} clickable quiz images`);
+    console.log(` Found ${quizImages.length} clickable quiz images`);
 
     if (quizImages.length === 0) {
-      console.error('❌ No quiz images found! Module content may not be visible yet.');
+      console.error(' No quiz images found! Module content may not be visible yet.');
       return;
     }
 
     quizImages.forEach((img, index) => {
-      console.log(`✅ Image ${index + 1}: ${img.src}`);
+      console.log(` Image ${index + 1}: ${img.src}`);
       img.addEventListener('click', (e) => handleHotspotClick(e, img));
       img.style.cursor = 'crosshair';
 
@@ -8765,7 +8388,7 @@ function initDamageHotspotQuiz() {
       restartButton.addEventListener('click', () => restartQuiz(quizState));
     }
 
-    console.log(`✅ Damage Hotspot Quiz initialized with ${quizImages.length} interactive images`);
+    console.log(` Damage Hotspot Quiz initialized with ${quizImages.length} interactive images`);
   }, 100); // 100ms delay to ensure DOM is ready
 }
 
@@ -8815,7 +8438,7 @@ function handleHotspotClick(event, imageElement) {
         // Show duplicate marker (orange recycle symbol)
         const duplicateMarker = document.createElement('div');
         duplicateMarker.className = 'hotspot-marker duplicate';
-        duplicateMarker.innerHTML = '<span style="font-size: 24px; color: #ff9800;">⟳</span>';
+        duplicateMarker.innerHTML = '<span style="font-size: 24px; color: var(--text-primary);">⟳</span>';
         duplicateMarker.style.left = `${clickX}%`;
         duplicateMarker.style.top = `${clickY}%`;
         duplicateMarker.style.transform = 'translate(-50%, -50%)';
@@ -8832,7 +8455,7 @@ function handleHotspotClick(event, imageElement) {
         const correctMarker = document.createElement('div');
         correctMarker.className = 'hotspot-marker correct';
         correctMarker.setAttribute('data-hotspot-id', spotId);
-        correctMarker.innerHTML = '<span style="font-size: 28px; color: #4caf50;">✓</span>';
+        correctMarker.innerHTML = '<span style="font-size: 28px; color: var(--text-primary);">✓</span>';
         correctMarker.style.left = `${spot.x}%`;
         correctMarker.style.top = `${spot.y}%`;
         correctMarker.style.transform = 'translate(-50%, -50%)';
@@ -8847,7 +8470,7 @@ function handleHotspotClick(event, imageElement) {
         if (currentCount + 1 === totalSpots) {
           question.querySelector('.btn-next, .btn-complete').style.display = 'inline-block';
           setTimeout(() => {
-            alert(`🎉 Excellent! You found all ${totalSpots} damage spots!`);
+            alert(` Excellent! You found all ${totalSpots} damage spots!`);
           }, 300);
         }
       }
@@ -8864,7 +8487,7 @@ function handleHotspotClick(event, imageElement) {
     // Show incorrect marker (red X)
     const incorrectMarker = document.createElement('div');
     incorrectMarker.className = 'hotspot-marker incorrect';
-    incorrectMarker.innerHTML = '<span style="font-size: 24px; color: #f44336;">✗</span>';
+    incorrectMarker.innerHTML = '<span style="font-size: 24px; color: var(--text-primary);">✗</span>';
     incorrectMarker.style.left = `${clickX}%`;
     incorrectMarker.style.top = `${clickY}%`;
     incorrectMarker.style.transform = 'translate(-50%, -50%)';
@@ -8933,7 +8556,7 @@ function updateAccuracyDisplay(questionElement, qKey) {
   // Update display
   if (totalClicks > 0) {
     accuracyEl.innerHTML = `Accuracy: <strong>${accuracy}%</strong> (${stats.correct} correct, ${stats.incorrect} incorrect)`;
-    accuracyEl.style.color = accuracy >= 70 ? '#4caf50' : accuracy >= 50 ? '#ff9800' : '#f44336';
+    accuracyEl.style.color = accuracy >= 70 ? "var(--text-primary)" : accuracy >= 50 ? "var(--text-primary)" : "var(--text-primary)";
   } else {
     accuracyEl.textContent = '';
   }
@@ -9064,13 +8687,13 @@ function completeQuiz(quizState) {
   // Performance feedback based on completion AND accuracy (with null check)
   if (feedbackMsg) {
     if (completionRate === 100 && overallAccuracy >= 80) {
-      feedbackMsg.innerHTML = '🏆 <strong>Perfect performance!</strong> You have excellent damage identification skills with great accuracy.';
+      feedbackMsg.innerHTML = ' <strong>Perfect performance!</strong> You have excellent damage identification skills with great accuracy.';
     } else if (completionRate >= 80 && overallAccuracy >= 70) {
-      feedbackMsg.innerHTML = '🌟 <strong>Great job!</strong> You identified most damage with good accuracy. Review any missed spots.';
+      feedbackMsg.innerHTML = ' <strong>Great job!</strong> You identified most damage with good accuracy. Review any missed spots.';
     } else if (completionRate >= 60 && overallAccuracy >= 60) {
-      feedbackMsg.innerHTML = '👍 <strong>Good effort!</strong> Review the images again to improve precision and coverage.';
+      feedbackMsg.innerHTML = ' <strong>Good effort!</strong> Review the images again to improve precision and coverage.';
     } else {
-      feedbackMsg.innerHTML = '📚 <strong>Keep practicing!</strong> Review the damage types and practice identifying key patterns.';
+      feedbackMsg.innerHTML = ' <strong>Keep practicing!</strong> Review the damage types and practice identifying key patterns.';
     }
   }
 
@@ -9131,19 +8754,19 @@ function restartQuiz(quizState) {
 function updateAgnesLiveUI() {
   const connectionDot = document.getElementById('agnes-connection-dot');
   if (connectionDot) {
-    connectionDot.style.backgroundColor = agnesLiveState.isConnected ? '#4ade80' : '#ef4444';
+    connectionDot.style.backgroundColor = agnesLiveState.isConnected ? "var(--hover-bg)" : "var(--hover-bg)";
     connectionDot.classList.toggle('connected', agnesLiveState.isConnected);
   }
 
   const muteBtn = document.getElementById('agnes-mute-btn');
   if (muteBtn) {
-    muteBtn.innerHTML = agnesLiveState.isMuted ? '🔇 Unmute' : '🎤 Mute';
+    muteBtn.innerHTML = agnesLiveState.isMuted ? ' Unmute' : ' Mute';
     muteBtn.classList.toggle('muted', agnesLiveState.isMuted);
   }
 
   const videoBtn = document.getElementById('agnes-video-btn');
   if (videoBtn) {
-    videoBtn.innerHTML = agnesLiveState.isVideoEnabled ? '📹 Hide Video' : '📹 Show Video';
+    videoBtn.innerHTML = agnesLiveState.isVideoEnabled ? ' Hide Video' : ' Show Video';
   }
 
   const statusText = document.getElementById('agnes-status-text');
@@ -9231,7 +8854,7 @@ function analyzeVoiceTranscript() {
   if (scoreEl) {
     const score = Math.round((coveredCount / keyPoints.length) * 100);
     scoreEl.textContent = `${score}%`;
-    scoreEl.style.color = score >= 80 ? '#22c55e' : score >= 50 ? '#eab308' : '#ef4444';
+    scoreEl.style.color = score >= 80 ? "var(--text-primary)" : score >= 50 ? "var(--text-primary)" : "var(--text-primary)";
   }
 
   // Tone analysis
@@ -9245,11 +8868,11 @@ function analyzeVoiceTranscript() {
     if (wordCount < 20) {
       toneAnalysis = 'Keep going! Add more detail to your pitch.';
     } else if (hasQuestions > 2) {
-      toneAnalysis = '👍 Good use of questions to engage the homeowner.';
+      toneAnalysis = ' Good use of questions to engage the homeowner.';
     } else if (hasExclamations > 1) {
-      toneAnalysis = '⚡ Enthusiastic tone detected - keep the energy!';
+      toneAnalysis = ' Enthusiastic tone detected - keep the energy!';
     } else {
-      toneAnalysis = '📢 Try varying your tone and asking questions.';
+      toneAnalysis = ' Try varying your tone and asking questions.';
     }
     toneEl.textContent = toneAnalysis;
   }
@@ -9542,7 +9165,7 @@ async function initAgnesLiveSession() {
       console.warn('Could not fetch ephemeral token:', tokenErr);
     }
 
-    // Live API requires an ephemeral token in the browser — no key fallback.
+    // Live API requires an ephemeral token in the browser ,  no key fallback.
     const apiKey = tokenData?.token;
     if (!apiKey) {
       showAgnesError('AI connection not available. Please check server configuration.');
@@ -9711,7 +9334,7 @@ async function handleAgnesMessage(message: any) {
     }
 
     // Check for door slam
-    if (textContent.toLowerCase().includes('door slam') || textContent.includes('🚪💥')) {
+    if (isRoleplayDoorSlam(textContent)) {
       handleAgnesDoorSlam();
     }
 
@@ -9751,13 +9374,13 @@ function handleAgnesInitError(err: any) {
 
   let errorMsg = 'Failed to initialize Agnes session.';
   if (err.name === 'NotAllowedError') {
-    errorMsg = '🎤 Microphone/Camera access denied. Please enable permissions.';
+    errorMsg = ' Microphone/Camera access denied. Please enable permissions.';
   } else if (err.name === 'NotFoundError') {
-    errorMsg = '🎤 No microphone or camera detected.';
+    errorMsg = ' No microphone or camera detected.';
   } else if (err.name === 'NotReadableError') {
-    errorMsg = '🎥 Camera/mic is being used by another app.';
+    errorMsg = ' Camera/mic is being used by another app.';
   } else if (err.message?.includes('API')) {
-    errorMsg = '🌐 AI connection failed. Check your API key.';
+    errorMsg = ' AI connection failed. Check your API key.';
   }
 
   showAgnesError(errorMsg);
@@ -9832,6 +9455,7 @@ async function endAgnesSession(saveSession: boolean = true) {
     // Show success modal
     showAgnesSessionComplete(xpEarned, xpResult, streakResult);
   } else if (saveSession && agnesLiveState.currentScore === null) {
+    announceTrainingStatus('Practice ended without a score. Your completion is saved; try another session for scored feedback.', true);
     // Score never arrived (timeout) - still mark roleplay as completed
     markRoleplayCompleted('role-play');
     completeModule('role-play');
@@ -9866,13 +9490,9 @@ function showAgnesSessionComplete(xpEarned: number, xpResult: any, streakResult:
   const content = modal.querySelector('.modal-content');
   if (content) {
     content.innerHTML = `
-      <h2>🎉 Session Complete!</h2>
+      <h2> Session Complete!</h2>
       <div class="session-stats">
         <div class="stat"><span class="label">Score:</span> <span class="value">${agnesLiveState.currentScore}/100</span></div>
-        <div class="stat"><span class="label">XP Earned:</span> <span class="value">+${xpEarned} XP</span></div>
-        <div class="stat"><span class="label">Streak:</span> <span class="value">${streakResult.newStreak} days 🔥</span></div>
-        ${xpResult.leveledUp ? `<div class="level-up">🎊 Level Up! Now Level ${xpResult.newLevel}!</div>` : ''}
-        ${xpResult.newUnlocks.length > 0 ? `<div class="unlocks">${xpResult.newUnlocks.join('<br>')}</div>` : ''}
       </div>
       <button onclick="document.getElementById('agnes-success-modal').style.display='none'; showAgnesScreen('agnes-mode-selector');" class="btn-primary">Continue</button>
     `;
@@ -9941,11 +9561,11 @@ function renderAgnesDifficultyCards() {
   const progress = getAgnesUserProgress();
 
   const difficulties = [
-    { id: 'BEGINNER', name: 'Beginner', icon: '🌱', color: '#22d3ee', desc: 'The Eager Learner' },
-    { id: 'ROOKIE', name: 'Rookie', icon: '🏡', color: '#4ade80', desc: 'The Friendly Neighbor' },
-    { id: 'PRO', name: 'Pro', icon: '👨‍👩‍👧', color: '#facc15', desc: 'The Busy Parent' },
-    { id: 'ELITE', name: 'Elite', icon: '😠', color: '#ef4444', desc: 'The Skeptic' },
-    { id: 'NIGHTMARE', name: 'Nightmare', icon: '⚖️', color: '#f97316', desc: 'The Lawyer' }
+    { id: 'BEGINNER', name: 'Beginner', icon: '', color: 'var(--text-primary)', desc: 'The Eager Learner' },
+    { id: 'ROOKIE', name: 'Rookie', icon: '', color: 'var(--text-primary)', desc: 'The Friendly Neighbor' },
+    { id: 'PRO', name: 'Pro', icon: '', color: 'var(--text-primary)', desc: 'The Busy Parent' },
+    { id: 'ELITE', name: 'Elite', icon: '', color: 'var(--text-primary)', desc: 'The Skeptic' },
+    { id: 'NIGHTMARE', name: 'Nightmare', icon: '', color: 'var(--text-primary)', desc: 'The Lawyer' }
   ];
 
   container.innerHTML = difficulties.map(d => {
@@ -9956,12 +9576,11 @@ function renderAgnesDifficultyCards() {
       <button class="difficulty-card ${unlocked ? '' : 'locked'}"
               data-difficulty="${d.id}"
               ${unlocked ? '' : 'disabled'}
-              style="border-color: ${unlocked ? d.color : '#666'}">
+              style="border-color: ${unlocked ? d.color : 'var(--text-primary)'}">
         <div class="difficulty-icon" style="color: ${d.color}">${d.icon}</div>
         <div class="difficulty-name">${d.name}</div>
         <div class="difficulty-desc">${d.desc}</div>
-        <div class="difficulty-multiplier">${config.multiplier}x XP</div>
-        ${!unlocked ? `<div class="unlock-req">🔒 Level ${config.unlockLevel}</div>` : ''}
+        ${!unlocked ? `<div class="unlock-req">Available after more practice</div>` : ''}
       </button>
     `;
   }).join('');
@@ -9977,7 +9596,7 @@ function renderAgnesDifficultyCards() {
         agnesSessionConfig.currentScenarioIndex = randomIndex;
       }
 
-      console.log(`🎯 Starting ${agnesSessionConfig.trainingType} mode (${agnesSessionConfig.inputMode}) with difficulty ${agnesLiveState.difficulty}`);
+      console.log(` Starting ${agnesSessionConfig.trainingType} mode (${agnesSessionConfig.inputMode}) with difficulty ${agnesLiveState.difficulty}`);
 
       // Start the appropriate mode
       if (agnesSessionConfig.inputMode === 'voice') {
@@ -9992,31 +9611,10 @@ function renderAgnesDifficultyCards() {
   });
 
   // Render XP bar
-  renderAgnesXPBar();
 }
 
 // Render XP progress bar
-function renderAgnesXPBar() {
-  const container = document.getElementById('agnes-xp-bar');
-  if (!container) return;
 
-  const progress = getAgnesUserProgress();
-  const currentLevelXP = getXPForLevel(progress.currentLevel);
-  const nextLevelXP = getXPForLevel(progress.currentLevel + 1);
-  const xpInLevel = progress.totalXP - currentLevelXP;
-  const xpNeeded = nextLevelXP - currentLevelXP;
-  const percentage = Math.round((xpInLevel / xpNeeded) * 100);
-
-  container.innerHTML = `
-    <div class="xp-bar-container">
-      <div class="xp-bar-fill" style="width: ${percentage}%"></div>
-    </div>
-    <div class="xp-label">
-      <span>Level ${progress.currentLevel}</span>
-      <span>${xpInLevel} / ${xpNeeded} XP</span>
-    </div>
-  `;
-}
 
 // Module to categories mapping (Module 8 only)
 const moduleToCategories: Record<string, string[]> = {
@@ -10054,24 +9652,33 @@ function getRandomScenarioFromModule(moduleId: string): any {
 
 // Initialize Agnes-21 Live Role-Play (NEW ENTRY POINT)
 function initAgnesLiveRolePlay() {
-  console.log('🎙️ Initializing Agnes-21 Live Role-Play System...');
+  console.log(' Initializing Agnes-21 Live Role-Play System...');
 
+  // Prepare one scenario before requesting microphone access, and use that same
+  // scenario for the session. No surprise prompt after the call starts.
+  agnesSessionConfig.selectedScenarios = getScenariosForModule('8');
+  agnesSessionConfig.currentScenarioIndex = Math.floor(Math.random() * Math.max(1, agnesSessionConfig.selectedScenarios.length));
+  const previewScenario = agnesSessionConfig.selectedScenarios[agnesSessionConfig.currentScenarioIndex];
+  const previewPrompt = document.getElementById('roleplay-scenario-prompt');
+  if (previewPrompt) previewPrompt.textContent = previewScenario?.prompt || 'Practice the inspection conversation with a homeowner.';
+  const previewPoints = document.getElementById('roleplay-scenario-points');
+  for (const point of previewScenario?.expectedKeyPoints || []) {
+    const item = document.createElement('li');
+    item.textContent = point;
+    previewPoints?.append(item);
+  }
   // Live role-play button (Module 8 only, voice only)
   const roleplayBtn = document.getElementById('agnes-roleplay-btn');
   roleplayBtn?.addEventListener('click', () => {
     agnesSessionConfig.trainingType = 'roleplay';
     agnesSessionConfig.inputMode = 'voice';
     agnesSessionConfig.selectedModule = '8';
-    agnesSessionConfig.selectedScenarios = getScenariosForModule('8');
 
     // Default to beginner difficulty and start live session
     agnesLiveState.difficulty = 'BEGINNER';
     agnesLiveState.inputMode = 'voice';
 
-    if (agnesSessionConfig.selectedScenarios.length > 0) {
-      const randomIndex = Math.floor(Math.random() * agnesSessionConfig.selectedScenarios.length);
-      agnesSessionConfig.currentScenarioIndex = randomIndex;
-    }
+
 
     showAgnesScreen('agnes-voice-ui');
     initAgnesLiveSession();
@@ -10117,14 +9724,14 @@ function initAgnesLiveRolePlay() {
 
             // If we received a score, end the session
             if (agnesLiveState.currentScore !== null) {
-              console.log('✅ Score received, ending session');
+              console.log(' Score received, ending session');
               endAgnesSession(true);
               return;
             }
 
             // If max timeout reached, end anyway (AI might not have responded)
             if (elapsed >= MAX_WAIT_MS) {
-              console.warn('⚠️ Max wait time reached without score, ending session');
+              console.warn(' Max wait time reached without score, ending session');
               endAgnesSession(true);
               return;
             }
@@ -10165,28 +9772,28 @@ function initAgnesLiveRolePlay() {
           if (d === difficulty) {
             // Make active
             if (d === 'easy') {
-              (b as HTMLElement).style.background = '#10b981';
-              (b as HTMLElement).style.color = 'white';
+              (b as HTMLElement).style.background = "var(--hover-bg)";
+              (b as HTMLElement).style.color = "var(--text-primary)";
             } else if (d === 'medium') {
-              (b as HTMLElement).style.background = '#f59e0b';
-              (b as HTMLElement).style.color = 'white';
+              (b as HTMLElement).style.background = "var(--hover-bg)";
+              (b as HTMLElement).style.color = "var(--text-primary)";
             } else if (d === 'hard') {
-              (b as HTMLElement).style.background = '#ef4444';
-              (b as HTMLElement).style.color = 'white';
+              (b as HTMLElement).style.background = "var(--hover-bg)";
+              (b as HTMLElement).style.color = "var(--text-primary)";
             }
             b.classList.add('active');
           } else {
             // Make inactive
             const dOther = (b as HTMLElement).dataset.difficulty;
             if (dOther === 'easy') {
-              (b as HTMLElement).style.background = 'white';
-              (b as HTMLElement).style.color = '#10b981';
+              (b as HTMLElement).style.background = "var(--hover-bg)";
+              (b as HTMLElement).style.color = "var(--text-primary)";
             } else if (dOther === 'medium') {
-              (b as HTMLElement).style.background = 'white';
-              (b as HTMLElement).style.color = '#f59e0b';
+              (b as HTMLElement).style.background = "var(--hover-bg)";
+              (b as HTMLElement).style.color = "var(--text-primary)";
             } else if (dOther === 'hard') {
-              (b as HTMLElement).style.background = 'white';
-              (b as HTMLElement).style.color = '#ef4444';
+              (b as HTMLElement).style.background = "var(--hover-bg)";
+              (b as HTMLElement).style.color = "var(--text-primary)";
             }
             b.classList.remove('active');
           }
@@ -10199,7 +9806,7 @@ function initAgnesLiveRolePlay() {
           'hard': 'ELITE'
         };
         agnesLiveState.difficulty = difficultyMap[difficulty] || 'BEGINNER';
-        console.log(`🎚️ Difficulty changed to: ${difficulty} (${agnesLiveState.difficulty})`);
+        console.log(` Difficulty changed to: ${difficulty} (${agnesLiveState.difficulty})`);
       });
     });
   }
@@ -10207,12 +9814,12 @@ function initAgnesLiveRolePlay() {
 
   // Show mode selector
   showAgnesScreen('agnes-mode-selector');
-  console.log('✅ Agnes-21 Live Role-Play System initialized');
+  console.log(' Agnes-21 Live Role-Play System initialized');
 }
 
 // --- New Simplified Text Mode Entry Point ---
 function initRolePlayWithScenarios(scenarios: any[], trainingType: 'roleplay' | 'walkthrough') {
-  console.log(`🎭 Starting ${trainingType} with ${scenarios.length} scenarios...`);
+  console.log(` Starting ${trainingType} with ${scenarios.length} scenarios...`);
 
   if (!scenarios || scenarios.length === 0) {
     alert('No scenarios available for this module. Please try another.');
@@ -10249,17 +9856,17 @@ function initRolePlayWithScenarios(scenarios: any[], trainingType: 'roleplay' | 
 
 // --- Agnes 21 Role-Play System (TEXT MODE - Original) ---
 function initRolePlay() {
-  console.log('🎭 Initializing Agnes Text Role-Play System...');
+  console.log(' Initializing Agnes Text Role-Play System...');
 
   // Verify that agnes-scenarios.js loaded successfully
   if (typeof getAllAgnesScenarios !== 'function') {
-    console.error('❌ Agnes scenarios not loaded. Check that agnes-scenarios.js is included before index.tsx');
+    console.error(' Agnes scenarios not loaded. Check that agnes-scenarios.js is included before index.tsx');
     alert('Error: Agnes scenario data not loaded. Please check browser console.');
     return;
   }
 
   if (typeof scoreResponse !== 'function') {
-    console.error('❌ scoreResponse function not found. Check agnes-scenarios.js');
+    console.error(' scoreResponse function not found. Check agnes-scenarios.js');
     alert('Error: Scoring function not available. Please check browser console.');
     return;
   }
@@ -10322,7 +9929,7 @@ function initRolePlay() {
   (window as any).showAgnesTextScreen = showScreen;
 
   function showRoleSelection() {
-    console.log('📋 Showing role selection');
+    console.log(' Showing role selection');
     showScreen('roleplay-setup');
     sessionState.selectedRole = null;
     sessionState.scenarios = [];
@@ -10657,8 +10264,8 @@ Response (plain text only, no JSON):`;
 
     if (scoreCircle) {
       scoreCircle.textContent = String(scoreResult.score);
-      scoreCircle.style.borderColor = scoreResult.score >= 85 ? '#4caf50' : scoreResult.score >= 70 ? '#ff9800' : '#f44336';
-      scoreCircle.style.color = scoreResult.score >= 85 ? '#4caf50' : scoreResult.score >= 70 ? '#ff9800' : '#f44336';
+      scoreCircle.style.borderColor = scoreResult.score >= 85 ? "var(--border-color)" : scoreResult.score >= 70 ? "var(--border-color)" : "var(--border-color)";
+      scoreCircle.style.color = scoreResult.score >= 85 ? "var(--text-primary)" : scoreResult.score >= 70 ? "var(--text-primary)" : "var(--text-primary)";
     }
 
     if (scoreText) {
@@ -10667,13 +10274,13 @@ Response (plain text only, no JSON):`;
 
     if (matchedList) {
       matchedList.innerHTML = scoreResult.matchedPoints.length > 0
-        ? scoreResult.matchedPoints.map((p: string) => `<li style="margin-bottom: 8px;"><span style="color: #4caf50; margin-right: 8px;">✓</span>${p}</li>`).join('')
+        ? scoreResult.matchedPoints.map((p: string) => `<li style="margin-bottom: 8px;"><span style="color: var(--text-primary); margin-right: 8px;">✓</span>${p}</li>`).join('')
         : '<li>No key points matched</li>';
     }
 
     if (missedList) {
       missedList.innerHTML = scoreResult.missedPoints.length > 0
-        ? scoreResult.missedPoints.map((p: string) => `<li style="margin-bottom: 8px;"><span style="color: #ff9800; margin-right: 8px;">✗</span>${p}</li>`).join('')
+        ? scoreResult.missedPoints.map((p: string) => `<li style="margin-bottom: 8px;"><span style="color: var(--text-primary); margin-right: 8px;">✗</span>${p}</li>`).join('')
         : '<li>All key points covered!</li>';
     }
 
@@ -10716,27 +10323,27 @@ Response (plain text only, no JSON):`;
     const passedCount = scores.filter(s => s >= 70).length;
 
     summaryContainer.innerHTML = `
-      <h2 style="text-align: center; color: #8b4fbe; margin-bottom: 30px;">🎉 Session Complete!</h2>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
-        <div style="background: #f8f4fc; padding: 20px; border-radius: 8px; text-align: center;">
-          <div style="font-size: 36px; font-weight: bold; color: #8b4fbe;">${sessionState.scores.length}</div>
-          <div style="color: #666;">Scenarios Completed</div>
+      <h2 style="text-align: center; color: var(--text-primary); margin-bottom: 30px;"> Session Complete!</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 20px; margin-bottom: 30px;">
+        <div style="background: var(--surface-color); padding: 20px; border-radius: var(--border-radius); text-align: center;">
+          <div style="font-size: 36px; font-weight: bold; color: var(--text-primary);">${sessionState.scores.length}</div>
+          <div style="color: var(--text-primary);">Scenarios Completed</div>
         </div>
-        <div style="background: #f8f4fc; padding: 20px; border-radius: 8px; text-align: center;">
-          <div style="font-size: 36px; font-weight: bold; color: #8b4fbe;">${avgScore}</div>
-          <div style="color: #666;">Average Score</div>
+        <div style="background: var(--surface-color); padding: 20px; border-radius: var(--border-radius); text-align: center;">
+          <div style="font-size: 36px; font-weight: bold; color: var(--text-primary);">${avgScore}</div>
+          <div style="color: var(--text-primary);">Average Score</div>
         </div>
-        <div style="background: #f8f4fc; padding: 20px; border-radius: 8px; text-align: center;">
-          <div style="font-size: 36px; font-weight: bold; color: #8b4fbe;">${highScore}</div>
-          <div style="color: #666;">Highest Score</div>
+        <div style="background: var(--surface-color); padding: 20px; border-radius: var(--border-radius); text-align: center;">
+          <div style="font-size: 36px; font-weight: bold; color: var(--text-primary);">${highScore}</div>
+          <div style="color: var(--text-primary);">Highest Score</div>
         </div>
-        <div style="background: #f8f4fc; padding: 20px; border-radius: 8px; text-align: center;">
-          <div style="font-size: 36px; font-weight: bold; color: #8b4fbe;">${passedCount}/${sessionState.scores.length}</div>
-          <div style="color: #666;">Passed</div>
+        <div style="background: var(--surface-color); padding: 20px; border-radius: var(--border-radius); text-align: center;">
+          <div style="font-size: 36px; font-weight: bold; color: var(--text-primary);">${passedCount}/${sessionState.scores.length}</div>
+          <div style="color: var(--text-primary);">Passed</div>
         </div>
       </div>
       <div style="text-align: center;">
-        <button id="start-new-session-btn" style="padding: 15px 40px; background: #8b4fbe; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: 500; cursor: pointer;">Start New Session</button>
+        <button id="start-new-session-btn" style="padding: 15px 40px; background: var(--surface-color); color: var(--text-primary); border: none; border-radius: var(--border-radius); font-size: 16px; font-weight: 500; cursor: pointer;">Start New Session</button>
       </div>
     `;
 
@@ -10841,7 +10448,7 @@ Provide a JSON response with these exact fields:
 
     // Show loading state
     if (loadingEl) {
-      loadingEl.innerHTML = '<strong>💡 Generating AI hint...</strong>';
+      loadingEl.innerHTML = '<strong> Generating AI hint...</strong>';
       loadingEl.style.display = 'block';
     }
 
@@ -10854,7 +10461,7 @@ Provide a JSON response with these exact fields:
       if (!hint) {
         // Basic fallback
         if (loadingEl) {
-          loadingEl.innerHTML = `<strong>💡 Tip:</strong> ${scenario.followUps?.[0] || 'Address their concern, then offer two time options.'}`;
+          loadingEl.innerHTML = `<strong> Tip:</strong> ${scenario.followUps?.[0] || 'Address their concern, then offer two time options.'}`;
           loadingEl.style.display = 'block';
           setTimeout(() => { loadingEl.style.display = 'none'; }, 10000);
         }
@@ -10877,7 +10484,7 @@ Provide a JSON response with these exact fields:
       } else {
         // Fallback to simple hint display
         if (loadingEl) {
-          loadingEl.innerHTML = `<strong>💡 Try saying:</strong> "${hint.suggestedResponse}"<br><br><strong>Key points:</strong> ${hint.keyPointsToInclude.join(', ')}<br><br><em>Tip: ${hint.toneGuidance}</em>`;
+          loadingEl.innerHTML = `<strong> Try saying:</strong> "${hint.suggestedResponse}"<br><br><strong>Key points:</strong> ${hint.keyPointsToInclude.join(', ')}<br><br><em>Tip: ${hint.toneGuidance}</em>`;
           loadingEl.style.display = 'block';
           setTimeout(() => { loadingEl.style.display = 'none'; }, 15000);
         }
@@ -10889,7 +10496,7 @@ Provide a JSON response with these exact fields:
       // Fall back to basic hint
       const basicHint = scenario.followUps?.[0] || 'Try addressing their main concern directly.';
       if (loadingEl) {
-        loadingEl.innerHTML = `<strong>💡 Hint:</strong> ${basicHint}`;
+        loadingEl.innerHTML = `<strong> Hint:</strong> ${basicHint}`;
         loadingEl.style.display = 'block';
         setTimeout(() => { loadingEl.style.display = 'none'; }, 10000);
       }
@@ -10913,7 +10520,7 @@ Provide a JSON response with these exact fields:
     if (!container) return;
 
     if (scenarios.length === 0) {
-      container.innerHTML = '<p style="text-align: center; color: #666;">No scenarios found for this category.</p>';
+      container.innerHTML = '<p style="text-align: center; color: var(--text-primary);">No scenarios found for this category.</p>';
       showScreen('scenario-list');
       return;
     }
@@ -10921,18 +10528,18 @@ Provide a JSON response with these exact fields:
     // Render scenario cards
     container.innerHTML = scenarios.map((scenario: any, index: number) => {
       const roleColors: Record<string, string> = {
-        'homeowner': '#8b4fbe',
-        'rep': '#2563eb',
-        'adjuster': '#059669'
+        'homeowner': 'var(--text-primary)',
+        'rep': 'var(--text-primary)',
+        'adjuster': 'var(--text-primary)'
       };
-      const roleColor = roleColors[scenario.role] || '#666';
+      const roleColor = roleColors[scenario.role] || 'var(--text-primary)';
 
       return `
         <div class="scenario-card" data-scenario-index="${index}" style="
           padding: 20px;
-          border: 2px solid #e5e7eb;
-          border-radius: 12px;
-          background: white;
+          border: 2px solid var(--border-color);
+          border-radius: var(--border-radius);
+          background: var(--surface-color);
           cursor: pointer;
           transition: all 0.3s;
           position: relative;
@@ -10942,15 +10549,15 @@ Provide a JSON response with these exact fields:
             top: 10px;
             right: 10px;
             background: ${roleColor};
-            color: white;
+            color: var(--text-primary);
             padding: 4px 10px;
-            border-radius: 20px;
+            border-radius: var(--border-radius);
             font-size: 12px;
             font-weight: 600;
             text-transform: capitalize;
           ">${scenario.role}</div>
-          <h3 style="margin: 0 0 10px 0; font-size: 16px; color: #1f2937; padding-right: 80px;">${scenario.id || `Scenario ${index + 1}`}</h3>
-          <p style="margin: 0; font-size: 14px; color: #6b7280; line-height: 1.5;">${scenario.prompt.substring(0, 100)}${scenario.prompt.length > 100 ? '...' : ''}</p>
+          <h3 style="margin: 0 0 10px 0; font-size: 16px; color: var(--text-primary); padding-right: 80px;">${scenario.id || `Scenario ${index + 1}`}</h3>
+          <p style="margin: 0; font-size: 14px; color: var(--text-primary); line-height: 1.5;">${scenario.prompt.substring(0, 100)}${scenario.prompt.length > 100 ? '...' : ''}</p>
         </div>
       `;
     }).join('');
@@ -10968,12 +10575,12 @@ Provide a JSON response with these exact fields:
 
       // Hover effects
       card.addEventListener('mouseenter', () => {
-        (card as HTMLElement).style.borderColor = '#8b4fbe';
+        (card as HTMLElement).style.borderColor = "var(--border-color)";
         (card as HTMLElement).style.transform = 'translateY(-2px)';
         (card as HTMLElement).style.boxShadow = '0 4px 12px rgba(139, 79, 190, 0.15)';
       });
       card.addEventListener('mouseleave', () => {
-        (card as HTMLElement).style.borderColor = '#e5e7eb';
+        (card as HTMLElement).style.borderColor = "var(--border-color)";
         (card as HTMLElement).style.transform = 'translateY(0)';
         (card as HTMLElement).style.boxShadow = 'none';
       });
@@ -11082,7 +10689,7 @@ Provide a JSON response with these exact fields:
         sessionState.selectedPersonality = personality;
         sessionState.difficulty = difficulty;
 
-        console.log(`✨ Selected personality: ${personality} (difficulty: ${difficulty})`);
+        console.log(` Selected personality: ${personality} (difficulty: ${difficulty})`);
 
         try {
           // Use already-loaded scenarios if available (from category/module selection)
@@ -11160,9 +10767,9 @@ Provide a JSON response with these exact fields:
 
     // Start with category selector (new default)
     showScreen('category-selector');
-    console.log('✅ Agnes Role-Play System initialized successfully');
+    console.log(' Agnes Role-Play System initialized successfully');
   } catch (error) {
-    console.error('❌ Error initializing Agnes system:', error);
+    console.error(' Error initializing Agnes system:', error);
     throw error;
   }
 }
@@ -11183,7 +10790,7 @@ async function generateQuiz() {
 
   try {
     if (!ai) {
-      quizArea.innerHTML = '<p style="color: red;">Quiz is unavailable: AI is not configured on the server.</p>';
+      quizArea.innerHTML = '<p style="color: var(--text-primary);">Quiz is unavailable: AI is not configured on the server.</p>';
       return;
     }
      const trainingSummary = Object.values(trainingContent).join(' '); // Use all content
@@ -11215,7 +10822,7 @@ async function generateQuiz() {
     renderQuiz(quizData);
   } catch (error) {
     console.error("Quiz generation failed:", error);
-    quizArea.innerHTML = '<p style="color: red;">Sorry, there was an error generating the quiz. Please try again.</p>';
+    quizArea.innerHTML = '<p style="color: var(--text-primary);">Sorry, there was an error generating the quiz. Please try again.</p>';
   }
 }
 
@@ -11227,7 +10834,7 @@ function renderQuiz(quizData: QuizQuestion[]) {
     <div class="quiz-item" data-question-index="${index}">
       <p class="quiz-question">${index + 1}. ${q.question}</p>
       <ul class="quiz-options">
-        ${q.options.map(option => `<li data-option="${option.replace(/"/g, '&quot;')}">${option}</li>`).join('')}
+        ${q.options.map(option => `<li data-option="${option.replace(/"/g, '&quot;')}"><button type="button" class="training-choice-button">${option}</button></li>`).join('')}
       </ul>
       <div id="quiz-feedback-${index}" class="quiz-feedback"></div>
     </div>
@@ -11269,14 +10876,12 @@ const cmsContentCache: Record<string, string> = {};
 
 async function fetchCMSContent(moduleName: string): Promise<string | null> {
   // Skip CMS fetch for non-training pages (use hardcoded content only)
-  if (moduleName === 'my-page' || moduleName === 'admin-dashboard') {
+  if (moduleName === 'my-page' || moduleName === 'admin-dashboard' || moduleName === 'field-library') {
     return null;
   }
 
   // Check cache first
-  if (cmsContentCache[moduleName]) {
-    return cmsContentCache[moduleName];
-  }
+  // Always revalidate published content when opening a lesson.
 
   try {
     const response = await fetch(`/api/content/modules/${moduleName}`);
@@ -11293,7 +10898,9 @@ async function fetchCMSContent(moduleName: string): Promise<string | null> {
   return null;
 }
 
+let moduleRenderSequence = 0;
 async function renderModule(moduleName: string) {
+  const renderSequence = ++moduleRenderSequence;
   if (!mainContent) return;
 
   // Don't render modules when in admin mode - admin has its own UI
@@ -11308,15 +10915,24 @@ async function renderModule(moduleName: string) {
   // Show loading state
   mainContent.innerHTML = '<div class="module-loading"><div class="loading-spinner"></div><p>Loading content...</p></div>';
 
+  if (moduleName === 'field-library') {
+    renderFieldLibrary(mainContent);
+    injectThemeToggle();
+    enhanceTrainingContent(mainContent, moduleName, 'Field library');
+    return;
+  }
+
   // Try to fetch from CMS first, fall back to hardcoded content
   let content = await fetchCMSContent(moduleName);
+  if (renderSequence !== moduleRenderSequence) return;
   if (!content) {
     content = trainingContent[moduleName] || '<div>Content not found.</div>';
   }
   mainContent.innerHTML = content;
 
-  // Inject theme toggle into the content area
+  // Refresh the reading interface after replacing lesson content.
   injectThemeToggle();
+  enhanceTrainingContent(mainContent, moduleName, getModuleDisplayName(moduleName));
 
   // Cancel any ongoing TTS when changing modules
   stopAllTTS();
@@ -11327,7 +10943,7 @@ async function renderModule(moduleName: string) {
   startActivityTracking(moduleName);
 
   // Setup contextual tip system for this module
-  setupScrollObserver(moduleName);
+  // Guidance stays in the lesson; no timed or scroll-triggered interruptions.
 
   // Initialize video players (since inline scripts don't execute with innerHTML)
   initVideoPlayers();
@@ -11341,6 +10957,8 @@ async function renderModule(moduleName: string) {
   switch (moduleName) {
       case 'my-page':
           initMyPage();
+          addPracticeReview(mainContent);
+          void mountCoaching(mainContent, {modules: MODULE_ORDER, title: getModuleDisplayName, navigate: navigateToModule, unlocked: getUnlockedModules});
           break;
       case 'quiz':
           document.getElementById('generateQuizButton')?.addEventListener('click', generateQuiz);
@@ -11352,7 +10970,8 @@ async function renderModule(moduleName: string) {
           initObjectionMatcher();
           break;
       case 'role-play':
-          initAgnesLiveRolePlay();
+          registerModuleCleanup(mountInspectionRoleplay(mainContent, getScenariosForModule('8'), () => { markRoleplayCompleted('role-play'); completeModule('role-play', false); }, () => navigateToModule('inspection-process')));
+          injectThemeToggle();
           break;
       case 'welcome':
           initQuickQuiz1();
@@ -11400,16 +11019,18 @@ async function renderModule(moduleName: string) {
             const btn = document.querySelector(`[data-script-id="${scriptId}"] .practice-btn`);
             if (btn) { btn.textContent = '✓ Practiced!'; btn.classList.add('practiced'); }
             const progressItem = document.querySelector(`.progress-item[data-script="${scriptId}"]`);
-            if (progressItem) { progressItem.classList.add('completed'); const icon = progressItem.querySelector('.progress-icon'); if (icon) icon.textContent = '✅'; }
+            if (progressItem) { progressItem.classList.add('completed'); const icon = progressItem.querySelector('.progress-icon'); if (icon) icon.textContent = ''; }
           });
           updatePracticeProgress();
           break;
   }
+  enhanceLesson(mainContent, moduleName);
+  void enhanceTrainingMedia(mainContent);
 }
 
 function handleNavigation(event: Event) {
-  const target = event.target as HTMLElement;
-  if (target.tagName === 'LI' && target.dataset.module) {
+  const target = (event.target as HTMLElement).closest<HTMLElement>('#sidebar li[data-module]');
+  if (target?.dataset.module) {
     const moduleName = target.dataset.module;
 
     // My Page is always accessible - it's a dashboard, not a training module
@@ -11432,6 +11053,7 @@ function handleNavigation(event: Event) {
 
     sidebar?.querySelectorAll('li').forEach(li => li.classList.remove('active'));
     target.classList.add('active');
+    closeTrainingDrawer();
     renderModule(moduleName);
     localStorage.setItem(STORAGE_KEYS.currentModule, moduleName);
   }
@@ -11477,7 +11099,7 @@ function initManagerModeUI() {
       const adminItem = document.createElement('li');
       adminItem.className = 'admin-sidebar-item unlocked';
       adminItem.dataset.module = 'admin-dashboard';
-      adminItem.innerHTML = '📊 Admin Dashboard';
+      adminItem.innerHTML = ' Admin Dashboard';
       sidebarNav.appendChild(adminItem);
     }
   }
@@ -11522,18 +11144,18 @@ interface ModuleTip extends TipData {
 
 const moduleTips: Record<string, ModuleTip[]> = {
   'welcome': [
-    { id: 'tip-video', trigger: 'scroll', targetSelector: '.video-player-container', icon: '🎬', title: 'Watch the Video', message: 'This video contains important context. Watch it fully to progress!' },
-    { id: 'tip-leaders', trigger: 'scroll', targetSelector: '.leader-grid', icon: '👥', title: 'Meet the Team', message: 'Click "My Bio" on each leader to learn more about them.' },
-    { id: 'tip-values', trigger: 'scroll', targetSelector: '.core-values', icon: '💎', title: 'Core Values', message: 'Remember: Integrity, Quality, Simplicity - you\'ll be tested!' },
-    { id: 'tip-quiz', trigger: 'scroll', targetSelector: '.quiz-section', icon: '📝', title: 'Quick Quiz', message: 'Test your knowledge before completing the module.' },
-    { id: 'tip-linger', trigger: 'linger', delay: 45000, icon: '⏱️', title: 'Take Your Time', message: 'This module takes about 15-20 minutes. No rush!' },
+    { id: 'tip-video', trigger: 'scroll', targetSelector: '.video-player-container', icon: '', title: 'Watch the Video', message: 'This video contains important context. Watch it fully to progress!' },
+    { id: 'tip-leaders', trigger: 'scroll', targetSelector: '.leader-grid', icon: '', title: 'Meet the Team', message: 'Click "My Bio" on each leader to learn more about them.' },
+    { id: 'tip-values', trigger: 'scroll', targetSelector: '.core-values', icon: '', title: 'Core Values', message: 'Remember: Integrity, Quality, Simplicity - you\'ll be tested!' },
+    { id: 'tip-quiz', trigger: 'scroll', targetSelector: '.quiz-section', icon: '', title: 'Quick Quiz', message: 'Test your knowledge before completing the module.' },
+    { id: 'tip-linger', trigger: 'linger', delay: 45000, icon: '', title: 'Take Your Time', message: 'This module takes about 15-20 minutes. No rush!' },
   ],
   'commitment': [
-    { id: 'tip-commitment-linger', trigger: 'linger', delay: 60000, icon: '💡', title: 'Still Here?', message: 'Take your time understanding the commitment expectations.' },
+    { id: 'tip-commitment-linger', trigger: 'linger', delay: 60000, icon: '', title: 'Still Here?', message: 'Take your time understanding the commitment expectations.' },
   ],
   'general-knowledge': [
-    { id: 'tip-gk-video', trigger: 'scroll', targetSelector: '.video-player-container', icon: '🎬', title: 'Educational Video', message: 'Learn the fundamentals of roofing in this video.' },
-    { id: 'tip-gk-linger', trigger: 'linger', delay: 60000, icon: '📚', title: 'Lots to Learn!', message: 'This module has important technical info. Take notes!' },
+    { id: 'tip-gk-video', trigger: 'scroll', targetSelector: '.video-player-container', icon: '', title: 'Educational Video', message: 'Learn the fundamentals of roofing in this video.' },
+    { id: 'tip-gk-linger', trigger: 'linger', delay: 60000, icon: '', title: 'Lots to Learn!', message: 'This module has important technical info. Take notes!' },
   ],
 };
 
@@ -11669,7 +11291,7 @@ function cleanupTipObservers(): void {
 }
 
 // Mark module as complete and unlock next
-function completeModule(moduleName: string) {
+function completeModule(moduleName: string, showCompletion = true) {
   unlockNextModule(moduleName);
 
   // Mark as completed in localStorage
@@ -11710,11 +11332,10 @@ function completeModule(moduleName: string) {
   }).catch(() => { /* Offline mode - localStorage already updated */ });
 
   // Trigger confetti celebration
-  triggerConfetti('module');
 
   // Check for new badges
-  checkAndAwardBadges();
 
+  if (!showCompletion) return;
   const currentIndex = MODULE_ORDER.indexOf(moduleName);
   if (currentIndex < MODULE_ORDER.length - 1) {
     const nextModule = MODULE_ORDER[currentIndex + 1];
@@ -11750,48 +11371,14 @@ function getModuleDisplayName(moduleId: string): string {
 }
 
 // Show module complete modal with countdown
-function showModuleCompleteModal(currentModule: string, nextModule: string, nextModuleName: string) {
+function showModuleCompleteModal(moduleName: string, nextModule: string, nextModuleName: string) {
   const modal = document.createElement('div');
   modal.className = 'module-complete-modal';
-  modal.innerHTML = `
-    <div class="module-complete-content">
-      <div class="success-icon">🎉</div>
-      <h2>Module Complete!</h2>
-      <p>Great work finishing <strong>${getModuleDisplayName(currentModule)}</strong></p>
-      <p class="next-module-text">Continuing to <strong>${nextModuleName}</strong> in <span id="countdown">3</span>...</p>
-      <button class="skip-btn" id="go-now-btn">Go Now</button>
-    </div>
-  `;
+  modal.innerHTML = '<div class="module-complete-content"><h2>Lesson complete</h2><p>' + getModuleDisplayName(moduleName) + '</p><p>Up next: ' + nextModuleName + '</p><button type="button" id="go-now-btn">Continue to next lesson</button><button type="button" class="secondary-button" data-close-modal>Stay here</button></div>';
   document.body.appendChild(modal);
-
-  // Add click handler for Go Now button
-  const goNowBtn = document.getElementById('go-now-btn');
-  let intervalCleared = false;
-
-  // Countdown and auto-navigate
-  let count = 3;
-  const interval = setInterval(() => {
-    count--;
-    const countdownEl = document.getElementById('countdown');
-    if (countdownEl) countdownEl.textContent = count.toString();
-    if (count <= 0) {
-      clearInterval(interval);
-      intervalCleared = true;
-      modal.remove();
-      navigateToModule(nextModule);
-    }
-  }, 1000);
-
-  if (goNowBtn) {
-    goNowBtn.onclick = () => {
-      if (!intervalCleared) {
-        clearInterval(interval);
-        intervalCleared = true;
-      }
-      modal.remove();
-      navigateToModule(nextModule);
-    };
-  }
+  modal.querySelector('#go-now-btn')?.addEventListener('click', () => { modal.remove(); navigateToModule(nextModule); });
+  modal.querySelector('[data-close-modal]')?.addEventListener('click', () => modal.remove());
+  announceTrainingStatus('Lesson complete. Choose when to continue.');
 }
 
 // Show training complete modal
@@ -11800,7 +11387,7 @@ function showTrainingCompleteModal() {
   modal.className = 'module-complete-modal';
   modal.innerHTML = `
     <div class="module-complete-content">
-      <div class="success-icon">🏆</div>
+      <div class="success-icon"></div>
       <h2>Training Complete!</h2>
       <p>Congratulations! You've completed all training modules.</p>
       <p class="next-module-text">You're now ready to hit the field!</p>
@@ -11817,6 +11404,13 @@ function showTrainingCompleteModal() {
 
 // Navigate to a specific module
 function navigateToModule(moduleName: string) {
+  if (moduleName === 'field-library') { closeTrainingDrawer(); void renderModule(moduleName); return; }
+  if (moduleName !== 'my-page' && moduleName !== 'admin-dashboard' && !getUnlockedModules().includes(moduleName)) {
+    announceTrainingStatus('Complete the preceding lessons to open this lesson.');
+    return;
+  }
+  if (moduleName === 'admin-dashboard' && !isManagerMode()) return;
+  closeTrainingDrawer();
   const sidebar = document.getElementById('sidebar');
   const targetItem = sidebar?.querySelector(`[data-module="${moduleName}"]`) as HTMLElement;
   if (targetItem) {
@@ -11953,7 +11547,7 @@ function startActivityTracking(moduleName: string) {
   }
 
   // Send heartbeat every 30s, but only credit the interval if the learner was
-  // actually present for it — skip when the tab is hidden or the user is idle.
+  // actually present for it ,  skip when the tab is hidden or the user is idle.
   activityHeartbeatInterval = window.setInterval(() => {
     if (!currentModuleForTracking) return;
 
@@ -11998,7 +11592,7 @@ function showLoginScreen(): void {
     <div class="login-container">
       <div class="login-header">
         <div class="login-logo">
-          <img src="/assets/logo-shield.png" alt="Roof-ER Logo" style="width: 280px; height: auto;">
+          <img src="/assets/logo-shield-560.webp" width="560" height="560" fetchpriority="high" alt="Roof-ER Logo" style="width: 280px; height: auto;">
         </div>
         <p style="margin-top: 15px;">Welcome to the sales training platform</p>
       </div>
@@ -12037,7 +11631,8 @@ function showLoginScreen(): void {
         <div id="login-error" class="login-error" style="display:none;"></div>
       </form>
 
-      <!-- Hidden Super Admin Login Section -->
+      <button type="button" id="open-content-editor-login" aria-expanded="false" aria-controls="admin-login-section">Content editor sign in</button>
+      <!-- Existing Super Admin Login Section -->
       <div id="admin-login-section" class="admin-login-section" style="display:none;">
         <div class="admin-login-divider">
           <span>Super Admin Access</span>
@@ -12078,10 +11673,16 @@ function showLoginScreen(): void {
   `;
 
   document.body.appendChild(loginScreen);
+  loginScreen.querySelector('.login-container')?.prepend(createThemeControl());
 
   // Add form submit handler
   const form = document.getElementById('login-form') as HTMLFormElement;
   form?.addEventListener('submit', handleLoginSubmit);
+
+  document.getElementById('open-content-editor-login')?.addEventListener('click', event => {
+    const section = document.getElementById('admin-login-section');
+    if (section) { const open = section.style.display === 'none'; section.style.display = open ? 'block' : 'none'; (event.currentTarget as HTMLElement).setAttribute('aria-expanded', String(open)); if (open) document.getElementById('admin-username')?.focus(); }
+  });
 
   // Add admin form submit handler
   const adminForm = document.getElementById('admin-login-form') as HTMLFormElement;
@@ -12470,7 +12071,7 @@ async function loadCMSModules(): Promise<void> {
         <p class="sa-empty">No modules in database yet.</p>
         <div class="sa-import-section">
           <button class="sa-action-btn sa-import-btn" id="import-content-btn">
-            <span class="btn-text">📥 Import Existing Training Content</span>
+            <span class="btn-text"> Import Existing Training Content</span>
             <span class="btn-loading" style="display: none;">Importing...</span>
           </button>
           <p class="sa-import-hint">This will import all ${MODULE_ORDER.length} training modules from the app into the CMS database.</p>
@@ -12516,159 +12117,10 @@ async function loadCMSModules(): Promise<void> {
 }
 
 async function openModuleEditor(moduleId: string): Promise<void> {
-  const mainContent = document.getElementById('sa-main-content');
-  if (!mainContent) return;
-
-  const data = await superAdminApiCall<{ module: any; content: any; versions: any[] }>(`/cms/modules/${moduleId}`);
-
-  if (!data) {
-    mainContent.innerHTML = '<div class="sa-error">Failed to load module</div>';
-    return;
-  }
-
-  mainContent.innerHTML = `
-    <div class="sa-editor">
-      <div class="sa-editor-header">
-        <button class="sa-back-btn" id="back-to-modules">&larr; Back to Modules</button>
-        <h1>Editing: ${data.module.title}</h1>
-        <div class="sa-editor-controls">
-          <div class="sa-editor-mode-toggle">
-            <button class="sa-mode-btn active" data-mode="html">HTML</button>
-            <button class="sa-mode-btn" data-mode="visual">Visual</button>
-          </div>
-          <div class="sa-editor-actions">
-            <button class="sa-save-btn" id="save-draft">Save Draft</button>
-            <button class="sa-publish-btn" id="publish-content">Publish</button>
-          </div>
-        </div>
-      </div>
-      <div class="sa-editor-version">
-        <label>Version: </label>
-        <select id="version-select">
-          ${data.versions.map(v => `
-            <option value="${v.version}" ${v.version === data.content?.version ? 'selected' : ''}>
-              v${v.version} (${v.status})
-            </option>
-          `).join('')}
-          <option value="new">+ New Draft</option>
-        </select>
-      </div>
-      <div class="sa-editor-container">
-        <div class="sa-editor-pane">
-          <h3 id="editor-mode-label">HTML Content</h3>
-          <textarea id="html-editor" class="sa-html-editor">${data.content?.htmlContent || ''}</textarea>
-          <div id="visual-editor" class="sa-visual-editor" contenteditable="true" style="display: none;">${data.content?.htmlContent || ''}</div>
-        </div>
-        <div class="sa-preview-pane">
-          <h3>Preview</h3>
-          <div id="preview-content" class="sa-preview-content">${data.content?.htmlContent || ''}</div>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Editor elements
-  const htmlEditor = document.getElementById('html-editor') as HTMLTextAreaElement;
-  const visualEditor = document.getElementById('visual-editor') as HTMLDivElement;
-  const preview = document.getElementById('preview-content');
-  const editorModeLabel = document.getElementById('editor-mode-label');
-  let currentMode: 'html' | 'visual' = 'html';
-
-  // Get current content from active editor
-  const getEditorContent = () => {
-    return currentMode === 'html' ? htmlEditor.value : visualEditor.innerHTML;
-  };
-
-  // Live preview for HTML mode
-  htmlEditor?.addEventListener('input', () => {
-    if (preview) preview.innerHTML = htmlEditor.value;
-  });
-
-  // Live preview for Visual mode
-  visualEditor?.addEventListener('input', () => {
-    if (preview) preview.innerHTML = visualEditor.innerHTML;
-  });
-
-  // Mode toggle buttons
-  document.querySelectorAll('.sa-mode-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const mode = (btn as HTMLElement).dataset.mode as 'html' | 'visual';
-      if (mode === currentMode) return;
-
-      // Update active button
-      document.querySelectorAll('.sa-mode-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-
-      if (mode === 'visual') {
-        // Sync HTML to Visual
-        visualEditor.innerHTML = htmlEditor.value;
-        htmlEditor.style.display = 'none';
-        visualEditor.style.display = 'block';
-        if (editorModeLabel) editorModeLabel.textContent = 'Visual Editor';
-      } else {
-        // Sync Visual to HTML
-        htmlEditor.value = visualEditor.innerHTML;
-        visualEditor.style.display = 'none';
-        htmlEditor.style.display = 'block';
-        if (editorModeLabel) editorModeLabel.textContent = 'HTML Content';
-      }
-
-      // Update preview
-      if (preview) preview.innerHTML = mode === 'visual' ? visualEditor.innerHTML : htmlEditor.value;
-      currentMode = mode;
-    });
-  });
-
-  // Back button
-  document.getElementById('back-to-modules')?.addEventListener('click', () => loadCMSModules());
-
-  // Save draft
-  document.getElementById('save-draft')?.addEventListener('click', async () => {
-    const htmlContent = getEditorContent();
-    const versionSelect = document.getElementById('version-select') as HTMLSelectElement;
-    const isNewVersion = versionSelect.value === 'new';
-
-    let result;
-    if (isNewVersion) {
-      result = await superAdminApiCall(`/cms/modules/${moduleId}/content`, {
-        method: 'POST',
-        body: JSON.stringify({ htmlContent })
-      });
-    } else {
-      result = await superAdminApiCall(`/cms/modules/${moduleId}/content/${versionSelect.value}`, {
-        method: 'PUT',
-        body: JSON.stringify({ htmlContent })
-      });
-    }
-
-    if (result) {
-      alert('Draft saved successfully!');
-      openModuleEditor(moduleId); // Refresh
-    }
-  });
-
-  // Publish
-  document.getElementById('publish-content')?.addEventListener('click', async () => {
-    const versionSelect = document.getElementById('version-select') as HTMLSelectElement;
-    const version = parseInt(versionSelect.value);
-
-    if (isNaN(version)) {
-      alert('Please save as a draft first before publishing');
-      return;
-    }
-
-    if (confirm('Publish this version? It will become visible to all users.')) {
-      const result = await superAdminApiCall(`/cms/modules/${moduleId}/publish`, {
-        method: 'POST',
-        body: JSON.stringify({ version })
-      });
-
-      if (result) {
-        alert('Published successfully!');
-        openModuleEditor(moduleId); // Refresh
-      }
-    }
-  });
+  const root = document.getElementById('sa-main-content');
+  if (!root) return;
+  await mountLessonEditor(root, moduleId, superAdminApiCall, () => { void loadCMSModules(); });
+  delete cmsContentCache[moduleId];
 }
 
 async function loadCMSExamQuestions(): Promise<void> {
@@ -12859,12 +12311,6 @@ function updateUserDisplay(): void {
     userInfo.className = 'user-info user-card-glass';
     sidebarHeader.appendChild(userInfo);
   }
-
-  // Calculate progress percentage (completed modules / total modules)
-  const unlockedModules = getUnlockedModules();
-  const totalModules = MODULE_ORDER.length;
-  const completedCount = unlockedModules.length - 1; // Subtract 1 for initial unlocked modules
-  const progressPct = Math.min(100, Math.round((completedCount / totalModules) * 100));
 
   userInfo.className = 'user-info user-card-glass';
   userInfo.innerHTML = `
@@ -13095,7 +12541,7 @@ function renderUsersTable(users: AdminUser[]): void {
           <tr data-user-id="${user.id}">
             <td class="user-name-cell">
               <strong>${escapeHtml(user.name)}</strong>
-              ${user.isCertified ? '<span class="cert-icon" title="Certified">🏆</span>' : ''}
+              ${user.isCertified ? '<span class="cert-icon" title="Certified"></span>' : ''}
             </td>
             <td>${user.isManager ? '<span class="role-badge manager">Manager</span>' : '<span class="role-badge user">User</span>'}</td>
             <td>
@@ -13104,7 +12550,7 @@ function renderUsersTable(users: AdminUser[]): void {
                 <span class="exam-count">${user.examAttempts}/3 attempts</span>
               </div>
             </td>
-            <td>${user.isCertified ? '✅ Yes' : '❌ No'}</td>
+            <td>${user.isCertified ? ' Yes' : ' No'}</td>
             <td>${user.lastLogin ? formatRelativeDate(user.lastLogin) : 'Never'}</td>
             <td>
               <button class="btn-view-user" data-user-id="${user.id}">View Details</button>
@@ -13188,17 +12634,17 @@ async function showUserDetail(userId: string): Promise<void> {
   // Get status badge
   function getStatusBadge(status: string): string {
     switch (status) {
-      case 'completed': return '<span class="status-badge completed">✅ Done</span>';
-      case 'in_progress': return '<span class="status-badge in-progress">🟡 Active</span>';
-      case 'unlocked': return '<span class="status-badge unlocked">🔓 Ready</span>';
-      default: return '<span class="status-badge locked">⬜ Locked</span>';
+      case 'completed': return '<span class="status-badge completed"> Done</span>';
+      case 'in_progress': return '<span class="status-badge in-progress"> Active</span>';
+      case 'unlocked': return '<span class="status-badge unlocked"> Ready</span>';
+      default: return '<span class="status-badge locked"> Locked</span>';
     }
   }
 
   body.innerHTML = `
     <div class="user-detail-sections">
       <div class="detail-section">
-        <h3>📋 Overview</h3>
+        <h3> Overview</h3>
         <div class="detail-grid">
           <div class="detail-item">
             <span class="label">Role:</span>
@@ -13214,17 +12660,17 @@ async function showUserDetail(userId: string): Promise<void> {
           </div>
           <div class="detail-item">
             <span class="label">Commitment:</span>
-            <span class="value">${result.user.commitmentSigned ? '✅ Signed' : '❌ Not signed'}</span>
+            <span class="value">${result.user.commitmentSigned ? ' Signed' : ' Not signed'}</span>
           </div>
         </div>
       </div>
 
       <div class="detail-section transcript-section">
-        <h3>📚 Training Transcript</h3>
+        <h3> Training Transcript</h3>
         <div class="transcript-summary">
           <span class="summary-item"><strong>Total Time:</strong> ${formatSeconds(totalTimeSeconds)}</span>
           <span class="summary-item"><strong>Modules:</strong> ${completedCount}/${MODULE_ORDER.length} Complete</span>
-          <button class="btn-unlock-all" data-user-id="${userId}">🔓 Unlock All Modules</button>
+          <button class="btn-unlock-all" data-user-id="${userId}"> Unlock All Modules</button>
         </div>
         <table class="transcript-table">
           <thead>
@@ -13247,7 +12693,7 @@ async function showUserDetail(userId: string): Promise<void> {
                 <td class="date-cell">${formatShortDate(m.completedAt)}</td>
                 <td class="action-cell">
                   ${m.status === 'locked' || m.status === 'not_started' ?
-                    `<button class="btn-unlock-module" data-user-id="${userId}" data-module="${m.name}">🔓 Unlock</button>` :
+                    `<button class="btn-unlock-module" data-user-id="${userId}" data-module="${m.name}"> Unlock</button>` :
                     '<span class="already-unlocked">✓</span>'}
                 </td>
               </tr>
@@ -13257,8 +12703,8 @@ async function showUserDetail(userId: string): Promise<void> {
       </div>
 
       <div class="detail-section exam-section">
-        <h3>📝 Exam Records (${result.examAttempts.length}/3 attempts)</h3>
-        ${result.certification ? `<div class="cert-banner">🏆 Certified on ${formatDate(result.certification.certifiedAt)} with score ${result.certification.score}%</div>` : ''}
+        <h3> Exam Records (${result.examAttempts.length}/3 attempts)</h3>
+        ${result.certification ? `<div class="cert-banner"> Certified on ${formatDate(result.certification.certifiedAt)} with score ${result.certification.score}%</div>` : ''}
         ${result.examAttempts.length > 0 ? `
           <div class="exam-attempts-list">
             ${result.examAttempts.map(a => `
@@ -13266,7 +12712,7 @@ async function showUserDetail(userId: string): Promise<void> {
                 <div class="attempt-header">
                   <span class="attempt-num">Attempt ${a.attemptNumber}</span>
                   <span class="attempt-score">${a.totalScore}%</span>
-                  <span class="attempt-status">${a.passed ? '✅ Passed' : '❌ Failed'}</span>
+                  <span class="attempt-status">${a.passed ? ' Passed' : ' Failed'}</span>
                   <span class="attempt-date">${a.completedAt ? formatDate(a.completedAt) : 'In progress'}</span>
                   ${a.completedAt ? `<button class="btn-view-answers" data-user-id="${userId}" data-attempt-id="${a.id}">View Answers</button>` : ''}
                 </div>
@@ -13285,7 +12731,7 @@ async function showUserDetail(userId: string): Promise<void> {
       </div>
 
       <div class="detail-section">
-        <h3>🎭 Roleplay Sessions (${result.roleplaySessions.length})</h3>
+        <h3> Roleplay Sessions (${result.roleplaySessions.length})</h3>
         ${result.roleplaySessions.length > 0 ? `
           <div class="roleplay-stats">
             <div class="stat-box">
@@ -13296,16 +12742,13 @@ async function showUserDetail(userId: string): Promise<void> {
               <span class="stat-value">${result.roleplaySessions.filter(r => r.completedAt).length}</span>
               <span class="stat-label">Completed</span>
             </div>
-            <div class="stat-box highlight">
-              <span class="stat-value">${result.roleplaySessions.reduce((sum, r) => sum + (r.xpEarned || 0), 0)}</span>
-              <span class="stat-label">Total XP</span>
-            </div>
+
           </div>
         ` : '<p class="no-data">No roleplay sessions yet.</p>'}
       </div>
 
       <div class="detail-section actions-section">
-        <h3>⚙️ Actions</h3>
+        <h3> Actions</h3>
         <div class="action-buttons">
           <button class="btn-action btn-reset-exam" data-user-id="${userId}">Reset Exam Attempts</button>
           <button class="btn-action btn-reset-progress btn-danger" data-user-id="${userId}">Reset All Progress</button>
@@ -13313,6 +12756,8 @@ async function showUserDetail(userId: string): Promise<void> {
       </div>
     </div>
   `;
+
+  void mountCoaching(body, {userId, modules: MODULE_ORDER, title: getModuleDisplayName, navigate: navigateToModule, unlocked: getUnlockedModules});
 
   // Add action handlers
   body.querySelector('.btn-reset-exam')?.addEventListener('click', () => resetUserExam(userId));
@@ -13452,7 +12897,7 @@ async function loadExamAnswers(userId: string, attemptId: string): Promise<void>
                   <span class="q-num">Q${a.questionNumber}:</span> ${escapeHtml(a.questionText || 'Question not available')}
                 </div>
                 <div class="answer-text">
-                  <span class="answer-icon">${a.isCorrect ? '✅' : '❌'}</span>
+                  <span class="answer-icon">${a.isCorrect ? '' : ''}</span>
                   <strong>Answer:</strong> <span class="user-ans">${escapeHtml(a.userAnswer || '-')}</span>
                   ${!a.isCorrect && a.correctAnswer ? `<span class="correct-ans">→ Correct: ${escapeHtml(a.correctAnswer)}</span>` : ''}
                 </div>
@@ -13472,7 +12917,7 @@ async function loadExamAnswers(userId: string, attemptId: string): Promise<void>
                   <span class="q-num">Q${a.questionNumber}:</span> ${escapeHtml(a.questionText || 'Question not available')}
                 </div>
                 <div class="answer-text">
-                  <span class="answer-icon">${a.isCorrect ? '✅' : '❌'}</span>
+                  <span class="answer-icon">${a.isCorrect ? '' : ''}</span>
                   <strong>Answer:</strong> <span class="user-ans">"${escapeHtml(a.userAnswer || '-')}"</span>
                   ${!a.isCorrect && a.correctAnswer ? `<span class="correct-ans">→ Correct: "${escapeHtml(a.correctAnswer)}"</span>` : ''}
                 </div>
@@ -13570,7 +13015,7 @@ function renderAnalytics(data: AdminAnalytics): void {
   container.innerHTML = `
     <div class="analytics-grid">
       <div class="analytics-card overview-card">
-        <h3>👥 Users Overview</h3>
+        <h3> Users Overview</h3>
         <div class="stat-grid">
           <div class="stat-item">
             <span class="stat-value">${data.overview.totalUsers}</span>
@@ -13592,7 +13037,7 @@ function renderAnalytics(data: AdminAnalytics): void {
       </div>
 
       <div class="analytics-card exam-card">
-        <h3>📝 Exam Stats</h3>
+        <h3> Exam Stats</h3>
         <div class="stat-grid">
           <div class="stat-item">
             <span class="stat-value">${data.exam.totalAttempts}</span>
@@ -13614,7 +13059,7 @@ function renderAnalytics(data: AdminAnalytics): void {
       </div>
 
       <div class="analytics-card roleplay-card">
-        <h3>🎭 Roleplay Stats</h3>
+        <h3> Roleplay Stats</h3>
         <div class="stat-grid">
           <div class="stat-item">
             <span class="stat-value">${data.roleplay.totalSessions}</span>
@@ -13628,23 +13073,17 @@ function renderAnalytics(data: AdminAnalytics): void {
             <span class="stat-value">${data.roleplay.averageScore || 0}</span>
             <span class="stat-label">Avg Score</span>
           </div>
-          <div class="stat-item highlight">
-            <span class="stat-value">${data.roleplay.totalXPAwarded}</span>
-            <span class="stat-label">Total XP</span>
-          </div>
+
         </div>
       </div>
 
       <div class="analytics-card modules-card">
-        <h3>📚 Module Completion Rates</h3>
+        <h3> Module completion</h3>
         <div class="module-bars">
           ${data.modules.map(m => `
             <div class="module-bar-item">
               <span class="module-bar-name">${formatModuleName(m.name)}</span>
-              <div class="module-bar-track">
-                <div class="module-bar-fill" style="width: ${m.completionRate}%"></div>
-              </div>
-              <span class="module-bar-rate">${m.completionRate}%</span>
+              <span class="module-bar-rate">${m.usersCompleted} done</span>
             </div>
           `).join('')}
         </div>
@@ -13692,12 +13131,12 @@ function renderTimeTracker(data: ModuleTimeAnalytics): void {
 
   // Calculate difficulty color based on avg time (green = fast, yellow = medium, red = slow)
   function getDifficultyColor(avgSeconds: number): string {
-    if (avgSeconds === 0) return '#9ca3af'; // gray for no data
-    if (avgSeconds < 120) return '#22c55e'; // green - under 2 min
-    if (avgSeconds < 300) return '#84cc16'; // lime - 2-5 min
-    if (avgSeconds < 600) return '#eab308'; // yellow - 5-10 min
-    if (avgSeconds < 1200) return '#f97316'; // orange - 10-20 min
-    return '#ef4444'; // red - over 20 min
+    if (avgSeconds === 0) return 'var(--text-primary)'; // gray for no data
+    if (avgSeconds < 120) return 'var(--text-primary)'; // green - under 2 min
+    if (avgSeconds < 300) return 'var(--text-primary)'; // lime - 2-5 min
+    if (avgSeconds < 600) return 'var(--text-primary)'; // yellow - 5-10 min
+    if (avgSeconds < 1200) return 'var(--text-primary)'; // orange - 10-20 min
+    return 'var(--text-primary)'; // red - over 20 min
   }
 
   container.innerHTML = `
@@ -13728,7 +13167,7 @@ function renderTimeTracker(data: ModuleTimeAnalytics): void {
           <th>Avg Time</th>
           <th>Fastest</th>
           <th>Slowest</th>
-          <th>Completion %</th>
+          <th>Completed</th>
         </tr>
       </thead>
       <tbody>
@@ -13742,15 +13181,12 @@ function renderTimeTracker(data: ModuleTimeAnalytics): void {
             <td>${m.usersStarted}</td>
             <td>${m.usersCompleted}</td>
             <td>${m.usersInProgress}</td>
-            <td class="${m.usersStale > 0 ? 'stale-warning' : ''}">${m.usersStale > 0 ? '⚠️ ' + m.usersStale : '0'}</td>
+            <td class="${m.usersStale > 0 ? 'stale-warning' : ''}">${m.usersStale > 0 ? ' ' + m.usersStale : '0'}</td>
             <td class="time-cell">${formatSeconds(m.avgTimeSeconds)}</td>
             <td class="time-cell fastest">${formatSeconds(m.minTimeSeconds)}</td>
             <td class="time-cell slowest">${formatSeconds(m.maxTimeSeconds)}</td>
             <td>
-              <div class="completion-bar-mini">
-                <div class="completion-fill" style="width: ${m.completionRate}%"></div>
-                <span class="completion-text">${m.completionRate}%</span>
-              </div>
+              <span>${m.usersCompleted} done</span>
             </td>
           </tr>
         `).join('')}
@@ -13760,11 +13196,11 @@ function renderTimeTracker(data: ModuleTimeAnalytics): void {
     <div class="time-tracker-legend">
       <h4>Difficulty Legend (based on avg completion time)</h4>
       <div class="legend-items">
-        <span><span class="difficulty-dot" style="background-color: #22c55e"></span> Fast (&lt;2 min)</span>
-        <span><span class="difficulty-dot" style="background-color: #84cc16"></span> Quick (2-5 min)</span>
-        <span><span class="difficulty-dot" style="background-color: #eab308"></span> Medium (5-10 min)</span>
-        <span><span class="difficulty-dot" style="background-color: #f97316"></span> Long (10-20 min)</span>
-        <span><span class="difficulty-dot" style="background-color: #ef4444"></span> Complex (&gt;20 min)</span>
+        <span><span class="difficulty-dot" style="background-color: var(--surface-color)"></span> Fast (&lt;2 min)</span>
+        <span><span class="difficulty-dot" style="background-color: var(--surface-color)"></span> Quick (2-5 min)</span>
+        <span><span class="difficulty-dot" style="background-color: var(--surface-color)"></span> Medium (5-10 min)</span>
+        <span><span class="difficulty-dot" style="background-color: var(--surface-color)"></span> Long (10-20 min)</span>
+        <span><span class="difficulty-dot" style="background-color: var(--surface-color)"></span> Complex (&gt;20 min)</span>
       </div>
     </div>
   `;
@@ -13826,11 +13262,11 @@ function renderProgressGrid(data: ProgressGridData): void {
 
   function getStatusIcon(status: string): string {
     switch (status) {
-      case 'completed': return '✅';
-      case 'in_progress': return '🟡';
-      case 'stale': return '🔴';
-      case 'unlocked': return '🔓';
-      default: return '⬜';
+      case 'completed': return '';
+      case 'in_progress': return '';
+      case 'stale': return '';
+      case 'unlocked': return '';
+      default: return '';
     }
   }
 
@@ -13862,7 +13298,7 @@ function renderProgressGrid(data: ProgressGridData): void {
             // Create a map for quick lookup
             const statusMap = new Map(user.moduleStatus.map(m => [m.module, m]));
             const completedCount = user.moduleStatus.filter(m => m.status === 'completed').length;
-            const progressPct = Math.round((completedCount / moduleOrder.length) * 100);
+
 
             return `
               <tr>
@@ -13880,9 +13316,7 @@ function renderProgressGrid(data: ProgressGridData): void {
                   return `<td class="module-cell ${getStatusClass(status)}" title="${tooltip}">${getStatusIcon(status)}</td>`;
                 }).join('')}
                 <td class="progress-col">
-                  <div class="mini-progress-bar">
-                    <div class="mini-progress-fill" style="width: ${progressPct}%"></div>
-                  </div>
+
                   <span class="progress-text">${completedCount}/${moduleOrder.length}</span>
                 </td>
               </tr>
@@ -13972,6 +13406,7 @@ function initializeApp(): void {
     sidebar.addEventListener('click', handleNavigation);
   }
   mainContent?.addEventListener('click', handleSpeak);
+  if (!document.getElementById('field-library-button')) initLearningWorkspace({content: trainingContent, modules: MODULE_ORDER, title: getModuleDisplayName, unlocked: getUnlockedModules, navigate: navigateToModule});
 
   // Update user display
   updateUserDisplay();
@@ -13994,6 +13429,7 @@ function initializeApp(): void {
 document.addEventListener('DOMContentLoaded', async () => {
   // Initialize theme system immediately (applies saved preference or system default)
   initThemeSystem();
+  initTrainingInterface();
 
   // Check if user is logged in
   if (isLoggedIn()) {
@@ -14021,14 +13457,14 @@ const LEADER_BIOS: Record<string, {name: string; title: string; img: string; lin
     title: 'Owner & Founder',
     img: '/resources/images/oliver-theroofdocs.jpg',
     link: 'https://www.theroofdocs.com/about/',
-    summary: 'Owner & Founder focused on integrity, quality, and simplicity with a transparent, customer‑first process.'
+    summary: 'Owner & Founder focused on integrity, quality, and simplicity with a transparent, customer-first process.'
   },
   reese: {
     name: 'Reese Samala',
     title: 'Director of Sales',
     img: '/resources/images/reese-theroofdocs.jpg',
     link: 'https://www.theroofdocs.com/about/',
-    summary: 'Leads sales with a consultative, education‑forward approach that builds trust and results.'
+    summary: 'Leads sales with a consultative, education-forward approach that builds trust and results.'
   },
   ford: {
     name: 'Ford Barsi',
@@ -14073,7 +13509,7 @@ function initWelcomeModals() {
       const key = (btn as HTMLElement).getAttribute('data-bio') || '';
       const bio = LEADER_BIOS[key];
       if (!bio) return;
-      (overlay!.querySelector('#bioTitle') as HTMLElement).textContent = `${bio.name} — ${bio.title}`;
+      (overlay!.querySelector('#bioTitle') as HTMLElement).textContent = `${bio.name} ,  ${bio.title}`;
       const imgEl = overlay!.querySelector('#bioImg') as HTMLImageElement;
       imgEl.src = bio.img; imgEl.alt = bio.name;
       (overlay!.querySelector('#bioSummary') as HTMLElement).textContent = bio.summary;
@@ -14102,7 +13538,7 @@ function initCommitmentGate() {
       signatureSection.innerHTML = `
         <div class="commitment-completed">
           <span class="completed-icon">✓</span> You have already signed this commitment.
-          <button class="reset-commitment-btn" id="reset-commitment-btn" style="margin-left: 15px; padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Reset (Testing)</button>
+          <button class="reset-commitment-btn" id="reset-commitment-btn" style="margin-left: 15px; padding: 8px 16px; background: var(--surface-color); color: var(--text-primary); border: none; border-radius: var(--border-radius); cursor: pointer; font-size: 0.85rem;">Reset (Testing)</button>
         </div>`;
       // Add reset button handler
       const resetBtn = document.getElementById('reset-commitment-btn');
@@ -14286,7 +13722,7 @@ function updateInitialsProgress() {
 
   if (progressFill) {
     progressFill.style.width = `${(count / 8) * 100}%`;
-    progressFill.style.backgroundColor = count === 8 ? '#28a745' : '#c62828';
+    progressFill.style.backgroundColor = count === 8 ? "var(--hover-bg)" : "var(--hover-bg)";
   }
   if (progressText) {
     progressText.textContent = count === 8 ? 'All commitments initialed ✓' : `${count} of 8 commitments initialed`;
@@ -14305,11 +13741,11 @@ function updateCommitmentRequirements() {
     if (commitmentVideoWatched) {
       reqVideo.classList.remove('pending');
       reqVideo.classList.add('complete');
-      reqVideo.innerHTML = '<span class="req-icon">✓</span> Watch the commitment video (90%+)';
+      reqVideo.innerHTML = '<span class="req-icon">✓</span> Watch the commitment video';
     } else {
       reqVideo.classList.add('pending');
       reqVideo.classList.remove('complete');
-      reqVideo.innerHTML = '<span class="req-icon">○</span> Watch the commitment video (90%+)';
+      reqVideo.innerHTML = '<span class="req-icon">○</span> Watch the commitment video';
     }
   }
 
@@ -14473,9 +13909,7 @@ function initQuickQuiz2() {
       <div class="quiz2-container">
         <div class="quiz2-progress">
           <span class="quiz2-progress-text">Question ${currentQuestion + 1} of ${quiz2Questions.length}</span>
-          <div class="quiz2-progress-bar">
-            <div class="quiz2-progress-fill" style="width: ${((currentQuestion + 1) / quiz2Questions.length) * 100}%"></div>
-          </div>
+
         </div>
         <div class="quiz2-question">
           <h4>${q.question}</h4>
@@ -14536,7 +13970,7 @@ function initQuickQuiz2() {
     area.innerHTML = `
       <div class="quiz2-results">
         <div class="quiz2-result-header ${passed ? 'passed' : 'failed'}">
-          <span class="result-icon">${passed ? '🎉' : '📚'}</span>
+          <span class="result-icon">${passed ? '' : ''}</span>
           <h3>${passed ? 'Great Job!' : 'Keep Learning!'}</h3>
           <p class="result-score">${score}/${quiz2Questions.length} correct (${percentage}%)</p>
         </div>
@@ -14559,7 +13993,7 @@ function initQuickQuiz2() {
         </div>
         <div class="quiz2-result-actions">
           ${passed
-            ? `<button class="quiz2-btn quiz2-complete" style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);">✓ Complete Module & Continue</button>`
+            ? `<button class="quiz2-btn quiz2-complete" style="background: var(--surface-color);">✓ Complete Module & Continue</button>`
             : `<button class="quiz2-btn quiz2-retry">Try Again</button>`
           }
         </div>
@@ -14731,7 +14165,7 @@ function updateSidebarCertifiedBadge(isCertified: boolean): void {
       badge = document.createElement('div');
       badge.id = 'cert-badge';
       badge.className = 'cert-badge certified-badge-glass';
-      badge.innerHTML = '<span class="badge-icon">🏆</span><span class="badge-text">Certified</span>';
+      badge.innerHTML = '<span class="badge-icon"></span><span class="badge-text">Certified</span>';
       sidebarHeader.appendChild(badge);
     }
     if (badge) {
@@ -14813,13 +14247,13 @@ function showExamStartScreen(root: HTMLElement, state: ExamState) {
       </div>
 
       <div class="exam-info-panel">
-        <h3>📋 Exam Format</h3>
+        <h3> Exam Format</h3>
         <ul>
-          <li><strong>36 Multiple Choice Questions</strong> (2 points each)</li>
-          <li><strong>10 Fill-in-the-Blank Questions</strong> (2 points each)</li>
-          <li><strong>9 Short Answer Questions</strong> (2 points each)</li>
-          <li><strong>Total: 110 points</strong></li>
-          <li><strong>Passing Score: 70% (77 points)</strong></li>
+          <li><strong>${FINAL_EXAM_MCQ.length} Multiple Choice Questions</strong> (2 points each)</li>
+          <li><strong>${FINAL_EXAM_FIB.length} Fill-in-the-Blank Questions</strong> (2 points each)</li>
+          <li><strong>${FINAL_EXAM_SA.length} Short Answer Questions</strong> (2 points each)</li>
+          <li><strong>Total: ${(FINAL_EXAM_MCQ.length + FINAL_EXAM_FIB.length + FINAL_EXAM_SA.length) * 2} points</strong></li>
+          <li><strong>Passing Score: 70% (${Math.ceil((FINAL_EXAM_MCQ.length + FINAL_EXAM_FIB.length + FINAL_EXAM_SA.length) * 2 * 0.7)} points)</strong></li>
         </ul>
       </div>
 
@@ -14828,7 +14262,7 @@ function showExamStartScreen(root: HTMLElement, state: ExamState) {
         <input type="text" id="exam-user-name" placeholder="Enter your full name" value="${state.userName}" />
       </div>
 
-      <button id="startFinalExam" class="exam-start-btn">🎯 Start Final Exam</button>
+      <button id="startFinalExam" class="exam-start-btn"> Start Final Exam</button>
     </div>
   `;
 
@@ -14853,12 +14287,12 @@ function showLockoutScreen(root: HTMLElement, state: ExamState) {
 
   root.innerHTML = `
     <div class="exam-lockout-screen">
-      <div class="lockout-icon">🔒</div>
+      <div class="lockout-icon"></div>
       <h2>Exam Locked</h2>
       <p>You have used all 3 attempts without passing.</p>
 
       <div class="lockout-message">
-        <h3>📚 Time to Review</h3>
+        <h3> Time to Review</h3>
         <p>Please review the training modules to strengthen your knowledge, then contact your manager to request additional attempts.</p>
 
         <div class="review-suggestions">
@@ -14880,7 +14314,7 @@ function showLockoutScreen(root: HTMLElement, state: ExamState) {
         </ul>
       </div>
 
-      <button onclick="renderModule('welcome')" class="btn-secondary">📖 Return to Training</button>
+      <button onclick="renderModule('welcome')" class="btn-secondary"> Return to Training</button>
     </div>
   `;
 }
@@ -14893,7 +14327,7 @@ function showCertifiedScreen(root: HTMLElement, state: ExamState) {
   // Build review HTML
   const buildReviewHTML = () => {
     if (wrongAnswers.length === 0) {
-      return '<p class="perfect-score-banner">🎯 Perfect Score! You answered all questions correctly!</p>';
+      return '<p class="perfect-score-banner"> Perfect Score! You answered all questions correctly!</p>';
     }
 
     const mcqWrong = wrongAnswers.filter(w => w.type === 'mcq');
@@ -14905,7 +14339,7 @@ function showCertifiedScreen(root: HTMLElement, state: ExamState) {
     if (mcqWrong.length > 0) {
       html += `
         <div class="review-section">
-          <h4>📝 Multiple Choice (${mcqWrong.length} incorrect)</h4>
+          <h4> Multiple Choice (${mcqWrong.length} incorrect)</h4>
           ${mcqWrong.map(w => `
             <div class="wrong-answer-item">
               <div class="question-header">
@@ -14914,16 +14348,16 @@ function showCertifiedScreen(root: HTMLElement, state: ExamState) {
               </div>
               <div class="answer-comparison">
                 <div class="your-answer wrong">
-                  <span class="label">❌ Your Answer:</span>
+                  <span class="label"> Your Answer:</span>
                   <span class="value">${w.userAnswer}</span>
                 </div>
                 <div class="correct-answer">
-                  <span class="label">✅ Correct Answer:</span>
+                  <span class="label"> Correct Answer:</span>
                   <span class="value">${w.correctAnswer}</span>
                 </div>
               </div>
               <div class="explanation">
-                <strong>💡 Explanation:</strong> ${w.explanation}
+                <strong> Explanation:</strong> ${w.explanation}
               </div>
             </div>
           `).join('')}
@@ -14934,7 +14368,7 @@ function showCertifiedScreen(root: HTMLElement, state: ExamState) {
     if (fibWrong.length > 0) {
       html += `
         <div class="review-section">
-          <h4>✏️ Fill-in-the-Blank (${fibWrong.length} incorrect)</h4>
+          <h4> Fill-in-the-Blank (${fibWrong.length} incorrect)</h4>
           ${fibWrong.map(w => `
             <div class="wrong-answer-item">
               <div class="question-header">
@@ -14943,16 +14377,16 @@ function showCertifiedScreen(root: HTMLElement, state: ExamState) {
               </div>
               <div class="answer-comparison">
                 <div class="your-answer wrong">
-                  <span class="label">❌ Your Answer:</span>
+                  <span class="label"> Your Answer:</span>
                   <span class="value">${w.userAnswer}</span>
                 </div>
                 <div class="correct-answer">
-                  <span class="label">✅ Correct Answer:</span>
+                  <span class="label"> Correct Answer:</span>
                   <span class="value">${w.correctAnswer}</span>
                 </div>
               </div>
               <div class="explanation">
-                <strong>💡 Explanation:</strong> ${w.explanation}
+                <strong> Explanation:</strong> ${w.explanation}
               </div>
             </div>
           `).join('')}
@@ -14963,7 +14397,7 @@ function showCertifiedScreen(root: HTMLElement, state: ExamState) {
     if (saWrong.length > 0) {
       html += `
         <div class="review-section">
-          <h4>📄 Short Answer (${saWrong.length} need improvement)</h4>
+          <h4> Short Answer (${saWrong.length} need improvement)</h4>
           ${saWrong.map(w => `
             <div class="wrong-answer-item sa-review">
               <div class="question-header">
@@ -14972,16 +14406,16 @@ function showCertifiedScreen(root: HTMLElement, state: ExamState) {
               </div>
               <div class="answer-comparison">
                 <div class="your-answer partial">
-                  <span class="label">📝 Your Answer:</span>
+                  <span class="label"> Your Answer:</span>
                   <div class="value sa-value">${w.userAnswer}</div>
                 </div>
                 <div class="correct-answer">
-                  <span class="label">✅ Expected Response:</span>
+                  <span class="label"> Expected Response:</span>
                   <div class="value sa-value">${w.correctAnswer.replace(/\n/g, '<br>')}</div>
                 </div>
               </div>
               <div class="explanation">
-                <strong>💡 Feedback:</strong> ${w.explanation}
+                <strong> Feedback:</strong> ${w.explanation}
               </div>
             </div>
           `).join('')}
@@ -14994,9 +14428,9 @@ function showCertifiedScreen(root: HTMLElement, state: ExamState) {
 
   root.innerHTML = `
     <div class="certified-screen">
-      <div class="confetti-container" id="confetti"></div>
 
-      <div class="cert-badge-large">🏆</div>
+
+      <div class="cert-badge-large"></div>
       <h1>Congratulations!</h1>
       <h2>You are a Certified Roof E.R. Sales Representative</h2>
 
@@ -15006,20 +14440,20 @@ function showCertifiedScreen(root: HTMLElement, state: ExamState) {
         <p><strong>Score:</strong> ${passingAttempt?.totalScore || 0}%</p>
       </div>
 
-      <button id="downloadCert" class="cert-download-btn">📄 Download Certificate</button>
+      <button id="downloadCert" class="cert-download-btn"> Download Certificate</button>
 
       ${wrongAnswers.length > 0 ? `
         <div class="answer-review-section" style="margin-top: 30px;">
-          <button id="toggleCertReview" class="btn-toggle-review">📋 Review My Exam (${wrongAnswers.length} questions to review)</button>
+          <button id="toggleCertReview" class="btn-toggle-review"> Review My Exam (${wrongAnswers.length} questions to review)</button>
           <div id="certReviewContent" class="answer-review-content hidden">
-            <h3>📚 Questions You Missed</h3>
+            <h3> Questions You Missed</h3>
             <p class="review-intro">Even though you passed, here are the questions you can improve on:</p>
             ${buildReviewHTML()}
           </div>
         </div>
       ` : `
         <div class="answer-review-section" style="margin-top: 30px;">
-          <div class="perfect-score-banner">🎯 Perfect Score! You answered all questions correctly!</div>
+          <div class="perfect-score-banner"> Perfect Score! You answered all questions correctly!</div>
         </div>
       `}
 
@@ -15039,13 +14473,12 @@ function showCertifiedScreen(root: HTMLElement, state: ExamState) {
     if (content && btn) {
       content.classList.toggle('hidden');
       btn.textContent = content.classList.contains('hidden')
-        ? `📋 Review My Exam (${wrongAnswers.length} questions to review)`
-        : '📋 Hide Answer Review';
+        ? ` Review My Exam (${wrongAnswers.length} questions to review)`
+        : ' Hide Answer Review';
     }
   });
 
   // Trigger confetti
-  setTimeout(() => triggerConfetti(), 300);
 }
 
 async function startExam(root: HTMLElement) {
@@ -15084,22 +14517,22 @@ function renderFinalExam(root: HTMLElement) {
   root.innerHTML = `
     <div class="exam-container">
       <div class="exam-header">
-        <h2>🎯 Final Certification Exam</h2>
+        <h2> Final Certification Exam</h2>
         <div class="exam-progress">
-          <span id="exam-progress-text">Answer all 55 questions</span>
-          <span class="exam-attempt-indicator" style="margin-left: 16px; padding: 4px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; background: ${attemptsLeft <= 1 ? 'rgba(239,68,68,0.15); color: #ef4444' : 'rgba(59,130,246,0.15); color: #60a5fa'};">Attempt ${attemptNum} of 3</span>
+          <span id="exam-progress-text">Answer all ${mcq.length + fib.length + sa.length} questions</span>
+          <span class="exam-attempt-indicator">Attempt ${attemptNum} of 3</span>
         </div>
       </div>
 
       <div class="exam-sections">
         <!-- Multiple Choice Section -->
         <div class="exam-section">
-          <h3>📝 Section 1: Multiple Choice (35 questions - 2 pts each)</h3>
+          <h3> Section 1: Multiple Choice (${mcq.length} questions - 2 pts each)</h3>
           <div class="mcq-questions">
             ${mcq.map((q, idx) => `
               <div class="exam-question mcq-question" data-id="${q.id}">
-                <p class="question-text"><strong>${idx + 1}.</strong> ${q.question}</p>
-                <div class="options-group">
+                <p class="question-text" id="exam-mcq-label-${idx}"><strong>${idx + 1}.</strong> ${q.question}</p>
+                <div class="options-group" role="radiogroup" aria-labelledby="exam-mcq-label-${idx}">
                   ${q.options.map((opt, optIdx) => `
                     <label class="option-label">
                       <input type="radio" name="mcq-${idx}" value="${optIdx}">
@@ -15114,12 +14547,12 @@ function renderFinalExam(root: HTMLElement) {
 
         <!-- Fill in the Blank Section -->
         <div class="exam-section">
-          <h3>✏️ Section 2: Fill in the Blank (10 questions - 2 pts each)</h3>
+          <h3> Section 2: Fill in the Blank (${fib.length} questions - 2 pts each)</h3>
           <div class="fib-questions">
             ${fib.map((q, idx) => `
               <div class="exam-question fib-question" data-id="${q.id}">
-                <p class="question-text"><strong>${idx + 1}.</strong> ${q.question}</p>
-                <input type="text" name="fib-${idx}" class="fib-input" placeholder="Type your answer..." />
+                <p class="question-text" id="exam-fib-label-${idx}"><strong>${idx + 1}.</strong> ${q.question}</p>
+                <input type="text" aria-labelledby="exam-fib-label-${idx}" name="fib-${idx}" class="fib-input" placeholder="Type your answer..." />
               </div>
             `).join('')}
           </div>
@@ -15127,12 +14560,12 @@ function renderFinalExam(root: HTMLElement) {
 
         <!-- Short Answer Section -->
         <div class="exam-section">
-          <h3>📄 Section 3: Short Answer (10 questions - 2 pts each)</h3>
+          <h3> Section 3: Short Answer (${sa.length} questions - 2 pts each)</h3>
           <div class="sa-questions">
             ${sa.map((q, idx) => `
               <div class="exam-question sa-question" data-id="${q.id}">
-                <p class="question-text"><strong>${idx + 1}.</strong> ${q.prompt}</p>
-                <textarea name="sa-${idx}" class="sa-input" rows="10" style="min-height: 220px;" placeholder="Write your answer..."></textarea>
+                <p class="question-text" id="exam-sa-label-${idx}"><strong>${idx + 1}.</strong> ${q.prompt}</p>
+                <textarea aria-labelledby="exam-sa-label-${idx}" name="sa-${idx}" class="sa-input" rows="10" style="min-height: 220px;" placeholder="Write your answer..."></textarea>
               </div>
             `).join('')}
           </div>
@@ -15140,8 +14573,8 @@ function renderFinalExam(root: HTMLElement) {
       </div>
 
       <div class="exam-submit-section">
-        <button id="submitExam" class="exam-submit-btn">✅ Submit Exam</button>
-        <p class="submit-warning">⚠️ You cannot change answers after submitting.</p>
+        <button id="submitExam" class="exam-submit-btn"> Submit Exam</button>
+        <p class="submit-warning"> You cannot change answers after submitting.</p>
       </div>
 
       <div id="exam-result"></div>
@@ -15173,15 +14606,15 @@ function renderFinalExam(root: HTMLElement) {
     // Build error message if any unanswered
     const totalUnanswered = unansweredMCQ.length + unansweredFIB.length + unansweredSA.length;
     if (totalUnanswered > 0) {
-      let errorMsg = '⚠️ Please answer all questions before submitting.\n\n';
+      let errorMsg = ' Please answer all questions before submitting.\n\n';
       if (unansweredMCQ.length > 0) {
-        errorMsg += `📝 Multiple Choice: Questions ${unansweredMCQ.slice(0, 5).join(', ')}${unansweredMCQ.length > 5 ? ` and ${unansweredMCQ.length - 5} more` : ''}\n`;
+        errorMsg += ` Multiple Choice: Questions ${unansweredMCQ.slice(0, 5).join(', ')}${unansweredMCQ.length > 5 ? ` and ${unansweredMCQ.length - 5} more` : ''}\n`;
       }
       if (unansweredFIB.length > 0) {
-        errorMsg += `✏️ Fill in the Blank: Questions ${unansweredFIB.join(', ')}\n`;
+        errorMsg += ` Fill in the Blank: Questions ${unansweredFIB.join(', ')}\n`;
       }
       if (unansweredSA.length > 0) {
-        errorMsg += `📄 Short Answer: Questions ${unansweredSA.join(', ')}\n`;
+        errorMsg += ` Short Answer: Questions ${unansweredSA.join(', ')}\n`;
       }
       alert(errorMsg);
       return;
@@ -15390,7 +14823,7 @@ async function gradeFinalExam(root: HTMLElement) {
         question: q.prompt,
         userAnswer: userAnswer || '(No answer provided)',
         correctAnswer: `Sample: ${q.sampleAnswer}${result.strengths?.length ? `\n\nStrengths: ${result.strengths.join(', ')}` : ''}`,
-        explanation: `${result.aiScored ? '🤖 AI Scored' : '📝 Keyword Scored'}: ${Math.round(questionPoints * 10) / 10}/2 points.\n${feedbackParts.join('')}`
+        explanation: `${result.aiScored ? ' AI Scored' : ' Keyword Scored'}: ${Math.round(questionPoints * 10) / 10}/2 points.\n${feedbackParts.join('')}`
       });
     }
   });
@@ -15499,7 +14932,7 @@ function showExamResults(root: HTMLElement, attempt: ExamAttempt, detailedResult
   // Build the answer review HTML
   const buildAnswerReview = () => {
     if (wrongAnswers.length === 0) {
-      return '<p class="perfect-score">🎯 Perfect Score! You answered all questions correctly!</p>';
+      return '<p class="perfect-score"> Perfect Score! You answered all questions correctly!</p>';
     }
 
     const mcqWrong = wrongAnswers.filter(w => w.type === 'mcq');
@@ -15511,7 +14944,7 @@ function showExamResults(root: HTMLElement, attempt: ExamAttempt, detailedResult
     if (mcqWrong.length > 0) {
       html += `
         <div class="review-section">
-          <h4>📝 Multiple Choice (${mcqWrong.length} incorrect)</h4>
+          <h4> Multiple Choice (${mcqWrong.length} incorrect)</h4>
           ${mcqWrong.map(w => `
             <div class="wrong-answer-item">
               <div class="question-header">
@@ -15520,16 +14953,16 @@ function showExamResults(root: HTMLElement, attempt: ExamAttempt, detailedResult
               </div>
               <div class="answer-comparison">
                 <div class="your-answer wrong">
-                  <span class="label">❌ Your Answer:</span>
+                  <span class="label"> Your Answer:</span>
                   <span class="value">${w.userAnswer}</span>
                 </div>
                 <div class="correct-answer">
-                  <span class="label">✅ Correct Answer:</span>
+                  <span class="label"> Correct Answer:</span>
                   <span class="value">${w.correctAnswer}</span>
                 </div>
               </div>
               <div class="explanation">
-                <strong>💡 Explanation:</strong> ${w.explanation}
+                <strong> Explanation:</strong> ${w.explanation}
               </div>
             </div>
           `).join('')}
@@ -15540,7 +14973,7 @@ function showExamResults(root: HTMLElement, attempt: ExamAttempt, detailedResult
     if (fibWrong.length > 0) {
       html += `
         <div class="review-section">
-          <h4>✏️ Fill-in-the-Blank (${fibWrong.length} incorrect)</h4>
+          <h4> Fill-in-the-Blank (${fibWrong.length} incorrect)</h4>
           ${fibWrong.map(w => `
             <div class="wrong-answer-item">
               <div class="question-header">
@@ -15549,16 +14982,16 @@ function showExamResults(root: HTMLElement, attempt: ExamAttempt, detailedResult
               </div>
               <div class="answer-comparison">
                 <div class="your-answer wrong">
-                  <span class="label">❌ Your Answer:</span>
+                  <span class="label"> Your Answer:</span>
                   <span class="value">${w.userAnswer}</span>
                 </div>
                 <div class="correct-answer">
-                  <span class="label">✅ Correct Answer:</span>
+                  <span class="label"> Correct Answer:</span>
                   <span class="value">${w.correctAnswer}</span>
                 </div>
               </div>
               <div class="explanation">
-                <strong>💡 Explanation:</strong> ${w.explanation}
+                <strong> Explanation:</strong> ${w.explanation}
               </div>
             </div>
           `).join('')}
@@ -15569,7 +15002,7 @@ function showExamResults(root: HTMLElement, attempt: ExamAttempt, detailedResult
     if (saWrong.length > 0) {
       html += `
         <div class="review-section">
-          <h4>📄 Short Answer (${saWrong.length} need improvement)</h4>
+          <h4> Short Answer (${saWrong.length} need improvement)</h4>
           ${saWrong.map(w => `
             <div class="wrong-answer-item sa-review">
               <div class="question-header">
@@ -15578,16 +15011,16 @@ function showExamResults(root: HTMLElement, attempt: ExamAttempt, detailedResult
               </div>
               <div class="answer-comparison">
                 <div class="your-answer partial">
-                  <span class="label">📝 Your Answer:</span>
+                  <span class="label"> Your Answer:</span>
                   <div class="value sa-value">${w.userAnswer}</div>
                 </div>
                 <div class="correct-answer">
-                  <span class="label">✅ Expected Response:</span>
+                  <span class="label"> Expected Response:</span>
                   <div class="value sa-value">${w.correctAnswer.replace(/\n/g, '<br>')}</div>
                 </div>
               </div>
               <div class="explanation">
-                <strong>💡 Feedback:</strong> ${w.explanation}
+                <strong> Feedback:</strong> ${w.explanation}
               </div>
             </div>
           `).join('')}
@@ -15602,9 +15035,9 @@ function showExamResults(root: HTMLElement, attempt: ExamAttempt, detailedResult
     // Show celebration
     root.innerHTML = `
       <div class="exam-results passed">
-        <div class="confetti-container" id="confetti"></div>
 
-        <div class="result-badge success">🎉</div>
+
+        <div class="result-badge success"></div>
         <h1>Congratulations!</h1>
         <h2>You Passed!</h2>
 
@@ -15625,22 +15058,22 @@ function showExamResults(root: HTMLElement, attempt: ExamAttempt, detailedResult
         </div>
 
         <div class="cert-section">
-          <h3>🏆 You are now a Certified Roof E.R. Sales Representative!</h3>
-          <button id="downloadCertResult" class="cert-download-btn">📄 Download Certificate</button>
+          <h3> You are now a Certified Roof E.R. Sales Representative!</h3>
+          <button id="downloadCertResult" class="cert-download-btn"> Download Certificate</button>
         </div>
 
         ${wrongAnswers.length > 0 ? `
           <div class="answer-review-section">
-            <button id="toggleAnswerReview" class="btn-toggle-review">📋 Review Answers (${wrongAnswers.length} to review)</button>
+            <button id="toggleAnswerReview" class="btn-toggle-review"> Review Answers (${wrongAnswers.length} to review)</button>
             <div id="answerReviewContent" class="answer-review-content hidden">
-              <h3>📚 Answer Review</h3>
+              <h3> Answer Review</h3>
               <p class="review-intro">Even though you passed, here are the questions you can improve on:</p>
               ${buildAnswerReview()}
             </div>
           </div>
         ` : `
           <div class="answer-review-section">
-            <div class="perfect-score-banner">🎯 Perfect Score! You answered all questions correctly!</div>
+            <div class="perfect-score-banner"> Perfect Score! You answered all questions correctly!</div>
           </div>
         `}
       </div>
@@ -15656,12 +15089,11 @@ function showExamResults(root: HTMLElement, attempt: ExamAttempt, detailedResult
       if (content && btn) {
         content.classList.toggle('hidden');
         btn.textContent = content.classList.contains('hidden')
-          ? `📋 Review Answers (${wrongAnswers.length} to review)`
-          : '📋 Hide Answer Review';
+          ? ` Review Answers (${wrongAnswers.length} to review)`
+          : ' Hide Answer Review';
       }
     });
 
-    triggerConfetti();
 
     // Mark quiz as passed in engagement state
     markQuizPassed('final-exam');
@@ -15674,7 +15106,7 @@ function showExamResults(root: HTMLElement, attempt: ExamAttempt, detailedResult
 
     root.innerHTML = `
       <div class="exam-results failed">
-        <div class="result-badge fail">😔</div>
+        <div class="result-badge fail"></div>
         <h1>Not Quite There</h1>
         <h2>Score: ${attempt.totalScore}% (Need 70% to pass)</h2>
 
@@ -15696,7 +15128,7 @@ function showExamResults(root: HTMLElement, attempt: ExamAttempt, detailedResult
 
         ${locked ? `
           <div class="lockout-warning">
-            <h3>🔒 Exam Locked</h3>
+            <h3> Exam Locked</h3>
             <p>You've used all 3 attempts. Please review the training modules and contact your manager for additional attempts.</p>
           </div>
         ` : `
@@ -15707,7 +15139,7 @@ function showExamResults(root: HTMLElement, attempt: ExamAttempt, detailedResult
         `}
 
         <div class="answer-review-section expanded">
-          <h3>📚 Answer Review - See What You Got Wrong</h3>
+          <h3> Answer Review - See What You Got Wrong</h3>
           <p class="review-intro">Study these carefully before your next attempt:</p>
           <div id="answerReviewContent" class="answer-review-content">
             ${buildAnswerReview()}
@@ -15715,7 +15147,7 @@ function showExamResults(root: HTMLElement, attempt: ExamAttempt, detailedResult
         </div>
 
         <div class="review-suggestions">
-          <h4>📚 Recommended Modules to Review:</h4>
+          <h4> Recommended Modules to Review:</h4>
           <ul>
             <li>Module 5: Initial Pitch & 5 Non-Negotiables</li>
             <li>Module 6 & 10: Handling Objections</li>
@@ -15724,8 +15156,8 @@ function showExamResults(root: HTMLElement, attempt: ExamAttempt, detailedResult
         </div>
 
         <div class="result-actions">
-          ${!locked ? '<button onclick="initFinalExam()" class="btn-primary">🔄 Try Again</button>' : ''}
-          <button onclick="renderModule(\'welcome\')" class="btn-secondary">📖 Review Training</button>
+          ${!locked ? '<button onclick="initFinalExam()" class="btn-primary"> Try Again</button>' : ''}
+          <button onclick="renderModule(\'welcome\')" class="btn-secondary"> Review Training</button>
         </div>
       </div>
     `;
@@ -15786,7 +15218,7 @@ async function generateCertificatePDF(userName: string, score: number, dateStr: 
   } catch (e) {
     // Fallback to text if logo fails to load
     ctx.font = '60px Arial';
-    ctx.fillText('🏆', canvas.width / 2, 180);
+    ctx.fillText('', canvas.width / 2, 180);
     ctx.fillStyle = '#D90429';
     ctx.font = 'bold 48px Arial, sans-serif';
     ctx.fillText('ROOF E.R.', canvas.width / 2, 250);
@@ -15956,7 +15388,7 @@ function initQuickQuiz1() {
           res.innerHTML = `
             <div class="quiz-success">&#10003; Perfect! You know the Roof-ER leadership team, core values, and founding year.</div>
             <div style="margin-top: 20px; text-align: center;">
-              <button class="complete-module-btn" onclick="completeModule('welcome')" style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: white; border: none; padding: 16px 32px; border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer;">
+              <button class="complete-module-btn" onclick="completeModule('welcome')" style="background: var(--surface-color); color: var(--text-primary); border: none; padding: 16px 32px; border-radius: var(--border-radius); font-size: 18px; font-weight: 700; cursor: pointer;">
                 ✓ Complete Module & Continue
               </button>
             </div>
@@ -15971,7 +15403,7 @@ function initQuickQuiz1() {
           if (q1 !== 'a') feedback += 'Review the leadership team. ';
           if (q2 !== 'b') feedback += 'Check our core values. ';
           if (q3 !== 'b') feedback += 'Roof-ER was founded in 2018. ';
-          feedback += '<br><br><button onclick="location.reload()" style="background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Try Again</button></div>';
+          feedback += '<br><br><button onclick="location.reload()" style="background: var(--surface-color); color: var(--text-primary); border: none; padding: 10px 20px; border-radius: var(--border-radius); cursor: pointer;">Try Again</button></div>';
           res.innerHTML = feedback;
         }
       }

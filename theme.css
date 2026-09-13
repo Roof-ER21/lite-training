@@ -1,0 +1,57 @@
+/* Shared Roof-ER roles for every learning surface, in light and dark mode. */
+:root {
+  color-scheme: light;
+  --brand: #B60807;
+  --video-bg: #101315;
+  --scrim: rgb(10 11 12 / .7);
+  --drawer-scrim: rgb(10 11 12 / .6);
+  --on-brand: #ffffff;
+  --primary-color: var(--brand);
+  --primary-hover-color: var(--brand);
+  --accent-text: var(--brand);
+  --dark-bg: #101315;
+  --light-bg: #F3F5F6;
+  --surface-color: #ffffff;
+  --text-primary: #101315;
+  --text-secondary: #535D65;
+  --border-color: #D5DCE1;
+  --white: #ffffff;
+  --success-color: #21643E;
+  --error-color: var(--accent-text);
+  --font-family: 'Geist', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Consolas, monospace;
+  --shadow-sm: 0 1px 3px rgb(10 11 12 / 0.05);
+  --shadow-md: 0 2px 6px rgb(10 11 12 / 0.1);
+  --border-radius: 2px;
+  --card-bg: var(--surface-color);
+  --input-bg: var(--surface-color);
+  --input-border: #89939B;
+  --hover-bg: #E8ECEF;
+  --code-bg: var(--light-bg);
+  --script-bg: var(--light-bg);
+  --highlight-bg: var(--hover-bg);
+  --agnes-gradient-primary: var(--brand);
+  --agnes-gradient-secondary: var(--dark-bg);
+  --agnes-shadow-sm: var(--shadow-sm);
+  --agnes-shadow-md: var(--shadow-md);
+  --agnes-shadow-lg: var(--shadow-md);
+  --agnes-radius-sm: var(--border-radius);
+  --agnes-radius-md: var(--border-radius);
+  --agnes-radius-lg: var(--border-radius);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --light-bg: #0A0B0C;
+  --surface-color: #101315;
+  --text-primary: #F3F5F6;
+  --text-secondary: #A8B0B7;
+  --border-color: #343E45;
+  --input-border: #6C767E;
+  /* Brand red stays a fill/mark on dark surfaces. Small text uses paper. */
+  --accent-text: var(--text-primary);
+  --success-color: #93CBA7;
+  --hover-bg: #232A2F;
+  --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.3);
+  --shadow-md: 0 2px 6px rgb(0 0 0 / 0.4);
+}

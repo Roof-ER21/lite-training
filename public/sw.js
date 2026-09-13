@@ -1,11 +1,11 @@
 // Service Worker for Roof-ER Training PWA
-const CACHE_NAME = 'roofer-training-v49';
+const CACHE_NAME = 'roofer-training-v50';
 const OFFLINE_URL = '/offline.html';
 
 // Assets to cache on install
 const STATIC_ASSETS = [
   '/',
-  '/index.css',
+  '/theme-init.js',
   '/manifest.json',
   '/agnes-scenarios.js',
   '/offline.html'

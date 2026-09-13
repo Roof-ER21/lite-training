@@ -1,0 +1,50 @@
+.lesson-guide, .lesson-recall, .field-checklist, .visual-workbench, .practice-review { margin: 32px 0; padding: 28px 0; border-top: 1px solid var(--border-color); }
+.lesson-guide h2, .visual-workbench h2 { margin-top: 8px; }
+.lesson-guide nav, .reference-actions { display:flex; flex-wrap:wrap; gap:8px; }
+.lesson-guide nav button, .reference-actions button, .lesson-recall button, .practice-review button { margin:8px 8px 0 0; }
+#lesson-resume:empty { display:none; }
+.lesson-recall textarea, .reference-controls input, .reference-controls select, .media-transcript input, .coaching-panel textarea, .coaching-panel select, .structured-editor textarea { width:100%; background:var(--surface-color); color:var(--text-primary); border:1px solid var(--input-border); border-radius:var(--border-radius); padding:12px; font:inherit; transition:none; }
+.lesson-recall textarea { display:block; margin:8px 0; min-height:120px; }
+#recall-feedback { margin-top:24px; padding:20px; background:var(--hover-bg); }
+.field-checklist label { display:flex; align-items:flex-start; gap:12px; padding:12px 0; }
+.field-checklist input { width:24px; height:24px; flex-shrink:0; accent-color:var(--brand); }
+.reference-controls { display:grid; grid-template-columns:minmax(0,1fr) minmax(160px,220px); gap:16px; margin:28px 0; }
+.reference-controls label, .media-transcript label, .coaching-panel label, .structured-editor label { display:grid; gap:8px; }
+.reference-result { padding:24px 0; border-top:1px solid var(--border-color); }
+.reference-result h2 { font-size:1.3rem; margin:8px 0; }
+.reference-result p { max-width:70ch; }
+.reference-result button[aria-pressed="true"] { border-color:var(--text-primary); }
+.visual-comparison { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr)); gap:20px; }
+.visual-comparison figure { margin:0; border:1px solid var(--border-color); }
+.visual-comparison img { width:100%; aspect-ratio:4/3; object-fit:contain; background:var(--light-bg); display:block; }
+.visual-comparison figcaption { padding:20px; }
+.visual-comparison figcaption p, .source-note { font-size:14px; line-height:1.6; }
+.media-companion { text-align:left; padding:12px 0; }
+.media-transcript { border:1px solid var(--border-color); padding:16px; }
+.media-transcript summary { cursor:pointer; min-height:44px; display:list-item; }
+.media-transcript[open] summary { margin-bottom:12px; }
+.transcript-cues { max-height:360px; overflow:auto; overscroll-behavior:contain; padding:8px; }
+.transcript-cues p { display:grid; grid-template-columns:50px minmax(0,1fr); gap:12px; line-height:1.6; }
+.cue-time { font-family:var(--font-mono); color:var(--text-secondary); font-size:13px; }
+.transcript-chapters { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
+.transcript-chapters button { text-align:left; font-size:13px; }
+.practice-review button { display:block; text-align:left; }
+.coaching-panel { border-top:1px solid var(--border-color); padding:24px 0; margin-top:24px; }
+.coaching-panel form { display:grid; gap:16px; }
+.coaching-record { padding:16px 0; border-bottom:1px solid var(--border-color); }
+.structured-editor { display:grid; gap:24px; }
+.structured-editor fieldset { border:1px solid var(--border-color); padding:20px; min-width:0; }
+.structured-editor textarea { min-height:100px; }
+.structured-editor iframe { width:100%; min-height:450px; border:1px solid var(--border-color); background:var(--surface-color); }
+.structured-editor > details { max-height:460px; overflow:auto; border:1px solid var(--border-color); padding:20px; }
+.structured-editor #editor-fields { display:grid; gap:20px; margin-top:20px; }
+.structured-editor summary { min-height:44px; cursor:pointer; }
+.inspection-reference-sequence { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr)); gap:8px; padding:0; list-style:none; }
+.inspection-reference-sequence button { width:100%; min-height:60px; text-align:left; }
+@media(max-width:767px) {
+  #field-library-button { font-size:12px; padding:8px; min-width:44px; margin-left:auto; }
+  .training-product-name { display:none; }
+  .training-topbar { gap:8px; }
+  .reference-controls { grid-template-columns:minmax(0,1fr); }
+  .lesson-guide, .lesson-recall, .field-checklist, .visual-workbench { padding:20px 0; }
+}
