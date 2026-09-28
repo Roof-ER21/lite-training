@@ -1,4 +1,7 @@
-.lesson-guide, .lesson-recall, .field-checklist, .visual-workbench, .practice-review { margin: 32px 0; padding: 28px 0; border-top: 1px solid var(--border-color); }
+.lesson-guide, .lesson-recall, .field-checklist, .visual-workbench, .practice-review { margin: 32px 0; padding: 28px; border: 1px solid var(--border-color); border-radius: var(--border-radius); }
+.lesson-guide { margin-top: 20px; background: var(--surface-warm); }
+.visual-workbench { background: var(--surface-soft); }
+.lesson-recall, .field-checklist, .practice-review { background: var(--surface-practice); }
 .lesson-guide h2, .visual-workbench h2 { margin-top: 8px; }
 .lesson-guide nav, .reference-actions { display:flex; flex-wrap:wrap; gap:8px; }
 .lesson-guide nav button, .reference-actions button, .lesson-recall button, .practice-review button { margin:8px 8px 0 0; }
@@ -15,7 +18,7 @@
 .reference-result p { max-width:70ch; }
 .reference-result button[aria-pressed="true"] { border-color:var(--text-primary); }
 .visual-comparison { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr)); gap:20px; }
-.visual-comparison figure { margin:0; border:1px solid var(--border-color); }
+.visual-comparison figure { margin:0; overflow:hidden; border:1px solid var(--border-color); border-radius:var(--border-radius); background:var(--surface-color); box-shadow:var(--shadow-sm); }
 .visual-comparison img { width:100%; aspect-ratio:4/3; object-fit:contain; background:var(--light-bg); display:block; }
 .visual-comparison figcaption { padding:20px; }
 .visual-comparison figcaption p, .source-note { font-size:14px; line-height:1.6; }
@@ -46,5 +49,5 @@
   .training-product-name { display:none; }
   .training-topbar { gap:8px; }
   .reference-controls { grid-template-columns:minmax(0,1fr); }
-  .lesson-guide, .lesson-recall, .field-checklist, .visual-workbench { padding:20px 0; }
+  .lesson-guide, .lesson-recall, .field-checklist, .visual-workbench, .practice-review { margin:20px 0; padding:20px; }
 }
