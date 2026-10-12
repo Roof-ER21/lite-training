@@ -14,3 +14,10 @@
 .inspection-history summary { min-height:44px; cursor:pointer; }
 .inspection-history button { display:block; text-align:left; width:100%; margin:12px 0; white-space:normal; }
 @media(max-width:767px){.inspection-actions { display:grid; grid-template-columns:minmax(0,1fr); } .inspection-actions button { width:100%; } }
+.inspection-audio-check { padding:16px; border:1px solid var(--border-color); border-radius:8px; }
+#inspection-level { display:block; width:100%; max-width:360px; height:20px; margin:8px 0; }
+#inspection-text-form { margin:24px 0; }
+#inspection-text-form label { display:block; font-weight:600; margin-bottom:8px; }
+#inspection-text { box-sizing:border-box; width:100%; font:inherit; padding:12px; color:var(--text-primary); background:var(--surface-color); border:1px solid var(--border-color); border-radius:8px; }
+#inspection-state, #inspection-debrief { scroll-margin-top:200px; }
+@media(max-width:767px) { #inspection-state, #inspection-debrief { scroll-margin-top:80px; } }

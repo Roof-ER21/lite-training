@@ -3,7 +3,7 @@ import OpenAI from 'openai';
 import { GoogleGenAI, Modality } from '@google/genai';
 import { requireAuth } from '../middleware/auth.js';
 import { rateLimit } from '../middleware/rate-limit.js';
-import { normalizeInspectionFeedback } from '../lib/inspection-contract.js';
+import { inspectionInstruction, normalizeInspectionFeedback, validInspectionConversation } from '../lib/inspection-contract.js';
 
 const router = Router();
 
@@ -293,7 +293,23 @@ router.post('/tts', requireAuth, aiLimiter, async (req: Request, res: Response) 
   }
 });
 
-// POST /api/ai/gemini-token - Generate ephemeral token for Gemini Live API
+// Typed alternative uses the same scenario and rubric as voice practice.
+router.post('/inspection-reply', requireAuth, aiLimiter, async (req:Request,res:Response) => {
+  const {scenario,transcript}=req.body;
+  if(!validInspectionConversation(scenario,transcript)) {res.status(400).json({error:'A valid inspection scenario and conversation are required.'});return;}
+  if(!geminiClient){res.status(503).json({error:'AI practice is unavailable. Your conversation is kept on this device.'});return;}
+  try {
+    const response=await geminiClient.models.generateContent({
+      model:process.env.GEMINI_SCORING_MODEL || 'gemini-2.5-flash',
+      contents:transcript.map((turn:any)=>({role:turn.role==='agnes'?'model':'user',parts:[{text:turn.text}]})),
+      config:{systemInstruction:inspectionInstruction(scenario)+' The conversation has already started. Reply to the latest rep message in one or two short sentences. Do not repeat the opening question.',maxOutputTokens:1000}
+    });
+    const reply=response.text?.trim();
+    if(!reply)throw Error('Empty response');
+    res.json({success:true,reply:reply.slice(0,4000)});
+  }catch{res.status(503).json({error:'Agnes could not reply. Keep your conversation and retry.'});}
+});
+
 router.post('/inspection-feedback', requireAuth, aiLimiter, async (req: Request, res: Response) => {
   const {scenario,transcript}=req.body;
   if(!scenario || typeof scenario.prompt!=='string' || scenario.prompt.length>2000 || !Array.isArray(scenario.expectedKeyPoints) || !scenario.expectedKeyPoints.length || scenario.expectedKeyPoints.length>10 || scenario.expectedKeyPoints.some((p:any)=>typeof p!=='string'||p.length>1000) || !Array.isArray(transcript) || transcript.length>1000 || transcript.some((t:any)=>!['user','agnes'].includes(t.role)||typeof t.text!=='string') || JSON.stringify(transcript).length>80000 || !transcript.some((t:any)=>t.role==='user'&&t.text.trim())) {

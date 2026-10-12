@@ -12,6 +12,7 @@ router.use(requireAuth);
 // One durable record per client-generated inspection session, including retries.
 router.post('/inspection-save', async (req:Request,res:Response)=>{
   const record=req.body;
+  if(record.inputMode!==undefined && !['voice','text','mixed'].includes(record.inputMode)){res.status(400).json({error:'Invalid practice mode.'});return;}
   if(!/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i.test(record.id || '') || record.difficulty!=='BEGINNER' || record.completed!==true || !record.scenario || typeof record.scenario.id!=='string' || !record.scenario.id.startsWith('insp-') || !Array.isArray(record.scenario.expectedKeyPoints) || !record.scenario.expectedKeyPoints.length || !Number.isFinite(Date.parse(record.startedAt)) || !Array.isArray(record.transcript) || record.transcript.some((t:any)=>!['user','agnes'].includes(t.role)||typeof t.text!=='string') || !record.transcript.some((t:any)=>t.role==='user'&&t.text.trim()) || JSON.stringify(record).length>100000){res.status(400).json({error:'Invalid inspection session.'});return;}
   let feedback=null;
   try{if(record.feedback)feedback=normalizeInspectionFeedback(record.feedback,record.scenario,record.transcript);}catch{res.status(400).json({error:'Invalid feedback evidence.'});return;}
@@ -21,9 +22,9 @@ router.post('/inspection-save', async (req:Request,res:Response)=>{
     client=await pool.connect();
     await client.query('BEGIN');
     const saved=await client.query(`INSERT INTO roleplay_sessions (id,user_id,personality,difficulty,input_mode,started_at,completed_at,final_score,xp_earned,door_slammed,conversation_log)
-      VALUES ($1,$2,$3,'BEGINNER','voice',$4,NOW(),$5,0,FALSE,$6)
-      ON CONFLICT(id) DO UPDATE SET final_score=EXCLUDED.final_score,conversation_log=EXCLUDED.conversation_log
-      WHERE roleplay_sessions.user_id=EXCLUDED.user_id RETURNING id`,[record.id,req.user!.id,record.scenario.id,record.startedAt,feedback?.score ?? null,JSON.stringify({...record,feedback})]);
+      VALUES ($1,$2,$3,'BEGINNER',$7,$4,NOW(),$5,0,FALSE,$6)
+      ON CONFLICT(id) DO UPDATE SET final_score=EXCLUDED.final_score,conversation_log=EXCLUDED.conversation_log,input_mode=EXCLUDED.input_mode
+      WHERE roleplay_sessions.user_id=EXCLUDED.user_id RETURNING id`,[record.id,req.user!.id,record.scenario.id,record.startedAt,feedback?.score ?? null,JSON.stringify({...record,feedback}),record.inputMode || 'voice']);
     if(!saved.rowCount){await client.query('ROLLBACK');res.status(409).json({error:'Session could not be saved.'});return;}
     await client.query('DELETE FROM roleplay_scores WHERE session_id=$1',[record.id]);
     for(const [i,criterion] of (feedback?.criteria || []).entries())await client.query('INSERT INTO roleplay_scores(session_id,category,points,reason) VALUES($1,$2,$3,$4)',[record.id,`inspection-${i+1}`,criterion.status==='covered'?1:criterion.status==='partial'?0.5:0,JSON.stringify(criterion)]);

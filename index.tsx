@@ -849,12 +849,12 @@ function startScrollTracking(moduleName: string) {
   if (!mainContentEl) return;
 
   scrollListener = () => {
-    const scrollTop = mainContentEl.scrollTop;
-    const scrollHeight = mainContentEl.scrollHeight;
-    const clientHeight = mainContentEl.clientHeight;
-
-    // Within 100px of bottom = scrolled to bottom
-    if (scrollTop + clientHeight >= scrollHeight - 100) {
+    // The reading layout scrolls the document, not #main-content. Support both layouts.
+    const ownsScroll = mainContentEl.scrollHeight > mainContentEl.clientHeight + 1 && getComputedStyle(mainContentEl).overflowY !== 'visible';
+    const atEnd = ownsScroll
+      ? mainContentEl.scrollTop + mainContentEl.clientHeight >= mainContentEl.scrollHeight - 100
+      : mainContentEl.getBoundingClientRect().bottom <= window.innerHeight + 100;
+    if (atEnd) {
       if (moduleEngagement[moduleName] && !moduleEngagement[moduleName].scrolledToBottom) {
         moduleEngagement[moduleName].scrolledToBottom = true;
         updateRequirementIndicator(moduleName, 'scroll', true);
@@ -864,6 +864,8 @@ function startScrollTracking(moduleName: string) {
   };
 
   mainContentEl.addEventListener('scroll', scrollListener);
+  window.addEventListener('scroll', scrollListener, {passive:true});
+  requestAnimationFrame(() => { if(currentModuleForEngagement===moduleName) scrollListener?.(); });
 }
 
 // Start time tracking
@@ -909,6 +911,7 @@ function stopEngagementTracking() {
     if (mainContentEl) {
       mainContentEl.removeEventListener('scroll', scrollListener);
     }
+    window.removeEventListener('scroll', scrollListener);
     scrollListener = null;
   }
 }
@@ -1006,69 +1009,43 @@ function markRoleplayCompleted(moduleName: string) {
 
 // Check if all requirements are met and show/hide completion button
 function checkModuleCompletion(moduleName: string) {
+  if (document.getElementById('main-content')?.dataset.lesson !== moduleName) return;
   const requirements = MODULE_REQUIREMENTS[moduleName];
   const engagement = moduleEngagement[moduleName];
 
   if (!requirements || !engagement) return;
 
-  let canComplete = true;
-
-  // Check scroll
-  if (requirements.needsScroll && !engagement.scrolledToBottom) {
-    canComplete = false;
-  }
-
-  // Check time
-  if (requirements.needsTime && engagement.timeSpent < requirements.needsTime) {
-    canComplete = false;
-  }
-
-  // Check video
-  if (requirements.needsVideo && !engagement.videoWatched) {
-    canComplete = false;
-  }
-
-  // Check quiz
-  if (requirements.needsQuiz && !engagement.quizPassed) {
-    canComplete = false;
-  }
-
-  // Check game
-  if (requirements.needsGame && !engagement.gameCompleted) {
-    canComplete = false;
-  }
-
-  // Check practice
-  if (requirements.needsPractice && !engagement.practiceCompleted) {
-    canComplete = false;
-  }
-
-  // Check challenge
-  if (requirements.needsChallenge && !engagement.challengeCompleted) {
-    canComplete = false;
-  }
-
-  // Check roleplay
-  if (requirements.needsRoleplay && !engagement.roleplayCompleted) {
-    canComplete = false;
-  }
-
-  // Show/hide completion button
+  const completed = JSON.parse(localStorage.getItem('roof-er.completedModules') || '[]').includes(moduleName);
+  const missing: string[] = [];
+  if (requirements.needsTime && engagement.timeSpent < requirements.needsTime) missing.push('Finish reading this lesson');
+  if (requirements.needsVideo && !engagement.videoWatched) missing.push('Watch the lesson video');
+  if (requirements.needsScroll && !engagement.scrolledToBottom) missing.push('Read to the end of this lesson');
+  if (requirements.needsQuiz && !engagement.quizPassed) missing.push('Complete the lesson quiz');
+  if (requirements.needsGame && !engagement.gameCompleted) missing.push('Pass the lesson activity');
+  if (requirements.needsPractice && !engagement.practiceCompleted) missing.push('Practice all four pitch sections');
+  if (requirements.needsChallenge && !engagement.challengeCompleted) missing.push('Complete the lesson challenge');
+  if (requirements.needsRoleplay && !engagement.roleplayCompleted) missing.push('Finish a practice conversation and review it');
+  if (moduleName === 'commitment' && localStorage.getItem(STORAGE_KEYS.commitmentSigned) !== 'true') missing.push('Initial each commitment and sign the form');
+  const canComplete = completed || missing.length === 0;
+  const nextId = MODULE_ORDER[MODULE_ORDER.indexOf(moduleName) + 1];
+  const label = nextId ? 'Next: ' + getModuleDisplayName(nextId) : 'View your training';
+  const guidance = document.getElementById('lesson-requirement');
+  const message = canComplete ? (completed ? 'Lesson complete. Continue when you are ready.' : 'Ready to continue. Your lesson will be marked complete.') : missing.join('. ') + ' to continue.';
+  if (guidance && guidance.textContent !== message) guidance.textContent = message;
+  const nextButton = document.getElementById('lesson-next') as HTMLButtonElement | null;
+  if (nextButton) { nextButton.disabled = !canComplete; nextButton.textContent = label; }
+  const activityButton = document.getElementById('lesson-activity') as HTMLButtonElement | null;
+  if (activityButton) activityButton.hidden = canComplete || moduleName === 'welcome';
   const section = document.getElementById('module-complete-section');
   if (section) {
-    if (canComplete) {
-      const wasHidden = section.style.display === 'none';
-      section.style.display = 'block';
-      section.classList.add('revealed');
-      // Scroll into view on mobile when newly revealed so users can see the button
-      if (wasHidden) {
-        setTimeout(() => {
-          section.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 300);
-      }
-    } else {
-      section.style.display = 'none';
-      section.classList.remove('revealed');
+    section.style.display = 'block';
+    section.classList.toggle('revealed', canComplete);
+    const button = section.querySelector<HTMLButtonElement>('.complete-module-btn');
+    if (button) {
+      button.disabled = !canComplete;
+      button.textContent = label;
+      button.setAttribute('aria-describedby', 'lesson-requirement');
+      button.onclick = () => nextButton?.click();
     }
   }
 }
@@ -1883,8 +1860,8 @@ function getNextTrainingModule(): { module: string; displayName: string } {
     }
   }
 
-  // All complete - return to welcome
-  return { module: 'welcome', displayName: 'Welcome & Company Intro' };
+  // Keep completed trainees at their assessment records rather than restarting.
+  return { module: 'final-exam', displayName: 'Training complete' };
 }
 
 // Calculate level from XP
@@ -1905,7 +1882,7 @@ async function initMyPage() {
   if (title) title.textContent = next.displayName;
   const continueButton = document.getElementById('continue-training-btn');
   if (continueButton) {
-    continueButton.textContent = completed.size ? 'Continue training' : 'Start training';
+    continueButton.textContent = MODULE_ORDER.every(id => completed.has(id)) ? 'View exam results' : completed.size ? 'Continue training' : 'Start training';
     continueButton.onclick = () => navigateToModule(next.module);
   }
   const standing = document.getElementById('exam-standing');
@@ -10908,6 +10885,7 @@ async function renderModule(moduleName: string) {
 
   // Clean up previous module's event listeners and resources (prevents memory leaks)
   cleanupCurrentModule();
+  stopEngagementTracking();
 
   // Clean up tip observers from previous module
   cleanupTipObservers();
@@ -11026,6 +11004,38 @@ async function renderModule(moduleName: string) {
   }
   enhanceLesson(mainContent, moduleName);
   void enhanceTrainingMedia(mainContent);
+  mountLessonNavigation(moduleName);
+}
+
+function mountLessonNavigation(moduleName: string) {
+  if (!mainContent || !MODULE_REQUIREMENTS[moduleName] || moduleName === 'final-exam') return;
+  const nav = document.createElement('section');
+  nav.className = 'lesson-navigation';
+  nav.setAttribute('aria-label', 'Lesson progress and next step');
+  nav.innerHTML = '<p id="lesson-requirement" role="status"></p><div class="lesson-navigation-actions"><button type="button" id="lesson-activity">Go to required activity</button><button type="button" id="lesson-next" aria-describedby="lesson-requirement" disabled>Next lesson</button></div>';
+  mainContent.prepend(nav);
+  const targets: Record<string, string> = {
+    commitment: '#commitment-initials-section', 'general-knowledge': '#quiz2',
+    'shingle-types-materials': '#shingle-game', 'initial-pitch': '[data-script-id]',
+    'handling-initial-pitch-objections': '#objection-challenge-container',
+    'damage-identification': '#damage-matching-game', 'inspection-process': '#inspection-order-game',
+    'post-inspection-pitch': '#agnes-pitch-practice', 'post-inspection-objections': '#m10-quiz-section',
+    'filing-claim-closing': '#filing-claim-quiz', 'sales-cycle-job-flow': '#sales-cycle-game',
+    'role-play': '.inspection-brief'
+  };
+  nav.querySelector<HTMLButtonElement>('#lesson-activity')!.onclick = () => {
+    let target = mainContent!.querySelector<HTMLElement>(targets[moduleName] || 'h1');
+    // Some activities start in a collapsed section. Scroll to its visible parent.
+    while (target && !target.getClientRects().length) target = target.parentElement;
+    if (target) { target.tabIndex = -1; target.focus({preventScroll:true}); target.scrollIntoView({behavior:'instant', block:'center'}); }
+  };
+  nav.querySelector<HTMLButtonElement>('#lesson-next')!.onclick = () => {
+    checkModuleCompletion(moduleName);
+    if (nav.querySelector<HTMLButtonElement>('#lesson-next')!.disabled) return;
+    completeModule(moduleName, false);
+    navigateToModule(MODULE_ORDER[MODULE_ORDER.indexOf(moduleName) + 1] || 'my-page');
+  };
+  checkModuleCompletion(moduleName);
 }
 
 function handleNavigation(event: Event) {
@@ -11335,6 +11345,7 @@ function completeModule(moduleName: string, showCompletion = true) {
 
   // Check for new badges
 
+  checkModuleCompletion(moduleName);
   if (!showCompletion) return;
   const currentIndex = MODULE_ORDER.indexOf(moduleName);
   if (currentIndex < MODULE_ORDER.length - 1) {

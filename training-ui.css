@@ -197,3 +197,10 @@ body #main-content { width: 100%; min-width: 0; max-width: none; height: auto; m
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+.lesson-navigation { position:sticky; top:72px; z-index:5; padding:12px 16px; margin-bottom:24px; background:var(--surface-color); border:1px solid var(--border-color); border-radius:12px; box-shadow:var(--shadow-sm); }
+.lesson-navigation p { margin:0 0 8px; font-size:14px; }
+.lesson-navigation-actions { display:flex; flex-wrap:wrap; gap:8px; }
+.lesson-navigation-actions button { margin:0; min-height:44px; white-space:normal; }
+.lesson-navigation-actions #lesson-next { margin-left:auto; }
+.lesson-navigation button:disabled, .complete-module-btn:disabled { cursor:not-allowed; opacity:0.65; }
+@media(max-width:767px) { .lesson-navigation { position:static; } .lesson-navigation-actions { flex-direction:column; } .lesson-navigation-actions #lesson-next { margin-left:0; } }

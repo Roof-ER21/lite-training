@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — training usability
+
+- Make the next lesson and its requirements visible; fix reading completion when
+  the whole page scrolls and keep completed trainees at their assessment records.
+- Add a direct final-exam action after inspection practice, microphone/speaker
+  checks, clearer connection recovery, and a typed alternative with saved history.
+- Preserve interrupted conversations when switching to typing and prevent duplicate
+  replies or leaked microphones after cancellation.
+
 ## 1.1.0 — 2026-09-12
 
 - Redesigned training navigation and lesson layouts for light/dark mode, keyboard access,

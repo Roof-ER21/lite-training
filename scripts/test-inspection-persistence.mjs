@@ -18,6 +18,13 @@ try{
  const record={id,scenario:{id:'insp-local-qa',prompt:'How do you inspect?',expectedKeyPoints:['Document findings','Explain the photos']},difficulty:'BEGINNER',startedAt:new Date().toISOString(),transcript:[{role:'user',text:'I document findings and explain the photos.'},{role:'agnes',text:'Thank you.'}],feedback:null,completed:true};
  assert.equal((await call('/inspection-save',rep,record)).status,200);
  assert.equal((await call('/inspection-save',rep,record)).status,200);
+ for(const inputMode of ['text','mixed']){
+   record.inputMode=inputMode;
+   assert.equal((await call('/inspection-save',rep,record)).status,200);
+   const saved=await call('/session/'+id,rep);
+   assert.equal(saved.data.session.inputMode,inputMode);
+   assert.equal(JSON.parse(saved.data.session.conversationLog).inputMode,inputMode);
+ }
  let row=(await pool.query('SELECT * FROM roleplay_sessions WHERE id=$1',[id])).rows[0];assert.equal(row.final_score,null);assert.deepEqual(JSON.parse(row.conversation_log).transcript,record.transcript);
  record.feedback={summary:'Practice the explanation again.',criteria:[{status:'covered',evidence:'document findings',nextStep:'Keep documenting.'},{status:'partial',evidence:'explain the photos',nextStep:'Explain what the photos show.'}]};
  assert.equal((await call('/inspection-save',rep,record)).status,200);assert.equal((await call('/inspection-save',rep,record)).status,200);

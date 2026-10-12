@@ -1,17 +1,21 @@
 import { GoogleGenAI } from '@google/genai';
 import { inspectionInstruction, type InspectionScenario } from './server/lib/inspection-contract';
 import type { InspectionConnection } from './inspection-session';
+import { acquireMicrophone } from './inspection-audio-check';
 
 export async function inspectionRequest(path:string,body:unknown,signal:AbortSignal,timeout=25000):Promise<any>{
   const response=await fetch('/api'+path,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${localStorage.getItem('roof-er.sessionToken') || ''}`},body:JSON.stringify(body),signal:AbortSignal.any([signal,AbortSignal.timeout(timeout)])});
-  const data=await response.json();if(!response.ok || data.success===false)throw Error(data.message || data.error || 'Request failed.');return data;
+  if(response.status===401)throw Error('Your sign-in expired. Sign in again, then retry. Your captured conversation remains on this device.');
+  if(response.status===429)throw Error('Practice is receiving too many requests. Wait a minute and retry.');
+  const data=await response.json().catch(()=>({}));if(!response.ok || data.success===false)throw Error(data.message || data.error || 'Practice is unavailable. Retry when connected.');return data;
 }
 export async function connectInspection(scenario:InspectionScenario,onMessage:(message:any)=>void,onDisconnect:()=>void,signal:AbortSignal):Promise<InspectionConnection>{
   let stream:MediaStream|null=null;let session:any=null;let node:AudioWorkletNode|null=null;let closed=false;let muted=false;let sending=false;
   let next=0;const sources=new Set<AudioBufferSourceNode>();
   const Audio=window.AudioContext || (window as any).webkitAudioContext;
   if(!navigator.mediaDevices?.getUserMedia || !Audio)throw Error('This browser cannot start microphone practice. Use a current browser with microphone access.');
-  const input=new Audio({sampleRate:16000}) as AudioContext;
+  // Use the device rate, then resample before sending. Some mobile devices reject 16 kHz contexts.
+  const input=new Audio() as AudioContext;
   const output=new Audio({sampleRate:24000}) as AudioContext;
   const stopAudio=()=>{for(const source of sources){try{source.stop();}catch{}}sources.clear();next=0;};
   const close=()=>{
@@ -31,8 +35,10 @@ export async function connectInspection(scenario:InspectionScenario,onMessage:(m
   let timeout:ReturnType<typeof setTimeout>|undefined;
   try{
     await Promise.all([input.resume(),output.resume()]);
-    stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true},video:false});
+    onMessage({localStatus:'Allow microphone access when your browser asks. You can stop and use typed practice instead.'});
+    stream=await acquireMicrophone(signal);
     if(closed || signal.aborted){stream.getTracks().forEach(t=>t.stop());throw Error('Practice cancelled.');}
+    onMessage({localStatus:'Microphone connected. Connecting to Agnes…'});
     const token=await inspectionRequest('/ai/gemini-token',{systemInstruction:inspectionInstruction(scenario),inspection:true},signal);
     if(!token.token || !token.model)throw Error('Voice practice could not obtain a connection. Retry when online.');
     const ai=new GoogleGenAI({apiKey:token.token,httpOptions:{apiVersion:'v1alpha'}});
@@ -66,6 +72,7 @@ export async function connectInspection(scenario:InspectionScenario,onMessage:(m
     session=connected;
     if(closed || signal.aborted){session.close();throw Error('Practice cancelled.');}
     await ready;clearTimeout(timeout);
+    onMessage({localStatus:'Agnes connected. Preparing microphone audio…'});
     await input.audioWorklet.addModule('/inspection-audio-worklet.js');
     if(closed || signal.aborted)throw Error('Practice cancelled.');
     node=new AudioWorkletNode(input,'inspection-capture');

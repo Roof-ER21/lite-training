@@ -1,5 +1,15 @@
 export type InspectionScenario = {id:string; prompt:string; expectedKeyPoints:string[]; followUps?:string[]};
 export type InspectionTurn = {role:'user'|'agnes'; text:string};
+export function validInspectionConversation(scenario:any,transcript:any):boolean {
+  return !!scenario && typeof scenario.id==='string' && scenario.id.startsWith('insp-') &&
+    typeof scenario.prompt==='string' && scenario.prompt.length>0 && scenario.prompt.length<=2000 &&
+    Array.isArray(scenario.expectedKeyPoints) && scenario.expectedKeyPoints.length>0 && scenario.expectedKeyPoints.length<=10 &&
+    scenario.expectedKeyPoints.every((p:any)=>typeof p==='string' && p.length>0 && p.length<=1000) &&
+    (scenario.followUps===undefined || (Array.isArray(scenario.followUps) && scenario.followUps.length<=20 && scenario.followUps.every((p:any)=>typeof p==='string' && p.length<=2000))) &&
+    Array.isArray(transcript) && transcript.length>0 && transcript.length<=100 &&
+    transcript.every((t:any)=>t && ['user','agnes'].includes(t.role) && typeof t.text==='string' && t.text.trim().length>0 && t.text.length<=4000) &&
+    transcript[transcript.length-1].role==='user' && JSON.stringify(transcript).length<=60000;
+}
 export type InspectionFeedback = {score:number; summary:string; criteria:{point:string; status:'covered'|'partial'|'missed'; evidence:string; nextStep:string}[]};
 export function inspectionInstruction(scenario:InspectionScenario):string {
   return `You are Agnes, a patient homeowner in Roof-ER's INSPECTION PROCESS training.

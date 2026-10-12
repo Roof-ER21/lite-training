@@ -26,6 +26,7 @@ try{
  session.sendRealtimeInput({audioStreamEnd:true});await waitUntil(()=>turns>1&&transcript.some(t=>t.role==='user'));
  session.close();session=null;assert.ok(audioParts>0);assert.ok(transcript.some(t=>t.role==='agnes'));
  const feedback=await call('inspection-feedback',{scenario,transcript});assert.equal(feedback.aiScored,true);assert.equal(feedback.feedback.criteria.length,4);
- console.log(JSON.stringify({result:'PASS',syntheticAudio:true,liveAudioParts:audioParts,repTranscriptionEvents:transcript.filter(t=>t.role==='user').length,homeownerTranscriptionEvents:transcript.filter(t=>t.role==='agnes').length,feedbackCriteria:feedback.feedback.criteria.length,score:feedback.feedback.score}));
+ const typed=await call('inspection-reply',{scenario,transcript:[{role:'agnes',text:scenario.prompt},{role:'user',text:'I look for storm damage and document the shingles, flashing, vents and collateral damage with photos.'}]});assert.ok(typed.reply?.trim());
+ console.log(JSON.stringify({result:'PASS',syntheticAudio:true,typedReply:true,liveAudioParts:audioParts,repTranscriptionEvents:transcript.filter(t=>t.role==='user').length,homeownerTranscriptionEvents:transcript.filter(t=>t.role==='agnes').length,feedbackCriteria:feedback.feedback.criteria.length,score:feedback.feedback.score}));
 }catch(e){console.error(JSON.stringify({error:e.message,ready,turns,audioParts,closeCode,providerError,repEvents:transcript.filter(t=>t.role==='user').length}));process.exitCode=1;}
 finally{session?.close();await pool.query('DELETE FROM users WHERE id=$1',[rep]);server.close();await pool.end();}

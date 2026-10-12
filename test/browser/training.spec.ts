@@ -16,6 +16,45 @@ async function openLesson(page: Page, id: string) {
   await expect(page.locator('#main-content')).toHaveAttribute('data-lesson',id);
 }
 
+test('lesson guidance explains the gate and continues directly to the named next lesson', async ({page}) => {
+  await login(page);
+  await page.evaluate(ids => localStorage.setItem('roof-er.unlockedModules',JSON.stringify(ids)),modules);
+  await openLesson(page,'general-knowledge');
+  const next = page.locator('#lesson-next');
+  await expect(next).toBeVisible();
+  await expect(next).toBeDisabled();
+  await expect(page.locator('#lesson-requirement')).toContainText('quiz');
+  await page.getByRole('button',{name:'Go to required activity',exact:true}).click();
+  await expect(page.locator('#quiz2')).toBeInViewport();
+  await page.evaluate(() => (window as any).markQuizPassed('general-knowledge'));
+  await expect(next).toBeEnabled();
+  await expect(next).toContainText('Shingle Types');
+  await next.click();
+  await expect(page.locator('#main-content')).toHaveAttribute('data-lesson','shingle-types-materials');
+  await openLesson(page,'general-knowledge');
+  await expect(page.locator('#lesson-next')).toBeEnabled();
+});
+
+test('finished training offers records instead of restarting Welcome', async ({page}) => {
+  await login(page);
+  await page.evaluate(ids => {
+    localStorage.setItem('roof-er.unlockedModules',JSON.stringify(ids));
+    localStorage.setItem('roof-er.completedModules',JSON.stringify(ids));
+  },modules);
+  await openLesson(page,'my-page');
+  await expect(page.locator('#continue-training-btn')).toHaveText('View exam results');
+  await page.locator('#continue-training-btn').click();
+  await expect(page.locator('#main-content')).toHaveAttribute('data-lesson','final-exam');
+});
+
+test('reading Welcome unlocks Next when the document reaches the end',async({page})=>{
+  await login(page);await openLesson(page,'welcome');
+  await expect(page.locator('#lesson-next')).toBeDisabled();
+  await page.locator('#module-complete-section').scrollIntoViewIfNeeded();
+  await page.evaluate(()=>window.scrollTo({top:document.documentElement.scrollHeight,behavior:'instant'}));
+  await expect(page.locator('#lesson-next')).toBeEnabled();
+});
+
 for (const theme of ['light','dark']) {
   test(`${theme}: mobile lessons have no WCAG violations or page overflow`, async ({page}) => {
     const errors: string[] = [];

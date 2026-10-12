@@ -12,6 +12,38 @@ function harness(overrides:any={}){
   return {flow,deps,close,mute,completed,save,speech:()=>message({serverContent:{inputTranscription:{text:transcript[0].text},outputTranscription:{text:'Thank you.'}}}),disconnect:()=>disconnect()};
 }
 describe('rookie inspection session',()=>{
+  it('typed practice retains a failed reply and retries without duplicating the rep turn',async()=>{
+    const reply=vi.fn().mockRejectedValueOnce(Error('offline')).mockResolvedValue('Can I see the photos?');
+    const h=harness({reply});
+    h.flow.startText();
+    await h.flow.sendText('I will take a close-up and an overview.');
+    expect(h.flow.record?.transcript.filter(t=>t.role==='user')).toHaveLength(1);
+    expect(h.flow.replyFailed).toBe(true);
+    await h.flow.retryReply();
+    expect(h.flow.replyFailed).toBe(false);
+    expect(h.flow.record?.transcript.filter(t=>t.role==='user')).toHaveLength(1);
+    await h.flow.finish();
+    expect(h.completed).toHaveBeenCalledOnce();
+    expect(h.flow.record?.inputMode).toBe('text');
+  });
+  it('switching from interrupted voice to typing preserves captured speech',async()=>{
+    const h=harness({reply:vi.fn().mockResolvedValue('Thank you.')});
+    await h.flow.start();h.speech();h.disconnect();const id=h.flow.record!.id;
+    h.flow.startText();
+    expect(h.flow.record?.id).toBe(id);
+    expect(h.flow.record?.inputMode).toBe('mixed');
+    expect(h.flow.record?.transcript.some(t=>t.text===transcript[0].text)).toBe(true);
+  });
+  it('ignores a late typed reply after stopping and starting another attempt',async()=>{
+    let resolve:any;const h=harness({reply:()=>new Promise(r=>resolve=r)});
+    h.flow.startText();const pending=h.flow.sendText('Old reply');h.flow.stop();h.flow.startText();
+    resolve('Late homeowner response');await pending;
+    expect(h.flow.record?.transcript.some(t=>t.text==='Late homeowner response')).toBe(false);
+  });
+  it('can review captured typed words after stopping a pending reply',async()=>{
+    const h=harness({reply:()=>new Promise(()=>{})});h.flow.startText();void h.flow.sendText('I document photos.');
+    h.flow.stop();await h.flow.finish();expect(h.completed).toHaveBeenCalledOnce();
+  });
   it('joins streamed word fragments without breaking the transcript',()=>{const turns:any[]=[];appendInspectionTurn(turns,'user','I document col');appendInspectionTurn(turns,'user','lateral damage.');appendInspectionTurn(turns,'agnes','Thank you.');expect(turns).toEqual([{role:'user',text:'I document collateral damage.'},{role:'agnes',text:'Thank you.'}]);});
   it('uses the exact scenario and locks instructions to rookie inspection',()=>{const prompt=inspectionInstruction(scenario);expect(prompt).toContain(scenario.prompt);expect(prompt).toContain('ROOKIE / EASY');expect(prompt).toContain('Do not escalate difficulty');});
   it('captures both speakers and completes/saves once despite repeated End',async()=>{const h=harness();await h.flow.start();h.speech();await Promise.all([h.flow.finish(),h.flow.finish()]);expect(h.flow.record?.transcript.map(t=>t.role)).toEqual(['user','agnes']);expect(h.completed).toHaveBeenCalledTimes(1);expect(h.save).toHaveBeenCalledTimes(1);expect(h.flow.saved).toBe(true);expect(h.close).toHaveBeenCalledTimes(1);});

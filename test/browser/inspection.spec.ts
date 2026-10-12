@@ -41,8 +41,51 @@ test('rookie inspection briefing matches the live SDK request, debrief and durab
   await expect(page.locator('#inspection-feedback')).toContainText('AI-scored practice: 100/100');
   await expect(page.locator('#inspection-save-status')).toContainText('saved to your training record');
   expect(mock.saved().scenario.prompt).toBe(prompt);expect(mock.saved().difficulty).toBe('BEGINNER');expect(mock.saved().transcript.some((t:any)=>t.role==='user')).toBe(true);expect(mock.saves()).toBe(1);
+  await expect(page.locator('#lesson-next')).toBeEnabled();
+  await expect(page.locator('#lesson-next')).toHaveText('Next: Final Exam');
   await mkdir('output/playwright',{recursive:true});
   for(const width of [1280,390])for(const theme of ['light','dark']){await page.setViewportSize({width,height:900});await page.getByLabel('Appearance').selectOption(theme);await expect.poll(async()=> (await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze()).violations).toEqual([]);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.evaluate(()=>{(document.activeElement as HTMLElement)?.blur();window.scrollTo(0,0);});await page.screenshot({path:`output/playwright/inspection-${width}-${theme}.png`,fullPage:true});}
+});
+test('typed practice works without microphone access and continues to the exam',async({page})=>{
+  const mock=await provider(page);let calls=0;
+  await page.route('**/api/ai/inspection-reply',route=>{calls++;return route.fulfill(calls===1?{status:503,json:{error:'Unavailable'}}:{json:{success:true,reply:'Can I see the photos?'}});});
+  await open(page);
+  await page.evaluate(()=>{navigator.mediaDevices.getUserMedia=()=>Promise.reject(Error('Microphone must not be used'));});
+  await page.getByRole('button',{name:'Use typed practice',exact:true}).click();
+  await page.getByLabel('Your reply to Agnes').fill(speech);
+  await page.getByRole('button',{name:'Send reply',exact:true}).click();
+  await expect(page.locator('#inspection-state')).toContainText('could not reply');
+  await page.getByRole('button',{name:'Retry Agnes’s reply',exact:true}).click();
+  await expect(page.locator('#inspection-transcript')).toContainText('Can I see the photos?');
+  await page.getByRole('button',{name:'End & review',exact:true}).click();
+  await expect(page.locator('#inspection-save-status')).toContainText('saved to your training record');
+  expect(mock.saved().inputMode).toBe('text');
+  expect(mock.saved().transcript.filter((turn:any)=>turn.role==='user')).toHaveLength(1);
+  await page.locator('#inspection-continue').click();
+  await expect(page.locator('#main-content')).toHaveAttribute('data-lesson','final-exam');
+});
+
+test('a pending microphone request can be cancelled and replaced by typing',async({page})=>{
+  await provider(page);await open(page);
+  await page.evaluate(()=>{navigator.mediaDevices.getUserMedia=()=>new Promise(()=>{});});
+  await page.getByRole('button',{name:'Start voice practice',exact:true}).click();
+  await expect(page.locator('#inspection-state')).toContainText('Allow microphone');
+  await page.getByRole('button',{name:'Use typed practice',exact:true}).click();
+  await expect(page.getByLabel('Your reply to Agnes')).toBeVisible();
+  await expect(page.locator('#inspection-state')).toContainText('Typed practice');
+});
+
+test('microphone check releases its stream when stopped',async({page})=>{
+  await provider(page);await open(page);
+  await page.evaluate(()=>{
+    const original=navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+    navigator.mediaDevices.getUserMedia=async options=>{const stream=await original(options);(window as any).qaMic=stream;return stream;};
+  });
+  await page.getByRole('button',{name:'Check microphone',exact:true}).click();
+  await expect.poll(()=>page.evaluate(()=>(window as any).qaMic?.getAudioTracks()[0].readyState)).toBe('live');
+  await page.getByRole('button',{name:'Stop microphone check',exact:true}).click();
+  await expect.poll(()=>page.evaluate(()=>(window as any).qaMic?.getAudioTracks()[0].readyState)).toBe('ended');
+  await expect(page.locator('#inspection-audio-status')).toContainText('stopped');
 });
 test('feedback and save failures retain the transcript and allow focused retries',async({page})=>{
   const mock=await provider(page,{failSave:true,failFeedback:true});await open(page);
