@@ -378,3 +378,21 @@ button:active:not(:disabled) { transform: translateY(1px); }
 #main-content :is(.script-purpose-callout, .intro-highlight-card) {
   background:var(--lesson-accent-surface) !important; border-left-color:var(--brand-mark) !important;
 }
+
+/* Prominent lesson panels use actual brand contrast, rather than pale nested boxes. */
+#main-content .content-card > h1 {
+  background:var(--brand); color:var(--on-brand); border:0; border-radius:8px;
+}
+#main-content .promise-section {
+  background:var(--lesson-feature-surface); color:var(--lesson-feature-ink);
+  border-left:5px solid var(--brand); border-radius:0 10px 10px 0; padding:28px 32px;
+}
+#main-content .promise-section :is(p, strong, li) { color:var(--lesson-feature-ink); }
+#main-content .promise-section .promise-check { color:var(--lesson-feature-accent); }
+#main-content .promise-section li { padding:16px 0; align-items:flex-start; }
+#main-content .promise-section li + li { border-top:1px solid var(--lesson-feature-rule); }
+#main-content .lesson-reading-tools {
+  background:var(--lesson-feature-surface); color:var(--lesson-feature-ink); border:0;
+}
+#main-content .lesson-reading-tools :is(summary, a) { color:var(--lesson-feature-ink); }
+@media(max-width:767px) { #main-content .promise-section { padding:22px; } }

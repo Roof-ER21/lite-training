@@ -113,3 +113,14 @@
   --lesson-practice-surface: #3D4957;
   --lesson-reference-surface: #494A52;
 }
+
+/* Strong feature surfaces, shared by light and dark lesson pages. */
+:root {
+  --lesson-feature-surface: #414D5C;
+  --lesson-feature-ink: #FFFFFF;
+  --lesson-feature-rule: #77818F;
+  --lesson-feature-accent: #FFB1AC;
+}
+:root[data-theme="dark"] {
+  --lesson-feature-surface: #485568;
+}
