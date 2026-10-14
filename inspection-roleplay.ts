@@ -19,17 +19,16 @@ export function mountInspectionRoleplay(root:HTMLElement,complete:()=>void,revie
         <p class="doorstep-context">You’ve just knocked. Agnes opens the door.</p>
         <blockquote id="inspection-prompt"></blockquote>
         <p class="doorstep-direction">Run your initial pitch, listen to Agnes’s concern, and work toward permission to inspect. She’ll raise a simple objection and give you room to respond.</p>
-        <div class="inspection-actions doorstep-start"><button type="button" id="inspection-start" class="primary-action">Start voice practice</button><button type="button" id="inspection-type">Use typed practice</button></div>
-        <p class="doorstep-mode-note">Same conversation and feedback in either mode. No camera needed.</p>
+        <div class="inspection-actions doorstep-start"><button type="button" id="inspection-start" class="primary-action">Start voice practice</button></div>
+        <p class="doorstep-mode-note">Speak naturally and let Agnes respond. Microphone required; no camera needed.</p>
         <details class="inspection-audio-check"><summary>Check your microphone &amp; sound</summary><p>The sound check stays on this device.</p><div class="inspection-actions"><button type="button" id="inspection-check">Check microphone</button><button type="button" id="inspection-speaker">Play test sound</button></div><label for="inspection-level">Microphone level</label><meter id="inspection-level" min="0" max="1" value="0">Microphone level</meter><p id="inspection-audio-status" role="status">Speak during the check to see the level move. If the test sound is silent, check your volume and audio output.</p></details>
       </section>
       <aside class="doorstep-script" aria-labelledby="doorstep-script-title"><p class="doorstep-kicker">Your script guide</p><h2 id="doorstep-script-title">Make the first<br>impression count.</h2><p>Your script, one simple objection, and a clear next step.</p><ol id="inspection-points"></ol><button type="button" id="inspection-review">Review the initial script</button></aside>
     </div>
     <div class="doorstep-session">
       <p id="inspection-state" role="status" aria-live="polite"></p>
-      <div class="inspection-actions" id="inspection-live-controls" hidden><button type="button" id="inspection-mute" aria-pressed="false">Mute microphone</button><button type="button" id="inspection-end" class="primary-action">End &amp; review</button><button type="button" id="inspection-cancel">Stop practice</button><button type="button" id="inspection-switch">Switch to typing</button></div>
+      <div class="inspection-actions" id="inspection-live-controls" hidden><button type="button" id="inspection-mute" aria-pressed="false">Mute microphone</button><button type="button" id="inspection-end" class="primary-action">End &amp; review</button><button type="button" id="inspection-cancel">Stop practice</button></div>
       <section id="inspection-transcript-panel" hidden><p class="doorstep-kicker">The conversation</p><h2>You &amp; Agnes</h2><p class="doorstep-mode-note">Feedback uses the words captured here. Automatic transcription can contain errors.</p><div id="inspection-transcript" role="log" aria-label="Doorstep conversation" aria-live="polite"></div></section>
-      <form id="inspection-text-form" hidden><label for="inspection-text">Your reply to Agnes</label><textarea id="inspection-text" rows="4" maxlength="4000" placeholder="Hi, how are you? My name is…" required></textarea><div class="inspection-actions"><button type="submit" id="inspection-send" class="primary-action">Send reply</button><button type="button" id="inspection-reply-retry" hidden>Retry Agnes’s reply</button></div><p class="doorstep-mode-note">Your typed words are included in your saved practice and AI feedback.</p></form>
       <section id="inspection-debrief" hidden><p class="doorstep-kicker">Your next rep starts here</p><h2>How your pitch landed</h2><div id="inspection-feedback"></div><p id="inspection-save-status" role="status"></p><div class="inspection-actions"><button type="button" id="inspection-feedback-retry">Retry feedback</button><button type="button" id="inspection-save-retry">Retry server save</button><button type="button" id="inspection-again">Practice this scenario again</button><button type="button" id="inspection-download">Download conversation</button><button type="button" id="inspection-continue" class="primary-action">Next: Final Exam</button></div></section>
     </div>
     <details class="inspection-history"><summary>Your saved doorstep practice</summary><div id="inspection-history"></div></details>
@@ -60,14 +59,8 @@ export function mountInspectionRoleplay(root:HTMLElement,complete:()=>void,revie
     root.querySelector('#inspection-prompt')!.textContent=flow.scenario.prompt;
     root.querySelector('#inspection-points')!.innerHTML=flow.scenario.expectedKeyPoints.map(point=>`<li>${escapeText(point)}</li>`).join('');
     button('inspection-start').disabled=active;button('inspection-start').textContent=phase==='ready'?'Start voice practice':'Retry same scenario';
-    button('inspection-type').disabled=phase==='scoring' || (phase==='practicing' && flow.typing);
-    button('inspection-type').textContent=phase==='interrupted'?'Continue by typing':'Use typed practice';
     button('inspection-check').disabled=active;button('inspection-speaker').disabled=active;
     button('inspection-check').textContent=checking?'Stop microphone check':'Check microphone';
-    root.querySelector<HTMLFormElement>('#inspection-text-form')!.hidden=!flow.typing || phase!=='practicing';
-    button('inspection-send').disabled=flow.replying || flow.replyFailed;
-    button('inspection-reply-retry').hidden=!flow.replyFailed;button('inspection-reply-retry').disabled=flow.replying;
-    root.querySelector<HTMLTextAreaElement>('#inspection-text')!.disabled=flow.replying || flow.replyFailed;
     if(previousPhase!==phase){
       previousPhase=phase;clearTimeout(speechTimer);
       if(['connecting','practicing','completed'].includes(phase))requestAnimationFrame(()=>{
@@ -77,14 +70,13 @@ export function mountInspectionRoleplay(root:HTMLElement,complete:()=>void,revie
       });
       if(phase==='practicing' && !flow.typing)speechTimer=setTimeout(()=>{
         if(flow.phase==='practicing' && !flow.typing && !flow.record?.transcript.some(t=>t.role==='user')){
-          root.querySelector('#inspection-state')!.textContent='No words from you have been captured yet. Speak a short sentence. If nothing appears below, stop and check your microphone or continue by typing.';
+          root.querySelector('#inspection-state')!.textContent='No words from you have been captured yet. Speak a short sentence. If nothing appears below, stop and check your microphone then retry voice practice.';
         }
       },15000);
     }
     button('inspection-review').disabled=phase==='scoring';
     const controls=root.querySelector<HTMLElement>('#inspection-live-controls')!;controls.hidden=!active && phase!=='interrupted';
     button('inspection-mute').hidden=flow.typing;button('inspection-mute').disabled=phase!=='practicing';button('inspection-mute').textContent=flow.muted?'Unmute microphone':'Mute microphone';button('inspection-mute').setAttribute('aria-pressed',String(flow.muted));
-    button('inspection-switch').hidden=flow.typing;button('inspection-switch').disabled=phase==='scoring';
     button('inspection-continue').disabled=flow.saving;
     button('inspection-end').disabled=!['practicing','interrupted'].includes(phase) || flow.replying;button('inspection-cancel').disabled=phase==='scoring';
     const transcript=flow.record?.transcript || [];root.querySelector<HTMLElement>('#inspection-transcript-panel')!.hidden=!transcript.length;
@@ -99,31 +91,25 @@ export function mountInspectionRoleplay(root:HTMLElement,complete:()=>void,revie
   };
   const makeFlow=(scenario:InspectionScenario)=>new InspectionSession(scenario,{
     connect:connectInspection,
-    reply:async(record,signal)=>{const data=await inspectionRequest('/ai/inspection-reply',{scenario:record.scenario,transcript:record.transcript},signal);if(typeof data.reply!=='string')throw Error('No reply received.');return data.reply;},
-    feedback:async(record,signal)=>{const data=await inspectionRequest('/ai/inspection-feedback',{scenario:record.scenario,transcript:record.transcript},signal);return normalizeInspectionFeedback(data.feedback,record.scenario,record.transcript);},
+    feedback:async(record,signal)=>{const data=await inspectionRequest('/ai/inspection-feedback',{scenario:record.scenario,transcript:record.transcript},signal,60000);return normalizeInspectionFeedback(data.feedback,record.scenario,record.transcript);},
     save:async(record,signal)=>{const result=await inspectionRequest('/roleplay/inspection-save',record,signal);if(result.sessionId!==record.id)throw Error('Session save was not confirmed.');},
     changed:update,completed:()=>{complete();announceTrainingStatus('Initial pitch practice completed. Review your feedback below.');}
   });
   flow=makeFlow(INITIAL_PITCH_SCENARIO);update();
   button('inspection-start').onclick=()=>{stopCheck();void flow.start();};
-  button('inspection-again').onclick=()=>{stopCheck();if(flow.typing)flow.startText();else void flow.start();};
-  button('inspection-type').onclick=()=>{stopCheck();if(['connecting','practicing'].includes(flow.phase))flow.stop();flow.startText();root.querySelector<HTMLTextAreaElement>('#inspection-text')!.focus();};
-  button('inspection-switch').onclick=()=>button('inspection-type').click();
+  button('inspection-again').onclick=()=>{stopCheck();void flow.start();};
   button('inspection-continue').onclick=()=>{complete();document.getElementById('lesson-next')?.click();};
-  const form=root.querySelector<HTMLFormElement>('#inspection-text-form')!;
-  form.onsubmit=event=>{event.preventDefault();const input=root.querySelector<HTMLTextAreaElement>('#inspection-text')!;const text=input.value;if(!text.trim() || flow.replying || flow.replyFailed)return;input.value='';void flow.sendText(text).then(()=>{if(!disposed && flow.phase==='practicing' && !flow.replyFailed)input.focus();});};
-  button('inspection-reply-retry').onclick=()=>void flow.retryReply();
   button('inspection-check').onclick=async()=>{
-    if(checking){stopCheck();audioStatus.textContent='Microphone check stopped. Start voice or typed practice when ready.';update();return;}
+    if(checking){stopCheck();audioStatus.textContent='Microphone check stopped. Start voice practice when ready.';update();return;}
     stopCheck();checking=true;update();const signal=audioController.signal;let detected=false;
     audioStatus.textContent='Allow microphone access, then say a sentence. The check stops after ten seconds.';
     try{
       await checkMicrophone(signal,level=>{if(disposed)return;root.querySelector<HTMLMeterElement>('#inspection-level')!.value=level;if(level>0.03)detected=true;});
       if(signal.aborted)return;
-      audioTimer=setTimeout(()=>{stopCheck();audioStatus.textContent=detected?'Microphone detected sound. If you heard the test tone, you are ready for voice practice.':'No microphone sound detected. Check your selected microphone and mute switch, or use typed practice.';update();},10000);
-    }catch(error){if(signal.aborted)return;stopCheck();audioStatus.textContent=(error as Error).name==='NotAllowedError'?'Microphone permission was denied. Allow access in browser settings, or use typed practice.':(error as Error).message;update();}
+      audioTimer=setTimeout(()=>{stopCheck();audioStatus.textContent=detected?'Microphone detected sound. If you heard the test tone, you are ready for voice practice.':'No microphone sound detected. Check your selected microphone and mute switch, then retry voice practice.';update();},10000);
+    }catch(error){if(signal.aborted)return;stopCheck();audioStatus.textContent=(error as Error).name==='NotAllowedError'?'Microphone permission was denied. Allow access in browser settings, then retry voice practice.':(error as Error).message;update();}
   };
-  button('inspection-speaker').onclick=()=>{const signal=audioController.signal;void playSpeakerCheck(signal).then(()=>{if(!disposed&&!signal.aborted)audioStatus.textContent='A short tone was played. If you did not hear it, check your volume and selected audio output, or use typed practice.';}).catch(()=>{if(!disposed)audioStatus.textContent='Sound could not play. Check your audio output or use typed practice.';});};
+  button('inspection-speaker').onclick=()=>{const signal=audioController.signal;void playSpeakerCheck(signal).then(()=>{if(!disposed&&!signal.aborted)audioStatus.textContent='A short tone was played. If you did not hear it, check your volume and selected audio output, then retry voice practice.';}).catch(()=>{if(!disposed)audioStatus.textContent='Sound could not play. Check your audio output then retry voice practice.';});};
   button('inspection-review').onclick=review;
   button('inspection-end').onclick=()=>void flow.finish();
   button('inspection-mute').onclick=()=>flow.toggleMute();

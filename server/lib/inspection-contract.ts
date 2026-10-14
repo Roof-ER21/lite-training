@@ -60,8 +60,15 @@ export function normalizeInspectionFeedback(value:any,scenario:InspectionScenari
   const speech=transcript.filter(t=>t.role==='user').map(t=>t.text).join(' ').toLowerCase().replace(/\s+/g,' ');
   const criteria=scenario.expectedKeyPoints.map((point,i)=>{
     const row=value.criteria[i];
-    if(!row || !['covered','partial','missed'].includes(row.status) || typeof row.evidence!=='string' || typeof row.nextStep!=='string')throw Error('Invalid feedback');
-    const evidence=row.evidence.trim();
+    if(!row || !['covered','partial','missed'].includes(row.status) || typeof row.nextStep!=='string')throw Error('Invalid feedback');
+    // New provider responses cite an existing rep turn, not a generated quotation.
+    // Saved/legacy feedback still uses the exact-quote validation below.
+    let evidence=typeof row.evidence==='string'?row.evidence.trim():'';
+    if(row.status!=='missed' && row.evidenceTurnIndex!==undefined) {
+      const turn=Number.isInteger(row.evidenceTurnIndex)?transcript[row.evidenceTurnIndex]:undefined;
+      if(!turn || turn.role!=='user' || !turn.text.trim()) throw Error('Unsupported feedback evidence');
+      evidence=turn.text.trim();
+    }
     // A supported assessment must cite words that actually came from the rep.
     if(row.status!=='missed' && (!evidence || !speech.includes(evidence.toLowerCase().replace(/\s+/g,' '))))throw Error('Unsupported feedback evidence');
     return {point,status:row.status,evidence:row.status==='missed'?'':evidence,nextStep:row.nextStep.slice(0,1000)};

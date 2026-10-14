@@ -99,3 +99,17 @@
 
 :root { --reading-surface: #F0F0F3; --lesson-title-surface: #E1E1E7; }
 :root[data-theme="dark"] { --reading-surface: #3C3D43; --lesson-title-surface: #4B4C54; }
+
+/* Distinguish lesson guidance, scripts, and practice without white-on-white panels. */
+:root {
+  --lesson-accent-surface: #F1DCDA;
+  --lesson-accent-header: #E6C1BD;
+  --lesson-practice-surface: #DCE3EA;
+  --lesson-reference-surface: #E0E1E6;
+}
+:root[data-theme="dark"] {
+  --lesson-accent-surface: #514044;
+  --lesson-accent-header: #64484D;
+  --lesson-practice-surface: #3D4957;
+  --lesson-reference-surface: #494A52;
+}

@@ -1,7 +1,7 @@
 /** Bound permission prompts and release streams that arrive after cancellation. */
 export function acquireMicrophone(signal:AbortSignal, timeout=20000):Promise<MediaStream> {
   if(signal.aborted)return Promise.reject(Error('Microphone check cancelled.'));
-  if(!navigator.mediaDevices?.getUserMedia)return Promise.reject(Error('Microphone access is unavailable. Use typed practice or a supported browser.'));
+  if(!navigator.mediaDevices?.getUserMedia)return Promise.reject(Error('Microphone access is unavailable. Use a supported browser with microphone access.'));
   return new Promise((resolve,reject)=>{
     let settled=false;
     const finish=(error?:Error,stream?:MediaStream)=>{
@@ -10,7 +10,7 @@ export function acquireMicrophone(signal:AbortSignal, timeout=20000):Promise<Med
       if(error)reject(error);else resolve(stream!);
     };
     const abort=()=>finish(Error('Microphone request cancelled.'));
-    const timer=setTimeout(()=>finish(Error('Microphone permission timed out. Allow microphone access in your browser, retry, or use typed practice.')),timeout);
+    const timer=setTimeout(()=>finish(Error('Microphone permission timed out. Allow microphone access in your browser, then retry.')),timeout);
     signal.addEventListener('abort',abort,{once:true});
     navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true},video:false})
       .then(stream=>finish(undefined,stream),error=>finish(error));
@@ -19,7 +19,7 @@ export function acquireMicrophone(signal:AbortSignal, timeout=20000):Promise<Med
 
 export async function checkMicrophone(signal:AbortSignal,onLevel:(level:number)=>void):Promise<()=>void> {
   const Audio=window.AudioContext || (window as any).webkitAudioContext;
-  if(!Audio)throw Error('This browser cannot check audio. Use typed practice.');
+  if(!Audio)throw Error('This browser cannot check audio. Try a supported browser.');
   const context=new Audio() as AudioContext;
   let stream:MediaStream|null=null,frame=0;
   const close=()=>{cancelAnimationFrame(frame);stream?.getTracks().forEach(t=>t.stop());void context.close().catch(()=>{});onLevel(0);signal.removeEventListener('abort',close);};

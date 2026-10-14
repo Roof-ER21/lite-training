@@ -51,33 +51,22 @@ test('single doorstep pitch briefing matches the live SDK request, debrief and d
   await mkdir('output/playwright',{recursive:true});
   for(const width of [1280,390])for(const theme of ['light','dark']){await page.setViewportSize({width,height:900});await page.getByLabel('Appearance').selectOption(theme);await expect.poll(async()=> (await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze()).violations).toEqual([]);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.evaluate(()=>{(document.activeElement as HTMLElement)?.blur();window.scrollTo(0,0);});await page.screenshot({path:`output/playwright/inspection-${width}-${theme}.png`,fullPage:true});}
 });
-test('typed practice works without microphone access and continues to the exam',async({page})=>{
-  const mock=await provider(page);let calls=0;
-  await page.route('**/api/ai/inspection-reply',route=>{calls++;return route.fulfill(calls===1?{status:503,json:{error:'Unavailable'}}:{json:{success:true,reply:'Can I see the photos?'}});});
-  await open(page);
-  await page.evaluate(()=>{navigator.mediaDevices.getUserMedia=()=>Promise.reject(Error('Microphone must not be used'));});
-  await page.getByRole('button',{name:'Use typed practice',exact:true}).click();
-  await page.getByLabel('Your reply to Agnes').fill(speech);
-  await page.getByRole('button',{name:'Send reply',exact:true}).click();
-  await expect(page.locator('#inspection-state')).toContainText('could not reply');
-  await page.getByRole('button',{name:'Retry Agnes’s reply',exact:true}).click();
-  await expect(page.locator('#inspection-transcript')).toContainText('Can I see the photos?');
-  await page.getByRole('button',{name:'End & review',exact:true}).click();
-  await expect(page.locator('#inspection-save-status')).toContainText('saved to your training record');
-  expect(mock.saved().inputMode).toBe('text');
-  expect(mock.saved().transcript.filter((turn:any)=>turn.role==='user')).toHaveLength(1);
-  await page.locator('#inspection-continue').click();
-  await expect(page.locator('#main-content')).toHaveAttribute('data-lesson','final-exam');
+test('Module 13 is voice only and links to the initial script',async({page})=>{
+ await provider(page);await open(page);
+ await expect(page.getByRole('button',{name:/typed|typing/i})).toHaveCount(0);
+ await expect(page.locator('#inspection-text-form')).toHaveCount(0);
+ await page.evaluate(()=>localStorage.setItem('roof-er.unlockedModules',JSON.stringify(['welcome','initial-pitch','role-play'])));
+ await page.getByRole('button',{name:'Review the initial script',exact:true}).click();
+ await expect(page.locator('#main-content')).toHaveAttribute('data-lesson','initial-pitch');
 });
-
-test('a pending microphone request can be cancelled and replaced by typing',async({page})=>{
-  await provider(page);await open(page);
-  await page.evaluate(()=>{navigator.mediaDevices.getUserMedia=()=>new Promise(()=>{});});
-  await page.getByRole('button',{name:'Start voice practice',exact:true}).click();
-  await expect(page.locator('#inspection-state')).toContainText('Allow microphone');
-  await page.getByRole('button',{name:'Use typed practice',exact:true}).click();
-  await expect(page.getByLabel('Your reply to Agnes')).toBeVisible();
-  await expect(page.locator('#inspection-state')).toContainText('Typed practice');
+test('a pending microphone request can be stopped without completing practice',async({page})=>{
+ await provider(page);await open(page);
+ await page.evaluate(()=>{navigator.mediaDevices.getUserMedia=()=>new Promise(()=>{});});
+ await page.getByRole('button',{name:'Start voice practice',exact:true}).click();
+ await expect(page.locator('#inspection-state')).toContainText('Allow microphone');
+ await page.getByRole('button',{name:'Stop practice',exact:true}).click();
+ await expect(page.locator('#inspection-state')).toContainText('stopped');
+ expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('roof-er.completedModules')||'[]'))).not.toContain('role-play');
 });
 
 test('microphone check releases its stream when stopped',async({page})=>{

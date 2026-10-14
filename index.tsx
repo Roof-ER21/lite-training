@@ -10867,7 +10867,7 @@ const cmsContentCache: Record<string, string> = {};
 
 async function fetchCMSContent(moduleName: string): Promise<string | null> {
   // Skip CMS fetch for non-training pages (use hardcoded content only)
-  if (moduleName === 'my-page' || moduleName === 'admin-dashboard' || moduleName === 'field-library') {
+  if (moduleName === 'my-page' || moduleName === 'admin-dashboard' || moduleName === 'field-library' || moduleName === 'role-play' || moduleName === 'final-exam') {
     return null;
   }
 

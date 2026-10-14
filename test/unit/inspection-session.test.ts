@@ -66,3 +66,14 @@ it('Module 13 is one initial door-knock pitch with script and rookie objection c
  expect(prompt).toContain('Do not keep inventing objections after agreement');
  expect(prompt).not.toContain('INSPECTION PROCESS training');
 });
+
+it('grounds indexed feedback in actual rep turns and refuses homeowner or missing indices',()=>{
+ const turns:any[]=[{role:'agnes',text:'It is free, right?'},{role:'user',text:'Yes — it’s free. I’ll share the photos with you.'}];
+ const row={status:'covered',evidenceTurnIndex:1,nextStep:'Keep practicing'};
+ const result=normalizeInspectionFeedback({summary:'Good',criteria:[row]},scenario,turns);
+ expect(result.criteria[0].evidence).toBe(turns[1].text);
+ expect(result.score).toBe(100);
+ // Stored output can be validated again on the save endpoint without model-generated quotes.
+ expect(normalizeInspectionFeedback(result,scenario,turns)).toEqual(result);
+ for(const evidenceTurnIndex of [0,-1,3,1.5,null]) expect(()=>normalizeInspectionFeedback({summary:'Good',criteria:[{...row,evidenceTurnIndex}]},scenario,turns)).toThrow('Unsupported');
+});

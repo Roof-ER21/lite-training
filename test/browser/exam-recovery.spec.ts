@@ -10,14 +10,14 @@ test('refresh keeps question order and all answer types without consuming anothe
  await page.locator('#exam-user-name').fill('Exam Recovery QA');
  await page.locator('#startFinalExam').click();
  const question=await page.locator('.mcq-question').first().getAttribute('data-id');
- await page.locator('input[name="mcq-0"]').nth(2).check();
+ await page.locator('input[name="mcq-0"]').nth(1).check();
  await page.locator('[name="fib-0"]').fill('saved fill answer');
  await page.locator('[name="sa-0"]').fill('saved long answer');
  await page.reload();
  await expect(page.locator('#learning-path li')).toHaveCount(14);
  await page.evaluate(()=>(window as any).navigateToModule('final-exam'));
  await expect(page.locator('.mcq-question').first()).toHaveAttribute('data-id',question!);
- await expect(page.locator('input[name="mcq-0"]').nth(2)).toBeChecked();
+ await expect(page.locator('input[name="mcq-0"]').nth(1)).toBeChecked();
  await expect(page.locator('[name="fib-0"]')).toHaveValue('saved fill answer');
  await expect(page.locator('[name="sa-0"]')).toHaveValue('saved long answer');
  await expect(page.locator('.exam-attempt-indicator')).toContainText('Attempt 1');

@@ -35,7 +35,7 @@ export async function connectInspection(scenario:InspectionScenario,onMessage:(m
   let timeout:ReturnType<typeof setTimeout>|undefined;
   try{
     await Promise.all([input.resume(),output.resume()]);
-    onMessage({localStatus:'Allow microphone access when your browser asks. You can stop and use typed practice instead.'});
+    onMessage({localStatus:'Allow microphone access when your browser asks. You can stop the connection if you need to change microphone permissions.'});
     stream=await acquireMicrophone(signal);
     if(closed || signal.aborted){stream.getTracks().forEach(t=>t.stop());throw Error('Practice cancelled.');}
     onMessage({localStatus:'Microphone connected. Connecting to Agnes…'});

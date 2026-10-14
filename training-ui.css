@@ -361,3 +361,20 @@ button:active:not(:disabled) { transform: translateY(1px); }
 .certificate-record { padding: 24px 0; border-bottom: 1px solid var(--border-color); }
 .certificate-record .certificate-actions { justify-content: flex-start; }
 .certificate-download-status { font-size: 13px; color: var(--text-primary); }
+
+/* Scoped lesson boxes: warm red for scripts, steel gray for exercises. */
+#main-content :is(.script-card, .nn-card, .key-points-reminder) {
+  background:var(--lesson-accent-surface); border-left:3px solid var(--brand-mark); box-shadow:none;
+}
+#main-content :is(.script-header, .step-card-header) { background:var(--lesson-accent-header); }
+#main-content .nn-card p.nn-quote { background:transparent; border-left-color:var(--brand-mark); }
+#main-content :is(.tip-card, .inspection-step-card, .commitment-item, .objection-card, .lesson-guide) {
+  background:var(--lesson-reference-surface); box-shadow:none;
+}
+#main-content :is(.quiz-container-enhanced, .visual-workbench, .recall-panel, .key-points) {
+  background:var(--lesson-practice-surface); border-top:3px solid var(--brand-mark);
+}
+/* These two legacy callouts have inline backgrounds. */
+#main-content :is(.script-purpose-callout, .intro-highlight-card) {
+  background:var(--lesson-accent-surface) !important; border-left-color:var(--brand-mark) !important;
+}
