@@ -13842,3 +13842,7 @@ button:disabled {
     transition: none;
   }
 }
+
+/* Certificate actions layout (exam + certified screens) */
+.certificate-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 20px 0; }
+.certified-screen .certificate-actions, .exam-results .certificate-actions { justify-content: center; }
