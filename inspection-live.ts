@@ -92,7 +92,7 @@ export async function connectInspection(scenario:InspectionScenario,onMessage:(m
       if(buffered.length>=2048)flush();
     };
     sending=true;
-    session.sendClientContent({turns:[{role:'user',parts:[{text:'Begin the supplied rookie inspection scenario with its exact opening question.'}]}],turnComplete:true});
+    session.sendClientContent({turns:[{role:'user',parts:[{text:'Begin the supplied rookie role-play with its exact opening question.'}]}],turnComplete:true});
     return {close,mute(value){muted=value;buffered=[];stream?.getAudioTracks().forEach(t=>t.enabled=!value);},async finish(){
       flush();sending=false;stream?.getAudioTracks().forEach(t=>t.enabled=false);stopAudio();
       if(!closed)session.sendRealtimeInput({audioStreamEnd:true});

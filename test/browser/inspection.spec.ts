@@ -1,7 +1,7 @@
 import {test,expect,type Page} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import {mkdir} from 'node:fs/promises';
-const speech='I will check the shingles, flashing and vents, document collateral damage, and share the photos with you.';
+const speech='Hi, my name is Alex with Roof-ER. We are a local roofing company. I can offer a free inspection, take photos and share what I find. May I take 10 to 15 minutes to check your roof?';
 async function open(page:Page){
 
   await page.goto('/');await page.getByLabel('Your Name').fill('Local Inspection QA');await page.getByRole('button',{name:'Start Training',exact:true}).click();
@@ -22,17 +22,22 @@ async function provider(page:Page,{failSave=false,failFeedback=false,disconnect=
   await page.route('**/api/ai/inspection-feedback',route=>{
     feedbackCalls++;const data=route.request().postDataJSON();
     if(failFeedback&&feedbackCalls===1)return route.fulfill({status:503,json:{error:'Feedback unavailable'}});
-    return route.fulfill({json:{success:true,aiScored:true,feedback:{summary:'You explained the inspection clearly.',criteria:data.scenario.expectedKeyPoints.map((point:string)=>({point,status:'covered',evidence:'check the shingles',nextStep:'Practice explaining how you document the findings.'}))}}});
+    return route.fulfill({json:{success:true,aiScored:true,feedback:{summary:'You introduced yourself and offered the inspection.',criteria:data.scenario.expectedKeyPoints.map((point:string)=>({point,status:'covered',evidence:'my name is Alex',nextStep:'Practice your opening introduction.'}))}}});
   });
   await page.route('**/api/roleplay/inspection-save',route=>{saves++;saved=route.request().postDataJSON();return route.fulfill(failSave&&saves===1?{status:503,json:{error:'Save unavailable'}}:{json:{success:true,sessionId:saved.id}});});
   return {instruction:()=>instruction,saved:()=>saved,saves:()=>saves,close:()=>ws?.close()};
 }
-test('rookie inspection briefing matches the live SDK request, debrief and durable save',async({page})=>{
+test('single doorstep pitch briefing matches the live SDK request, debrief and durable save',async({page})=>{
   const mock=await provider(page);await open(page);
   const prompt=await page.locator('#inspection-prompt').innerText();
+  expect(prompt).toBe('Hi, can I help you?');
+  await expect(page.locator('#inspection-next')).toHaveCount(0);
+  await expect(page.locator('#inspection-points li')).toHaveCount(6);
+  await mkdir('output/playwright',{recursive:true});
+  for (const theme of ['light','dark']) {await page.getByLabel('Appearance').selectOption(theme);await page.waitForTimeout(300);await expect.poll(async()=> (await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze()).violations).toEqual([]);await page.screenshot({path:`output/playwright/doorstep-ready-${theme}.png`,fullPage:true});}
   await page.getByRole('button',{name:'Start voice practice',exact:true}).click();
   await expect(page.locator('#inspection-state')).toContainText('Ready.');
-  expect(mock.instruction()).toContain(prompt);expect(mock.instruction()).toContain('ROOKIE / EASY');
+  expect(mock.instruction()).toContain(prompt);expect(mock.instruction()).toContain('ROOKIE / EASY');expect(mock.instruction()).toContain('INITIAL DOOR-KNOCK PITCH');
   await expect(page.getByRole('button',{name:'Medium',exact:true})).toHaveCount(0);
   await expect(page.locator('#inspection-transcript')).toContainText(speech);
   await page.getByRole('button',{name:'Mute microphone',exact:true}).click();
@@ -81,6 +86,7 @@ test('microphone check releases its stream when stopped',async({page})=>{
     const original=navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
     navigator.mediaDevices.getUserMedia=async options=>{const stream=await original(options);(window as any).qaMic=stream;return stream;};
   });
+  await page.getByText('Check your microphone & sound',{exact:true}).click();
   await page.getByRole('button',{name:'Check microphone',exact:true}).click();
   await expect.poll(()=>page.evaluate(()=>(window as any).qaMic?.getAudioTracks()[0].readyState)).toBe('live');
   await page.getByRole('button',{name:'Stop microphone check',exact:true}).click();
@@ -102,7 +108,7 @@ test('denied microphone and provider disconnect do not silently complete practic
   await page.getByRole('button',{name:'Start voice practice',exact:true}).click();await expect(page.locator('#inspection-state')).toContainText('denied');
   expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('roof-er.completedModules')||'[]'))).not.toContain('role-play');
 });
-test('disconnect keeps captured speech and retry starts the same inspection scenario',async({page})=>{
+test('disconnect keeps captured speech and retry starts the same doorstep scenario',async({page})=>{
   await provider(page,{disconnect:true});await open(page);const prompt=await page.locator('#inspection-prompt').innerText();
   await page.getByRole('button',{name:'Start voice practice',exact:true}).click();await expect(page.locator('#inspection-state')).toContainText('interrupted');
   await expect(page.locator('#inspection-transcript')).toContainText(speech);

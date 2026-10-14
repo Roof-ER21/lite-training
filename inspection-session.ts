@@ -50,11 +50,11 @@ export class InspectionSession {
     this.record={id:crypto.randomUUID(),scenario:this.scenario,difficulty:'BEGINNER',startedAt:new Date().toISOString(),transcript:[],feedback:null,completed:false};
     this.typing=false;this.replying=false;this.replyFailed=false;
     this.record.inputMode='voice';
-    this.completedOnce=false;this.saved=false;this.saving=false;this.muted=false;this.phase='connecting';this.message='Connecting microphone and inspection practice…';this.emit();
+    this.completedOnce=false;this.saved=false;this.saving=false;this.muted=false;this.phase='connecting';this.message='Connecting microphone and practice…';this.emit();
     try {
       const connection=await this.deps.connect(this.scenario,m=>{if(generation===this.generation)this.receive(m);},()=>{if(generation===this.generation && ['connecting','practicing'].includes(this.phase))this.interrupt('Connection interrupted. Your captured transcript is still here. Review it or retry the same scenario.');},this.controller.signal);
       if(generation!==this.generation || this.phase!=='connecting'){connection.close();return;}
-      this.connection=connection;this.phase='practicing';this.message='Ready. Explain the inspection to Agnes.';this.emit();
+      this.connection=connection;this.phase='practicing';this.message='Ready. Agnes is listening. Deliver your opening pitch.';this.emit();
     } catch(error){if(generation===this.generation)this.interrupt((error as Error).message || 'Could not start practice.');}
   }
   receive(message:any){
@@ -81,7 +81,7 @@ export class InspectionSession {
   }
   async retryFeedback(){if(this.phase!=='completed' || !this.record || this.record.feedback || this.saving)return;this.phase='scoring';await this.scoreAndSave(this.generation);}
   private async scoreAndSave(generation:number){
-    this.message='Preparing your inspection feedback…';this.emit();
+    this.message='Preparing your practice feedback…';this.emit();
     const record=this.record!;
     try{const feedback=await this.deps.feedback(record,this.controller.signal);if(generation!==this.generation)return;record.feedback=feedback;this.message='Review what you covered and choose a point to practice again.';}
     catch{if(generation!==this.generation)return;this.message='Practice finished, but AI feedback is unavailable. Your captured conversation is kept below. You can retry feedback without repeating the conversation.';}

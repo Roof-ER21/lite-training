@@ -21,3 +21,67 @@
 #inspection-text { box-sizing:border-box; width:100%; font:inherit; padding:12px; color:var(--text-primary); background:var(--surface-color); border:1px solid var(--border-color); border-radius:8px; }
 #inspection-state, #inspection-debrief { scroll-margin-top:200px; }
 @media(max-width:767px) { #inspection-state, #inspection-debrief { scroll-margin-top:80px; } }
+
+/* A focused doorstep rehearsal, with the script beside the conversation. */
+.doorstep-practice { max-width:1200px; margin:0 auto; color:var(--text-primary); }
+.doorstep-hero { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:32px; padding:38px 40px; background:var(--brand); color:var(--on-brand); border-radius:16px 16px 0 0; }
+.doorstep-practice .doorstep-hero h1 { margin:12px 0 18px; padding:0; border:0; color:inherit; font-size:clamp(2.3rem,4vw,3.7rem); line-height:1.04; letter-spacing:-.055em; font-weight:800; text-wrap:balance; }
+.doorstep-hero p { max-width:48ch; color:inherit; margin:0; line-height:1.6; }
+.doorstep-practice .doorstep-kicker { font-family:var(--font-mono); font-size:.72rem; font-weight:600; letter-spacing:.11em; text-transform:uppercase; margin:0; }
+.doorstep-hero-note { align-self:center; border-left:1px solid var(--on-brand); padding-left:30px; min-width:190px; }
+.doorstep-hero-note > span { font-family:var(--font-mono); font-size:.7rem; letter-spacing:.12em; }
+.doorstep-hero-note strong { display:block; font-size:1.8rem; line-height:1.15; letter-spacing:-.03em; margin:12px 0; }
+.doorstep-hero-note p { font-size:.85rem; }
+.doorstep-workspace { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(270px,1fr); background:var(--surface-color); border:1px solid var(--border-color); border-top:0; border-radius:0 0 16px 16px; overflow:hidden; }
+.doorstep-practice .inspection-brief { margin:0; border:0; padding:32px; }
+.doorstep-stage-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; color:var(--text-secondary); }
+.doorstep-level { font-size:.75rem; padding:5px 8px; border:1px solid var(--border-color); border-radius:4px; white-space:nowrap; }
+.doorstep-homeowner { display:flex; align-items:center; gap:14px; margin:32px 0 24px; }
+.doorstep-avatar { display:grid; place-items:center; width:58px; height:64px; border-radius:16px 16px 4px 4px; background:var(--brand-soft); color:var(--accent-text); font-size:1.5rem; font-weight:750; border-bottom:3px solid var(--brand-mark); }
+.doorstep-practice .doorstep-homeowner h2 { font-size:1.15rem; padding:0; border:0; margin:0 0 4px; }
+.doorstep-homeowner p { margin:0; font-size:.85rem; color:var(--text-secondary); }
+.doorstep-context { font-size:.9rem; color:var(--text-secondary); }
+.doorstep-practice #inspection-prompt { margin:16px 0 22px; padding:18px 22px; border:0; border-left:3px solid var(--brand-mark); background:var(--surface-inset); border-radius:0 10px 10px 0; font-size:clamp(1.6rem,2.5vw,2.1rem); line-height:1.3; letter-spacing:-.035em; font-weight:650; }
+.doorstep-direction { max-width:49ch; line-height:1.65; }
+.doorstep-practice .doorstep-start { margin:26px 0 12px; }
+.doorstep-practice button { min-height:46px; border-radius:7px; font-weight:650; transition:background .18s,transform .18s; }
+.doorstep-practice button:not(.primary-action) { background:var(--surface-color); color:var(--text-primary); border:1px solid var(--border-strong); }
+.doorstep-practice button:not(.primary-action):hover:not(:disabled) { background:var(--hover-bg); }
+.doorstep-practice button:active:not(:disabled) { transform:translateY(1px); }
+.doorstep-practice .primary-action { background:var(--brand); color:var(--on-brand); border:1px solid var(--brand); }
+.doorstep-practice .primary-action:hover:not(:disabled) { background:var(--brand-deep); }
+.doorstep-mode-note { font-size:.8rem; color:var(--text-secondary); line-height:1.6; }
+.doorstep-practice .inspection-audio-check { margin-top:24px; padding:14px 0 0; border:0; border-top:1px solid var(--border-color); border-radius:0; font-size:.85rem; }
+.inspection-audio-check summary { cursor:pointer; font-weight:600; min-height:32px; }
+.doorstep-script { background:var(--surface-inset); padding:32px; border-left:1px solid var(--border-color); }
+.doorstep-practice .doorstep-script h2 { margin:14px 0 12px; padding:0; border:0; font-size:1.8rem; line-height:1.16; letter-spacing:-.045em; }
+.doorstep-script > p:not(.doorstep-kicker) { font-size:.85rem; color:var(--text-secondary); }
+#inspection-points { list-style:none; counter-reset:pitch; padding:0; margin:24px 0; }
+#inspection-points li { counter-increment:pitch; display:grid; grid-template-columns:25px 1fr; gap:12px; padding:13px 0; margin:0; border-top:1px solid var(--border-color); font-size:.88rem; line-height:1.5; }
+#inspection-points li::before { content:counter(pitch,decimal-leading-zero); font-family:var(--font-mono); color:var(--accent-text); font-size:.75rem; padding-top:2px; }
+.doorstep-script button { width:100%; }
+.doorstep-session { margin-top:24px; background:var(--surface-color); border:1px solid var(--border-color); border-radius:12px; padding:0 28px; }
+.doorstep-practice #inspection-state { margin:0; padding:20px 0; background:transparent; font-size:.95rem; font-weight:600; }
+.doorstep-practice #inspection-transcript-panel, .doorstep-practice #inspection-debrief { margin-top:0; }
+.doorstep-practice #inspection-transcript-panel h2,.doorstep-practice #inspection-debrief h2 { margin:10px 0 16px; border:0; padding:0; letter-spacing:-.03em; }
+.doorstep-practice #inspection-transcript { border:0; padding:4px 0; max-height:480px; }
+.doorstep-practice #inspection-transcript p { max-width:85%; padding:14px 18px; border-radius:10px; background:var(--surface-inset); line-height:1.6; }
+.doorstep-practice #inspection-transcript p:nth-child(even) { margin-left:auto; border-right:3px solid var(--brand-mark); }
+.doorstep-practice #inspection-transcript strong { margin-bottom:4px; }
+.doorstep-practice .inspection-criterion { display:grid; grid-template-columns:minmax(180px,1fr) minmax(0,1.3fr); gap:6px 24px; padding:20px 0; }
+.doorstep-practice .inspection-criterion h3 { grid-row:span 3; font-size:1rem; line-height:1.55; }
+.doorstep-practice .inspection-criterion p,.doorstep-practice .inspection-criterion blockquote { margin:4px 0; }
+.doorstep-practice .inspection-history { padding:18px 4px; color:var(--text-secondary); }
+@media(max-width:900px) {
+ .doorstep-hero { padding:28px; gap:20px; }.doorstep-hero-note { min-width:150px; padding-left:20px; }
+ .doorstep-workspace { grid-template-columns:minmax(0,1.1fr) minmax(240px,1fr); }
+ .doorstep-practice .inspection-brief,.doorstep-script { padding:24px; }
+}
+@media(max-width:650px) {
+ .doorstep-hero { grid-template-columns:1fr; padding:26px 22px; }.doorstep-hero-note { display:none; }
+ .doorstep-workspace { grid-template-columns:minmax(0,1fr); }.doorstep-script { border-left:0; border-top:1px solid var(--border-color); }
+ .doorstep-practice .inspection-brief,.doorstep-script { padding:22px; }
+ .doorstep-practice .doorstep-script h2 br { display:none; }
+ .doorstep-session { padding:0 20px; }.doorstep-practice .inspection-criterion { display:block; }
+ .doorstep-practice #inspection-transcript p { max-width:100%; }
+}

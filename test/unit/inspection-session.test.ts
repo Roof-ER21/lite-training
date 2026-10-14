@@ -1,6 +1,6 @@
 import { describe,it,expect,vi } from 'vitest';
 import { InspectionSession } from '../../inspection-session';
-import { inspectionInstruction,normalizeInspectionFeedback,appendInspectionTurn } from '../../server/lib/inspection-contract';
+import { INITIAL_PITCH_SCENARIO,inspectionInstruction,normalizeInspectionFeedback,appendInspectionTurn } from '../../server/lib/inspection-contract';
 const scenario={id:'insp-test',prompt:'What happens during the inspection?',expectedKeyPoints:['Photo documentation'],followUps:['Can I see the photos?']};
 const transcript=[{role:'user' as const,text:'I will take a close-up and an overview.'}];
 const feedback=normalizeInspectionFeedback({summary:'Clear explanation.',criteria:[{status:'covered',evidence:'a close-up and an overview',nextStep:'Explain why both help.'}]},scenario,transcript);
@@ -54,4 +54,15 @@ describe('rookie inspection session',()=>{
   it('releases a late connection after navigation without completing',async()=>{let resolve:any;const close=vi.fn();const h=harness({connect:()=>new Promise(r=>resolve=r)});const pending=h.flow.start();h.flow.dispose();resolve({close,mute:vi.fn(),finish:vi.fn()});await pending;expect(close).toHaveBeenCalledOnce();expect(h.completed).not.toHaveBeenCalled();});
   it('does not let late feedback overwrite a newer scenario attempt',async()=>{let resolve:any;const h=harness({feedback:()=>new Promise(r=>resolve=r)});await h.flow.start();h.speech();const pending=h.flow.finish();await Promise.resolve();h.flow.stop();await h.flow.start();resolve(feedback);await pending;expect(h.flow.record?.feedback).toBeNull();expect(h.completed).not.toHaveBeenCalled();});
   it('rejects unsupported quotes and derives the score from coverage',()=>{expect(()=>normalizeInspectionFeedback({summary:'Good',criteria:[{status:'covered',evidence:'invented words',nextStep:'Practice'}]},scenario,transcript)).toThrow('Unsupported');expect(normalizeInspectionFeedback({summary:'Try again',criteria:[{status:'partial',evidence:'close-up',nextStep:'Add the context'}]},scenario,transcript).score).toBe(50);});
+});
+
+it('Module 13 is one initial door-knock pitch with script and rookie objection checkpoints',()=>{
+ const prompt=inspectionInstruction(INITIAL_PITCH_SCENARIO);
+ expect(INITIAL_PITCH_SCENARIO.prompt).toBe('Hi, can I help you?');
+ expect(INITIAL_PITCH_SCENARIO.expectedKeyPoints).toHaveLength(6);
+ expect(prompt).toContain('INITIAL DOOR-KNOCK PITCH');
+ expect(prompt).toContain('raise ONE mild objection before agreeing');
+ expect(prompt).toContain('Wait for the rep to answer it');
+ expect(prompt).toContain('Do not keep inventing objections after agreement');
+ expect(prompt).not.toContain('INSPECTION PROCESS training');
 });

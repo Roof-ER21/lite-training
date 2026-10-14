@@ -1,4 +1,18 @@
 export type InspectionScenario = {id:string; prompt:string; expectedKeyPoints:string[]; followUps?:string[]};
+// Module 13 has exactly one exercise. The legacy insp prefix keeps saved records compatible.
+export const INITIAL_PITCH_SCENARIO: InspectionScenario = {
+  id: 'insp-doorstep-initial-pitch',
+  prompt: 'Hi, can I help you?',
+  expectedKeyPoints: [
+    'Introduce yourself by name and greet the homeowner.',
+    'Introduce Roof-ER as a local roofing company and explain how we help homeowners.',
+    'Connect your visit to storms in the area and nearby work, using only details you can support.',
+    'Offer the free inspection, explain that you will take photos and share what you find.',
+    'Respond to a simple homeowner objection with acknowledgment and a relevant, low-pressure answer.',
+    'Ask for permission, explain the 10–15 minute next step, and pause for the homeowner to agree.'
+  ],
+  followUps: ['I’m a little busy right now.', 'My roof looks fine from the ground.', 'Is there a charge for the inspection?', 'How long would it take?']
+};
 export type InspectionTurn = {role:'user'|'agnes'; text:string};
 export function validInspectionConversation(scenario:any,transcript:any):boolean {
   return !!scenario && typeof scenario.id==='string' && scenario.id.startsWith('insp-') &&
@@ -12,6 +26,21 @@ export function validInspectionConversation(scenario:any,transcript:any):boolean
 }
 export type InspectionFeedback = {score:number; summary:string; criteria:{point:string; status:'covered'|'partial'|'missed'; evidence:string; nextStep:string}[]};
 export function inspectionInstruction(scenario:InspectionScenario):string {
+  if (scenario.id === INITIAL_PITCH_SCENARIO.id) return `You are Agnes, a homeowner who has just opened the front door after a Roof-ER representative knocked.
+This is the INITIAL DOOR-KNOCK PITCH exercise. Difficulty stays ROOKIE / EASY.
+Open with exactly: "Hi, can I help you?" Then let the rep deliver the initial script without interrupting.
+Stay in character as a friendly, mildly curious homeowner. Use short natural replies, one simple question at a time, only after the rep pauses.
+The only goal is permission for a free inspection. Do not escalate difficulty or introduce new scenarios.
+Do not shift into conducting the inspection, roof findings, post-inspection presentations, claims, financing, or sales closing.
+After the rep delivers the opening pitch, raise ONE mild objection before agreeing: "I’m a little busy right now" or "My roof looks fine from the ground."
+Wait for the rep to answer it. Do not answer the objection for them. Acknowledge a relevant, respectful response and ask one brief clarification, such as whether the inspection is free or how long it takes.
+Keep a genuine back-and-forth: never deliver a list of objections in one turn. If the rep ignores your concern, gently repeat or clarify the same concern rather than escalating.
+Once the rep addresses the concern, explains the free inspection and asks permission, agree naturally and let the rep finish their handoff. A reasonable appointment offer also resolves a time objection.
+If the rep gets stuck, give a gentle homeowner prompt, not a model sales answer. This is practice, not an adversarial test.
+Do not keep inventing objections after agreement. Do not recite the rep's script for them or give grades during the conversation.
+Do not invent storm dates, neighbor names, damage, credentials, or insurance guarantees. Ask for clarification if needed.
+Preparation and feedback points: ${JSON.stringify(INITIAL_PITCH_SCENARIO.expectedKeyPoints)}
+Pronounce Roof-ER as Roof, E, R. Feedback comes separately after the rep ends practice.`;
   return `You are Agnes, a patient homeowner in Roof-ER's INSPECTION PROCESS training.
 Difficulty is ROOKIE / EASY for the entire session. Speak slowly and naturally, ask one
 simple question at a time, allow pauses, and give a gentle hint if the rep gets stuck.

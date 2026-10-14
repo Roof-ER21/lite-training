@@ -10962,7 +10962,7 @@ async function renderModule(moduleName: string) {
           initObjectionMatcher();
           break;
       case 'role-play':
-          registerModuleCleanup(mountInspectionRoleplay(mainContent, getScenariosForModule('8'), () => { markRoleplayCompleted('role-play'); completeModule('role-play', false); }, () => navigateToModule('inspection-process')));
+          registerModuleCleanup(mountInspectionRoleplay(mainContent, () => { markRoleplayCompleted('role-play'); completeModule('role-play', false); }, () => navigateToModule('initial-pitch')));
           injectThemeToggle();
           break;
       case 'welcome':
