@@ -124,3 +124,49 @@
 :root[data-theme="dark"] {
   --lesson-feature-surface: #485568;
 }
+
+/* Neutral dark foundations with deliberate red contrast; no navy cast. */
+:root {
+  --control-surface: #FFFFFF;
+  --control-ink: #191919;
+  --control-border: #555555;
+  --control-hover: #F5DEDC;
+  --control-shadow: #A7A7A7;
+}
+:root[data-theme="dark"] {
+  --light-bg: #292929;
+  --surface-color: #393939;
+  --surface-raised: #494949;
+  --surface-soft: #454545;
+  --surface-inset: #323232;
+  --surface-warm: #454545;
+  --surface-practice: #454545;
+  --reading-surface: #353535;
+  --lesson-reference-surface: #454545;
+  --lesson-practice-surface: #414141;
+  --lesson-accent-surface: #592626;
+  --lesson-accent-header: #762A28;
+  --lesson-feature-surface: #681D1B;
+  --lesson-feature-rule: #C9827E;
+  --border-color: #808080;
+  --border-strong: #C2C2C2;
+  --hover-bg: #515151;
+  --hero-surface: #681D1B;
+  --hero-border: #C9827E;
+  --control-surface: #F5F5F5;
+  --control-ink: #181818;
+  --control-border: #FFFFFF;
+  --control-hover: #FFDEDA;
+  --control-shadow: #161616;
+}
+
+:root[data-theme="dark"] #main-content .doorstep-script {
+  background:var(--lesson-feature-surface); border-left:2px solid var(--lesson-feature-rule);
+}
+:root[data-theme="dark"] #main-content .doorstep-workspace,
+:root[data-theme="dark"] #main-content .doorstep-session {
+  border:2px solid var(--border-strong);
+}
+:root[data-theme="dark"] #main-content .doorstep-script :is(#inspection-points li, .doorstep-level) {
+  border-color:var(--lesson-feature-rule);
+}

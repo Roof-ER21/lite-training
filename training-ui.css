@@ -396,3 +396,35 @@ button:active:not(:disabled) { transform: translateY(1px); }
 }
 #main-content .lesson-reading-tools :is(summary, a) { color:var(--lesson-feature-ink); }
 @media(max-width:767px) { #main-content .promise-section { padding:22px; } }
+
+/* Controls must read as controls, independently of panel fills. */
+#main-content button, .training-topbar button {
+  border-width:2px; border-style:solid; border-color:var(--control-border);
+  font-weight:650; box-shadow:0 3px 0 var(--control-shadow);
+}
+#main-content button:hover:not(:disabled), .training-topbar button:hover:not(:disabled) {
+  border-color:var(--brand-mark); box-shadow:0 3px 0 var(--control-shadow);
+}
+#main-content button:active:not(:disabled), .training-topbar button:active:not(:disabled) {
+  transform:translateY(2px); box-shadow:none;
+}
+#main-content button:disabled { box-shadow:none; border-color:var(--border-color); opacity:.65; }
+#main-content :is(.doorstep-practice button:not(.primary-action), .lesson-navigation button, .lesson-guide button),
+.training-topbar button {
+  background:var(--control-surface); color:var(--control-ink);
+}
+#main-content :is(.doorstep-practice button:not(.primary-action), .lesson-navigation button, .lesson-guide button):hover:not(:disabled),
+.training-topbar button:hover:not(:disabled) {
+  background:var(--control-hover); color:var(--control-ink);
+}
+#main-content .doorstep-practice .primary-action { border:2px solid var(--on-brand); box-shadow:0 3px 0 var(--brand-deep); }
+#main-content :is(button,summary):focus-visible, .training-topbar button:focus-visible {
+  outline:3px solid var(--brand-mark) !important; outline-offset:5px;
+}
+/* Keep the lesson guidance in flow so it cannot cover a scrolled heading. */
+.lesson-navigation { position:static; }
+#main-content .inspection-audio-check summary, #main-content .inspection-history > summary {
+  display:list-item; padding:12px 18px; border:2px solid var(--control-border); border-radius:7px;
+  background:var(--control-surface); color:var(--control-ink); font-weight:650;
+  box-shadow:0 3px 0 var(--control-shadow);
+}
