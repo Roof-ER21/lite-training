@@ -19,8 +19,8 @@ One illustrated next-lesson panel leads into a compact certification row and a
 two-column course map (one column on phones). The sidebar is narrower, with a
 single active indicator and quieter locked lessons. Reading pages use restrained
 white or slate surfaces, a shorter line length, and compact navigation controls.
-Light, Dark, and Use device setting remain available; dark mode uses layered
-charcoal with a red action, subtle borders, and white typography. Field photography
+Light, Dark, and Use device setting remain available; dark mode uses medium
+graphite with a red action, subtle borders, and white typography. Field photography
 is monochrome so red, white, black, and gray remain the dominant palette. Theme values live in `theme.css`.
 
 ## Certificate of Completion
@@ -83,3 +83,5 @@ video transcripts. `training-media.ts` adds posters, automatic captions, searcha
 transcripts, and playback recovery. `coaching-ui.ts` connects self-review and manager
 assignments; `lesson-editor.ts` provides prose/guidance editing and saved-draft previews.
 See `ENHANCEMENTS-2026-09-12.md` for verification, persistence, and acceptance boundaries.
+
+Lesson pages use gray canvases, soft reading panels, inset title bands with red edges, and distinct activity surfaces. Dark mode uses medium graphite throughout the shell and reading area; near-black is reserved for media.

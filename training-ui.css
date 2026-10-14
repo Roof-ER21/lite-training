@@ -344,3 +344,16 @@ button:active:not(:disabled) { transform: translateY(1px); }
   .next-lesson h2 { font-size: 30px; }
   .training-heading h1 { font-size: 32px; }
 }
+
+/* Shared reading surfaces carry the visual system through every lesson. */
+#main-content .content-card { background: var(--reading-surface); border: 1px solid var(--border-color); box-shadow: none; }
+#main-content .content-card > h1 { max-width: none; padding: 20px 24px; background: var(--lesson-title-surface); border-left: 4px solid var(--brand); border-radius: 0 8px 8px 0; }
+#main-content .content-card > h2 { padding-top: 24px; border-top: 1px solid var(--border-color); }
+#main-content .promise-section { background: var(--surface-soft); border: 0; border-left: 3px solid var(--brand); box-shadow: none; border-radius: 0 8px 8px 0; }
+#main-content .lesson-guide, #main-content .visual-workbench { background: var(--surface-soft); }
+#main-content .lesson-reading-tools { background: var(--surface-inset); padding: 0 16px; border-radius: 6px; }
+.lesson-navigation { background: var(--surface-soft); box-shadow: none; }
+#main-content .commitment-item { background: var(--surface-color); border-color: var(--border-color); box-shadow: none; }
+@media (max-width: 767px) {
+  #main-content .content-card > h1 { padding: 16px 18px; }
+}
