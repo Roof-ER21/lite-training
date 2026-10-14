@@ -232,3 +232,5 @@ input:focus, textarea:focus, select:focus { border-color: var(--border-strong); 
 .cert-download-secondary:hover { background: var(--hover-bg); color: var(--text-primary); }
 .certificate-id-note { color: var(--text-secondary); font-size: 13px; font-family: var(--font-mono); }
 @media (max-width: 767px) { .certificate-panel { padding: 24px 20px; } .certificate-actions, .certificate-actions button { width: 100%; } }
+
+.certificate-panel[hidden] { display: none; }

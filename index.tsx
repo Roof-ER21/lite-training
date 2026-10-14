@@ -35,6 +35,7 @@ const STORAGE_KEYS = {
   finalExamHistory: 'roof-er.finalExamHistory',
   certifiedStatus: 'roof-er.certifiedStatus',
   certificationDate: 'roof-er.certificationDate',
+  certificationScore: 'roof-er.certificationScore',
   examUserName: 'roof-er.examUserName',
   lastExamWrongAnswers: 'roof-er.lastExamWrongAnswers',
   // Session/Auth keys
@@ -378,6 +379,9 @@ async function syncProgressFromServer(): Promise<void> {
       localStorage.setItem(STORAGE_KEYS.certifiedStatus, 'true');
       if (progress.certificationDate) {
         localStorage.setItem(STORAGE_KEYS.certificationDate, progress.certificationDate);
+      }
+      if (typeof progress.certificationScore === 'number') {
+        localStorage.setItem(STORAGE_KEYS.certificationScore, String(progress.certificationScore));
       }
       updateSidebarCertifiedBadge(true);
     }
@@ -2045,7 +2049,6 @@ Threshold: ${doorSlamInfo.description}
 1. Stay in character 100% until they say "score me" or you slam the door
 2. React naturally to what they say
 3. Use progressive objections - start mild, escalate based on their responses
-4. Interrupt s - start mild, escalate based on their responses
 4. Interrupt according to your persona
 
 ## IMPORTANT - DO NOT REPEAT WHAT THE USER SAID:
@@ -2197,6 +2200,10 @@ const trainingContent = {
         <section class="next-lesson" aria-labelledby="next-lesson-title"><p class="section-label">Pick up where you left off</p><h2 id="next-lesson-title">Welcome & Company Intro</h2><p>Your lessons and practice are saved as you go.</p><button type="button" id="continue-training-btn">Continue training</button></section>
         <section class="assessment-panel" aria-labelledby="assessment-title"><p class="section-label">Assessment</p><h2 id="assessment-title">Your exam standing</h2><p id="exam-standing">Complete the lessons to unlock your exam</p><button type="button" class="secondary-button" id="dashboard-exam-link">Open final exam</button></section>
       </div>
+      <section id="certificate-panel" class="certificate-panel" aria-labelledby="certificate-title" hidden>
+        <div class="certificate-panel-copy"><h2 id="certificate-title">Your certificate</h2><p id="certificate-summary"></p><label class="certificate-name-label" for="certificate-name">Name on certificate</label><input id="certificate-name" type="text" autocomplete="name" /></div>
+        <div class="certificate-actions"><button id="dashboard-download-cert-pdf" class="cert-download-btn" type="button">Download Certificate (PDF)</button><button id="dashboard-download-cert-png" class="cert-download-btn cert-download-secondary" type="button">Download PNG</button></div>
+      </section>
       <section class="learning-path-section" aria-labelledby="learning-path-title"><div class="section-heading"><h2 id="learning-path-title">Your learning path</h2><p>From the first conversation to the completed job.</p></div><ol id="learning-path" class="learning-path"></ol></section>
       <div id="dashboard-review"></div>
       <details class="connected-agents-disclosure"><summary>Connected agents</summary><div class="dashboard-agents" id="dashboard-agents"></div></details>
@@ -14467,11 +14474,11 @@ function showCertifiedScreen(root: HTMLElement, state: ExamState) {
       <div class="cert-details">
         <p><strong>Name:</strong> ${state.userName}</p>
         <p><strong>Certified:</strong> ${state.certificationDate ? formatExamDate(state.certificationDate) : 'N/A'}</p>
-        <p><strong>Score:</strong> ${passingAttempt?.totalScore || 0}%</p>
+        <p><strong>Score:</strong> ${getCertificateDetails()?.score ?? 0}%</p>
       </div>
 
       ${certificateButtonsHtml('downloadCert', 'downloadCertPng')}
-      <p class="certificate-id-note">Certificate ID: ${certificateIdFor({ recipientName: state.userName || getCurrentUser()?.name || '', score: passingAttempt?.totalScore || 0, certificationDate: state.certificationDate || new Date().toISOString() })}</p>
+      <p class="certificate-id-note">Certificate ID: ${certificateIdFor(getCertificateDetails()!)}</p>
 
       ${wrongAnswers.length > 0 ? `
         <div class="answer-review-section" style="margin-top: 30px;">
@@ -14494,9 +14501,7 @@ function showCertifiedScreen(root: HTMLElement, state: ExamState) {
     </div>
   `;
 
-  document.getElementById('downloadCert')?.addEventListener('click', () => {
-    generateCertificatePDF(state.userName, passingAttempt?.totalScore || 70, state.certificationDate || new Date().toISOString());
-  });
+  wireCertificateButtons(root, passingAttempt?.totalScore || 0, state.certificationDate || '');
 
   document.getElementById('toggleCertReview')?.addEventListener('click', () => {
     const content = document.getElementById('certReviewContent');
@@ -15090,7 +15095,7 @@ function showExamResults(root: HTMLElement, attempt: ExamAttempt, detailedResult
 
         <div class="cert-section">
           <h3> You are now a Certified Roof E.R. Sales Representative!</h3>
-          <button id="downloadCertResult" class="cert-download-btn"> Download Certificate</button>
+          ${certificateButtonsHtml('downloadCertResult', 'downloadCertResultPng')}
         </div>
 
         ${wrongAnswers.length > 0 ? `
@@ -15110,9 +15115,7 @@ function showExamResults(root: HTMLElement, attempt: ExamAttempt, detailedResult
       </div>
     `;
 
-    document.getElementById('downloadCertResult')?.addEventListener('click', () => {
-      generateCertificatePDF(state.userName, attempt.totalScore, attempt.date);
-    });
+    wireCertificateButtons(root, attempt.totalScore, attempt.date);
 
     document.getElementById('toggleAnswerReview')?.addEventListener('click', () => {
       const content = document.getElementById('answerReviewContent');
