@@ -120,6 +120,7 @@ test('drawer, keyboard exercises, completion choice, and stored records', async 
 
 test('theme persistence, system preference, and accessible exam form', async ({page}) => {
   await login(page);
+  await page.route('**/api/exam/start', route => route.fulfill({json:{attemptId:'11111111-1111-4111-8111-111111111111',remainingAttempts:3}}));
   await page.getByLabel('Appearance').selectOption('dark');
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
