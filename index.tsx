@@ -355,9 +355,9 @@ async function syncProgressFromServer(): Promise<void> {
     localStorage.setItem('roof-er.completedModules', JSON.stringify(allCompleted));
 
     // Sync exam attempts and certification status from server (authoritative source)
-    if (progress.examAttempts && progress.examAttempts.length > 0) {
+    if (progress.examAttempts) {
       const serverAttempts = progress.examAttempts
-        .filter(a => a.totalScore != null) // Only completed attempts
+        .filter(a => a.completedAt != null && a.totalScore != null) // Only completed attempts
         .map(a => ({
           attemptNumber: a.attemptNumber,
           date: a.completedAt || new Date().toISOString(),
@@ -368,23 +368,14 @@ async function syncProgressFromServer(): Promise<void> {
           passed: a.passed
         }));
 
-      // Server is authoritative for exam attempts ,  always use server data if it has more
-      const localAttempts = JSON.parse(localStorage.getItem(STORAGE_KEYS.finalExamHistory) || '[]');
-      if (serverAttempts.length >= localAttempts.length) {
-        localStorage.setItem(STORAGE_KEYS.finalExamHistory, JSON.stringify(serverAttempts));
-      }
+      localStorage.setItem(STORAGE_KEYS.finalExamHistory, JSON.stringify(serverAttempts));
     }
-
+    localStorage.setItem(STORAGE_KEYS.certifiedStatus, String(!!progress.isCertified));
     if (progress.isCertified) {
-      localStorage.setItem(STORAGE_KEYS.certifiedStatus, 'true');
-      if (progress.certificationDate) {
-        localStorage.setItem(STORAGE_KEYS.certificationDate, progress.certificationDate);
-      }
-      if (typeof progress.certificationScore === 'number') {
-        localStorage.setItem(STORAGE_KEYS.certificationScore, String(progress.certificationScore));
-      }
-      updateSidebarCertifiedBadge(true);
+      if (progress.certificationDate) localStorage.setItem(STORAGE_KEYS.certificationDate, progress.certificationDate);
+      if (typeof progress.certificationScore === 'number') localStorage.setItem(STORAGE_KEYS.certificationScore, String(progress.certificationScore));
     }
+    updateSidebarCertifiedBadge(!!progress.isCertified);
 
     // Sync gamification
     if (progress.gamification) {
@@ -14097,6 +14088,7 @@ let currentExamAttemptId: string | null = null;
 
 function saveExamAttempt(attempt: ExamAttempt): void {
   const state = getExamState();
+  state.attempts = state.attempts.filter(a => a.attemptNumber !== attempt.attemptNumber);
   state.attempts.push(attempt);
   localStorage.setItem(STORAGE_KEYS.finalExamHistory, JSON.stringify(state.attempts));
 
@@ -14115,10 +14107,10 @@ async function submitExamToAPI(
   mcqAnswers?: any[],
   fibAnswers?: any[],
   saAnswers?: any[]
-): Promise<void> {
-  if (!attemptId) return;
+): Promise<{success: boolean; score: number; passed: boolean}> {
+  if (!attemptId) throw new Error('No saved attempt. Reopen the exam while online.');
 
-  await apiCall('/exam/submit', {
+  const response = await apiCall<{success: boolean; score: number; passed: boolean}>('/exam/submit', {
     method: 'POST',
     body: JSON.stringify({
       attemptId,
@@ -14130,6 +14122,8 @@ async function submitExamToAPI(
     }),
     silent: true
   } as any);
+  if (!response?.success) throw new Error('Submission not confirmed. Your answers are saved on this browser. Reconnect and retry; this will not use another attempt.');
+  return response;
 }
 
 // Start exam attempt via API
@@ -14139,8 +14133,7 @@ async function startExamAttemptAPI(): Promise<{ attemptId: string | null; remain
   });
 
   if (!result) {
-    // Offline mode - use local tracking
-    return { attemptId: null, remainingAttempts: getRemainingAttempts() };
+    throw new Error('Unable to open the exam. Reconnect and try again. No attempt was used.');
   }
 
   if ('error' in result) {
@@ -14259,6 +14252,19 @@ function formatExamDate(dateStr: string): string {
 let currentExamData: { mcq: MCQQuestion[], fib: FIBQuestion[], sa: SAQuestion[] } | null = null;
 let examStartTime: number | null = null;
 
+function examDraftKey(): string { return `roof-er.examDraft.${getCurrentUser()?.id || 'unknown'}`; }
+function readExamDraft(): any {
+  try { return JSON.parse(localStorage.getItem(examDraftKey()) || 'null'); } catch { return null; }
+}
+function persistExamInputs(root: HTMLElement) {
+  const draft = readExamDraft();
+  if (!draft || draft.attemptId !== currentExamAttemptId) return;
+  root.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input[name], textarea[name]').forEach(input => {
+    if (input.type !== 'radio' || (input as HTMLInputElement).checked) draft.answers[input.name] = input.value;
+  });
+  localStorage.setItem(examDraftKey(), JSON.stringify(draft));
+}
+
 function initFinalExam() {
   const examArea = document.getElementById('exam-area');
   if (!examArea) return;
@@ -14268,8 +14274,12 @@ function initFinalExam() {
   // Show appropriate screen based on state
   if (state.isCertified) {
     showCertifiedScreen(examArea, state);
+  } else if (readExamDraft()?.pending) {
+    void startExam(examArea);
   } else if (isExamLockedOut()) {
     showLockoutScreen(examArea, state);
+  } else if (readExamDraft()) {
+    void startExam(examArea);
   } else {
     showExamStartScreen(examArea, state);
   }
@@ -14538,6 +14548,15 @@ function showCertifiedScreen(root: HTMLElement, state: ExamState) {
 }
 
 async function startExam(root: HTMLElement) {
+  try {
+  const saved = readExamDraft();
+  if (saved?.pending) {
+    currentExamAttemptId = saved.attemptId;
+    currentExamData = saved.questions;
+    examStartTime = saved.startedAt;
+    renderFinalExam(root);
+    return;
+  }
   // Start exam attempt in API to track it
   const { attemptId, remainingAttempts } = await startExamAttemptAPI();
   currentExamAttemptId = attemptId;
@@ -14548,17 +14567,18 @@ async function startExam(root: HTMLElement) {
     return;
   }
 
-  // Record start time for duration tracking
-  examStartTime = Date.now();
-
-  // Shuffle questions for this attempt
-  currentExamData = {
-    mcq: shuffleArray(FINAL_EXAM_MCQ),
-    fib: shuffleArray(FINAL_EXAM_FIB),
-    sa: shuffleArray(FINAL_EXAM_SA)
-  };
+  const draft = readExamDraft();
+  if (draft?.attemptId === attemptId) {
+    currentExamData = draft.questions;
+    examStartTime = draft.startedAt;
+  } else {
+    examStartTime = Date.now();
+    currentExamData = {mcq: shuffleArray(FINAL_EXAM_MCQ), fib: shuffleArray(FINAL_EXAM_FIB), sa: shuffleArray(FINAL_EXAM_SA)};
+    localStorage.setItem(examDraftKey(), JSON.stringify({attemptId, questions: currentExamData, startedAt: examStartTime, answers: {}}));
+  }
 
   renderFinalExam(root);
+  } catch (error) { alert(error instanceof Error ? error.message : 'Unable to open exam. Please retry.'); }
 }
 
 function renderFinalExam(root: HTMLElement) {
@@ -14630,12 +14650,27 @@ function renderFinalExam(root: HTMLElement) {
 
       <div class="exam-submit-section">
         <button id="submitExam" class="exam-submit-btn"> Submit Exam</button>
-        <p class="submit-warning"> You cannot change answers after submitting.</p>
+        <p class="submit-warning">Answers are saved on this browser. Refreshing does not use an attempt. An attempt counts only after submission is saved.</p><p id="exam-save-error" role="alert"></p>
       </div>
 
       <div id="exam-result"></div>
     </div>
   `;
+
+  const draft = readExamDraft();
+  if (draft?.pending) {
+    const status = root.querySelector('#exam-save-error');
+    if (status) status.textContent = 'Your submission is saved on this browser but confirmation is pending. Submit again to recover the original result without using another attempt.';
+  }
+  root.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input[name], textarea[name]').forEach(input => {
+    const value = draft?.answers?.[input.name];
+    if (value !== undefined) {
+      if (input.type === 'radio') (input as HTMLInputElement).checked = input.value === value;
+      else input.value = value;
+    }
+    input.addEventListener('input', () => persistExamInputs(root));
+    input.addEventListener('change', () => persistExamInputs(root));
+  });
 
   document.getElementById('submitExam')?.addEventListener('click', async () => {
     // Validate all questions are answered before submitting
@@ -14684,18 +14719,26 @@ function renderFinalExam(root: HTMLElement) {
         submitBtn.textContent = 'Grading with AI...';
       }
       try {
+        persistExamInputs(root);
+        root.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input, textarea').forEach(el => el.disabled = true);
         await gradeFinalExam(root);
+      } catch (error) {
+        const status = root.querySelector('#exam-save-error');
+        if (status) status.textContent = error instanceof Error ? error.message : 'Submission failed. Retry without starting another attempt.';
       } finally {
         if (submitBtn) {
           submitBtn.disabled = false;
           submitBtn.textContent = 'Submit Exam';
         }
+        root.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input, textarea').forEach(el => el.disabled = false);
       }
     }
   });
 }
 
 async function gradeFinalExam(root: HTMLElement) {
+  const savedSubmission = readExamDraft()?.pending;
+  if (savedSubmission) return finishPendingExam(root, savedSubmission);
   if (!currentExamData) return;
 
   const { mcq, fib, sa } = currentExamData;
@@ -14904,7 +14947,7 @@ async function gradeFinalExam(root: HTMLElement) {
     totalScore,
     passed
   };
-  saveExamAttempt(attempt);
+  // Save locally only after the server confirms the attempt and certificate.
 
   // Submit exam results to API
   const mcqAnswerData = mcq.map((q, idx) => {
@@ -14954,14 +14997,22 @@ async function gradeFinalExam(root: HTMLElement) {
   // Calculate time taken in seconds
   const timeTaken = examStartTime ? Math.round((Date.now() - examStartTime) / 1000) : 0;
 
-  submitExamToAPI(
-    currentExamAttemptId,
-    { mcqCorrect, fibCorrect, saPoints: Math.round(saPoints), totalScore, passed },
-    timeTaken,
-    mcqAnswerData,
-    fibAnswerData,
-    saAnswerData
-  );
+  const pending = {attempt, results: {mcqCorrect, fibCorrect, saPoints: Math.round(saPoints), totalScore, passed}, timeTaken, mcqAnswerData, fibAnswerData, saAnswerData, wrongAnswers};
+  const draft = readExamDraft();
+  localStorage.setItem(examDraftKey(), JSON.stringify({...draft, pending}));
+  await finishPendingExam(root, pending);
+}
+
+async function finishPendingExam(root: HTMLElement, pending: any) {
+  const {attempt, results, timeTaken, mcqAnswerData, fibAnswerData, saAnswerData, wrongAnswers} = pending;
+  const receipt = await submitExamToAPI(currentExamAttemptId, results, timeTaken, mcqAnswerData, fibAnswerData, saAnswerData);
+  attempt.totalScore = receipt.score;
+  attempt.passed = receipt.passed;
+  saveExamAttempt(attempt);
+  localStorage.removeItem(examDraftKey());
+  const {mcqCorrect, fibCorrect, saPoints} = results;
+  const totalScore = receipt.score;
+  const passed = receipt.passed;
 
   // Save wrong answers to localStorage for later review
   localStorage.setItem(STORAGE_KEYS.lastExamWrongAnswers, JSON.stringify(wrongAnswers));

@@ -44,7 +44,7 @@ router.get('/users', async (req: Request, res: Response) => {
       ) mp ON u.id = mp.user_id
       LEFT JOIN (
         SELECT user_id, COUNT(*) as exam_attempts
-        FROM exam_attempts
+        FROM exam_attempts WHERE completed_at IS NOT NULL
         GROUP BY user_id
       ) ea ON u.id = ea.user_id
       LEFT JOIN certifications c ON u.id = c.user_id
@@ -124,7 +124,7 @@ router.get('/users/:id', async (req: Request, res: Response) => {
     }>(`
       SELECT id, attempt_number, started_at, completed_at, mcq_correct, fib_correct,
              sa_points, total_score, passed, time_taken_seconds
-      FROM exam_attempts WHERE user_id = $1
+      FROM exam_attempts WHERE user_id = $1 AND completed_at IS NOT NULL
       ORDER BY attempt_number ASC
     `, [id]);
 

@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { query, queryOne } from '../db/connection.js';
+import { query, queryOne, pool } from '../db/connection.js';
 import { requireAuth } from '../middleware/auth.js';
 
 const router = Router();
@@ -24,7 +24,7 @@ router.get('/history', async (req: Request, res: Response) => {
       time_taken_seconds: number;
     }>(`
       SELECT * FROM exam_attempts
-      WHERE user_id = $1
+      WHERE user_id = $1 AND completed_at IS NOT NULL
       ORDER BY attempt_number ASC
     `, [userId]);
 
@@ -64,83 +64,70 @@ router.get('/history', async (req: Request, res: Response) => {
 
 // POST /api/exam/start - Start a new exam attempt
 router.post('/start', async (req: Request, res: Response) => {
+  const client = await pool?.connect();
+  if (!client) return res.status(503).json({error: 'Database unavailable'});
   try {
+    await client.query('BEGIN');
     const userId = req.user!.id;
-
-    // Check if already certified
-    const certification = await queryOne(`
-      SELECT id FROM certifications WHERE user_id = $1
-    `, [userId]);
-
-    if (certification) {
-      return res.status(400).json({ error: 'Already certified', isCertified: true });
+    await client.query('SELECT id FROM users WHERE id = $1 FOR UPDATE', [userId]);
+    const cert = await client.query('SELECT id FROM certifications WHERE user_id = $1', [userId]);
+    const count = await client.query('SELECT COUNT(*) FROM exam_attempts WHERE user_id = $1 AND completed_at IS NOT NULL', [userId]);
+    const completed = Number(count.rows[0].count);
+    if (cert.rowCount || completed >= 3) {
+      await client.query('ROLLBACK');
+      return res.status(409).json({error: cert.rowCount ? 'Already certified' : 'Maximum attempts reached'});
     }
-
-    // Count previous attempts
-    const attemptCount = await queryOne<{ count: string }>(`
-      SELECT COUNT(*) as count FROM exam_attempts WHERE user_id = $1
-    `, [userId]);
-
-    const currentAttempts = parseInt(attemptCount?.count || '0');
-
-    if (currentAttempts >= 3) {
-      return res.status(400).json({ error: 'Maximum attempts reached', lockedOut: true });
-    }
-
-    // Create new attempt record
-    const attempt = await queryOne<{ id: string; attempt_number: number }>(`
-      INSERT INTO exam_attempts (user_id, attempt_number, started_at)
-      VALUES ($1, $2, NOW())
-      RETURNING id, attempt_number
-    `, [userId, currentAttempts + 1]);
-
-    res.json({
-      attemptId: attempt?.id,
-      attemptNumber: attempt?.attempt_number,
-      remainingAttempts: 3 - currentAttempts - 1
-    });
+    const active = await client.query('SELECT id FROM exam_attempts WHERE user_id = $1 AND completed_at IS NULL ORDER BY started_at DESC NULLS LAST LIMIT 1', [userId]);
+    const attempt = active.rows[0] || (await client.query('INSERT INTO exam_attempts (user_id, attempt_number, started_at) VALUES ($1, $2, NOW()) RETURNING id', [userId, completed + 1])).rows[0];
+    await client.query('COMMIT');
+    res.json({attemptId: attempt.id, attemptNumber: completed + 1, remainingAttempts: 3 - completed, resumed: !!active.rowCount});
   } catch (error) {
+    await client.query('ROLLBACK');
     console.error('Start exam error:', error);
-    res.status(500).json({ error: 'Failed to start exam' });
-  }
+    res.status(500).json({error: 'Unable to start exam. Please retry.'});
+  } finally { client.release(); }
 });
 
 // POST /api/exam/submit - Submit exam answers
 router.post('/submit', async (req: Request, res: Response) => {
+  const {attemptId, mcqAnswers, fibAnswers, saAnswers, timeTaken, results} = req.body;
+  if (!/^[0-9a-f-]{36}$/i.test(attemptId || '') || !results ||
+      !['mcqCorrect','fibCorrect','saPoints','totalScore'].every(k => Number.isInteger(results[k]) && results[k] >= 0) ||
+      results.totalScore > 100 || results.passed !== (results.totalScore >= 70)) {
+    return res.status(400).json({error: 'Invalid exam submission'});
+  }
+  const client = await pool?.connect();
+  if (!client) return res.status(503).json({error: 'Database unavailable'});
   try {
+    await client.query('BEGIN');
     const userId = req.user!.id;
-    const { attemptId, mcqAnswers, fibAnswers, saAnswers, timeTaken, results } = req.body;
-
-    if (!attemptId || !results) {
-      return res.status(400).json({ error: 'attemptId and results required' });
+    await client.query('SELECT id FROM users WHERE id = $1 FOR UPDATE', [userId]);
+    const found = await client.query('SELECT * FROM exam_attempts WHERE id = $1 AND user_id = $2 FOR UPDATE', [attemptId, userId]);
+    const attempt = found.rows[0];
+    if (!attempt) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({error: 'Attempt not found'});
     }
-
-    // Update attempt with results
-    await query(`
-      UPDATE exam_attempts SET
-        completed_at = NOW(),
-        mcq_correct = $2,
-        fib_correct = $3,
-        sa_points = $4,
-        total_score = $5,
-        passed = $6,
-        time_taken_seconds = $7
-      WHERE id = $1 AND user_id = $8
-    `, [
-      attemptId,
-      results.mcqCorrect,
-      results.fibCorrect,
-      results.saPoints,
-      results.totalScore,
-      results.passed,
-      timeTaken,
-      userId
-    ]);
-
+    const count = await client.query('SELECT COUNT(*) FROM exam_attempts WHERE user_id = $1 AND completed_at IS NOT NULL', [userId]);
+    const completed = Number(count.rows[0].count);
+    // A repeated POST after a lost response returns the original result unchanged.
+    if (attempt.completed_at) {
+      await client.query('COMMIT');
+      return res.json({success: true, passed: attempt.passed, score: attempt.total_score, remainingAttempts: Math.max(0, 3 - completed)});
+    }
+    const cert = await client.query('SELECT id FROM certifications WHERE user_id = $1', [userId]);
+    if (completed >= 3 || cert.rowCount) {
+      await client.query('ROLLBACK');
+      return res.status(409).json({error: 'Exam already completed or attempt limit reached'});
+    }
+    await client.query(`UPDATE exam_attempts SET completed_at = NOW(), attempt_number = $9,
+      mcq_correct = $2, fib_correct = $3, sa_points = $4, total_score = $5, passed = $6,
+      time_taken_seconds = $7 WHERE id = $1 AND user_id = $8`,
+      [attemptId, results.mcqCorrect, results.fibCorrect, results.saPoints, results.totalScore, results.passed, timeTaken, userId, completed + 1]);
     // Store individual answers if provided
     if (mcqAnswers && Array.isArray(mcqAnswers)) {
       for (const answer of mcqAnswers) {
-        await query(`
+        await client.query(`
           INSERT INTO exam_answers (attempt_id, question_type, question_id, question_number, question_text, user_answer, correct_answer, is_correct, points_earned)
           VALUES ($1, 'mcq', $2, $3, $4, $5, $6, $7, $8)
         `, [attemptId, answer.questionId, answer.questionNumber, answer.questionText, answer.userAnswer, answer.correctAnswer, answer.isCorrect, answer.isCorrect ? 2 : 0]);
@@ -149,7 +136,7 @@ router.post('/submit', async (req: Request, res: Response) => {
 
     if (fibAnswers && Array.isArray(fibAnswers)) {
       for (const answer of fibAnswers) {
-        await query(`
+        await client.query(`
           INSERT INTO exam_answers (attempt_id, question_type, question_id, question_number, question_text, user_answer, correct_answer, is_correct, points_earned)
           VALUES ($1, 'fib', $2, $3, $4, $5, $6, $7, $8)
         `, [attemptId, answer.questionId, answer.questionNumber, answer.questionText, answer.userAnswer, answer.correctAnswer, answer.isCorrect, answer.isCorrect ? 2 : 0]);
@@ -158,47 +145,26 @@ router.post('/submit', async (req: Request, res: Response) => {
 
     if (saAnswers && Array.isArray(saAnswers)) {
       for (const answer of saAnswers) {
-        await query(`
+        await client.query(`
           INSERT INTO exam_answers (attempt_id, question_type, question_id, question_number, question_text, user_answer, correct_answer, is_correct, points_earned)
           VALUES ($1, 'sa', $2, $3, $4, $5, $6, $7, $8)
-        `, [attemptId, answer.questionId, answer.questionNumber, answer.questionText, answer.userAnswer, answer.correctAnswer, answer.isCorrect, answer.pointsEarned]);
+        `, [attemptId, answer.questionId, answer.questionNumber, answer.questionText, answer.userAnswer, answer.correctAnswer, answer.isCorrect, Math.round(answer.pointsEarned)]);
       }
     }
 
-    // If passed, create certification record. This must never fail silently -
-    // a broken insert here is exactly what made admin show "Certified: No"
-    // for every user who had passed the exam.
+
     if (results.passed) {
-      try {
-        const user = await queryOne<{ name: string }>(`
-          SELECT name FROM users WHERE id = $1
-        `, [userId]);
-
-        await query(`
-          INSERT INTO certifications (user_id, passing_attempt_id, certificate_name, score)
-          VALUES ($1, $2, $3, $4)
-          ON CONFLICT (user_id) DO NOTHING
-        `, [userId, attemptId, user?.name || 'Unknown', results.totalScore]);
-      } catch (certError) {
-        console.error('CERTIFICATION INSERT FAILED for user', userId, certError);
-      }
+      await client.query(`INSERT INTO certifications (user_id, passing_attempt_id, certificate_name, score)
+        SELECT id, $2, name, $3 FROM users WHERE id = $1 ON CONFLICT (user_id) DO NOTHING`,
+        [userId, attemptId, results.totalScore]);
     }
-
-    // Get remaining attempts
-    const attemptCount = await queryOne<{ count: string }>(`
-      SELECT COUNT(*) as count FROM exam_attempts WHERE user_id = $1
-    `, [userId]);
-
-    res.json({
-      success: true,
-      passed: results.passed,
-      score: results.totalScore,
-      remainingAttempts: Math.max(0, 3 - parseInt(attemptCount?.count || '0'))
-    });
+    await client.query('COMMIT');
+    res.json({success: true, passed: results.passed, score: results.totalScore, remainingAttempts: Math.max(0, 2 - completed)});
   } catch (error) {
+    await client.query('ROLLBACK');
     console.error('Submit exam error:', error);
-    res.status(500).json({ error: 'Failed to submit exam' });
-  }
+    res.status(500).json({error: 'Submission was not saved. Retry the same attempt.'});
+  } finally { client.release(); }
 });
 
 // GET /api/exam/answers/:attemptId - Get detailed answers for an attempt

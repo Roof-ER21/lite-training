@@ -37,7 +37,7 @@ router.get('/', async (req: Request, res: Response) => {
       passed: boolean;
     }>(`
       SELECT id, attempt_number, completed_at, mcq_correct, fib_correct, sa_points, total_score, passed
-      FROM exam_attempts WHERE user_id = $1
+      FROM exam_attempts WHERE user_id = $1 AND completed_at IS NOT NULL
       ORDER BY attempt_number ASC
     `, [userId]);
 
@@ -385,7 +385,7 @@ router.post('/badges/check', async (req: Request, res: Response) => {
         SELECT current_streak, longest_streak FROM user_gamification WHERE user_id = $1
       `, [userId]),
       query<{ passed: boolean; total_score: number }>(`
-        SELECT passed, total_score FROM exam_attempts WHERE user_id = $1
+        SELECT passed, total_score FROM exam_attempts WHERE user_id = $1 AND completed_at IS NOT NULL
       `, [userId]),
       query<{ final_score: number }>(`
         SELECT final_score FROM roleplay_sessions WHERE user_id = $1 AND final_score >= 70
