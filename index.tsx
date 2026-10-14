@@ -1879,12 +1879,14 @@ function getNextTrainingModule(): { module: string; displayName: string } {
 async function initMyPage() {
   const user = getCurrentUser();
   const greeting = document.getElementById('profile-greeting');
-  if (greeting) greeting.textContent = user ? 'Your training, ' + user.name.split(' ')[0] : 'Your training';
+  if (greeting) greeting.textContent = user ? 'Welcome back, ' + user.name.split(' ')[0] + '.' : 'Your training starts here.';
   const next = getNextTrainingModule();
   const completed = new Set<string>(JSON.parse(localStorage.getItem('roof-er.completedModules') || '[]'));
   const unlocked = new Set(getUnlockedModules());
   const title = document.getElementById('next-lesson-title');
   if (title) title.textContent = next.displayName;
+  const lessonNumber = document.getElementById('next-lesson-number');
+  if (lessonNumber) lessonNumber.textContent = MODULE_ORDER.every(id => completed.has(id)) ? 'Assessment records' : 'Lesson ' + String(MODULE_ORDER.indexOf(next.module) + 1).padStart(2, '0');
   const continueButton = document.getElementById('continue-training-btn');
   if (continueButton) {
     continueButton.textContent = MODULE_ORDER.every(id => completed.has(id)) ? 'View exam results' : completed.size ? 'Continue training' : 'Start training';
@@ -2195,16 +2197,19 @@ const trainingScriptMap: Record<string, { scripts: string[]; keyPhrases: string[
 const trainingContent = {
   'my-page': `
     <div class="training-home">
-      <header class="training-heading"><p class="section-label">Roof-ER · Sales training</p><h1 id="profile-greeting">Your training</h1><p>Learn the work. Practice the conversation. Be ready for the field.</p></header>
+      <header class="training-heading"><p class="section-label">The Roof-ER learning workspace</p><h1 id="profile-greeting">Your training starts here.</h1><p>Build your knowledge. Put it into practice.</p></header>
       <div class="training-overview">
-        <section class="next-lesson" aria-labelledby="next-lesson-title"><p class="section-label">Pick up where you left off</p><h2 id="next-lesson-title">Welcome & Company Intro</h2><p>Your lessons and practice are saved as you go.</p><button type="button" id="continue-training-btn">Continue training</button></section>
-        <section class="assessment-panel" aria-labelledby="assessment-title"><p class="section-label">Assessment</p><h2 id="assessment-title">Your exam standing</h2><p id="exam-standing">Complete the lessons to unlock your exam</p><button type="button" class="secondary-button" id="dashboard-exam-link">Open final exam</button></section>
+        <section class="next-lesson" aria-labelledby="next-lesson-title">
+          <div class="next-lesson-copy"><p class="section-label">Your next step <span aria-hidden="true">/</span> <span id="next-lesson-number">Lesson 01</span></p><h2 id="next-lesson-title">Welcome & Company Intro</h2><p>Pick up where you left off. Your lessons and practice are saved as you go.</p><button type="button" id="continue-training-btn">Continue training</button></div>
+          <figure class="training-field-image"><img src="/assets/photo-strategy/step6-roof-overview.jpg" alt="Roof overview showing shingles, ridge and ventilation" /><figcaption>Built for the work ahead.<span>Roof-ER / Field training</span></figcaption></figure>
+        </section>
+        <section class="assessment-panel" aria-labelledby="assessment-title"><div class="assessment-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3h12v14H6zM9 7h6M9 10h6M9 14v7l3-2 3 2v-7"/></svg></div><div><h2 id="assessment-title">Your certification</h2><p id="exam-standing">Complete the lessons to unlock your exam</p></div><button type="button" class="secondary-button" id="dashboard-exam-link">Open final exam</button></section>
       </div>
       <section id="certificate-panel" class="certificate-panel" aria-labelledby="certificate-title" hidden>
         <div class="certificate-panel-copy"><h2 id="certificate-title">Your certificate</h2><p id="certificate-summary"></p><label class="certificate-name-label" for="certificate-name">Name on certificate</label><input id="certificate-name" type="text" autocomplete="name" /></div>
         <div class="certificate-actions"><button id="dashboard-download-cert-pdf" class="cert-download-btn" type="button">Download Certificate (PDF)</button><button id="dashboard-download-cert-png" class="cert-download-btn cert-download-secondary" type="button">Download PNG</button></div>
       </section>
-      <section class="learning-path-section" aria-labelledby="learning-path-title"><div class="section-heading"><h2 id="learning-path-title">Your learning path</h2><p>From the first conversation to the completed job.</p></div><ol id="learning-path" class="learning-path"></ol></section>
+      <section class="learning-path-section" aria-labelledby="learning-path-title"><div class="section-heading"><h2 id="learning-path-title">Your learning path</h2><p>14 lessons. One step at a time.</p></div><ol id="learning-path" class="learning-path"></ol></section>
       <div id="dashboard-review"></div>
       <details class="connected-agents-disclosure"><summary>Connected agents</summary><div class="dashboard-agents" id="dashboard-agents"></div></details>
     </div>

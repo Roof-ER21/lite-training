@@ -12,30 +12,21 @@ surfaces use light text for links instead of small red text. Gray text and field
 borders have separate accessible roles. Geist and Geist Mono, restrained 2px
 corners, fine dividers, and consistent spacing support extended reading.
 
-### Premium alternative — "Charcoal & Porcelain" (implemented)
+### Field workspace (local review)
 
-The upscale direction keeps exactly the red / white / black / gray scheme and
-gets its premium feel from layering rather than decoration (the UI gate still
-bans gradients and raw colors in component CSS):
-
-- **Light mode** reads as porcelain: a warm porcelain page (`--light-bg`),
-  pure-white raised cards (`--surface-raised`), inset panels
-  (`--surface-inset`), hairline borders, and deep, soft, multi-layer shadows
-  (`--shadow-sm/md/lg`).
-- **Dark mode** reads as charcoal: a near-black page, three stacked charcoal
-  surfaces (inset / surface / raised), and stronger black shadows so cards
-  lift instead of flattening.
-- **Red is rationed**: brand red is only the primary action, the active-lesson
-  edge in the sidebar, section labels, and the certificate's top rule. Hover
-  darkens to `--brand-deep` instead of brightening, which reads more expensive.
-- **Shape**: the shared radius moved from 2px to 10px (`--border-radius`), with
-  tighter heading letter-spacing — the same content, noticeably more tailored.
+The dashboard uses cool gray and slate surfaces with a single red primary action.
+One illustrated next-lesson panel leads into a compact certification row and a
+two-column course map (one column on phones). The sidebar is narrower, with a
+single active indicator and quieter locked lessons. Reading pages use restrained
+white or slate surfaces, a shorter line length, and compact navigation controls.
+Light, Dark, and Use device setting remain available; dark mode uses layered
+slate instead of near-black. Theme values live in `theme.css`.
 
 ## Certificate of Completion
 
 `certificate.ts` renders one polished certificate at 3300 x 2550 (US Letter
 landscape, 300 dpi): charcoal double frame with a red keyline and corner
-ornaments, the Roof-ER shield logo in a charcoal medallion panel, recipient
+ornaments, the approved black-and-red theroofdocs.com logo, recipient
 name, program, score, certification date, a stable certificate ID
 (`RER-<year>-<hash>`), a red certified seal, and the three leadership
 signatures. Downloads are a high-resolution PNG or a real single-page PDF
@@ -46,7 +37,7 @@ simply `isCertified`, whether it was earned on this device or synced from the
 server (`certificationScore` is now synced and stored too). Download buttons
 appear on the certified screen, on the passing results screen, and in a
 dedicated My Page panel where the name on the certificate can be corrected
-before downloading. See `RoofER-Certificate-Preview.png` for a sample.
+before downloading. See `RoofER-Certificate-Preview-v4.png` for a sample.
 
 `training-ui.css` defines the shell and final component styles. `index.css` keeps
 legacy lesson layouts using the shared roles; theme-specific override rules,

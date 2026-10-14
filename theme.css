@@ -15,17 +15,17 @@
   --primary-hover-color: var(--brand-deep);
   --accent-text: var(--brand);
   --dark-bg: #0C0D0E;
-  --light-bg: #F1F0EC;
+  --light-bg: #E8EDF1;
   --surface-color: #ffffff;
   --surface-raised: #ffffff;
-  --surface-soft: #E9E7E1;
-  --surface-inset: #F6F5F1;
-  --surface-warm: #FBF7F0;
-  --surface-practice: #EFF2EF;
-  --text-primary: #141518;
-  --text-secondary: #565D63;
-  --border-color: #D9D5CC;
-  --border-strong: #AEB4B9;
+  --surface-soft: #DFE6EC;
+  --surface-inset: #F0F4F7;
+  --surface-warm: #E8EEF3;
+  --surface-practice: #E8EFEC;
+  --text-primary: #253542;
+  --text-secondary: #526573;
+  --border-color: #CBD5DE;
+  --border-strong: #91A1AE;
   --white: #ffffff;
   --success-color: #21643E;
   --error-color: var(--accent-text);
@@ -34,11 +34,11 @@
   --shadow-sm: 0 1px 2px rgb(20 18 14 / 0.05), 0 4px 14px -6px rgb(20 18 14 / 0.10);
   --shadow-md: 0 2px 4px rgb(20 18 14 / 0.05), 0 18px 38px -18px rgb(20 18 14 / 0.28);
   --shadow-lg: 0 4px 8px rgb(20 18 14 / 0.06), 0 32px 64px -24px rgb(20 18 14 / 0.34);
-  --border-radius: 10px;
+  --border-radius: 8px;
   --card-bg: var(--surface-color);
   --input-bg: var(--surface-color);
   --input-border: #7C848B;
-  --hover-bg: #E4E0D8;
+  --hover-bg: #D9E3EB;
   --code-bg: var(--light-bg);
   --script-bg: var(--light-bg);
   --highlight-bg: var(--hover-bg);
@@ -56,23 +56,26 @@
   color-scheme: dark;
   --brand-deep: #8C0605;
   --brand-soft: #2A1211;
-  --light-bg: #08090A;
-  --surface-color: #121315;
-  --surface-raised: #1A1B1E;
-  --surface-soft: #17181B;
-  --surface-inset: #0D0E0F;
-  --surface-warm: #191713;
-  --surface-practice: #131713;
-  --text-primary: #F4F4F1;
-  --text-secondary: #A9ADB3;
-  --border-color: #2E3034;
-  --border-strong: #4A4D52;
+  --light-bg: #17212A;
+  --surface-color: #202D38;
+  --surface-raised: #283846;
+  --surface-soft: #1C2934;
+  --surface-inset: #1B2731;
+  --surface-warm: #263440;
+  --surface-practice: #233630;
+  --text-primary: #EDF3F8;
+  --text-secondary: #B1C1CF;
+  --border-color: #3C4D5C;
+  --border-strong: #61798D;
   --input-border: #7A7F86;
   /* Brand red stays a fill/mark on dark surfaces. Small text uses paper. */
   --accent-text: var(--text-primary);
   --success-color: #93CBA7;
-  --hover-bg: #232529;
+  --hover-bg: #324656;
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.45), 0 6px 18px -8px rgb(0 0 0 / 0.55);
   --shadow-md: 0 2px 4px rgb(0 0 0 / 0.5), 0 22px 44px -20px rgb(0 0 0 / 0.7);
   --shadow-lg: 0 4px 8px rgb(0 0 0 / 0.55), 0 36px 72px -28px rgb(0 0 0 / 0.8);
 }
+
+:root { --hero-surface: #DEE7EE; --hero-ink: #273E50; --photo-caption: #23333F; --photo-text: #FFFFFF; }
+:root[data-theme="dark"] { --hero-surface: #2B4051; --hero-ink: #EDF3F8; }
