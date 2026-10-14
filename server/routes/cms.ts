@@ -1,3 +1,4 @@
+import { privilegedCertificateRoutes } from './certificates.js';
 import { Router, Request, Response } from 'express';
 import { query, queryOne, pool } from '../db/connection.js';
 import { createLessonDraft, publishLessonDraft } from '../lib/lesson-versions.js';
@@ -7,6 +8,7 @@ const router = Router();
 
 // All CMS routes require super admin authentication
 router.use(requireSuperAdmin);
+router.use('/certificates', privilegedCertificateRoutes());
 
 // ============================================
 // MODULE MANAGEMENT

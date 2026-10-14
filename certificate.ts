@@ -10,6 +10,7 @@
  */
 
 export interface CertificateDetails {
+  certificateId?: string;
   recipientName: string;
   score: number;
   /** ISO date string (or anything `new Date()` can parse) of certification. */
@@ -41,6 +42,7 @@ export function isCertificateEligible(state: { isCertified?: boolean | null }): 
 
 /** Stable, verifiable-looking ID derived from the certificate contents. */
 export function certificateIdFor(details: CertificateDetails): string {
+  if (details.certificateId) return details.certificateId;
   const seed = `${details.recipientName.trim().toLowerCase()}|${details.certificationDate}|${Math.round(details.score)}`;
   let hash = 0x811c9dc5; // FNV-1a
   for (let i = 0; i < seed.length; i++) {
@@ -229,7 +231,7 @@ export async function renderCertificateCanvas(details: CertificateDetails): Prom
   });
 
   ctx.fillStyle = GRAY; ctx.font = '26px Geist, Arial, sans-serif';
-  centered(ctx, `Verify this credential with Roof-ER Training using Certificate ID ${certificateId}.`, 2330);
+  centered(ctx, `Roof-ER Sales Training · Certificate ID ${certificateId}`, 2330);
 
   return canvas;
 }
@@ -249,11 +251,12 @@ export async function downloadCertificate(details: CertificateDetails, format: '
   const base = certificateFileBase(details.recipientName);
   if (format === 'png') {
     const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png'));
-    if (blob) saveBlob(blob, `${base}.png`);
+    if (!blob) throw new Error('Could not prepare the certificate image. Please try again.');
+    saveBlob(blob, `${base}.png`);
     return;
   }
   const jpegBlob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.92));
-  if (!jpegBlob) return;
+  if (!jpegBlob) throw new Error('Could not prepare the certificate PDF. Please try again.');
   const jpeg = new Uint8Array(await jpegBlob.arrayBuffer());
   saveBlob(buildCertificatePdf(jpeg), `${base}.pdf`);
 }

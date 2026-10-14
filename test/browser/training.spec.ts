@@ -70,6 +70,12 @@ for (const theme of ['light','dark']) {
       expect(result.violations, `${theme}: ${id}`).toEqual([]);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),`${theme}: ${id} overflow`).toBe(true);
       expect(await page.locator('#main-content').innerText()).not.toMatch(/Total XP|Day Streak|Time Trained|Next Milestone|Leaderboard|\[object Object\]|\bundefined\b/);
+      if (process.env.CAPTURE_MODULE_REVIEW) {
+        await page.screenshot({path:`output/playwright/module-review/${theme}-mobile-${id}.png`,fullPage:true});
+        await page.setViewportSize({width:1440,height:1000});
+        await page.screenshot({path:`output/playwright/module-review/${theme}-desktop-${id}.png`,fullPage:true});
+        await page.setViewportSize({width:390,height:844});
+      }
     }
     expect(errors).toEqual([]);
   });

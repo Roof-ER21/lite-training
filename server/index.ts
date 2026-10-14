@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import { initDatabase, isDatabaseAvailable } from './db/connection.js';
 
 // Import routes
+import { certificateRoutes } from './routes/certificates.js';
 import authRoutes from './routes/auth.js';
 import progressRoutes from './routes/progress.js';
 import examRoutes from './routes/exam.js';
@@ -85,6 +86,7 @@ app.get('/api/health', (req, res) => {
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/progress', progressRoutes);
+app.use('/api/certificates', certificateRoutes);
 app.use('/api/exam', examRoutes);
 app.use('/api/roleplay', roleplayRoutes);
 app.use('/api/admin', adminRoutes);

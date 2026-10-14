@@ -11,7 +11,7 @@ import './learning-workspace.css';
 */
 import { GoogleGenAI, Type, Chat } from '@google/genai';
 import { initTrainingInterface, enhanceTrainingContent, announceTrainingStatus, closeTrainingDrawer } from './training-ui';
-import { downloadCertificate, isCertificateEligible, certificateIdFor } from './certificate';
+import { downloadCertificate, isCertificateEligible } from './certificate';
 
 // No API key ships to the browser: all Gemini REST calls route through the
 // Express proxy, which attaches the key server-side (server/routes/gemini-proxy.ts).
@@ -1909,17 +1909,9 @@ async function initMyPage() {
   const certDetails = getCertificateDetails();
   if (certPanel && certDetails) {
     certPanel.hidden = false;
-    const nameInput = document.getElementById('certificate-name') as HTMLInputElement | null;
-    if (nameInput) nameInput.value = certDetails.recipientName;
     const summary = document.getElementById('certificate-summary');
-    if (summary) summary.textContent = `Certified ${formatExamDate(certDetails.certificationDate)} · Score ${certDetails.score}% · Certificate ID ${certificateIdFor(certDetails)}`;
-    const downloadFromDashboard = (format: 'pdf' | 'png') => {
-      const recipientName = nameInput?.value.trim() || certDetails.recipientName;
-      if (recipientName) localStorage.setItem(STORAGE_KEYS.examUserName, recipientName);
-      void downloadCertificate({ ...certDetails, recipientName }, format);
-    };
-    document.getElementById('dashboard-download-cert-pdf')?.addEventListener('click', () => downloadFromDashboard('pdf'));
-    document.getElementById('dashboard-download-cert-png')?.addEventListener('click', () => downloadFromDashboard('png'));
+    if (summary) summary.textContent = 'Download your earned certificate with the name, score and date from your training record.';
+    wireRecordedCertificateButtons(certPanel, '/certificates/me');
   }
   document.getElementById('dashboard-exam-link')?.addEventListener('click', () => navigateToModule('final-exam'));
   const examButton = document.getElementById('dashboard-exam-link') as HTMLButtonElement | null;
@@ -2206,8 +2198,8 @@ const trainingContent = {
         <section class="assessment-panel" aria-labelledby="assessment-title"><div class="assessment-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3h12v14H6zM9 7h6M9 10h6M9 14v7l3-2 3 2v-7"/></svg></div><div><h2 id="assessment-title">Your certification</h2><p id="exam-standing">Complete the lessons to unlock your exam</p></div><button type="button" class="secondary-button" id="dashboard-exam-link">Open final exam</button></section>
       </div>
       <section id="certificate-panel" class="certificate-panel" aria-labelledby="certificate-title" hidden>
-        <div class="certificate-panel-copy"><h2 id="certificate-title">Your certificate</h2><p id="certificate-summary"></p><label class="certificate-name-label" for="certificate-name">Name on certificate</label><input id="certificate-name" type="text" autocomplete="name" /></div>
-        <div class="certificate-actions"><button id="dashboard-download-cert-pdf" class="cert-download-btn" type="button">Download Certificate (PDF)</button><button id="dashboard-download-cert-png" class="cert-download-btn cert-download-secondary" type="button">Download PNG</button></div>
+        <div class="certificate-panel-copy"><h2 id="certificate-title">Your certificate</h2><p id="certificate-summary"></p></div>
+        <div class="certificate-actions"><button id="dashboard-download-cert-pdf" data-certificate-format="pdf" class="cert-download-btn" type="button">Download Certificate (PDF)</button><button id="dashboard-download-cert-png" data-certificate-format="png" class="cert-download-btn cert-download-secondary" type="button">Download PNG</button></div>
       </section>
       <section class="learning-path-section" aria-labelledby="learning-path-title"><div class="section-heading"><h2 id="learning-path-title">Your learning path</h2><p>14 lessons. One step at a time.</p></div><ol id="learning-path" class="learning-path"></ol></section>
       <div id="dashboard-review"></div>
@@ -11950,6 +11942,7 @@ function showSuperAdminDashboard(): void {
         <button class="sa-nav-item" data-section="modules">Modules</button>
         <button class="sa-nav-item" data-section="exam">Exam Questions</button>
         <button class="sa-nav-item" data-section="scenarios">Scenarios</button>
+        <button class="sa-nav-item" data-section="certificates">Certificates</button>
         <button class="sa-nav-item" data-section="audit">Audit Log</button>
       </nav>
       <button class="sa-logout-btn" id="sa-logout">Logout</button>
@@ -11996,10 +11989,29 @@ async function loadSuperAdminSection(section: string): Promise<void> {
     case 'scenarios':
       await loadCMSScenarios();
       break;
+    case 'certificates':
+      await loadCMSCertificates();
+      break;
     case 'audit':
       await loadCMSAuditLog();
       break;
   }
+}
+
+async function loadCMSCertificates(): Promise<void> {
+  const root = document.getElementById('sa-main-content');
+  if (!root) return;
+  const data = await superAdminApiCall<{ certificates: Array<{userId: string; recipientName: string; score: number; certificationDate: string; certificateId: string}> }>('/cms/certificates');
+  if (!data?.certificates) { root.innerHTML = '<h2>Certificates</h2><p role="status">Could not load earned certificates. Reopen Certificates to retry.</p>'; return; }
+  root.innerHTML = '<h2>Earned certificates</h2><p>Download any representative’s saved certificate. Only earned certifications appear here.</p><label for="certificate-search">Find a certificate</label><input id="certificate-search" type="search" placeholder="Name or certificate ID" /><div id="certificate-records"></div>';
+  const list = root.querySelector<HTMLElement>('#certificate-records')!;
+  const render = (search = '') => {
+    const matches = data.certificates.filter(c => (c.recipientName + ' ' + c.certificateId).toLowerCase().includes(search.toLowerCase()));
+    list.innerHTML = matches.length ? matches.map((c, i) => `<section class="certificate-record"><h3>${escapeHtml(c.recipientName)}</h3><p>${escapeHtml(formatExamDate(c.certificationDate))} · Score ${c.score}%</p><p class="certificate-id-note">${escapeHtml(c.certificateId)}</p>${certificateButtonsHtml('cms-cert-pdf-' + i, 'cms-cert-png-' + i)}</section>`).join('') : '<p>No earned certificates found.</p>';
+    list.querySelectorAll<HTMLElement>('.certificate-record').forEach((row, i) => wireRecordedCertificateButtons(row, '/cms/certificates/' + encodeURIComponent(matches[i].userId), true));
+  };
+  render();
+  root.querySelector<HTMLInputElement>('#certificate-search')!.addEventListener('input', event => render((event.target as HTMLInputElement).value));
 }
 
 async function loadCMSDashboard(): Promise<void> {
@@ -12746,7 +12758,7 @@ async function showUserDetail(userId: string): Promise<void> {
 
       <div class="detail-section exam-section">
         <h3> Exam Records (${result.examAttempts.length}/3 attempts)</h3>
-        ${result.certification ? `<div class="cert-banner"> Certified on ${formatDate(result.certification.certifiedAt)} with score ${result.certification.score}%</div>` : ''}
+        ${result.certification ? `<div class="cert-banner"> Certified on ${formatDate(result.certification.certifiedAt)} with score ${result.certification.score}%${certificateButtonsHtml('admin-cert-pdf', 'admin-cert-png')}</div>` : ''}
         ${result.examAttempts.length > 0 ? `
           <div class="exam-attempts-list">
             ${result.examAttempts.map(a => `
@@ -12799,6 +12811,7 @@ async function showUserDetail(userId: string): Promise<void> {
     </div>
   `;
 
+  if (result.certification) wireRecordedCertificateButtons(body, `/admin/certificates/${userId}`);
   void mountCoaching(body, {userId, modules: MODULE_ORDER, title: getModuleDisplayName, navigate: navigateToModule, unlocked: getUnlockedModules});
 
   // Add action handlers
@@ -14483,7 +14496,7 @@ function showCertifiedScreen(root: HTMLElement, state: ExamState) {
       </div>
 
       ${certificateButtonsHtml('downloadCert', 'downloadCertPng')}
-      <p class="certificate-id-note">Certificate ID: ${certificateIdFor(getCertificateDetails()!)}</p>
+      <p class="certificate-id-note">Downloads use your saved certification record.</p>
 
       ${wrongAnswers.length > 0 ? `
         <div class="answer-review-section" style="margin-top: 30px;">
@@ -15221,21 +15234,45 @@ function getCertificateDetails(fallbackScore = 0): { recipientName: string; scor
   };
 }
 
-function wireCertificateButtons(root: ParentNode, score: number, dateStr: string): void {
-  const download = (format: 'pdf' | 'png') => {
-    const details = getCertificateDetails(score);
-    if (!details) return;
-    if (dateStr) details.certificationDate = details.certificationDate || dateStr;
-    void downloadCertificate(details, format);
-  };
-  root.querySelector('#downloadCert, #downloadCertResult')?.addEventListener('click', () => download('pdf'));
-  root.querySelector('#downloadCertPng, #downloadCertResultPng')?.addEventListener('click', () => download('png'));
+function wireCertificateButtons(root: ParentNode, _score: number, _dateStr: string): void {
+  wireRecordedCertificateButtons(root, '/certificates/me');
+}
+
+function wireRecordedCertificateButtons(root: ParentNode, endpoint: string, superAdmin = false): void {
+  root.querySelectorAll<HTMLButtonElement>('[data-certificate-format]').forEach(button => {
+    button.addEventListener('click', async () => {
+      const label = button.textContent;
+      button.disabled = true;
+      button.textContent = 'Preparing certificate…';
+      let status = root.querySelector<HTMLElement>('.certificate-download-status');
+      if (!status) {
+        status = document.createElement('p');
+        status.className = 'certificate-download-status';
+        status.setAttribute('role', 'status');
+        button.parentElement?.after(status);
+      }
+      status.textContent = '';
+      try {
+        const token = superAdmin ? getSuperAdminSession()?.token : localStorage.getItem(STORAGE_KEYS.sessionToken);
+        const response = await fetch('/api' + endpoint, { headers: { Authorization: `Bearer ${token || ''}` }, cache: 'no-store' });
+        const data = await response.json();
+        if (!response.ok || !data.certificate) throw new Error(data.error || 'Could not load the earned certificate. Please sign in and try again.');
+        await downloadCertificate(data.certificate, button.dataset.certificateFormat as 'pdf' | 'png');
+        status.textContent = 'Certificate download prepared.';
+      } catch (error) {
+        status.textContent = error instanceof Error ? error.message : 'Download failed. Please try again.';
+      } finally {
+        button.disabled = false;
+        button.textContent = label;
+      }
+    });
+  });
 }
 
 const certificateButtonsHtml = (pdfId: string, pngId: string) => `
   <div class="certificate-actions">
-    <button id="${pdfId}" class="cert-download-btn" type="button">Download Certificate (PDF)</button>
-    <button id="${pngId}" class="cert-download-btn cert-download-secondary" type="button">Download PNG</button>
+    <button id="${pdfId}" data-certificate-format="pdf" class="cert-download-btn" type="button">Download Certificate (PDF)</button>
+    <button id="${pngId}" data-certificate-format="png" class="cert-download-btn cert-download-secondary" type="button">Download PNG</button>
   </div>`;
 
 function initQuickQuiz1() {

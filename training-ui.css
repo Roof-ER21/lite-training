@@ -357,3 +357,7 @@ button:active:not(:disabled) { transform: translateY(1px); }
 @media (max-width: 767px) {
   #main-content .content-card > h1 { padding: 16px 18px; }
 }
+
+.certificate-record { padding: 24px 0; border-bottom: 1px solid var(--border-color); }
+.certificate-record .certificate-actions { justify-content: flex-start; }
+.certificate-download-status { font-size: 13px; color: var(--text-primary); }

@@ -28,17 +28,20 @@ is monochrome so red, white, black, and gray remain the dominant palette. Theme 
 `certificate.ts` renders one polished certificate at 3300 x 2550 (US Letter
 landscape, 300 dpi): charcoal double frame with a red keyline and corner
 ornaments, the approved black-and-red theroofdocs.com logo, recipient
-name, program, score, certification date, a stable certificate ID
-(`RER-<year>-<hash>`), a red certified seal, and the three leadership
+name, program, score, certification date, a stable record-based certificate ID
+(`RER-<year>-<record-prefix>`), a red certified seal, and the three leadership
 signatures. Downloads are a high-resolution PNG or a real single-page PDF
 (the canvas is embedded into a hand-built PDF — no new dependencies).
 
-Anyone recorded as certified can download it at any time: eligibility is
-simply `isCertified`, whether it was earned on this device or synced from the
-server (`certificationScore` is now synced and stored too). Download buttons
-appear on the certified screen, on the passing results screen, and in a
-dedicated My Page panel where the name on the certificate can be corrected
-before downloading. See `RoofER-Certificate-Preview-v4.png` for a sample.
+Certified representatives can download from My Page and the exam screens.
+Downloads fetch `/api/certificates/me` and use the saved certificate name, score,
+and certification date. Local browser flags cannot substitute for an earned
+server record. A connection is required to retrieve the record.
+Managers can download from a representative's details; CMS Admin has a searchable
+Certificates page for all earned records. Both privileged routes retain their
+existing server authentication and role checks. Missing records and failed
+downloads show an inline error and permit retry. See `RoofER-Certificate-Preview-v4.png`
+for the approved artwork.
 
 `training-ui.css` defines the shell and final component styles. `index.css` keeps
 legacy lesson layouts using the shared roles; theme-specific override rules,

@@ -1,3 +1,4 @@
+import { privilegedCertificateRoutes } from './certificates.js';
 import { Router, Request, Response } from 'express';
 import { query, queryOne } from '../db/connection.js';
 import { requireAuth, requireManager } from '../middleware/auth.js';
@@ -7,6 +8,7 @@ const router = Router();
 // All admin routes require authentication and manager role
 router.use(requireAuth);
 router.use(requireManager);
+router.use('/certificates', privilegedCertificateRoutes());
 
 // GET /api/admin/users - Get all users with summary stats
 router.get('/users', async (req: Request, res: Response) => {
