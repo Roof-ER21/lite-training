@@ -204,3 +204,31 @@ body #main-content { width: 100%; min-width: 0; max-width: none; height: auto; m
 .lesson-navigation-actions #lesson-next { margin-left:auto; }
 .lesson-navigation button:disabled, .complete-module-btn:disabled { cursor:not-allowed; opacity:0.65; }
 @media(max-width:767px) { .lesson-navigation { position:static; } .lesson-navigation-actions { flex-direction:column; } .lesson-navigation-actions #lesson-next { margin-left:0; } }
+
+/* Premium charcoal & porcelain refinements (tokens live in theme.css). */
+.training-topbar { background: var(--surface-raised); box-shadow: var(--shadow-sm); }
+body #sidebar { background: var(--surface-soft); }
+#sidebar .sidebar-nav li { border-left: 3px solid transparent; padding-left: 12px; }
+#sidebar .sidebar-nav li.active { background: var(--surface-raised); border-left-color: var(--brand); box-shadow: var(--shadow-sm); font-weight: 600; }
+#sidebar .sidebar-nav li:not(.sidebar-divider):hover { background: var(--hover-bg); }
+.training-heading h1 { letter-spacing: -0.035em; }
+.section-label { color: var(--accent-text); letter-spacing: 0.14em; font-weight: 700; }
+.next-lesson, .assessment-panel { background: var(--surface-raised); box-shadow: var(--shadow-md); }
+#continue-training-btn, #login-screen .login-btn, .complete-module-btn, .btn-primary, #submitExamButton, .quiz2-complete, .start-review-btn { background: var(--brand); box-shadow: var(--shadow-sm); letter-spacing: 0.01em; }
+#continue-training-btn:hover, .complete-module-btn:hover, .btn-primary:hover { background: var(--brand-deep); }
+#main-content .content-card { background: var(--surface-raised); box-shadow: var(--shadow-md); }
+.lesson-path-row:not(:disabled):hover { background: var(--surface-raised); box-shadow: var(--shadow-sm); }
+input:focus, textarea:focus, select:focus { border-color: var(--border-strong); }
+
+/* Certificate of Completion — My Page panel, exam and results screens. */
+.certificate-panel { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 24px; margin: 0 0 40px; padding: 30px; background: var(--surface-raised); border: 1px solid var(--border-color); border-top: 4px solid var(--brand); border-radius: var(--border-radius); box-shadow: var(--shadow-md); }
+.certificate-panel-copy { display: grid; gap: 8px; max-width: 560px; }
+.certificate-panel-copy h2, .certificate-panel-copy p { margin: 0; }
+.certificate-name-label { margin-top: 12px; font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+.certificate-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.cert-download-btn { background: var(--brand); color: var(--on-brand); border: 1px solid var(--brand); box-shadow: var(--shadow-sm); font-weight: 600; min-height: 48px; }
+.cert-download-btn:hover { background: var(--brand-deep); color: var(--on-brand); }
+.cert-download-secondary { background: var(--surface-color); color: var(--text-primary); border: 1px solid var(--border-strong); box-shadow: none; }
+.cert-download-secondary:hover { background: var(--hover-bg); color: var(--text-primary); }
+.certificate-id-note { color: var(--text-secondary); font-size: 13px; font-family: var(--font-mono); }
+@media (max-width: 767px) { .certificate-panel { padding: 24px 20px; } .certificate-actions, .certificate-actions button { width: 100%; } }

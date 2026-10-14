@@ -11,6 +11,7 @@ import './learning-workspace.css';
 */
 import { GoogleGenAI, Type, Chat } from '@google/genai';
 import { initTrainingInterface, enhanceTrainingContent, announceTrainingStatus, closeTrainingDrawer } from './training-ui';
+import { downloadCertificate, isCertificateEligible, certificateIdFor } from './certificate';
 
 // No API key ships to the browser: all Gemini REST calls route through the
 // Express proxy, which attaches the key server-side (server/routes/gemini-proxy.ts).
@@ -1897,6 +1898,23 @@ async function initMyPage() {
     }).join('');
     path.querySelectorAll<HTMLButtonElement>('[data-lesson]').forEach(button => button.addEventListener('click', () => navigateToModule(button.dataset.lesson!)));
   }
+  // Any certified representative can re-download their certificate from My Page.
+  const certPanel = document.getElementById('certificate-panel');
+  const certDetails = getCertificateDetails();
+  if (certPanel && certDetails) {
+    certPanel.hidden = false;
+    const nameInput = document.getElementById('certificate-name') as HTMLInputElement | null;
+    if (nameInput) nameInput.value = certDetails.recipientName;
+    const summary = document.getElementById('certificate-summary');
+    if (summary) summary.textContent = `Certified ${formatExamDate(certDetails.certificationDate)} · Score ${certDetails.score}% · Certificate ID ${certificateIdFor(certDetails)}`;
+    const downloadFromDashboard = (format: 'pdf' | 'png') => {
+      const recipientName = nameInput?.value.trim() || certDetails.recipientName;
+      if (recipientName) localStorage.setItem(STORAGE_KEYS.examUserName, recipientName);
+      void downloadCertificate({ ...certDetails, recipientName }, format);
+    };
+    document.getElementById('dashboard-download-cert-pdf')?.addEventListener('click', () => downloadFromDashboard('pdf'));
+    document.getElementById('dashboard-download-cert-png')?.addEventListener('click', () => downloadFromDashboard('png'));
+  }
   document.getElementById('dashboard-exam-link')?.addEventListener('click', () => navigateToModule('final-exam'));
   const examButton = document.getElementById('dashboard-exam-link') as HTMLButtonElement | null;
   if (examButton) examButton.disabled = !unlocked.has('final-exam');
@@ -2027,6 +2045,7 @@ Threshold: ${doorSlamInfo.description}
 1. Stay in character 100% until they say "score me" or you slam the door
 2. React naturally to what they say
 3. Use progressive objections - start mild, escalate based on their responses
+4. Interrupt s - start mild, escalate based on their responses
 4. Interrupt according to your persona
 
 ## IMPORTANT - DO NOT REPEAT WHAT THE USER SAID:
@@ -14451,7 +14470,8 @@ function showCertifiedScreen(root: HTMLElement, state: ExamState) {
         <p><strong>Score:</strong> ${passingAttempt?.totalScore || 0}%</p>
       </div>
 
-      <button id="downloadCert" class="cert-download-btn"> Download Certificate</button>
+      ${certificateButtonsHtml('downloadCert', 'downloadCertPng')}
+      <p class="certificate-id-note">Certificate ID: ${certificateIdFor({ recipientName: state.userName || getCurrentUser()?.name || '', score: passingAttempt?.totalScore || 0, certificationDate: state.certificationDate || new Date().toISOString() })}</p>
 
       ${wrongAnswers.length > 0 ? `
         <div class="answer-review-section" style="margin-top: 30px;">
@@ -15176,136 +15196,39 @@ function showExamResults(root: HTMLElement, attempt: ExamAttempt, detailedResult
 }
 
 // ============================================================================
-// CERTIFICATE GENERATION (Canvas API)
+// CERTIFICATE GENERATION — polished 300-dpi design lives in certificate.ts.
+// Every certified representative can download it (PDF or PNG), from the exam
+// screens below and from My Page, at any time.
 // ============================================================================
 
-async function generateCertificatePDF(userName: string, score: number, dateStr: string) {
-  const canvas = document.createElement('canvas');
-  canvas.width = 1056;  // 11" at 96dpi (landscape)
-  canvas.height = 816;  // 8.5" at 96dpi
-  const ctx = canvas.getContext('2d')!;
-
-  // Background
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Outer border (Roof-ER red)
-  ctx.strokeStyle = '#D90429';
-  ctx.lineWidth = 12;
-  ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
-
-  // Inner border
-  ctx.strokeStyle = '#1a1a2e';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(40, 40, canvas.width - 80, canvas.height - 80);
-
-  // Decorative corners
-  ctx.fillStyle = '#D90429';
-  [[50, 50], [canvas.width - 70, 50], [50, canvas.height - 70], [canvas.width - 70, canvas.height - 70]].forEach(([x, y]) => {
-    ctx.beginPath();
-    ctx.arc(x + 10, y + 10, 8, 0, Math.PI * 2);
-    ctx.fill();
-  });
-
-  // Title
-  ctx.fillStyle = '#1a1a2e';
-  ctx.font = 'bold 42px Georgia, serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('CERTIFICATE OF COMPLETION', canvas.width / 2, 100);
-
-  // Load and draw shield logo (replaces ROOF E.R. text and trophy)
-  try {
-    const logo = new Image();
-    logo.crossOrigin = 'anonymous';
-    await new Promise<void>((resolve, reject) => {
-      logo.onload = () => resolve();
-      logo.onerror = () => reject(new Error('Failed to load logo'));
-      logo.src = '/assets/logo-shield.png';
-    });
-    // Draw logo centered, height ~150px maintaining aspect ratio
-    const logoHeight = 150;
-    const logoWidth = (logo.width / logo.height) * logoHeight;
-    ctx.drawImage(logo, (canvas.width - logoWidth) / 2, 120, logoWidth, logoHeight);
-  } catch (e) {
-    // Fallback to text if logo fails to load
-    ctx.font = '60px Arial';
-    ctx.fillText('', canvas.width / 2, 180);
-    ctx.fillStyle = '#D90429';
-    ctx.font = 'bold 48px Arial, sans-serif';
-    ctx.fillText('ROOF E.R.', canvas.width / 2, 250);
-  }
-
-  // "This certifies that"
-  ctx.fillStyle = '#1a1a2e';
-  ctx.font = '22px Georgia, serif';
-  ctx.fillText('This certifies that', canvas.width / 2, 310);
-
-  // User name
-  ctx.font = 'bold 44px Georgia, serif';
-  ctx.fillText(userName, canvas.width / 2, 370);
-
-  // Line under name
-  ctx.strokeStyle = '#D90429';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(250, 390);
-  ctx.lineTo(canvas.width - 250, 390);
-  ctx.stroke();
-
-  // Certification text
-  ctx.font = '20px Georgia, serif';
-  ctx.fillStyle = '#1a1a2e';
-  ctx.fillText('has successfully completed the', canvas.width / 2, 440);
-
-  ctx.font = 'bold 26px Georgia, serif';
-  ctx.fillText('Roof E.R. Sales Representative Training Program', canvas.width / 2, 480);
-
-  ctx.font = '20px Georgia, serif';
-  ctx.fillText('and is hereby certified as a', canvas.width / 2, 520);
-
-  // Certification title
-  ctx.fillStyle = '#D90429';
-  ctx.font = 'bold 32px Georgia, serif';
-  ctx.fillText('Certified Sales Representative', canvas.width / 2, 565);
-
-  // Score and date
-  ctx.fillStyle = '#666666';
-  ctx.font = '16px Arial, sans-serif';
-  ctx.fillText(`Score: ${score}%  |  Date: ${formatExamDate(dateStr)}`, canvas.width / 2, 620);
-
-  // Signature lines - now 3 signatures
-  ctx.fillStyle = '#1a1a2e';
-  ctx.font = '14px Arial, sans-serif';
-  ctx.strokeStyle = '#333';
-  ctx.lineWidth = 1;
-
-  // Left signature - Oliver Brown
-  ctx.beginPath();
-  ctx.moveTo(120, 730);
-  ctx.lineTo(300, 730);
-  ctx.stroke();
-  ctx.fillText('Oliver Brown, CEO', 210, 755);
-
-  // Center signature - Ford Barsi
-  ctx.beginPath();
-  ctx.moveTo(canvas.width / 2 - 90, 730);
-  ctx.lineTo(canvas.width / 2 + 90, 730);
-  ctx.stroke();
-  ctx.fillText('Ford Barsi, General Manager', canvas.width / 2, 755);
-
-  // Right signature - Reese Samala
-  ctx.beginPath();
-  ctx.moveTo(canvas.width - 300, 730);
-  ctx.lineTo(canvas.width - 120, 730);
-  ctx.stroke();
-  ctx.fillText('Reese Samala, Director of Sales', canvas.width - 210, 755);
-
-  // Download
-  const link = document.createElement('a');
-  link.download = `RoofER_Certificate_${userName.replace(/\s+/g, '_')}.png`;
-  link.href = canvas.toDataURL('image/png', 1.0);
-  link.click();
+function getCertificateDetails(fallbackScore = 0): { recipientName: string; score: number; certificationDate: string } | null {
+  const state = getExamState();
+  if (!isCertificateEligible(state)) return null;
+  const passingAttempt = state.attempts.find(a => a.passed);
+  const storedScore = Number(localStorage.getItem(STORAGE_KEYS.certificationScore));
+  return {
+    recipientName: state.userName || getCurrentUser()?.name || '',
+    score: passingAttempt?.totalScore || storedScore || fallbackScore,
+    certificationDate: state.certificationDate || passingAttempt?.date || new Date().toISOString(),
+  };
 }
+
+function wireCertificateButtons(root: ParentNode, score: number, dateStr: string): void {
+  const download = (format: 'pdf' | 'png') => {
+    const details = getCertificateDetails(score);
+    if (!details) return;
+    if (dateStr) details.certificationDate = details.certificationDate || dateStr;
+    void downloadCertificate(details, format);
+  };
+  root.querySelector('#downloadCert, #downloadCertResult')?.addEventListener('click', () => download('pdf'));
+  root.querySelector('#downloadCertPng, #downloadCertResultPng')?.addEventListener('click', () => download('png'));
+}
+
+const certificateButtonsHtml = (pdfId: string, pngId: string) => `
+  <div class="certificate-actions">
+    <button id="${pdfId}" class="cert-download-btn" type="button">Download Certificate (PDF)</button>
+    <button id="${pngId}" class="cert-download-btn cert-download-secondary" type="button">Download PNG</button>
+  </div>`;
 
 function initQuickQuiz1() {
   const startBtn = document.getElementById('startQuickQuiz1');
