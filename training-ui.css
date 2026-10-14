@@ -318,3 +318,29 @@ button:active:not(:disabled) { transform: translateY(1px); }
 
 /* Reading destinations receive focus without looking like editable fields. */
 #main-content h1[tabindex="-1"]:focus-visible { outline: none !important; }
+
+/* Brand-led finish: red feature surface in light, restrained charcoal in dark. */
+.training-heading h1 { font-weight: 700; letter-spacing: -.06em; }
+.training-heading .section-label::before { content: ''; display: inline-block; width: 20px; height: 3px; margin: 0 9px 3px 0; background: var(--brand); }
+.training-topbar { border-top: 3px solid var(--brand); }
+.training-topbar .training-wordmark > span:first-child { color: var(--brand-mark); }
+.next-lesson { border: 1px solid var(--hero-border); border-radius: 10px; box-shadow: var(--shadow-md); }
+.next-lesson-copy { position: relative; overflow: hidden; padding: 36px; border-top: 3px solid var(--brand); }
+.next-lesson-copy::before { content: '/'; position: absolute; right: -10px; top: -70px; font-size: 370px; line-height: 1; font-weight: 700; color: var(--hero-watermark); pointer-events: none; }
+.next-lesson-copy > * { position: relative; }
+.next-lesson h2 { font-size: clamp(28px, 3.1vw, 42px); font-weight: 700; letter-spacing: -.05em; }
+#continue-training-btn { background: var(--hero-button); color: var(--hero-button-ink); border-color: var(--hero-button); box-shadow: var(--shadow-sm); font-weight: 700; }
+#continue-training-btn:hover { background: var(--hero-button-hover); color: var(--hero-button-ink); border-color: var(--hero-button-hover); text-decoration: none; }
+#continue-training-btn:focus-visible { outline-color: var(--hero-ink) !important; }
+.training-field-image img { filter: grayscale(1); }
+.training-field-image figcaption { border-left: 3px solid var(--brand); }
+.assessment-panel { padding: 24px 4px; }
+.section-heading h2 { font-weight: 700; }
+.lesson-path-row:not(:disabled) .lesson-name { color: var(--text-primary); }
+#sidebar li.active > button { font-weight: 700; }
+#main-content .content-card > h1 { font-weight: 700; }
+@media (max-width: 767px) {
+  .next-lesson-copy { padding: 26px; }
+  .next-lesson h2 { font-size: 30px; }
+  .training-heading h1 { font-size: 32px; }
+}

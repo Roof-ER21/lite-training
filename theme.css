@@ -1,10 +1,8 @@
-/* Shared Roof-ER roles for every learning surface, in light and dark mode.
-   "Premium charcoal & porcelain" — flat layered surfaces, hairline borders and
-   deep soft shadows. No gradients: depth comes from stacked neutrals, with
-   Roof-ER red reserved for brand marks, primary actions and focus accents. */
+/* Roof-ER: bold red and white by day; layered charcoal after dark. */
 :root {
   color-scheme: light;
   --brand: #B60807;
+  --brand-mark: #B60807;
   --brand-deep: #8C0605;
   --brand-soft: #F8E9E8;
   --video-bg: #0C0D0E;
@@ -15,17 +13,17 @@
   --primary-hover-color: var(--brand-deep);
   --accent-text: var(--brand);
   --dark-bg: #0C0D0E;
-  --light-bg: #E8EDF1;
+  --light-bg: #F3F3F4;
   --surface-color: #ffffff;
   --surface-raised: #ffffff;
-  --surface-soft: #DFE6EC;
-  --surface-inset: #F0F4F7;
-  --surface-warm: #E8EEF3;
-  --surface-practice: #E8EFEC;
-  --text-primary: #253542;
-  --text-secondary: #526573;
-  --border-color: #CBD5DE;
-  --border-strong: #91A1AE;
+  --surface-soft: #E9E9EC;
+  --surface-inset: #FAFAFA;
+  --surface-warm: #F3F3F4;
+  --surface-practice: #F0F2F0;
+  --text-primary: #19191C;
+  --text-secondary: #5E5E65;
+  --border-color: #DCDCE1;
+  --border-strong: #9999A2;
   --white: #ffffff;
   --success-color: #21643E;
   --error-color: var(--accent-text);
@@ -38,7 +36,7 @@
   --card-bg: var(--surface-color);
   --input-bg: var(--surface-color);
   --input-border: #7C848B;
-  --hover-bg: #D9E3EB;
+  --hover-bg: #E5E5E9;
   --code-bg: var(--light-bg);
   --script-bg: var(--light-bg);
   --highlight-bg: var(--hover-bg);
@@ -54,28 +52,47 @@
 
 :root[data-theme="dark"] {
   color-scheme: dark;
+  --brand-mark: #EF4949;
   --brand-deep: #8C0605;
   --brand-soft: #2A1211;
-  --light-bg: #17212A;
-  --surface-color: #202D38;
-  --surface-raised: #283846;
-  --surface-soft: #1C2934;
-  --surface-inset: #1B2731;
-  --surface-warm: #263440;
-  --surface-practice: #233630;
-  --text-primary: #EDF3F8;
-  --text-secondary: #B1C1CF;
-  --border-color: #3C4D5C;
-  --border-strong: #61798D;
+  --light-bg: #111113;
+  --surface-color: #1A1A1E;
+  --surface-raised: #242429;
+  --surface-soft: #202025;
+  --surface-inset: #161619;
+  --surface-warm: #202024;
+  --surface-practice: #1C2420;
+  --text-primary: #F5F5F7;
+  --text-secondary: #B6B6C0;
+  --border-color: #35353D;
+  --border-strong: #666671;
   --input-border: #7A7F86;
   /* Brand red stays a fill/mark on dark surfaces. Small text uses paper. */
   --accent-text: var(--text-primary);
   --success-color: #93CBA7;
-  --hover-bg: #324656;
+  --hover-bg: #2D2D34;
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.45), 0 6px 18px -8px rgb(0 0 0 / 0.55);
   --shadow-md: 0 2px 4px rgb(0 0 0 / 0.5), 0 22px 44px -20px rgb(0 0 0 / 0.7);
   --shadow-lg: 0 4px 8px rgb(0 0 0 / 0.55), 0 36px 72px -28px rgb(0 0 0 / 0.8);
 }
 
-:root { --hero-surface: #DEE7EE; --hero-ink: #273E50; --photo-caption: #23333F; --photo-text: #FFFFFF; }
-:root[data-theme="dark"] { --hero-surface: #2B4051; --hero-ink: #EDF3F8; }
+:root {
+  --hero-surface: #B60807;
+  --hero-ink: #FFFFFF;
+  --hero-button: #FFFFFF;
+  --hero-button-ink: #A00706;
+  --hero-button-hover: #F5E7E7;
+  --hero-border: #B60807;
+  --photo-caption: #19191C;
+  --photo-text: #FFFFFF;
+  --hero-watermark: rgb(255 255 255 / .07);
+}
+:root[data-theme="dark"] {
+  --hero-surface: #232328;
+  --hero-ink: #F5F5F7;
+  --hero-button: #B60807;
+  --hero-button-ink: #FFFFFF;
+  --hero-button-hover: #8C0605;
+  --hero-border: #3C3C45;
+  --hero-watermark: rgb(255 255 255 / .035);
+}

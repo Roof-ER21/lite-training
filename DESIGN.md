@@ -14,13 +14,14 @@ corners, fine dividers, and consistent spacing support extended reading.
 
 ### Field workspace (local review)
 
-The dashboard uses cool gray and slate surfaces with a single red primary action.
+The dashboard uses neutral gray surfaces with a bold red feature panel in light mode.
 One illustrated next-lesson panel leads into a compact certification row and a
 two-column course map (one column on phones). The sidebar is narrower, with a
 single active indicator and quieter locked lessons. Reading pages use restrained
 white or slate surfaces, a shorter line length, and compact navigation controls.
 Light, Dark, and Use device setting remain available; dark mode uses layered
-slate instead of near-black. Theme values live in `theme.css`.
+charcoal with a red action, subtle borders, and white typography. Field photography
+is monochrome so red, white, black, and gray remain the dominant palette. Theme values live in `theme.css`.
 
 ## Certificate of Completion
 
