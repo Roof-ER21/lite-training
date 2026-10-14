@@ -11738,9 +11738,11 @@ function showLoginScreen(): void {
     }
   });
 
-  // Focus name input
+  // Initial focus must not steal input from an admin who has already opened sign-in.
   setTimeout(() => {
-    (document.getElementById('login-name') as HTMLInputElement)?.focus();
+    if (loginScreen.isConnected && (document.activeElement === document.body || document.activeElement === loginScreen)) {
+      nameInput?.focus();
+    }
   }, 100);
 }
 
