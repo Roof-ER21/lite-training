@@ -1,4 +1,82 @@
 import {test,expect} from '@playwright/test';
+test('autosave restores question order, answers and location from the account after local draft removal',async ({page})=>{
+ let saved: any = null;
+ let revision = 0;
+ let offline = false;
+ let lostResponse = false;
+ const attemptId = '11111111-1111-4111-8111-111111111111';
+ await page.route('**/api/**',r=>r.fulfill({status:503,json:{offline:true}}));
+ await page.route('**/api/exam/start',r=>r.fulfill({json:{attemptId,remainingAttempts:3,draft:saved,revision,savedAt:new Date().toISOString()}}));
+ await page.route('**/api/exam/draft',r=>{
+   if(r.request().method()==='GET') return r.fulfill({json:{draft:saved,attemptId,revision}});
+   if(offline) return r.fulfill({status:503,json:{offline:true}});
+   const payload=r.request().postDataJSON();
+   if(saved?.saveId !== payload.draft.saveId) {
+     if(payload.revision !== revision) return r.fulfill({json:{conflict:true}});
+     saved=payload.draft; revision++;
+   }
+   if(lostResponse) {lostResponse=false; return r.abort();}
+   return r.fulfill({json:{success:true,revision,savedAt:new Date().toISOString()}});
+ });
+ await page.goto('/');
+ await page.getByLabel('Your Name').fill('Account Resume QA');
+ await page.getByRole('button',{name:'Start Training',exact:true}).click();
+ await expect(page.locator('#learning-path li')).toHaveCount(14);
+ await page.evaluate(()=>{localStorage.setItem('roof-er.unlockedModules',JSON.stringify(['welcome','final-exam']));(window as any).navigateToModule('final-exam');});
+ await page.locator('#exam-user-name').fill('Account Resume QA');
+ await page.locator('#startFinalExam').click();
+ await expect(page.locator('#exam-autosave-status')).toContainText('Saved to your account');
+ const question=await page.locator('.mcq-question').first().getAttribute('data-id');
+ await page.locator('input[name="mcq-0"]').nth(1).check();
+ await page.locator('[name="fib-0"]').fill('saved roof');
+ await page.locator('[name="sa-0"]').fill('saved long answer');
+ await expect.poll(()=>saved?.answers?.['sa-0']).toBe('saved long answer');
+ await expect(page.locator('#exam-autosave-status')).toContainText('Saved to your account');
+ offline=true;
+ await page.locator('[name="sa-0"]').fill('offline answer');
+ await expect(page.locator('#exam-autosave-status')).toContainText('Waiting to sync');
+ offline=false; lostResponse=true;
+ await page.evaluate(()=>window.dispatchEvent(new Event('online')));
+ await expect.poll(()=>saved?.answers?.['sa-0']).toBe('offline answer');
+ await expect(page.locator('#exam-autosave-status')).toContainText('Waiting to sync');
+ await page.locator('[name="sa-0"]').fill('edited after lost response');
+ await expect.poll(()=>saved?.answers?.['sa-0']).toBe('edited after lost response');
+ await expect(page.locator('#exam-autosave-status')).toContainText('Saved to your account');
+ // The next load has no local exam cache; it must discover and restore server work.
+ await page.evaluate(()=>Object.keys(localStorage).filter(k=>k.startsWith('roof-er.examDraft.')).forEach(k=>localStorage.removeItem(k)));
+ await page.reload();
+ await expect(page.locator('#learning-path li')).toHaveCount(14);
+ await page.evaluate(()=>(window as any).navigateToModule('final-exam'));
+ await expect(page.locator('.mcq-question').first()).toHaveAttribute('data-id',question!);
+ await expect(page.locator('input[name="mcq-0"]').nth(1)).toBeChecked();
+ await expect(page.locator('[name="fib-0"]')).toHaveValue('saved roof');
+ await expect(page.locator('[name="sa-0"]')).toHaveValue('edited after lost response');
+ await page.getByRole('button',{name:'Return to last question'}).click();
+ await expect(page.locator('[name="sa-0"]')).toBeFocused();
+ await expect(page.locator('#exam-progress-text')).toHaveText('3 of 56 answered');
+ await expect(page.locator('#exam-autosave-status')).toContainText('Saved to your account');
+ saved = {...saved, saveId: 'other-device', answers: {...saved.answers, 'sa-0': 'newer device answer'}};
+ revision++;
+ await page.locator('[name="sa-0"]').fill('conflicting local answer');
+ await expect(page.locator('#exam-autosave-status')).toContainText('changed in another tab or device');
+ expect(saved.answers['sa-0']).toBe('newer device answer');
+ await page.reload();
+ await expect(page.locator('#learning-path li')).toHaveCount(14);
+ await page.evaluate(()=>(window as any).navigateToModule('final-exam'));
+ await expect(page.locator('[name="sa-0"]')).toHaveValue('newer device answer');
+ expect(await page.evaluate(()=>Object.keys(localStorage).filter(k=>k.endsWith('.recovery')).map(k=>JSON.parse(localStorage.getItem(k)!)).some(d=>d.answers?.['sa-0']==='conflicting local answer'))).toBe(true);
+ // Another tab shares localStorage but this tab still has an older form.
+ await page.evaluate(()=>{
+   const key=Object.keys(localStorage).find(k=>k.startsWith('roof-er.examDraft.') && !k.endsWith('.recovery'))!;
+   const draft=JSON.parse(localStorage.getItem(key)!);
+   draft.saveId='other-tab'; draft.answers['sa-0']='other tab answer';
+   localStorage.setItem(key,JSON.stringify(draft));
+ });
+ await page.locator('[name="sa-0"]').fill('stale tab edit');
+ await expect(page.locator('#exam-autosave-status')).toContainText('changed in another tab or device');
+ expect(await page.evaluate(()=>Object.keys(localStorage).filter(k=>k.startsWith('roof-er.examDraft.') && !k.endsWith('.recovery')).map(k=>JSON.parse(localStorage.getItem(k)!))[0].answers['sa-0'])).toBe('other tab answer');
+});
+
 test('refresh keeps question order and all answer types without consuming another attempt',async ({page})=>{
  await page.route('**/api/**',r=>r.fulfill({status:503,json:{offline:true}}));
  await page.route('**/api/exam/start',r=>r.fulfill({json:{attemptId:'11111111-1111-4111-8111-111111111111',remainingAttempts:3}}));

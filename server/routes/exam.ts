@@ -1,11 +1,55 @@
 import { Router, Request, Response } from 'express';
 import { query, queryOne, pool } from '../db/connection.js';
 import { requireAuth } from '../middleware/auth.js';
+import { validExamDraft } from '../exam-draft.js';
 
 const router = Router();
 
 // All routes require authentication
 router.use(requireAuth);
+
+// Discover saved work without creating or consuming an attempt.
+router.get('/draft', async (req: Request, res: Response) => {
+  try {
+    const attempt = await queryOne(`SELECT id, draft, draft_revision, draft_saved_at FROM exam_attempts
+      WHERE user_id = $1 AND completed_at IS NULL ORDER BY started_at DESC NULLS LAST LIMIT 1`, [req.user!.id]);
+    res.json({ attemptId: attempt?.id || null, draft: attempt?.draft || null,
+      revision: attempt?.draft_revision || 0, savedAt: attempt?.draft_saved_at || null });
+  } catch { res.status(500).json({ error: 'Unable to load saved exam' }); }
+});
+
+router.post('/draft', async (req: Request, res: Response) => {
+  const { attemptId, draft, revision } = req.body;
+  if (!/^[0-9a-f-]{36}$/i.test(attemptId || '') || !Number.isInteger(revision) || revision < 0 || !validExamDraft(draft)) {
+    return res.status(400).json({ error: 'Invalid exam draft' });
+  }
+  const client = await pool?.connect();
+  if (!client) return res.status(503).json({ error: 'Database unavailable' });
+  try {
+    await client.query('BEGIN');
+    const { rows: [attempt] } = await client.query('SELECT * FROM exam_attempts WHERE id = $1 AND user_id = $2 FOR UPDATE', [attemptId, req.user!.id]);
+    if (!attempt || attempt.completed_at) {
+      await client.query('ROLLBACK');
+      return res.status(409).json({ error: 'Attempt is no longer open' });
+    }
+    // Retrying a request whose response was lost must not create a conflict.
+    if (attempt.draft?.saveId === draft.saveId) {
+      await client.query('COMMIT');
+      return res.json({ success: true, revision: attempt.draft_revision, savedAt: attempt.draft_saved_at });
+    }
+    if (attempt.draft_revision !== revision) {
+      await client.query('ROLLBACK');
+      return res.json({ conflict: true });
+    }
+    const { rows: [saved] } = await client.query(`UPDATE exam_attempts SET draft = $3, draft_revision = draft_revision + 1,
+      draft_saved_at = NOW() WHERE id = $1 AND user_id = $2 RETURNING draft_revision, draft_saved_at`, [attemptId, req.user!.id, draft]);
+    await client.query('COMMIT');
+    res.json({ success: true, revision: saved.draft_revision, savedAt: saved.draft_saved_at });
+  } catch {
+    await client.query('ROLLBACK');
+    res.status(500).json({ error: 'Unable to save exam draft' });
+  } finally { client.release(); }
+});
 
 // GET /api/exam/history - Get exam attempt history
 router.get('/history', async (req: Request, res: Response) => {
@@ -77,10 +121,11 @@ router.post('/start', async (req: Request, res: Response) => {
       await client.query('ROLLBACK');
       return res.status(409).json({error: cert.rowCount ? 'Already certified' : 'Maximum attempts reached'});
     }
-    const active = await client.query('SELECT id FROM exam_attempts WHERE user_id = $1 AND completed_at IS NULL ORDER BY started_at DESC NULLS LAST LIMIT 1', [userId]);
+    const active = await client.query('SELECT id, draft, draft_revision, draft_saved_at FROM exam_attempts WHERE user_id = $1 AND completed_at IS NULL ORDER BY started_at DESC NULLS LAST LIMIT 1', [userId]);
     const attempt = active.rows[0] || (await client.query('INSERT INTO exam_attempts (user_id, attempt_number, started_at) VALUES ($1, $2, NOW()) RETURNING id', [userId, completed + 1])).rows[0];
     await client.query('COMMIT');
-    res.json({attemptId: attempt.id, attemptNumber: completed + 1, remainingAttempts: 3 - completed, resumed: !!active.rowCount});
+    res.json({attemptId: attempt.id, attemptNumber: completed + 1, remainingAttempts: 3 - completed, resumed: !!active.rowCount,
+      draft: attempt.draft || null, revision: attempt.draft_revision || 0, savedAt: attempt.draft_saved_at || null});
   } catch (error) {
     await client.query('ROLLBACK');
     console.error('Start exam error:', error);

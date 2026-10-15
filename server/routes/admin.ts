@@ -2,6 +2,7 @@ import { privilegedCertificateRoutes } from './certificates.js';
 import { Router, Request, Response } from 'express';
 import { query, queryOne } from '../db/connection.js';
 import { requireAuth, requireManager } from '../middleware/auth.js';
+import { examProgress } from '../exam-draft.js';
 
 const router = Router();
 
@@ -623,6 +624,11 @@ router.get('/progress-grid', async (req: Request, res: Response) => {
         AND module_name = ANY($2)
     `, [users.map(u => u.id), validModules]);
 
+    const exams = await query(`SELECT DISTINCT ON (user_id) * FROM exam_attempts
+      WHERE user_id = ANY($1::uuid[])
+      ORDER BY user_id, started_at DESC NULLS LAST, attempt_number DESC`, [users.map(u => u.id)]);
+    const examsByUser = new Map(exams.map(e => [e.user_id, examProgress(e)]));
+
     // Group progress by user
     const progressByUser = new Map<string, typeof allProgress>();
     for (const p of allProgress) {
@@ -642,6 +648,9 @@ router.get('/progress-grid', async (req: Request, res: Response) => {
         userName: u.name,
         lastLogin: u.last_login,
         registrationDate: u.registration_date,
+        exam: examsByUser.get(u.id) || null,
+        currentModule: [...modules].filter(m => m.started_at && m.status !== 'locked' && m.status !== 'unlocked')
+          .sort((a, b) => new Date(b.last_accessed || 0).getTime() - new Date(a.last_accessed || 0).getTime())[0]?.module_name || null,
         moduleStatus: modules.map(m => {
           const isStale = m.status === 'in_progress' &&
             m.last_accessed &&

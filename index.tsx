@@ -5355,11 +5355,12 @@ trainingContent['admin-dashboard'] = `
             <button id="refresh-progress-grid-btn" class="btn-secondary"> Refresh</button>
           </div>
         </div>
+        <p>See saved answer counts and the last question visited, including unfinished exams.</p>
         <div class="progress-grid-legend">
-          <span class="legend-item"><span class="status-icon completed"></span> Complete</span>
-          <span class="legend-item"><span class="status-icon in-progress"></span> In Progress</span>
-          <span class="legend-item"><span class="status-icon stale"></span> Stale (>48hrs)</span>
-          <span class="legend-item"><span class="status-icon not-started"></span> Not Started</span>
+          <span class="legend-item"><span class="status-icon completed" aria-hidden="true">✓</span> Complete</span>
+          <span class="legend-item"><span class="status-icon in-progress" aria-hidden="true">●</span> In Progress</span>
+          <span class="legend-item"><span class="status-icon stale" aria-hidden="true">!</span> No activity for 48 hours</span>
+          <span class="legend-item"><span class="status-icon not-started" aria-hidden="true">—</span> Not Started</span>
         </div>
         <div id="progress-grid-container">
           <p class="loading-text">Loading progress grid...</p>
@@ -12457,6 +12458,10 @@ interface ProgressGridData {
     userName: string;
     lastLogin: string | null;
     registrationDate: string;
+    currentModule?: string | null;
+    exam?: {status: string; attemptNumber: number; answered: number; total: number;
+      currentQuestion: string | null; savedAt: string | null; score: number | null;
+      sections: {section: string; answered: number; total: number}[];} | null;
     moduleStatus: {
       module: string;
       status: string;
@@ -12540,10 +12545,17 @@ function switchAdminTab(tabName: string): void {
   if (tabName === 'time-tracker' && !adminTimeTrackerCache) {
     loadTimeTracker();
   }
-  if (tabName === 'progress-grid' && !adminProgressGridCache) {
-    loadProgressGrid();
+  if (tabName === 'progress-grid') {
+    loadProgressGrid((document.getElementById('progress-grid-search') as HTMLInputElement)?.value || '');
   }
 }
+
+setInterval(() => {
+  const tab = document.getElementById('admin-progress-grid-tab');
+  if (tab && tab.style.display !== 'none' && document.visibilityState === 'visible') {
+    void loadProgressGrid((document.getElementById('progress-grid-search') as HTMLInputElement)?.value || '', true);
+  }
+}, 15000);
 
 async function loadAdminUsers(): Promise<void> {
   const container = document.getElementById('users-table-container');
@@ -13255,22 +13267,33 @@ function renderTimeTracker(data: ModuleTimeAnalytics): void {
 }
 
 // Progress Grid Tab Functions
-async function loadProgressGrid(searchTerm: string = ''): Promise<void> {
+let progressGridRequest = 0;
+async function loadProgressGrid(searchTerm: string = '', background = false): Promise<void> {
+  const request = ++progressGridRequest;
   const container = document.getElementById('progress-grid-container');
   if (!container) return;
 
-  container.innerHTML = '<p class="loading-text">Loading progress grid...</p>';
+  if (!background) container.innerHTML = '<p class="loading-text">Loading progress grid...</p>';
 
   const url = searchTerm ? `/admin/progress-grid?search=${encodeURIComponent(searchTerm)}` : '/admin/progress-grid';
-  const result = await apiCall<ProgressGridData>(url);
-
+  const result = await apiCall<ProgressGridData>(url, {silent: background});
+  if (request !== progressGridRequest || !container.isConnected) return;
   if (!result) {
+    if (background) {
+      const status = container.querySelector('.grid-updated');
+      if (status) status.textContent = 'Unable to refresh. Showing the last saved snapshot.';
+      return;
+    }
     container.innerHTML = '<p class="error-text">Failed to load progress grid. Server may be unavailable.</p>';
     return;
   }
 
+  const scrollLeft = container.querySelector('.progress-grid-wrapper')?.scrollLeft || 0;
+  const scrollTop = container.querySelector('.progress-grid-wrapper')?.scrollTop || 0;
   adminProgressGridCache = result;
   renderProgressGrid(result);
+  const wrapper = container.querySelector('.progress-grid-wrapper');
+  if (wrapper) { wrapper.scrollLeft = scrollLeft; wrapper.scrollTop = scrollTop; }
 }
 
 function renderProgressGrid(data: ProgressGridData): void {
@@ -13310,11 +13333,11 @@ function renderProgressGrid(data: ProgressGridData): void {
 
   function getStatusIcon(status: string): string {
     switch (status) {
-      case 'completed': return '';
-      case 'in_progress': return '';
-      case 'stale': return '';
-      case 'unlocked': return '';
-      default: return '';
+      case 'completed': return '✓';
+      case 'in_progress': return '●';
+      case 'stale': return '!';
+      case 'unlocked': return '○';
+      default: return '—';
     }
   }
 
@@ -13331,12 +13354,15 @@ function renderProgressGrid(data: ProgressGridData): void {
   container.innerHTML = `
     <div class="progress-grid-stats">
       <span>Showing ${data.userProgress.length} user${data.userProgress.length !== 1 ? 's' : ''}</span>
+      <span class="grid-updated">Updated ${new Date().toLocaleTimeString([], {hour: 'numeric', minute: '2-digit', second: '2-digit'})} · Refreshes every 15 seconds</span>
     </div>
     <div class="progress-grid-wrapper">
       <table class="progress-grid-table">
         <thead>
           <tr>
             <th class="user-col sticky-col">User</th>
+            <th class="current-module-col">Last lesson visited</th>
+            <th class="exam-progress-col">Current test progress</th>
             ${moduleOrder.map(m => `<th class="module-col" title="${formatModuleName(m)}">${shortNames[m]}</th>`).join('')}
             <th class="progress-col">Progress</th>
           </tr>
@@ -13353,15 +13379,17 @@ function renderProgressGrid(data: ProgressGridData): void {
                 <td class="user-col sticky-col">
                   <div class="user-info">
                     <span class="user-name">${escapeHtml(user.userName)}</span>
-                    <span class="user-login">${user.lastLogin ? formatRelativeDate(user.lastLogin) : 'Never'}</span>
+                    <span class="user-login">Last login: ${user.lastLogin ? formatRelativeDate(user.lastLogin) : 'Never'}</span>
                   </div>
                 </td>
+                <td class="current-module-col">${user.currentModule ? escapeHtml(formatModuleName(user.currentModule)) : 'Not started'}</td>
+                <td class="exam-progress-col">${renderAdminExamProgress(user.exam)}</td>
                 ${moduleOrder.map(moduleName => {
                   const moduleData = statusMap.get(moduleName);
                   const status = moduleData?.status || 'not_started';
                   const timeSpent = moduleData?.timeSpent || 0;
                   const tooltip = `${formatModuleName(moduleName)}\\nStatus: ${status}\\nTime: ${formatSeconds(timeSpent)}`;
-                  return `<td class="module-cell ${getStatusClass(status)}" title="${tooltip}">${getStatusIcon(status)}</td>`;
+                  return `<td class="module-cell ${getStatusClass(status)}" title="${tooltip}" aria-label="${escapeHtml(formatModuleName(moduleName))}: ${status.replaceAll('_', ' ')}">${getStatusIcon(status)}</td>`;
                 }).join('')}
                 <td class="progress-col">
 
@@ -13374,6 +13402,19 @@ function renderProgressGrid(data: ProgressGridData): void {
       </table>
     </div>
   `;
+}
+
+function renderAdminExamProgress(exam: ProgressGridData['userProgress'][number]['exam']): string {
+  if (!exam) return '<span class="exam-grid-muted">Not started</span>';
+  if (exam.status !== 'in_progress') return `<strong>${exam.status === 'passed' ? 'Passed' : 'Submitted'} · ${exam.score}/100</strong><span>Attempt ${exam.attemptNumber}</span>`;
+  const labels: Record<string, string> = {mcq: 'Multiple choice', fib: 'Fill in the blank', sa: 'Short answer'};
+  const [section, index] = (exam.currentQuestion || '').split('-');
+  const location = labels[section] && Number.isInteger(Number(index)) ? `${labels[section]} · Question ${Number(index) + 1}` : 'Exam opened';
+  return `<strong>In progress · Attempt ${exam.attemptNumber}</strong>
+    <span>${exam.total ? `${exam.answered} of ${exam.total} answered` : 'Waiting for first answer save'}</span>
+    <span>Last question: ${location}</span>
+    ${exam.sections?.length ? `<small>${exam.sections.map(s => `${labels[s.section] || s.section}: ${s.answered}/${s.total}`).join(' · ')}</small>` : ''}
+    <small>${exam.savedAt ? `Saved ${escapeHtml(new Date(exam.savedAt).toLocaleString())}` : 'No answers synced yet'}</small>`;
 }
 
 // Format seconds to human readable time
@@ -14127,8 +14168,8 @@ async function submitExamToAPI(
 }
 
 // Start exam attempt via API
-async function startExamAttemptAPI(): Promise<{ attemptId: string | null; remainingAttempts: number }> {
-  const result = await apiCall<{ attemptId: string; attemptNumber: number; remainingAttempts: number } | { error: string; lockedOut?: boolean; isCertified?: boolean }>('/exam/start', {
+async function startExamAttemptAPI(): Promise<{ attemptId: string | null; remainingAttempts: number; draft?: any; revision?: number; savedAt?: string }> {
+  const result = await apiCall<{ attemptId: string; attemptNumber: number; remainingAttempts: number; draft?: any; revision?: number; savedAt?: string } | { error: string; lockedOut?: boolean; isCertified?: boolean }>('/exam/start', {
     method: 'POST'
   });
 
@@ -14141,7 +14182,7 @@ async function startExamAttemptAPI(): Promise<{ attemptId: string | null; remain
   }
 
   currentExamAttemptId = result.attemptId;
-  return { attemptId: result.attemptId, remainingAttempts: result.remainingAttempts };
+  return result;
 }
 
 // ============================================================================
@@ -14256,16 +14297,91 @@ function examDraftKey(): string { return `roof-er.examDraft.${getCurrentUser()?.
 function readExamDraft(): any {
   try { return JSON.parse(localStorage.getItem(examDraftKey()) || 'null'); } catch { return null; }
 }
-function persistExamInputs(root: HTMLElement) {
+let examSaveTimer: ReturnType<typeof setTimeout>;
+let examSaveInFlight = false;
+let examSaveConflict = false;
+let renderedDraftSaveId: string | undefined;
+const examConflictMessage = 'This exam changed in another tab or device. Your edits remain on this browser. Reload to resume the server copy.';
+
+function examSaveStatus(message: string) {
+  const status = document.getElementById('exam-autosave-status');
+  if (status) status.textContent = message;
+}
+
+async function syncExamDraft(keepalive = false) {
+  const key = examDraftKey();
   const draft = readExamDraft();
-  if (!draft || draft.attemptId !== currentExamAttemptId) return;
+  if (!draft || draft.pending || !draft.dirty || examSaveInFlight || examSaveConflict) return;
+  const outgoing = draft.syncPending || {attemptId: draft.attemptId, revision: draft.revision || 0,
+    draft: {questions: draft.questions, answers: draft.answers, startedAt: draft.startedAt,
+      currentQuestion: draft.currentQuestion, saveId: draft.saveId}};
+  draft.syncPending = outgoing;
+  localStorage.setItem(key, JSON.stringify(draft));
+  examSaveInFlight = true;
+  examSaveStatus('Saving answers…');
+  const result = await apiCall<{success?: boolean; conflict?: boolean; revision: number; savedAt: string}>('/exam/draft', {
+    method: 'POST', silent: true, keepalive,
+    body: JSON.stringify(outgoing),
+  });
+  examSaveInFlight = false;
+  if (key !== examDraftKey()) return;
+  if (result?.conflict) {
+    examSaveConflict = true;
+    examSaveStatus(examConflictMessage);
+    return;
+  }
+  const latest = readExamDraft();
+  if (!latest || latest.attemptId !== draft.attemptId) return;
+  if (result?.success) {
+    latest.revision = result.revision;
+    latest.savedAt = result.savedAt;
+    latest.dirty = latest.saveId !== outgoing.draft.saveId;
+    delete latest.syncPending;
+    localStorage.setItem(key, JSON.stringify(latest));
+    examSaveStatus('Saved to your account. You can return to this exam later.');
+    if (latest.dirty) void syncExamDraft();
+  } else {
+    examSaveStatus('Saved on this browser. Waiting to sync to your account; keep this browser to resume.');
+  }
+}
+
+function persistExamInputs(root: HTMLElement, currentQuestion?: string) {
+  const draft = readExamDraft();
+  if (!draft || draft.attemptId !== currentExamAttemptId || draft.pending) return;
+  const changedInAnotherTab = draft.saveId !== renderedDraftSaveId;
   root.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input[name], textarea[name]').forEach(input => {
     if (input.type !== 'radio' || (input as HTMLInputElement).checked) draft.answers[input.name] = input.value;
   });
+  if (currentQuestion) draft.currentQuestion = currentQuestion;
+  draft.saveId = crypto.randomUUID();
+  draft.dirty = true;
+  if (changedInAnotherTab) {
+    // localStorage is shared across tabs: never combine a stale form with a newer revision.
+    localStorage.setItem(`${examDraftKey()}.recovery`, JSON.stringify(draft));
+    examSaveConflict = true;
+    examSaveStatus(examConflictMessage);
+    return;
+  }
+  renderedDraftSaveId = draft.saveId;
   localStorage.setItem(examDraftKey(), JSON.stringify(draft));
+  const answered = Object.values(draft.answers).filter(value => String(value).trim()).length;
+  const total = Object.values(draft.questions).reduce<number>((n, section: any) => n + section.length, 0);
+  const progress = document.getElementById('exam-progress-text');
+  if (progress) progress.textContent = `${answered} of ${total} answered`;
+  examSaveStatus(examSaveConflict ? examConflictMessage : 'Saved on this browser. Syncing…');
+  clearTimeout(examSaveTimer);
+  examSaveTimer = setTimeout(() => void syncExamDraft(), 500);
 }
 
-function initFinalExam() {
+window.addEventListener('online', () => void syncExamDraft());
+window.addEventListener('pagehide', () => void syncExamDraft(true));
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') void syncExamDraft(true);
+});
+// Retry unsynced edits even when the learner leaves the exam open or changes modules.
+setInterval(() => void syncExamDraft(), 15000);
+
+async function initFinalExam() {
   const examArea = document.getElementById('exam-area');
   if (!examArea) return;
 
@@ -14281,7 +14397,11 @@ function initFinalExam() {
   } else if (readExamDraft()) {
     void startExam(examArea);
   } else {
-    showExamStartScreen(examArea, state);
+    examArea.innerHTML = '<p>Checking for saved exam…</p>';
+    const saved = await apiCall<{draft: any}>('/exam/draft', {silent: true});
+    if (!examArea.isConnected) return;
+    if (saved?.draft) void startExam(examArea);
+    else showExamStartScreen(examArea, state);
   }
 
   // Check certification badge on load
@@ -14558,7 +14678,7 @@ async function startExam(root: HTMLElement) {
     return;
   }
   // Start exam attempt in API to track it
-  const { attemptId, remainingAttempts } = await startExamAttemptAPI();
+  const { attemptId, remainingAttempts, draft: serverDraft, revision = 0, savedAt } = await startExamAttemptAPI();
   currentExamAttemptId = attemptId;
 
   if (remainingAttempts === 0 && !attemptId) {
@@ -14567,17 +14687,37 @@ async function startExam(root: HTMLElement) {
     return;
   }
 
-  const draft = readExamDraft();
+  let draft = readExamDraft();
+  examSaveConflict = false;
+  if (serverDraft && draft?.attemptId === attemptId && draft.syncPending?.draft.saveId === serverDraft.saveId) {
+    draft.revision = revision;
+    draft.savedAt = savedAt;
+    draft.dirty = draft.saveId !== serverDraft.saveId;
+    delete draft.syncPending;
+    localStorage.setItem(examDraftKey(), JSON.stringify(draft));
+  }
+  if (serverDraft && !(draft?.attemptId === attemptId && draft.dirty && (draft.revision || 0) === revision)) {
+    // Keep a recovery copy if a newer device superseded unsynced local work.
+    if (draft?.dirty) localStorage.setItem(`${examDraftKey()}.recovery`, JSON.stringify(draft));
+    draft = {...serverDraft, attemptId, revision, savedAt, dirty: false};
+    localStorage.setItem(examDraftKey(), JSON.stringify(draft));
+  }
   if (draft?.attemptId === attemptId) {
+    if (!serverDraft) {
+      draft.dirty = true;
+      draft.saveId ||= crypto.randomUUID();
+      localStorage.setItem(examDraftKey(), JSON.stringify(draft));
+    }
     currentExamData = draft.questions;
     examStartTime = draft.startedAt;
   } else {
     examStartTime = Date.now();
     currentExamData = {mcq: shuffleArray(FINAL_EXAM_MCQ), fib: shuffleArray(FINAL_EXAM_FIB), sa: shuffleArray(FINAL_EXAM_SA)};
-    localStorage.setItem(examDraftKey(), JSON.stringify({attemptId, questions: currentExamData, startedAt: examStartTime, answers: {}}));
+    localStorage.setItem(examDraftKey(), JSON.stringify({attemptId, questions: currentExamData, startedAt: examStartTime, answers: {}, revision, dirty: true, saveId: crypto.randomUUID()}));
   }
 
   renderFinalExam(root);
+  void syncExamDraft();
   } catch (error) { alert(error instanceof Error ? error.message : 'Unable to open exam. Please retry.'); }
 }
 
@@ -14600,6 +14740,8 @@ function renderFinalExam(root: HTMLElement) {
         </div>
       </div>
 
+      <p id="exam-autosave-status" role="status" class="exam-autosave-status">Saved answers will sync to your account.</p>
+      <button type="button" id="resume-exam-position" class="btn-secondary">Return to last question</button>
       <div class="exam-sections">
         <!-- Multiple Choice Section -->
         <div class="exam-section">
@@ -14650,7 +14792,7 @@ function renderFinalExam(root: HTMLElement) {
 
       <div class="exam-submit-section">
         <button id="submitExam" class="exam-submit-btn"> Submit Exam</button>
-        <p class="submit-warning">Answers are saved on this browser. Refreshing does not use an attempt. An attempt counts only after submission is saved.</p><p id="exam-save-error" role="alert"></p>
+        <p class="submit-warning">Answers save automatically. Check the save status above before switching devices. Refreshing does not use an attempt. An attempt counts only after submission is saved.</p><p id="exam-save-error" role="alert"></p>
       </div>
 
       <div id="exam-result"></div>
@@ -14658,6 +14800,7 @@ function renderFinalExam(root: HTMLElement) {
   `;
 
   const draft = readExamDraft();
+  renderedDraftSaveId = draft?.saveId;
   if (draft?.pending) {
     const status = root.querySelector('#exam-save-error');
     if (status) status.textContent = 'Your submission is saved on this browser but confirmation is pending. Submit again to recover the original result without using another attempt.';
@@ -14668,9 +14811,24 @@ function renderFinalExam(root: HTMLElement) {
       if (input.type === 'radio') (input as HTMLInputElement).checked = input.value === value;
       else input.value = value;
     }
-    input.addEventListener('input', () => persistExamInputs(root));
-    input.addEventListener('change', () => persistExamInputs(root));
+    input.addEventListener('input', () => persistExamInputs(root, input.name));
+    input.addEventListener('focus', () => persistExamInputs(root, input.name));
+    input.addEventListener('change', () => persistExamInputs(root, input.name));
   });
+
+  const resume = root.querySelector<HTMLButtonElement>('#resume-exam-position');
+  if (resume) {
+    resume.hidden = !draft?.currentQuestion;
+    resume.addEventListener('click', () => {
+      const name = readExamDraft()?.currentQuestion;
+      const input = Array.from(root.querySelectorAll<HTMLInputElement>('input[name], textarea[name]')).find(el => el.name === name);
+      input?.focus();
+      input?.scrollIntoView({block: 'center', behavior: 'smooth'});
+    });
+  }
+  if (draft?.savedAt && !draft.dirty) examSaveStatus('Saved to your account. You can return to this exam later.');
+  const answered = Object.values(draft?.answers || {}).filter(value => String(value).trim()).length;
+  root.querySelector('#exam-progress-text')!.textContent = `${answered} of ${mcq.length + fib.length + sa.length} answered`;
 
   document.getElementById('submitExam')?.addEventListener('click', async () => {
     // Validate all questions are answered before submitting

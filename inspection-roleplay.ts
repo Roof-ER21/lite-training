@@ -29,7 +29,7 @@ export function mountInspectionRoleplay(root:HTMLElement,complete:()=>void,revie
       <p id="inspection-state" role="status" aria-live="polite"></p>
       <div class="inspection-actions" id="inspection-live-controls" hidden><button type="button" id="inspection-mute" aria-pressed="false">Mute microphone</button><button type="button" id="inspection-end" class="primary-action">End &amp; review</button><button type="button" id="inspection-cancel">Stop practice</button></div>
       <section id="inspection-transcript-panel" hidden><p class="doorstep-kicker">The conversation</p><h2>You &amp; Agnes</h2><p class="doorstep-mode-note">Feedback uses the words captured here. Automatic transcription can contain errors.</p><div id="inspection-transcript" role="log" aria-label="Doorstep conversation" aria-live="polite"></div></section>
-      <section id="inspection-debrief" hidden><p class="doorstep-kicker">Your next rep starts here</p><h2>How your pitch landed</h2><div id="inspection-feedback"></div><p id="inspection-save-status" role="status"></p><div class="inspection-actions"><button type="button" id="inspection-feedback-retry">Retry feedback</button><button type="button" id="inspection-save-retry">Retry server save</button><button type="button" id="inspection-again">Practice this scenario again</button><button type="button" id="inspection-download">Download conversation</button><button type="button" id="inspection-continue" class="primary-action">Next: Final Exam</button></div></section>
+      <section id="inspection-debrief" hidden><p class="doorstep-kicker">Your next rep starts here</p><h2>How your pitch landed</h2><div id="inspection-feedback"></div><p id="inspection-save-status" role="status"></p><div class="inspection-actions"><button type="button" id="inspection-feedback-retry">Retry feedback</button><button type="button" id="inspection-save-retry">Retry server save</button><button type="button" id="inspection-again">Retry again</button><button type="button" id="inspection-download">Download conversation</button><button type="button" id="inspection-continue" class="primary-action">Next: Final Exam</button></div></section>
     </div>
     <details class="inspection-history"><summary>Your saved doorstep practice</summary><div id="inspection-history"></div></details>
   </div>`;
@@ -58,7 +58,7 @@ export function mountInspectionRoleplay(root:HTMLElement,complete:()=>void,revie
     root.querySelector('#inspection-state')!.textContent=flow.message || 'Ready when you are.';
     root.querySelector('#inspection-prompt')!.textContent=flow.scenario.prompt;
     root.querySelector('#inspection-points')!.innerHTML=flow.scenario.expectedKeyPoints.map(point=>`<li>${escapeText(point)}</li>`).join('');
-    button('inspection-start').disabled=active;button('inspection-start').textContent=phase==='ready'?'Start voice practice':'Retry same scenario';
+    button('inspection-start').disabled=active;button('inspection-start').textContent=phase==='ready'?'Start voice practice':'Retry again';
     button('inspection-check').disabled=active;button('inspection-speaker').disabled=active;
     button('inspection-check').textContent=checking?'Stop microphone check':'Check microphone';
     if(previousPhase!==phase){

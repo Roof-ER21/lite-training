@@ -129,7 +129,8 @@ router.post('/module', async (req: Request, res: Response) => {
         VALUES ($1, $2, $3, NOW(), NOW())
         ON CONFLICT (user_id, module_name)
         DO UPDATE SET
-          status = CASE WHEN module_progress.status IN ('locked') THEN $3 ELSE module_progress.status END,
+          status = CASE WHEN module_progress.status = 'completed' THEN 'completed'
+            WHEN module_progress.status = 'in_progress' THEN 'in_progress' ELSE $3 END,
           started_at = COALESCE(module_progress.started_at, NOW()),
           last_accessed = NOW()
       `, [userId, moduleName, action === 'start' ? 'in_progress' : 'unlocked']);

@@ -102,5 +102,5 @@ test('disconnect keeps captured speech and retry starts the same doorstep scenar
   await page.getByRole('button',{name:'Start voice practice',exact:true}).click();await expect(page.locator('#inspection-state')).toContainText('interrupted');
   await expect(page.locator('#inspection-transcript')).toContainText(speech);
   expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('roof-er.completedModules')||'[]'))).not.toContain('role-play');
-  await page.getByRole('button',{name:'Retry same scenario',exact:true}).click();await expect(page.locator('#inspection-prompt')).toHaveText(prompt);
+  await page.getByRole('button',{name:'Retry again',exact:true}).click();await expect(page.locator('#inspection-prompt')).toHaveText(prompt);
 });

@@ -1,6 +1,7 @@
 import pg from 'pg';
 import { workspaceSchema } from './workspace-schema.js';
 import { inspectionSchema } from './inspection-schema.js';
+import { examDraftSchema } from './exam-draft-schema.js';
 const { Pool } = pg;
 
 // Check if database is configured
@@ -492,6 +493,7 @@ export async function initDatabase(): Promise<void> {
     await pool.query(migrations);
     await pool.query(workspaceSchema);
     await pool.query(inspectionSchema);
+    await pool.query(examDraftSchema);
     console.log('Database migrations completed');
 
     dbAvailable = true;
