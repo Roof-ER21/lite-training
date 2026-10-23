@@ -4635,7 +4635,7 @@ const trainingContent = {
                 <h4> Tips:</h4>
                 <ul>
                     <li>Explain the inspection process in simple steps</li>
-                    <li>Ask permission before using the ladder or taking photos</li>
+                    <li>Don't ask permission: tell them it takes 10 to 15 minutes, you'll walk the perimeter, then grab your ladder and check the roof</li>
                     <li>Set a clear next step before ending the session</li>
                 </ul>
             </div>
@@ -5296,7 +5296,7 @@ trainingContent['sales-cycle-job-flow'] = trainingContent['sales-cycle'] || `
 trainingContent['final-exam'] = `
   <div class="content-card" id="final-exam">
     <h1> Final Certification Exam</h1>
-    <p class="module-intro">Complete this exam to become a Certified Roof E.R. Sales Representative. You have 3 attempts to score 70% or higher.</p>
+    <p class="module-intro">Complete this exam to become a Certified Roof E.R. Sales Representative. You have 3 attempts to score 80% or higher.</p>
     <div id="exam-area">
       <!-- Dynamically populated by initFinalExam() -->
     </div>
@@ -14441,7 +14441,7 @@ function showExamStartScreen(root: HTMLElement, state: ExamState) {
           <li><strong>${FINAL_EXAM_FIB.length} Fill-in-the-Blank Questions</strong> (2 points each)</li>
           <li><strong>${FINAL_EXAM_SA.length} Short Answer Questions</strong> (2 points each)</li>
           <li><strong>Total: ${(FINAL_EXAM_MCQ.length + FINAL_EXAM_FIB.length + FINAL_EXAM_SA.length) * 2} points</strong></li>
-          <li><strong>Passing Score: 70% (${Math.ceil((FINAL_EXAM_MCQ.length + FINAL_EXAM_FIB.length + FINAL_EXAM_SA.length) * 2 * 0.7)} points)</strong></li>
+          <li><strong>Passing Score: 80% (${Math.ceil((FINAL_EXAM_MCQ.length + FINAL_EXAM_FIB.length + FINAL_EXAM_SA.length) * 2 * 0.8)} points)</strong></li>
         </ul>
       </div>
 
@@ -15093,7 +15093,7 @@ async function gradeFinalExam(root: HTMLElement) {
   const rawTotal = mcqScore + fibScore + saScore;
   const maxTotal = (mcq.length + fib.length + sa.length) * 2;
   const totalScore = Math.round((rawTotal / maxTotal) * 100); // Convert to percentage
-  const passed = totalScore >= 70; // 70%
+  const passed = totalScore >= 80; // 80% (Reese, 2026-10-21; certificates earned at 70 stand)
 
   // Save attempt
   const state = getExamState();
@@ -15372,7 +15372,7 @@ function showExamResults(root: HTMLElement, attempt: ExamAttempt, detailedResult
       <div class="exam-results failed">
         <div class="result-badge fail"></div>
         <h1>Not Quite There</h1>
-        <h2>Score: ${attempt.totalScore}% (Need 70% to pass)</h2>
+        <h2>Score: ${attempt.totalScore}% (Need 80% to pass)</h2>
 
         <div class="score-display">
           <div class="score-circle failed">

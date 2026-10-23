@@ -49,3 +49,20 @@ test('only three completed failures cause lockout',async()=>{
  }
  expect((await post('start',{},token)).status).toBe(409);
 });
+
+test('the server decides the pass at 80, whatever the page sends',async()=>{
+ await db.query('DELETE FROM certifications WHERE user_id = $1',[user]);
+ await db.query('DELETE FROM exam_attempts WHERE user_id = $1',[user]);
+ // A page cached from the 70% days sends 75 as passed: it is saved as a fail and earns no certificate.
+ const first=await post('start');
+ const failed=await post('submit',{attemptId:first.body.attemptId,timeTaken:10,results:{mcqCorrect:30,fibCorrect:5,saPoints:10,totalScore:75,passed:true}});
+ expect(failed.status).toBe(200);
+ expect(failed.body.passed).toBe(false);
+ expect((await db.query('SELECT passed FROM exam_attempts WHERE id=$1',[first.body.attemptId])).rows[0].passed).toBe(false);
+ expect((await db.query('SELECT * FROM certifications WHERE user_id=$1',[user])).rowCount).toBe(0);
+ // Exactly 80 passes.
+ const second=await post('start');
+ const passed=await post('submit',{attemptId:second.body.attemptId,timeTaken:10,results:{mcqCorrect:32,fibCorrect:5,saPoints:10,totalScore:80,passed:false}});
+ expect(passed.body.passed).toBe(true);
+ expect((await db.query('SELECT * FROM certifications WHERE user_id=$1',[user])).rowCount).toBe(1);
+});

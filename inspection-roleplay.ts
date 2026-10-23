@@ -18,7 +18,7 @@ export function mountInspectionRoleplay(root:HTMLElement,complete:()=>void,revie
         <div class="doorstep-homeowner"><span class="doorstep-avatar" aria-hidden="true">A</span><div><h2 id="doorstep-title">Meet Agnes</h2><p>Your AI homeowner</p></div></div>
         <p class="doorstep-context">You’ve just knocked. Agnes opens the door.</p>
         <blockquote id="inspection-prompt"></blockquote>
-        <p class="doorstep-direction">Run your initial pitch, listen to Agnes’s concern, and work toward permission to inspect. She’ll raise a simple objection and give you room to respond.</p>
+        <p class="doorstep-direction">Run your initial pitch, listen to Agnes’s concern, and move straight into the inspection: 10 to 15 minutes, the perimeter, then your ladder and the roof. She’ll raise a simple objection and give you room to respond.</p>
         <div class="inspection-actions doorstep-start"><button type="button" id="inspection-start" class="primary-action">Start voice practice</button></div>
         <p class="doorstep-mode-note">Speak naturally and let Agnes respond. Microphone required; no camera needed.</p>
         <details class="inspection-audio-check"><summary>Check your microphone &amp; sound</summary><p>The sound check stays on this device.</p><div class="inspection-actions"><button type="button" id="inspection-check">Check microphone</button><button type="button" id="inspection-speaker">Play test sound</button></div><label for="inspection-level">Microphone level</label><meter id="inspection-level" min="0" max="1" value="0">Microphone level</meter><p id="inspection-audio-status" role="status">Speak during the check to see the level move. If the test sound is silent, check your volume and audio output.</p></details>

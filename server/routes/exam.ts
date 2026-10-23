@@ -3,6 +3,9 @@ import { query, queryOne, pool } from '../db/connection.js';
 import { requireAuth } from '../middleware/auth.js';
 import { validExamDraft } from '../exam-draft.js';
 
+
+/** Final exam pass mark in percent. Certificates earned under the old 70 stay (Ahmed, 2026-10-23). */
+export const EXAM_PASS_SCORE = 80;
 const router = Router();
 
 // All routes require authentication
@@ -138,9 +141,11 @@ router.post('/submit', async (req: Request, res: Response) => {
   const {attemptId, mcqAnswers, fibAnswers, saAnswers, timeTaken, results} = req.body;
   if (!/^[0-9a-f-]{36}$/i.test(attemptId || '') || !results ||
       !['mcqCorrect','fibCorrect','saPoints','totalScore'].every(k => Number.isInteger(results[k]) && results[k] >= 0) ||
-      results.totalScore > 100 || results.passed !== (results.totalScore >= 70)) {
+      results.totalScore > 100) {
     return res.status(400).json({error: 'Invalid exam submission'});
   }
+  // The server decides the pass, so a page cached from the 70% days cannot pass a 70 to 79 (Reese, 2026-10-21: 80%).
+  results.passed = results.totalScore >= EXAM_PASS_SCORE;
   const client = await pool?.connect();
   if (!client) return res.status(503).json({error: 'Database unavailable'});
   try {

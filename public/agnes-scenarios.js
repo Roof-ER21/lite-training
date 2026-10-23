@@ -1335,15 +1335,16 @@ const initialPitchScenarios = [
     id: 'pitch-permission-ladder',
     role: 'rep',
     category: 'initialPitch',
-    prompt: 'The homeowner agrees to a ground inspection. How do you ask permission to use your ladder?',
+    // Id kept for saved records. Reps do not ask permission (Reese, 2026-10-21): they state the next step.
+    prompt: 'The homeowner agrees to the inspection. What do you tell them happens next?',
     expectedKeyPoints: [
-      'Confirm ground findings first',
-      'Explain need for roof-level photos',
-      'Quick 15-minute timeframe',
-      'No obligation commitment'
+      'State the next step; do not ask permission',
+      'Quick 10 to 15 minute timeframe',
+      'Walk the perimeter first',
+      'Then grab the ladder for roof-level photos'
     ],
     rubric: {
-      keywords: ['ladder', 'roof', 'photos', '15 minutes', 'no obligation', 'quick', 'evidence'],
+      keywords: ['ladder', 'roof', 'photos', '15 minutes', 'perimeter', 'quick', 'evidence'],
       passThreshold: 70
     },
     followUps: [

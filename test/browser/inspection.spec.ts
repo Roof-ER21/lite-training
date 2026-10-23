@@ -1,7 +1,7 @@
 import {test,expect,type Page} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import {mkdir} from 'node:fs/promises';
-const speech='Hi, my name is Alex with Roof-ER. We are a local roofing company. I can offer a free inspection, take photos and share what I find. May I take 10 to 15 minutes to check your roof?';
+const speech='Hi, my name is Alex with Roof-ER. We are a local roofing company. I can offer a free inspection, take photos and share what I find. It will take me about 10 to 15 minutes: I will walk the perimeter, then grab my ladder and check your roof.';
 async function open(page:Page){
 
   await page.goto('/');await page.getByLabel('Your Name').fill('Local Inspection QA');await page.getByRole('button',{name:'Start Training',exact:true}).click();

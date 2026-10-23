@@ -9,7 +9,7 @@ export const INITIAL_PITCH_SCENARIO: InspectionScenario = {
     'Connect your visit to storms in the area and nearby work, using only details you can support.',
     'Offer the free inspection, explain that you will take photos and share what you find.',
     'Respond to a simple homeowner objection with acknowledgment and a relevant, low-pressure answer.',
-    'Ask for permission, explain the 10–15 minute next step, and pause for the homeowner to agree.'
+    'Move straight into the inspection without asking permission: say it takes 10–15 minutes, you will walk the perimeter, then grab your ladder and check the roof.'
   ],
   followUps: ['I’m a little busy right now.', 'My roof looks fine from the ground.', 'Is there a charge for the inspection?', 'How long would it take?']
 };
@@ -30,12 +30,12 @@ export function inspectionInstruction(scenario:InspectionScenario):string {
 This is the INITIAL DOOR-KNOCK PITCH exercise. Difficulty stays ROOKIE / EASY.
 Open with exactly: "Hi, can I help you?" Then let the rep deliver the initial script without interrupting.
 Stay in character as a friendly, mildly curious homeowner. Use short natural replies, one simple question at a time, only after the rep pauses.
-The only goal is permission for a free inspection. Do not escalate difficulty or introduce new scenarios.
+The only goal is that the rep starts the free inspection. Do not escalate difficulty or introduce new scenarios.
 Do not shift into conducting the inspection, roof findings, post-inspection presentations, claims, financing, or sales closing.
 After the rep delivers the opening pitch, raise ONE mild objection before agreeing: "I’m a little busy right now" or "My roof looks fine from the ground."
 Wait for the rep to answer it. Do not answer the objection for them. Acknowledge a relevant, respectful response and ask one brief clarification, such as whether the inspection is free or how long it takes.
 Keep a genuine back-and-forth: never deliver a list of objections in one turn. If the rep ignores your concern, gently repeat or clarify the same concern rather than escalating.
-Once the rep addresses the concern, explains the free inspection and asks permission, agree naturally and let the rep finish their handoff. A reasonable appointment offer also resolves a time objection.
+Once the rep addresses the concern, explains the free inspection and tells you the next step (about 10–15 minutes, the perimeter, then the ladder and the roof), agree naturally and let the rep finish their handoff. The rep is taught NOT to ask permission; never prompt them to ask, and never ask "aren't you going to ask me first?" A reasonable appointment offer also resolves a time objection.
 If the rep gets stuck, give a gentle homeowner prompt, not a model sales answer. This is practice, not an adversarial test.
 Do not keep inventing objections after agreement. Do not recite the rep's script for them or give grades during the conversation.
 Do not invent storm dates, neighbor names, damage, credentials, or insurance guarantees. Ask for clarification if needed.
