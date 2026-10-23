@@ -138,6 +138,11 @@ body #main-content { width: 100%; min-width: 0; max-width: none; height: auto; m
 .keyboard-hotspot-cursor { position: absolute; pointer-events: none; width: 24px; height: 24px; border: 3px solid var(--brand); outline: 2px solid var(--on-brand); border-radius: 50%; transform: translate(-50%,-50%); z-index: 2; }
 .flip-card-inner, .flip-card-front, .flip-card-back { display: block; }
 .objection-flip-card { text-align: left; min-height: 210px; }
+/* The card is a button whose faces are absolutely positioned: without a width it shrinks to its padding (40px). The faces carry the look, so the shell drops the shared control border, shadow and press. */
+#main-content .objection-flip-card,
+#main-content .objection-flip-card:hover:not(:disabled),
+#main-content .objection-flip-card:active:not(:disabled) { display: block; width: 100%; padding: 0; border: 0; background: transparent; box-shadow: none; transform: none; }
+#main-content .objection-flip-card .flip-card-back { overflow-y: auto; }
 .modal-close, .photo-modal-close, .close-review, .speak-btn, .close-btn { min-width: 44px; min-height: 44px; }
 .module-complete-modal, .review-modal-overlay, .photo-modal-overlay, .modal-overlay { background: var(--scrim); padding: 24px; }
 [role="dialog"] { max-height: 100dvh; overflow: auto; }

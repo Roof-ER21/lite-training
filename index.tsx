@@ -7529,7 +7529,8 @@ function renderChallengeQuestion() {
   const challengeCard = document.getElementById('challenge-card');
   const challengeComplete = document.getElementById('challenge-complete');
 
-  if (!scenarioText || !optionsContainer || !progressBar || !progressText) return;
+  // The progress bar left the page in 66ff584; requiring it stopped every question after the first.
+  if (!scenarioText || !optionsContainer || !progressText) return;
 
   // Reset state
   challengeState.answered = false;
@@ -7539,7 +7540,7 @@ function renderChallengeQuestion() {
 
   // Update progress
   const progress = (challengeState.currentQuestion / objectionChallengeQuestions.length) * 100;
-  progressBar.style.width = `${progress}%`;
+  if (progressBar) progressBar.style.width = `${progress}%`;
   progressText.textContent = `Question ${challengeState.currentQuestion + 1} of ${objectionChallengeQuestions.length}`;
 
   // Render scenario
