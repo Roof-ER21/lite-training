@@ -467,3 +467,48 @@ button:active:not(:disabled) { transform: translateY(1px); }
   .progress-grid-table .progress-col::before { content: 'Modules completed: '; }
   .progress-grid-table .progress-text { display: inline; font-size: 14px; text-align: left; }
 }
+
+/* Learning path: one calm panel of rows, not a wall of controls (Reese, 2026-10-23).
+   The rows are buttons, so they opt out of the shared control border, shadow and press above. */
+#main-content .learning-path {
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0;
+  background:var(--surface-color); border:1px solid var(--border-color); border-radius:12px; overflow:hidden;
+}
+#main-content .learning-path li { border-bottom:1px solid var(--border-color); }
+#main-content .learning-path li:nth-child(odd) { border-right:1px solid var(--border-color); }
+#main-content .learning-path li:nth-last-child(-n+2):nth-child(odd),
+#main-content .learning-path li:last-child { border-bottom:0; }
+#main-content .lesson-path-row,
+#main-content .lesson-path-row:hover:not(:disabled),
+#main-content .lesson-path-row:active:not(:disabled),
+#main-content .lesson-path-row:disabled {
+  display:grid; grid-template-columns:32px minmax(0,1fr) 16px; grid-template-rows:auto auto; column-gap:14px; row-gap:2px;
+  align-items:center; width:100%; height:100%; min-height:72px; margin:0; padding:14px 20px; text-align:left;
+  border:0; border-radius:0; box-shadow:none; transform:none; font-weight:inherit; background:transparent; color:var(--text-primary); opacity:1;
+}
+#main-content .lesson-path-row:hover:not(:disabled) { background:var(--hover-bg); }
+#main-content .lesson-path-row:focus-visible { outline:3px solid var(--brand-mark) !important; outline-offset:-3px; }
+#main-content .lesson-path-row .lesson-index {
+  grid-row:1 / 3; width:32px; height:32px; border:0; border-radius:50%; display:grid; place-items:center;
+  font-size:11px; font-weight:600; background:var(--surface-soft); color:var(--text-secondary);
+}
+#main-content .lesson-path-row .lesson-name { grid-column:2; align-self:end; font-size:14px; font-weight:600; line-height:1.3; color:var(--text-primary); }
+#main-content .lesson-path-row .lesson-state { grid-column:2; align-self:start; font-size:12px; font-weight:500; color:var(--text-secondary); }
+#main-content .lesson-path-row > span:last-child { grid-column:3; grid-row:1 / 3; color:var(--text-secondary); transition:transform .15s ease, color .15s ease; }
+#main-content .lesson-path-row:hover:not(:disabled) > span:last-child { transform:translateX(3px); color:var(--brand-mark); }
+#main-content .lesson-path-row[data-state="todo"] .lesson-index,
+#main-content .lesson-path-row[data-state="progress"] .lesson-index { background:var(--brand-soft); color:var(--accent-text); }
+#main-content .lesson-path-row[data-state="progress"] .lesson-state { color:var(--accent-text); }
+#main-content .lesson-path-row[data-state="progress"] .lesson-state::before { content:''; display:inline-block; width:6px; height:6px; margin:0 6px 1px 0; border-radius:50%; background:var(--brand-mark); }
+#main-content .lesson-path-row[data-state="done"] .lesson-index { background:var(--brand); color:var(--on-brand); }
+#main-content .lesson-path-row[data-state="done"] > span:last-child { color:var(--brand-mark); }
+#main-content .lesson-path-row[data-state="locked"] :is(.lesson-index,.lesson-name,.lesson-state,span:last-child) { opacity:.55; }
+@media (max-width: 767px) {
+  #main-content .learning-path { grid-template-columns:minmax(0,1fr); }
+  #main-content .learning-path li:nth-child(odd) { border-right:0; }
+  #main-content .learning-path li:nth-last-child(-n+2):nth-child(odd) { border-bottom:1px solid var(--border-color); }
+  #main-content .lesson-path-row, #main-content .lesson-path-row:hover:not(:disabled) { min-height:64px; padding:12px 16px; }
+}
+/* The topbar's Field library sits inside the bar instead of hanging off its edge. */
+.training-topbar #field-library-button,
+.training-topbar #field-library-button:hover:not(:disabled) { min-height:38px; margin:0 0 0 auto; padding:6px 14px; border-width:1px; border-radius:8px; box-shadow:none; font-size:13px; }

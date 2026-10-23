@@ -1891,7 +1891,8 @@ async function initMyPage() {
       const done = completed.has(id);
       const available = unlocked.has(id);
       const status = done ? 'Done' : localStorage.getItem(STORAGE_KEYS.currentModule) === id && available ? 'In progress' : 'Not started';
-      return '<li><button type="button" class="lesson-path-row" data-lesson="' + id + '" ' + (available ? '' : 'disabled') + '><span class="lesson-index">' + String(index + 1).padStart(2, '0') + '</span><span class="lesson-name">' + getModuleDisplayName(id) + '</span><span class="lesson-state">' + status + (available ? '' : ' · Locked') + '</span><span aria-hidden="true">' + (done ? '✓' : '→') + '</span></button></li>';
+      const state = done ? 'done' : !available ? 'locked' : status === 'In progress' ? 'progress' : 'todo';
+      return '<li><button type="button" class="lesson-path-row" data-state="' + state + '" data-lesson="' + id + '" ' + (available ? '' : 'disabled') + '><span class="lesson-index">' + String(index + 1).padStart(2, '0') + '</span><span class="lesson-name">' + getModuleDisplayName(id) + '</span><span class="lesson-state">' + status + (available ? '' : ' · Locked') + '</span><span aria-hidden="true">' + (done ? '✓' : '→') + '</span></button></li>';
     }).join('');
     path.querySelectorAll<HTMLButtonElement>('[data-lesson]').forEach(button => button.addEventListener('click', () => navigateToModule(button.dataset.lesson!)));
   }
