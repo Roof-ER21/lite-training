@@ -3,7 +3,7 @@
 **Date:** January 21, 2026
 **Deadline:** TOMORROW - Team needs this working
 **Project:** Lite Training v2
-**URL:** https://lite-training-v2-production.up.railway.app
+**URL:** https://a21.up.railway.app (was lite-training-v2-production.up.railway.app, which no longer serves an app; fixed 2026-11-02)
 
 ---
 
@@ -93,7 +93,7 @@ https://raw.githubusercontent.com/Roof-ER21/lite-training/main/public/assets/tra
 
 - **Project ID:** `61d0164f-ce11-44cc-bf4d-b9eb22075cb3`
 - **Service ID:** `9c3ab228-d447-4502-a42f-90066140fed4`
-- **Production URL:** `lite-training-v2-production.up.railway.app`
+- **Production URL:** `a21.up.railway.app`
 - **GitHub Repo:** `Roof-ER21/lite-training`
 - **Branch:** `main`
 
@@ -105,19 +105,19 @@ After deployment, verify:
 
 1. **Check service worker version:**
 ```bash
-curl -s "https://lite-training-v2-production.up.railway.app/sw.js" | head -3
+curl -s "https://a21.up.railway.app/sw.js" | head -3
 # Should show: roofer-training-v7
 ```
 
 2. **Check videos load:**
 ```bash
-curl -sI "https://lite-training-v2-production.up.railway.app/assets/training/videos/module8-damage-id.mp4" | head -5
+curl -sI "https://a21.up.railway.app/assets/training/videos/module8-damage-id.mp4" | head -5
 # Should show: content-type: video/mp4 (NOT text/html)
 ```
 
 3. **Or if using GitHub URLs, check HTML contains:**
 ```bash
-curl -s "https://lite-training-v2-production.up.railway.app/" | grep "raw.githubusercontent.com"
+curl -s "https://a21.up.railway.app/" | grep "raw.githubusercontent.com"
 # Should find GitHub video URLs
 ```
 

@@ -55,7 +55,7 @@
 - Option A: Extract from `Sample Photo Report 1.pdf`, `Sample Photo Report 4.pdf` (they were in training-leaders-main resources)
 - Option B: Use photos from actual completed RoofER inspections
 - Option C: Take reference photos from real damaged roofs
-- Option D: Check S21 archive at https://s21.up.railway.app/rufus-pro/roof-images
+- Option D: (retired) the old S21 archive address no longer serves an app (Railway "Application not found" since at least 2026-11-02); do not use it
 
 **How to Add Images**:
 ```bash
@@ -480,7 +480,7 @@ Before considering deployment complete:
 - **GitHub Repo**: https://github.com/Roof-ER21/lite-training
 - **Production URL**: https://a21.up.railway.app
 - **Railway Dashboard**: https://railway.app
-- **S21 Archive**: https://s21.up.railway.app/rufus-pro
+- **S21 Archive**: retired; its old Railway address no longer serves an app (removed 2026-11-02 so nobody follows it to a name someone else could claim)
 
 ---
 
