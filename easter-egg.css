@@ -1,0 +1,58 @@
+/* ── Hidden-level easter egg (easter-egg-ui.ts) ─────────────────────────────
+   Tear-off burst: shingles in the shell's red, charcoal and gray fall once.
+   Theme tokens only (scripts/lint-ui.mjs checks this file). Sits above the
+   login screen and modals (10000-10001), below the skip link (12000). */
+.egg-tearoff { position: fixed; inset: 0; pointer-events: none; z-index: 11000; overflow: hidden; }
+.egg-shingle {
+  position: absolute; top: -32px; left: var(--x); width: var(--w); height: calc(var(--w) * .42);
+  border-radius: 1px; border-bottom: 2px solid var(--brand-deep);
+  box-shadow: var(--shadow-sm);
+  animation: egg-tearoff 1.15s cubic-bezier(.45, 0, .9, .6) var(--delay) both;
+}
+.egg-shingle-0 { background: var(--brand); }
+.egg-shingle-1 { background: var(--text-primary); border-bottom-color: var(--border-strong); }
+.egg-shingle-2 { background: var(--border-strong); border-bottom-color: var(--text-secondary); }
+.egg-shingle-3 { background: var(--brand-mark); }
+@keyframes egg-tearoff {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translateY(calc(100vh + 64px)) rotate(var(--spin)); opacity: .2; }
+}
+
+.egg-card {
+  position: fixed; z-index: 11001; left: 50%; bottom: max(24px, env(safe-area-inset-bottom));
+  transform: translateX(-50%); width: min(380px, calc(100vw - 32px)); box-sizing: border-box;
+  padding: 20px 20px 16px; font-family: var(--font-family);
+  background: var(--surface-raised); color: var(--text-primary);
+  border: 1px solid var(--border-color); border-top: 4px solid var(--brand); border-radius: 2px;
+  box-shadow: var(--shadow-lg);
+  animation: egg-pop .35s cubic-bezier(.2, 1.4, .4, 1) both;
+}
+@keyframes egg-pop {
+  from { transform: translate(-50%, 24px) scale(.96); opacity: 0; }
+  to { transform: translate(-50%, 0) scale(1); opacity: 1; }
+}
+.egg-card .egg-close {
+  position: absolute; top: 6px; right: 6px; width: 44px; height: 44px; min-height: 44px; padding: 0;
+  border: 0; border-radius: 2px; background: transparent; color: var(--text-secondary);
+  font: inherit; font-size: 26px; line-height: 1; cursor: pointer;
+}
+.egg-card .egg-close:hover { background: var(--hover-bg); color: var(--text-primary); }
+.egg-kicker {
+  margin: 0 0 6px; font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--accent-text);
+}
+.egg-title { margin: 0 48px 6px 0; font-size: 22px; font-weight: 700; line-height: 1.2; letter-spacing: -.02em; color: var(--text-primary); }
+.egg-body { margin: 0 0 16px; font-size: 15px; line-height: 1.45; color: var(--text-secondary); }
+.egg-go {
+  display: flex; align-items: center; justify-content: center; min-height: 48px; border-radius: 2px;
+  background: var(--brand); color: var(--on-brand); border: 1px solid var(--brand);
+  font-weight: 600; font-size: 16px; text-decoration: none;
+}
+.egg-go:hover { background: var(--brand-deep); border-color: var(--brand-deep); color: var(--on-brand); }
+.egg-go:focus-visible, .egg-card .egg-close:focus-visible { outline: 3px solid var(--brand-mark); outline-offset: 2px; }
+.egg-credit { margin: 10px 0 0; font-size: 12px; line-height: 1.4; color: var(--text-secondary); text-align: center; }
+@media (prefers-reduced-motion: reduce) {
+  .egg-card { animation: none; }
+  .egg-tearoff { display: none; }
+}
