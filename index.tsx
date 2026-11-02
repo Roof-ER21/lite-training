@@ -4,6 +4,7 @@ import { mountLessonEditor } from './lesson-editor';
 import { mountCoaching } from './coaching-ui';
 import { initLearningWorkspace, enhanceLesson, renderFieldLibrary, addPracticeReview } from './learning-workspace';
 import { enhanceTrainingMedia } from './training-media';
+import { mountEasterEgg } from './easter-egg-ui';
 import './learning-workspace.css';
 /**
  * @license
@@ -13521,6 +13522,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Initialize theme system immediately (applies saved preference or system default)
   initThemeSystem();
   initTrainingInterface();
+  mountEasterEgg(); // hidden level: Konami code or 7 taps on a logo (easter-egg-ui.ts)
 
   // Check if user is logged in
   if (isLoggedIn()) {

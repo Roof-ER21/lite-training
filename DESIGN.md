@@ -62,7 +62,12 @@ theme roles, not inline styles or component stylesheets.
 
 ## Boundaries
 
-Arcade displays and confetti are removed. Stored XP/streak compatibility data and
+Arcade displays and confetti are removed. One hidden exception, wanted by the owner: the
+hidden-level easter egg (`easter-egg.ts`, `easter-egg-ui.ts`, `easter-egg.css`).
+The Konami code, or 7 taps within 4 s on a Roof-ER logo or the wordmark, drops a
+short shingle tear-off and a card linking to Sprite Fusion's "Destroy Any Website"
+game aimed at the site root. It is a link only (new tab, `noopener noreferrer`);
+nothing third-party loads until it is clicked. Reduced motion skips the tear-off. Stored XP/streak compatibility data and
 prerequisite logic remain to avoid changing existing records and unlock behavior.
 Exam scores remain visible. Assessment questions, keys, grading rules, attempt
 history, certifications, signatures, agent controls, and activity tracking remain.

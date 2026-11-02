@@ -4,7 +4,7 @@ import postcss from 'postcss';
 const root = process.cwd();
 const failures = [];
 const check = (condition, message) => { if (!condition) failures.push(message); };
-for (const file of ['index.css', 'training-ui.css', 'learning-workspace.css', 'inspection-roleplay.css']) {
+for (const file of ['index.css', 'training-ui.css', 'learning-workspace.css', 'inspection-roleplay.css', 'easter-egg.css']) {
   const css = postcss.parse(fs.readFileSync(path.join(root,file),'utf8'));
   css.walkDecls(decl => {
     check(!/#[a-f\d]{3,8}\b|rgba?\(/i.test(decl.value), `${file}: ${decl.prop} must use a theme token`);
